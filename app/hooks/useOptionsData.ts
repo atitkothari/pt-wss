@@ -39,8 +39,11 @@ export function useOptionsData(
     if (minVol > 0) {
       filters.push({ operation: 'gt', field: 'volume', value: minVol });
     }
-    if (expiration) {
-      filters.push({ operation: 'eq', field: 'expiration', value: "\""+expiration+"\"" });
+    console.log(expiration)
+    if(expiration == ""){
+      filters.push({ operation: 'gt', field: 'expiration', value: `"${format(new Date(), 'yyyy-MM-dd')}"` });
+    }else if (expiration) {            
+        filters.push({ operation: 'eq', field: 'expiration', value: "\""+expiration+"\"" });      
     }
 
     const fetchData = async () => {
