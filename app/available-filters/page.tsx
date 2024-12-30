@@ -15,7 +15,7 @@ export default function AvailableFiltersPage() {
   useEffect(() => {
     const fetchFilters = async () => {
       try {
-        const response = await fetch('http://45.77.184.128:3000/screener/availableFilters');
+        const response = await fetch('https://wss-py.194.195.92.250.sslip.io/wheelstrat/availableFilters');
         if (!response.ok) {
           throw new Error('Failed to fetch filters');
         }

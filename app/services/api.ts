@@ -7,7 +7,7 @@ interface Filter {
 }
 
 export async function fetchOptionsData(filters: Filter[] = []) {
-  const response = await fetch('https://screener-x7jr.onrender.com/wheelstrat/filter', {
+  const response = await fetch('https://wss-py.194.195.92.250.sslip.io/wheelstrat/filter', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
