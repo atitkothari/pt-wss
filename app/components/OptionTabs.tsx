@@ -8,7 +8,7 @@ export function OptionTabs() {
   return (
     <Tabs defaultValue="covered-calls" className="w-full">
       <TabsList className="mb-4">
-        <TabsTrigger value="covered-calls">Covered Calls</TabsTrigger>
+        <TabsTrigger value="covered-calls">Covered Call</TabsTrigger>
         <TabsTrigger value="cash-secured-puts">Cash Secured Puts</TabsTrigger>
       </TabsList>
       <TabsContent value="covered-calls">
