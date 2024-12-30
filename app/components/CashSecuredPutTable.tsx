@@ -121,10 +121,10 @@ export function CashSecuredPutTable({option}: Tab) {
           type="number"
         />
         <FilterInput
-          label="Max Price"
+          label="Max Strike Price"
           value={maxPrice}
           onChange={setMaxPrice}
-          placeholder="Max price..."
+          placeholder="Max strike price..."
           type="number"
         />
         <FilterInput
