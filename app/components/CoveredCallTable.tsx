@@ -29,14 +29,15 @@ export function CoveredCallTable() {
     selectedExpiration
   );
 
-  const handleSort = (field: keyof Option) => {
-    setSortConfig(current => ({
-      field,
-      direction: 
-        current.field === field && current.direction === 'asc' 
-          ? 'desc' 
-          : 'asc'
-    }));
+  const handleSort = (field: string) => {    
+    const validKey = field as keyof Option;
+    // setSortConfig(current => ({
+    //   validKey,
+    //   direction: 
+    //     current.field === field && current.direction === 'asc' 
+    //       ? 'desc' 
+    //       : 'asc'
+    // }));
   };
 
   const sortedData = [...data].sort((a, b) => {
@@ -53,7 +54,20 @@ export function CoveredCallTable() {
   if (loading) return <LoadingSpinner />;
   if (error) return <div className="text-red-500 p-4">{error}</div>;
 
-  const uniqueExpirations = [...new Set(data.map(option => option.expiration))].sort();
+  // const uniqueExpirations = [...new Set(data.map(option => option.expiration))].sort();
+  const uniqueExpirations = (() => {
+    const expirations: string[] = [];
+    for (let i = 0; i < data.length; i++) {
+      const expiration = data[i].expiration;
+      if (expirations.indexOf(expiration) === -1) {
+        expirations.push(expiration);
+      }
+    }
+  
+    expirations.sort();
+    // expirations.unshift('All');
+    return expirations;
+  })();
 
   return (
     <div className="w-full">

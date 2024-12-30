@@ -15,7 +15,7 @@ export function OptionTabs() {
         <CoveredCallTable />
       </TabsContent>
       <TabsContent value="cash-secured-puts">
-        <CashSecuredPutTable />
+        <CashSecuredPutTable data={[]}/>
       </TabsContent>
     </Tabs>
   );

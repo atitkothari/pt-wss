@@ -61,7 +61,20 @@ export function CashSecuredPutTable({ data }: CashSecuredPutTableProps) {
       return 0;
     });
 
-  const uniqueExpirations = [...new Set(data.map(put => put.expiration))].sort();
+  // const uniqueExpirations = [...new Set(data.map(put => put.expiration))].sort();
+  const uniqueExpirations = (() => {
+    const expirations: string[] = [];
+    for (let i = 0; i < data.length; i++) {
+      const expiration = data[i].expiration;
+      if (expirations.indexOf(expiration) === -1) {
+        expirations.push(expiration);
+      }
+    }
+  
+    expirations.sort();
+    expirations.unshift('All');
+    return expirations;
+  })();
 
   return (
     <div className="w-full">
@@ -113,7 +126,7 @@ export function CashSecuredPutTable({ data }: CashSecuredPutTableProps) {
       <div className="rounded-md border">
         <Table>
           <TableHeader>
-            <TableRow>
+            {/* <TableRow>
               <SortableHeader label="Symbol" field="symbol" currentSort={sortConfig} onSort={handleSort} />
               <SortableHeader label="Price" field="stock_price" currentSort={sortConfig} onSort={handleSort} />
               <SortableHeader label="Strike" field="strike" currentSort={sortConfig} onSort={handleSort} />
@@ -147,7 +160,7 @@ export function CashSecuredPutTable({ data }: CashSecuredPutTableProps) {
                 onSort={handleSort}
                 className="text-right"
               />
-            </TableRow>
+            </TableRow> */}
           </TableHeader>
           <TableBody>
             {sortedAndFilteredData.map((put, index) => (

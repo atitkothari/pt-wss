@@ -16,7 +16,7 @@ export function useOptionsData(
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const filters = [];
+    const filters:any = [];
 
     if (symbol) {
       filters.push({ operation: '=', field: 'symbol', value: symbol });
