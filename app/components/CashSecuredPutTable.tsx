@@ -42,7 +42,7 @@ export function CashSecuredPutTable({option}: Tab) {
     selectedExpiration,
     option
   );
-
+  
   const handleSort = (field: keyof Option) => {
     setSortConfig(current => ({
       field,
@@ -124,7 +124,7 @@ export function CashSecuredPutTable({option}: Tab) {
           label="Max Strike Price"
           value={maxPrice}
           onChange={setMaxPrice}
-          placeholder="Max strike price..."
+          placeholder="Max strike git price..."
           type="number"
         />
         <FilterInput
