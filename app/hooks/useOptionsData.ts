@@ -13,8 +13,13 @@ export function useOptionsData(
   option: string = 'call'
 ) {
   const [data, setData] = useState<Option[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [firstLoad, setFirstLoad] = useState<boolean>(true);
+
+  useEffect(()=>{    
+    setFirstLoad(false)
+  },[])
 
   useEffect(() => {
     const filters:any = [];
@@ -65,8 +70,8 @@ export function useOptionsData(
       }
     };
 
-    fetchData();
+    if(!firstLoad) fetchData();
   }, [symbol, minYield, maxPrice, minVol, expiration]);
 
-  return { data, loading, error };
+  return { data, loading, error, firstLoad };
 }

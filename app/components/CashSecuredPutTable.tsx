@@ -34,7 +34,7 @@ export function CashSecuredPutTable({option}: Tab) {
   const [selectedExpiration, setSelectedExpiration] = useState("");
   const [sortConfig, setSortConfig] = useState<SortConfig>({ field: '', direction: null });
 
-  const { data, loading, error } = useOptionsData(
+  const { data, loading, error, firstLoad } = useOptionsData(
     searchTerm,
     minYield,
     maxPrice,
@@ -42,7 +42,7 @@ export function CashSecuredPutTable({option}: Tab) {
     selectedExpiration,
     option
   );
-  
+
   const handleSort = (field: keyof Option) => {
     setSortConfig(current => ({
       field,
@@ -150,6 +150,7 @@ export function CashSecuredPutTable({option}: Tab) {
           </select>
         </div>
       </div>
+      {/* {firstLoad?"Make a selection":""} */}
     {loading?<LoadingSpinner/>:
       <OptionsTable 
         data={sortedData}
