@@ -15,7 +15,7 @@ export function OptionRow({ option, index }: OptionRowProps) {
       <TableCell className="font-medium">{option.symbol}</TableCell>
       <TableCell>${option.stockPrice.toFixed(2)}</TableCell>
       <TableCell>${option.strike.toFixed(2)}</TableCell>
-      <TableCell>${((option.askPrice + option.askPrice)/2 * 100).toFixed(2)}</TableCell>
+      <TableCell>${option.expectedPremium.toFixed(2)}</TableCell>
       <TableCell className="text-right">
         {option.yieldPercent.toFixed(2)}%
       </TableCell>

@@ -4,6 +4,7 @@ export interface Option {
   earningsDate: string;
   stockPrice: number;
   strike: number;
+  expectedPremium: number,
   askPrice: number;
   yieldPercent: number;
   bidPrice: number;

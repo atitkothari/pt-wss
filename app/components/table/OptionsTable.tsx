@@ -13,7 +13,7 @@ import { OptionRow } from "./OptionRow";
 interface OptionsTableProps {
   data: Option[];
   sortConfig: { field: keyof Option | ''; direction: 'asc' | 'desc' | null };
-  onSort: (field: keyof Option|string) => void;
+  onSort: (field: keyof Option) => void;
 }
 
 export function OptionsTable({ data, sortConfig, onSort }: OptionsTableProps) {

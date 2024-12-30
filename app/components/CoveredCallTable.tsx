@@ -9,35 +9,39 @@ import { OptionsTable } from "./table/OptionsTable";
 import { format } from "date-fns";
 
 type SortConfig = {
-  field: keyof Option | '';
+  field: keyof Option;
   direction: 'asc' | 'desc' | null;
 };
 
-export function CoveredCallTable() {
+type Tab = {
+  option: 'call' | 'put'
+}
+
+export function CoveredCallTable({option}:Tab) {
   const [searchTerm, setSearchTerm] = useState("");
   const [minYield, setMinYield] = useState(0);
   const [maxPrice, setMaxPrice] = useState(1000);
   const [minVol, setMinVol] = useState(0);
   const [selectedExpiration, setSelectedExpiration] = useState("");
-  const [sortConfig, setSortConfig] = useState<SortConfig>({ field: '', direction: null });
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ field: "symbol", direction: null });
 
   const { data, loading, error } = useOptionsData(
     searchTerm,
     minYield,
     maxPrice,
     minVol,
-    selectedExpiration
+    selectedExpiration,
+    option
   );
 
-  const handleSort = (field: string) => {    
-    const validKey = field as keyof Option;
-    // setSortConfig(current => ({
-    //   validKey,
-    //   direction: 
-    //     current.field === field && current.direction === 'asc' 
-    //       ? 'desc' 
-    //       : 'asc'
-    // }));
+  const handleSort = (field: keyof Option) => {            
+    setSortConfig(current => ({
+      field,
+      direction: 
+        current.field === field && current.direction === 'asc' 
+          ? 'desc' 
+          : 'asc'
+    }));
   };
 
   const sortedData = [...data].sort((a, b) => {
@@ -66,7 +70,7 @@ export function CoveredCallTable() {
     let currentDate = new Date();
     
     // Get the next Friday and add it to the array
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 8; i++) {
       currentDate = getNextFriday(new Date(currentDate));
       nextFridays.push(new Date(currentDate));
       // Move to the next Friday
@@ -108,10 +112,10 @@ export function CoveredCallTable() {
           type="number"
         />
         <FilterInput
-          label="Max Price"
+          label="Max Strike Price"
           value={maxPrice}
           onChange={setMaxPrice}
-          placeholder="Max price..."
+          placeholder="Max strike price..."
           type="number"
         />
         <FilterInput

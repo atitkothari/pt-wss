@@ -12,10 +12,10 @@ export function OptionTabs() {
         <TabsTrigger value="cash-secured-puts">Cash Secured Puts</TabsTrigger>
       </TabsList>
       <TabsContent value="covered-calls">
-        <CoveredCallTable />
+        <CoveredCallTable option="call"/>
       </TabsContent>
       <TabsContent value="cash-secured-puts">
-        <CashSecuredPutTable data={[]}/>
+        <CashSecuredPutTable option="put"/>
       </TabsContent>
     </Tabs>
   );

@@ -2,12 +2,13 @@
 
 import { ArrowUpDown } from "lucide-react";
 import { TableHead } from "@/components/ui/table";
+import { Option } from "@/app/types/option";
 
 interface SortableHeaderProps {
   label: string;
-  field: string;
+  field: keyof Option;
   currentSort: { field: string; direction: 'asc' | 'desc' | null };
-  onSort: (field: string) => void;
+  onSort: (field: keyof Option) => void;
   className?: string;
 }
 

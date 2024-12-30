@@ -12,17 +12,21 @@ import { CashSecuredPut } from "../types/cash-secured-put";
 import { format } from "date-fns";
 import { FilterInput } from "./filters/FilterInput";
 import { SortableHeader } from "./table/SortableHeader";
-
-interface CashSecuredPutTableProps {
-  data: CashSecuredPut[];
-}
+import { useOptionsData } from "../hooks/useOptionsData";
+import { Option } from "../types/option";
+import { LoadingSpinner } from "./LoadingSpinner";
+import { OptionsTable } from "./table/OptionsTable";
 
 type SortConfig = {
-  field: keyof CashSecuredPut | '';
+  field: keyof Option | '';
   direction: 'asc' | 'desc' | null;
 };
 
-export function CashSecuredPutTable({ data }: CashSecuredPutTableProps) {
+type Tab = {
+  option: 'call' | 'put'
+}
+
+export function CashSecuredPutTable({option}: Tab) {
   const [searchTerm, setSearchTerm] = useState("");
   const [minYield, setMinYield] = useState(0);
   const [maxPrice, setMaxPrice] = useState(1000);
@@ -30,7 +34,16 @@ export function CashSecuredPutTable({ data }: CashSecuredPutTableProps) {
   const [selectedExpiration, setSelectedExpiration] = useState("");
   const [sortConfig, setSortConfig] = useState<SortConfig>({ field: '', direction: null });
 
-  const handleSort = (field: keyof CashSecuredPut) => {
+  const { data, loading, error } = useOptionsData(
+    searchTerm,
+    minYield,
+    maxPrice,
+    minVol,
+    selectedExpiration,
+    option
+  );
+
+  const handleSort = (field: keyof Option) => {
     setSortConfig(current => ({
       field,
       direction: 
@@ -40,28 +53,43 @@ export function CashSecuredPutTable({ data }: CashSecuredPutTableProps) {
     }));
   };
 
-  const sortedAndFilteredData = data
-    .filter((put) => {
-      return (
-        put.symbol.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        put.yield_percent >= minYield &&
-        put.stock_price <= maxPrice &&
-        put.volume >= minVol &&
-        (selectedExpiration ? put.expiration === selectedExpiration : true)
-      );
-    })
-    .sort((a, b) => {
-      if (!sortConfig.field || !sortConfig.direction) return 0;
-      
-      const aValue = a[sortConfig.field];
-      const bValue = b[sortConfig.field];
-      
-      if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
-      return 0;
-    });
+  const sortedData = [...data].sort((a, b) => {
+    if (!sortConfig.field || !sortConfig.direction) return 0;
+    
+    const aValue = a[sortConfig.field];
+    const bValue = b[sortConfig.field];
+    
+    if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+    if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+    return 0;
+  });
 
-  // const uniqueExpirations = [...new Set(data.map(put => put.expiration))].sort();
+  // if (loading) return <LoadingSpinner />;
+  if (error) return <div className="text-red-500 p-4">{error}</div>;
+
+  const getNextFriday = (date: Date): Date => {
+    const dayOfWeek = date.getDay();
+    const daysUntilFriday = (5 - dayOfWeek + 7) % 7; // 5 is Friday
+    date.setDate(date.getDate() + daysUntilFriday);
+    return date;
+  };
+  
+  const getNext4Fridays = (()=>{
+    const nextFridays: Date[] = [];
+    let currentDate = new Date();
+    
+    // Get the next Friday and add it to the array
+    for (let i = 0; i < 8; i++) {
+      currentDate = getNextFriday(new Date(currentDate));
+      nextFridays.push(new Date(currentDate));
+      // Move to the next Friday
+      currentDate.setDate(currentDate.getDate() + 7);
+    }
+  
+    return nextFridays;
+  })();
+  
+  // const uniqueExpirations = [...new Set(data.map(option => option.expiration))].sort();
   const uniqueExpirations = (() => {
     const expirations: string[] = [];
     for (let i = 0; i < data.length; i++) {
@@ -72,7 +100,7 @@ export function CashSecuredPutTable({ data }: CashSecuredPutTableProps) {
     }
   
     expirations.sort();
-    expirations.unshift('All');
+    // expirations.unshift('All');
     return expirations;
   })();
 
@@ -103,7 +131,7 @@ export function CashSecuredPutTable({ data }: CashSecuredPutTableProps) {
           label="Min Volume"
           value={minVol}
           onChange={setMinVol}
-          placeholder="Min Vol..."
+          placeholder="Min vol..."
           type="number"
         />
         <div className="flex-1">
@@ -111,78 +139,23 @@ export function CashSecuredPutTable({ data }: CashSecuredPutTableProps) {
           <select
             className="w-full px-3 py-2 border rounded-md"
             value={selectedExpiration}
-            onChange={(e) => setSelectedExpiration(e.target.value)}
+            onChange={(e) => e.target.value==""?setSelectedExpiration(""):setSelectedExpiration("\""+format(new Date(e.target.value),"yyyy-MM-dd")+"\"")}
           >
             <option value="">All Dates</option>
-            {uniqueExpirations.map((date) => (
-              <option key={date} value={date}>
+            {getNext4Fridays.map((date) => (
+              <option key={date.toString()} value={"\""+format(new Date(date.toString()),"yyyy-MM-dd")+"\""}>
                 {format(new Date(date), "MMM d, yyyy")}
               </option>
             ))}
           </select>
         </div>
       </div>
-
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {/* <TableRow>
-              <SortableHeader label="Symbol" field="symbol" currentSort={sortConfig} onSort={handleSort} />
-              <SortableHeader label="Price" field="stock_price" currentSort={sortConfig} onSort={handleSort} />
-              <SortableHeader label="Strike" field="strike" currentSort={sortConfig} onSort={handleSort} />
-              <SortableHeader label="Bid" field="bid_price" currentSort={sortConfig} onSort={handleSort} />
-              <SortableHeader label="Ask" field="ask_price" currentSort={sortConfig} onSort={handleSort} />
-              <SortableHeader 
-                label="Yield %" 
-                field="yield_percent" 
-                currentSort={sortConfig} 
-                onSort={handleSort}
-                className="text-right"
-              />
-              <SortableHeader 
-                label="Volume" 
-                field="volume" 
-                currentSort={sortConfig} 
-                onSort={handleSort}
-                className="text-right"
-              />
-              <SortableHeader 
-                label="Open Interest" 
-                field="open_interest" 
-                currentSort={sortConfig} 
-                onSort={handleSort}
-                className="text-right"
-              />
-              <SortableHeader 
-                label="Expiration" 
-                field="expiration" 
-                currentSort={sortConfig} 
-                onSort={handleSort}
-                className="text-right"
-              />
-            </TableRow> */}
-          </TableHeader>
-          <TableBody>
-            {sortedAndFilteredData.map((put, index) => (
-              <TableRow key={`${put.symbol}-${put.strike}-${index}`}>
-                <TableCell className="font-medium">{put.symbol}</TableCell>
-                <TableCell>${put.stock_price.toFixed(2)}</TableCell>
-                <TableCell>${put.strike.toFixed(2)}</TableCell>
-                <TableCell>${put.bid_price.toFixed(2)}</TableCell>
-                <TableCell>${put.ask_price.toFixed(2)}</TableCell>
-                <TableCell className="text-right">
-                  {put.yield_percent.toFixed(2)}%
-                </TableCell>
-                <TableCell className="text-right">{put.volume}</TableCell>
-                <TableCell className="text-right">{put.open_interest}</TableCell>
-                <TableCell className="text-right">
-                  {format(new Date(put.expiration), "MMM d, yyyy")}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+    {loading?<LoadingSpinner/>:
+      <OptionsTable 
+        data={sortedData}
+        sortConfig={sortConfig}
+        onSort={handleSort}
+      />}
     </div>
   );
 }

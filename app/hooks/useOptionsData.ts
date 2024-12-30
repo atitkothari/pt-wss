@@ -9,7 +9,8 @@ export function useOptionsData(
   minYield: number = 0,
   maxPrice: number = 1000,
   minVol: number = 0,
-  expiration: string = ''
+  expiration: string = '',
+  option: string = 'call'
 ) {
   const [data, setData] = useState<Option[]>([]);
   const [loading, setLoading] = useState(true);
@@ -17,7 +18,9 @@ export function useOptionsData(
 
   useEffect(() => {
     const filters:any = [];
-
+    if(option){
+      filters.push({ operation: 'eq', field: 'type', value: "\""+option+"\"" });
+    }
     if (symbol) {
       filters.push({ operation: 'like', field: 'symbol', value: symbol });
     }
@@ -25,7 +28,7 @@ export function useOptionsData(
       filters.push({ operation: 'gt', field: 'yieldPercent', value: minYield });
     }
     if (maxPrice < 1000) {
-      filters.push({ operation: 'lt', field: 'stockPrice', value: maxPrice });
+      filters.push({ operation: 'lt', field: 'strike', value: maxPrice });
     }
     if (minVol > 0) {
       filters.push({ operation: 'gt', field: 'volume', value: minVol });
@@ -37,8 +40,23 @@ export function useOptionsData(
     const fetchData = async () => {
       try {
         setLoading(true);
-        const result = await fetchOptionsData(filters);
-        setData(result);
+        const result = await fetchOptionsData(filters);   
+        // Add `expectedPremium` to each object in the result
+        const updatedResult = result.map((option: any) => {
+        const askPrice = option.askPrice || 0; // Default to 0 if askPrice is missing
+        const bidPrice = option.bidPrice || 0; // Default to 0 if bidPrice is missing
+
+        // Calculate the average of askPrice and bidPrice, then multiply by 100
+        const expectedPremium = ((askPrice + bidPrice) / 2) * 100;
+
+        // Add the expectedPremium field to the option object
+        return {
+          ...option,
+          expectedPremium,
+        };
+      });
+     
+        setData(updatedResult);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch data');
