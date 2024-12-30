@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { fetchOptionsData } from '../services/api';
 import { Option } from '../types/option';
+import { parseISO, addDays, format } from 'date-fns';
 
 export function useOptionsData(
   symbol: string = '',
@@ -46,20 +47,22 @@ export function useOptionsData(
       try {
         setLoading(true);
         const result = await fetchOptionsData(filters);   
-        // Add `expectedPremium` to each object in the result
         const updatedResult = result.map((option: any) => {
-        const askPrice = option.askPrice || 0; // Default to 0 if askPrice is missing
-        const bidPrice = option.bidPrice || 0; // Default to 0 if bidPrice is missing
+          const askPrice = option.askPrice || 0;
+          const bidPrice = option.bidPrice || 0;
+          const expectedPremium = ((askPrice + bidPrice) / 2) * 100;
 
-        // Calculate the average of askPrice and bidPrice, then multiply by 100
-        const expectedPremium = ((askPrice + bidPrice) / 2) * 100;
-
-        // Add the expectedPremium field to the option object
-        return {
-          ...option,
-          expectedPremium,
-        };
-      });
+          // Parse the ISO string and add one day
+          const expirationDate = addDays(parseISO(option.expiration), 1);
+          // Format back to YYYY-MM-DD
+          const correctedExpiration = format(expirationDate, 'yyyy-MM-dd');
+          
+          return {
+            ...option,
+            expectedPremium,
+            expiration: correctedExpiration,
+          };
+        });
      
         setData(updatedResult);
         setError(null);
@@ -71,7 +74,7 @@ export function useOptionsData(
     };
 
     if(!firstLoad) fetchData();
-  }, [symbol, minYield, maxPrice, minVol, expiration]);
+  }, [symbol, minYield, maxPrice, minVol, expiration, option]);
 
   return { data, loading, error, firstLoad };
 }

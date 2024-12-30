@@ -141,12 +141,19 @@ export function CoveredCallTable({option}:Tab) {
           </select>
         </div>
       </div>
-{loading?<LoadingSpinner/>:
-      <OptionsTable 
-        data={sortedData}
-        sortConfig={sortConfig}
-        onSort={handleSort}
-      />}
+      {!searchTerm && minYield === 0 && maxPrice === 1000 && minVol === 0 && !selectedExpiration ? (
+        <div className="text-center py-8 text-gray-600">
+          Run a search to view results
+        </div>
+      ) : loading ? (
+        <LoadingSpinner />
+      ) : (
+        <OptionsTable 
+          data={sortedData}
+          sortConfig={sortConfig}
+          onSort={handleSort}
+        />
+      )}
     </div>
   );
 }
