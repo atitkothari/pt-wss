@@ -26,7 +26,7 @@ export function CashSecuredPutTable({ data }: CashSecuredPutTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [minYield, setMinYield] = useState(0);
   const [maxPrice, setMaxPrice] = useState(1000);
-  const [minBid, setMinBid] = useState(0);
+  const [minVol, setMinVol] = useState(0);
   const [selectedExpiration, setSelectedExpiration] = useState("");
   const [sortConfig, setSortConfig] = useState<SortConfig>({ field: '', direction: null });
 
@@ -46,7 +46,7 @@ export function CashSecuredPutTable({ data }: CashSecuredPutTableProps) {
         put.symbol.toLowerCase().includes(searchTerm.toLowerCase()) &&
         put.yield_percent >= minYield &&
         put.stock_price <= maxPrice &&
-        put.bid_price >= minBid &&
+        put.volume >= minVol &&
         (selectedExpiration ? put.expiration === selectedExpiration : true)
       );
     })
@@ -100,10 +100,10 @@ export function CashSecuredPutTable({ data }: CashSecuredPutTableProps) {
           type="number"
         />
         <FilterInput
-          label="Min Bid"
-          value={minBid}
-          onChange={setMinBid}
-          placeholder="Min bid..."
+          label="Min Volume"
+          value={minVol}
+          onChange={setMinVol}
+          placeholder="Min Vol..."
           type="number"
         />
         <div className="flex-1">

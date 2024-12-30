@@ -8,7 +8,7 @@ export function useOptionsData(
   symbol: string = '',
   minYield: number = 0,
   maxPrice: number = 1000,
-  minBid: number = 0,
+  minVol: number = 0,
   expiration: string = ''
 ) {
   const [data, setData] = useState<Option[]>([]);
@@ -19,7 +19,7 @@ export function useOptionsData(
     const filters:any = [];
 
     if (symbol) {
-      filters.push({ operation: '=', field: 'symbol', value: symbol });
+      filters.push({ operation: 'like', field: 'symbol', value: symbol });
     }
     if (minYield > 0) {
       filters.push({ operation: 'gt', field: 'yieldPercent', value: minYield });
@@ -27,11 +27,11 @@ export function useOptionsData(
     if (maxPrice < 1000) {
       filters.push({ operation: 'lt', field: 'stockPrice', value: maxPrice });
     }
-    if (minBid > 0) {
-      filters.push({ operation: 'gt', field: 'bidPrice', value: minBid });
+    if (minVol > 0) {
+      filters.push({ operation: 'gt', field: 'volume', value: minVol });
     }
     if (expiration) {
-      filters.push({ operation: '=', field: 'expiration', value: expiration });
+      filters.push({ operation: 'eq', field: 'expiration', value: expiration });
     }
 
     const fetchData = async () => {
@@ -48,7 +48,7 @@ export function useOptionsData(
     };
 
     fetchData();
-  }, [symbol, minYield, maxPrice, minBid, expiration]);
+  }, [symbol, minYield, maxPrice, minVol, expiration]);
 
   return { data, loading, error };
 }

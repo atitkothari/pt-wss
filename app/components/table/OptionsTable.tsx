@@ -25,8 +25,7 @@ export function OptionsTable({ data, sortConfig, onSort }: OptionsTableProps) {
             <SortableHeader label="Symbol" field="symbol" currentSort={sortConfig} onSort={onSort} />
             <SortableHeader label="Price" field="stockPrice" currentSort={sortConfig} onSort={onSort} />
             <SortableHeader label="Strike" field="strike" currentSort={sortConfig} onSort={onSort} />
-            <SortableHeader label="Bid" field="bidPrice" currentSort={sortConfig} onSort={onSort} />
-            <SortableHeader label="Ask" field="askPrice" currentSort={sortConfig} onSort={onSort} />
+            <SortableHeader label="Expected Premium" field="expectedPremium" currentSort={sortConfig} onSort={onSort} />
             <SortableHeader 
               label="Yield %" 
               field="yieldPercent" 
@@ -34,6 +33,8 @@ export function OptionsTable({ data, sortConfig, onSort }: OptionsTableProps) {
               onSort={onSort}
               className="text-right"
             />
+            <SortableHeader label="Bid" field="bidPrice" currentSort={sortConfig} onSort={onSort} />
+            <SortableHeader label="Ask" field="askPrice" currentSort={sortConfig} onSort={onSort} />            
             <SortableHeader 
               label="Volume" 
               field="volume" 
@@ -51,6 +52,13 @@ export function OptionsTable({ data, sortConfig, onSort }: OptionsTableProps) {
             <SortableHeader 
               label="Expiration" 
               field="expiration" 
+              currentSort={sortConfig} 
+              onSort={onSort}
+              className="text-right"
+            />
+            <SortableHeader 
+              label="Earnings Date" 
+              field="earningsDate" 
               currentSort={sortConfig} 
               onSort={onSort}
               className="text-right"

@@ -1,6 +1,7 @@
 export interface Option {
   symbol: string;
   expiration: string;
+  earningsDate: string;
   stockPrice: number;
   strike: number;
   askPrice: number;

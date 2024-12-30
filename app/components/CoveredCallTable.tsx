@@ -17,7 +17,7 @@ export function CoveredCallTable() {
   const [searchTerm, setSearchTerm] = useState("");
   const [minYield, setMinYield] = useState(0);
   const [maxPrice, setMaxPrice] = useState(1000);
-  const [minBid, setMinBid] = useState(0);
+  const [minVol, setMinVol] = useState(0);
   const [selectedExpiration, setSelectedExpiration] = useState("");
   const [sortConfig, setSortConfig] = useState<SortConfig>({ field: '', direction: null });
 
@@ -25,7 +25,7 @@ export function CoveredCallTable() {
     searchTerm,
     minYield,
     maxPrice,
-    minBid,
+    minVol,
     selectedExpiration
   );
 
@@ -51,9 +51,31 @@ export function CoveredCallTable() {
     return 0;
   });
 
-  if (loading) return <LoadingSpinner />;
+  // if (loading) return <LoadingSpinner />;
   if (error) return <div className="text-red-500 p-4">{error}</div>;
 
+  const getNextFriday = (date: Date): Date => {
+    const dayOfWeek = date.getDay();
+    const daysUntilFriday = (5 - dayOfWeek + 7) % 7; // 5 is Friday
+    date.setDate(date.getDate() + daysUntilFriday);
+    return date;
+  };
+  
+  const getNext4Fridays = (()=>{
+    const nextFridays: Date[] = [];
+    let currentDate = new Date();
+    
+    // Get the next Friday and add it to the array
+    for (let i = 0; i < 4; i++) {
+      currentDate = getNextFriday(new Date(currentDate));
+      nextFridays.push(new Date(currentDate));
+      // Move to the next Friday
+      currentDate.setDate(currentDate.getDate() + 7);
+    }
+  
+    return nextFridays;
+  })();
+  
   // const uniqueExpirations = [...new Set(data.map(option => option.expiration))].sort();
   const uniqueExpirations = (() => {
     const expirations: string[] = [];
@@ -93,10 +115,10 @@ export function CoveredCallTable() {
           type="number"
         />
         <FilterInput
-          label="Min Bid"
-          value={minBid}
-          onChange={setMinBid}
-          placeholder="Min bid..."
+          label="Min Volume"
+          value={minVol}
+          onChange={setMinVol}
+          placeholder="Min vol..."
           type="number"
         />
         <div className="flex-1">
@@ -104,23 +126,23 @@ export function CoveredCallTable() {
           <select
             className="w-full px-3 py-2 border rounded-md"
             value={selectedExpiration}
-            onChange={(e) => setSelectedExpiration(e.target.value)}
+            onChange={(e) => e.target.value==""?setSelectedExpiration(""):setSelectedExpiration("\""+format(new Date(e.target.value),"yyyy-MM-dd")+"\"")}
           >
             <option value="">All Dates</option>
-            {uniqueExpirations.map((date) => (
-              <option key={date} value={date}>
+            {getNext4Fridays.map((date) => (
+              <option key={date.toString()} value={"\""+format(new Date(date.toString()),"yyyy-MM-dd")+"\""}>
                 {format(new Date(date), "MMM d, yyyy")}
               </option>
             ))}
           </select>
         </div>
       </div>
-
+{loading?<LoadingSpinner/>:
       <OptionsTable 
         data={sortedData}
         sortConfig={sortConfig}
         onSort={handleSort}
-      />
+      />}
     </div>
   );
 }
