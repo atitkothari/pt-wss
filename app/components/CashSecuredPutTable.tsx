@@ -139,14 +139,17 @@ export function CashSecuredPutTable({option}: Tab) {
           <select
             className="w-full px-3 py-2 border rounded-md"
             value={selectedExpiration}
-            onChange={(e) => e.target.value==""?setSelectedExpiration(""):setSelectedExpiration("\""+format(new Date(e.target.value),"yyyy-MM-dd")+"\"")}
+            onChange={(e) => setSelectedExpiration(e.target.value)}
           >
             <option value="">All Dates</option>
-            {getNext4Fridays.map((date) => (
-              <option key={date.toString()} value={"\""+format(new Date(date.toString()),"yyyy-MM-dd")+"\""}>
-                {format(new Date(date), "MMM d, yyyy")}
-              </option>
-            ))}
+            {getNext4Fridays.map((date) => {
+              const formattedDate = format(date, "yyyy-MM-dd");
+              return (
+                <option key={formattedDate} value={formattedDate}>
+                  {format(date, "MMM d, yyyy")}
+                </option>
+              )
+            })}
           </select>
         </div>
       </div>

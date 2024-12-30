@@ -6,7 +6,7 @@ export default function Home() {
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Option Screener
+            The Wheel Strategy Screener
           </h1>
           <p className="text-gray-600">
             Find and analyze covered call and cash secured put opportunities across various stocks
