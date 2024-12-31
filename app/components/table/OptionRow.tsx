@@ -10,6 +10,15 @@ interface OptionRowProps {
 }
 
 export function OptionRow({ option, index }: OptionRowProps) {
+  const formatEarningsDate = (date: string | null) => {
+    if (!date) return 'N/A';
+    try {
+      return format(new Date(`${date}T00:00:00Z`), "MMM d, yyyy");
+    } catch (error) {
+      return 'N/A';
+    }
+  };
+
   return (
     <TableRow key={`${option.symbol}-${option.strike}-${index}`}>
       <TableCell className="font-medium">{option.symbol}</TableCell>
@@ -27,7 +36,7 @@ export function OptionRow({ option, index }: OptionRowProps) {
         {format(new Date(option.expiration), "MMM d, yyyy")}
       </TableCell>
       <TableCell className="text-right">
-        {format(new Date(`${option.earningsDate}T00:00:00Z`), "MMM d, yyyy")}
+        {formatEarningsDate(option.earningsDate)}
       </TableCell>
     </TableRow>
   );
