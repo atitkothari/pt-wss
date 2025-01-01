@@ -16,10 +16,10 @@ import { Button } from "@/components/ui/button";
 
 const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: "symbol", label: "Symbol" },
+  { key: "stockPrice", label: "Stock Price" },
+  { key: "strike", label: "Strike" },
   { key: "expectedPremium", label: "Premium" },
   { key: "yieldPercent", label: "Yield %" },
-  { key: "stockPrice", label: "Stock Price" },
-  { key: "strike", label: "Strike" },  
   { key: "bidPrice", label: "Bid" },
   { key: "askPrice", label: "Ask" },
   { key: "volume", label: "Volume" },
