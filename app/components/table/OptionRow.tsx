@@ -7,9 +7,10 @@ import { format } from "date-fns";
 interface OptionRowProps {
   option: Option;
   index: number;
+  visibleColumns: string[];
 }
 
-export function OptionRow({ option, index }: OptionRowProps) {
+export function OptionRow({ option, index, visibleColumns }: OptionRowProps) {
   const formatEarningsDate = (date: string | null) => {
     if (!date) return 'N/A';
     try {
@@ -19,25 +20,42 @@ export function OptionRow({ option, index }: OptionRowProps) {
     }
   };
 
+  const renderCell = (columnKey: string) => {
+    switch (columnKey) {
+      case 'symbol':
+        return <TableCell className="font-medium">{option.symbol}</TableCell>;
+      case 'stockPrice':
+        return <TableCell>${option.stockPrice.toFixed(2)}</TableCell>;
+      case 'strike':
+        return <TableCell>${option.strike.toFixed(2)}</TableCell>;
+      case 'expectedPremium':
+        return <TableCell>${option.expectedPremium.toFixed(2)}</TableCell>;
+      case 'yieldPercent':
+        return <TableCell className="text-right">{option.yieldPercent.toFixed(2)}%</TableCell>;
+      case 'bidPrice':
+        return <TableCell>${option.bidPrice.toFixed(2)}</TableCell>;
+      case 'askPrice':
+        return <TableCell>${option.askPrice.toFixed(2)}</TableCell>;
+      case 'volume':
+        return <TableCell className="text-right">{option.volume}</TableCell>;
+      case 'openInterest':
+        return <TableCell className="text-right">{option.openInterest}</TableCell>;
+      case 'expiration':
+        return <TableCell className="text-right">
+          {format(new Date(option.expiration), "MMM d, yyyy")}
+        </TableCell>;
+      case 'earningsDate':
+        return <TableCell className="text-right">
+          {formatEarningsDate(option.earningsDate)}
+        </TableCell>;
+      default:
+        return null;
+    }
+  };
+
   return (
     <TableRow key={`${option.symbol}-${option.strike}-${index}`}>
-      <TableCell className="font-medium">{option.symbol}</TableCell>
-      <TableCell>${option.stockPrice.toFixed(2)}</TableCell>
-      <TableCell>${option.strike.toFixed(2)}</TableCell>
-      <TableCell>${option.expectedPremium.toFixed(2)}</TableCell>
-      <TableCell className="text-right">
-        {option.yieldPercent.toFixed(2)}%
-      </TableCell>
-      <TableCell>${option.bidPrice.toFixed(2)}</TableCell>
-      <TableCell>${option.askPrice.toFixed(2)}</TableCell>      
-      <TableCell className="text-right">{option.volume}</TableCell>
-      <TableCell className="text-right">{option.openInterest}</TableCell>
-      <TableCell className="text-right">
-        {format(new Date(option.expiration), "MMM d, yyyy")}
-      </TableCell>
-      <TableCell className="text-right">
-        {formatEarningsDate(option.earningsDate)}
-      </TableCell>
+      {visibleColumns.map(columnKey => renderCell(columnKey))}
     </TableRow>
   );
 }

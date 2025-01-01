@@ -16,68 +16,65 @@ export function useOptionsData(
   const [data, setData] = useState<Option[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [firstLoad, setFirstLoad] = useState<boolean>(true);
+  const [firstLoad, setFirstLoad] = useState(true);
 
-  useEffect(()=>{    
-    setFirstLoad(false)
-  },[])
-
-  useEffect(() => {
-    const filters:any = [];
-    if(option){
-      filters.push({ operation: 'eq', field: 'type', value: "\""+option+"\"" });
-    }
-    if (symbol) {
-      filters.push({ operation: 'like', field: 'symbol', value: symbol });
-    }
-    if (minYield > 0) {
-      filters.push({ operation: 'gt', field: 'yieldPercent', value: minYield });
-    }
-    if (maxPrice < 1000) {
-      filters.push({ operation: 'lt', field: 'strike', value: maxPrice });
-    }
-    if (minVol > 0) {
-      filters.push({ operation: 'gt', field: 'volume', value: minVol });
-    }
-    console.log(expiration)
-    if(expiration == ""){
-      filters.push({ operation: 'gt', field: 'expiration', value: `"${format(new Date(), 'yyyy-MM-dd')}"` });
-    }else if (expiration) {            
-        filters.push({ operation: 'eq', field: 'expiration', value: "\""+expiration+"\"" });      
-    }
-
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const result = await fetchOptionsData(filters);   
-        const updatedResult = result.map((option: any) => {
-          const askPrice = option.askPrice || 0;
-          const bidPrice = option.bidPrice || 0;
-          const expectedPremium = ((askPrice + bidPrice) / 2) * 100;
-
-          // Parse the ISO string and add one day
-          const expirationDate = addDays(parseISO(option.expiration), 1);
-          // Format back to YYYY-MM-DD
-          const correctedExpiration = format(expirationDate, 'yyyy-MM-dd');
-          
-          return {
-            ...option,
-            expectedPremium,
-            expiration: correctedExpiration,
-          };
-        });
-     
-        setData(updatedResult);
-        setError(null);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch data');
-      } finally {
-        setLoading(false);
+  const fetchData = async (
+    searchTerm: string = symbol,
+    minYieldVal: number = minYield,
+    maxPriceVal: number = maxPrice,
+    minVolVal: number = minVol,
+    selectedExpiration: string = expiration
+  ) => {
+    setLoading(true);
+    try {
+      const filters: any = [];
+      if(option) {
+        filters.push({ operation: 'eq', field: 'type', value: `"${option}"` });
       }
-    };
+      if (searchTerm) {
+        filters.push({ operation: 'like', field: 'symbol', value: searchTerm });
+      }
+      if (minYieldVal > 0) {
+        filters.push({ operation: 'gt', field: 'yieldPercent', value: minYieldVal });
+      }
+      if (maxPriceVal < 1000) {
+        filters.push({ operation: 'lt', field: 'strike', value: maxPriceVal });
+      }
+      if (minVolVal > 0) {
+        filters.push({ operation: 'gt', field: 'volume', value: minVolVal });
+      }
+      
+      if(selectedExpiration === "") {
+        filters.push({ operation: 'gt', field: 'expiration', value: `"${format(new Date(), 'yyyy-MM-dd')}"` });
+      } else if (selectedExpiration) {            
+        filters.push({ operation: 'eq', field: 'expiration', value: `"${selectedExpiration}"` });      
+      }
 
-    if(!firstLoad) fetchData();
-  }, [symbol, minYield, maxPrice, minVol, expiration, option]);
+      const result = await fetchOptionsData(filters);   
+      const updatedResult = result.map((option: any) => {
+        const askPrice = option.askPrice || 0;
+        const bidPrice = option.bidPrice || 0;
+        const expectedPremium = ((askPrice + bidPrice) / 2) * 100;
 
-  return { data, loading, error, firstLoad };
+        const expirationDate = addDays(parseISO(option.expiration), 1);
+        const correctedExpiration = format(expirationDate, 'yyyy-MM-dd');
+        
+        return {
+          ...option,
+          expectedPremium,
+          expiration: correctedExpiration,
+        };
+      });
+   
+      setData(updatedResult);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch data');
+    } finally {
+      setLoading(false);
+      setFirstLoad(false);
+    }
+  };
+
+  return { data, loading, error, firstLoad, fetchData };
 }
