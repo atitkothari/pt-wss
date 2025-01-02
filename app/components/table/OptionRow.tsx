@@ -29,9 +29,9 @@ export function OptionRow({ option, index, visibleColumns }: OptionRowProps) {
       case 'strike':
         return <TableCell>${option.strike.toFixed(2)}</TableCell>;
       case 'premium':
-        return <TableCell>${option.premium.toFixed(2)}</TableCell>;
+        return <TableCell>${option.premium?.toFixed(2) ?? 'N/A'}</TableCell>;
       case 'yieldPercent':
-        return <TableCell className="text-right">{option.yieldPercent.toFixed(2)}%</TableCell>;
+        return <TableCell className="text-right">{option.yieldPercent?.toFixed(2) ?? 'N/A'}%</TableCell>;
       case 'bidPrice':
         return <TableCell>${option.bidPrice.toFixed(2)}</TableCell>;
       case 'askPrice':
