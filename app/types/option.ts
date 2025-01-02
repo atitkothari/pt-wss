@@ -15,3 +15,5 @@ export interface Option {
 }
 
 export type OptionType = 'call' | 'put';
+
+export type StrikeFilter = 'ITM' | 'ONE_OUT' | 'THREE_PERCENT' | 'ALL';

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { fetchOptionsData } from '../services/api';
-import { Option } from '../types/option';
+import { Option, OptionType, StrikeFilter } from '../types/option';
 import { parseISO, addDays, format } from 'date-fns';
 
 export function useOptionsData(

@@ -1,4 +1,5 @@
-import { Option } from "../types/option";
+import { Option, OptionType } from "../types/option";
+import { StrikeFilter as StrikeFilterType } from '../types/option';
 
 interface Filter {
   operation: string;
@@ -11,19 +12,13 @@ interface SortConfig {
   direction: 'asc' | 'desc' | null;
 }
 
-interface StrikeFilter {
-  operation: string;
-  field: string;
-  value: string | number;
-}
-
 export async function fetchOptionsData(
   filters: any[], 
   pageNo: number = 1, 
   pageSize: number = 50,
   sortConfig?: SortConfig,
-  strikeFilter?: StrikeFilter,
-  optionType: 'call' | 'put' = 'call'
+  strikeFilter?: StrikeFilterType,
+  optionType: OptionType = 'call'
 ) {
   const body: any = {
     filters,
