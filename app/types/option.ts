@@ -1,13 +1,15 @@
 export interface Option {
-  symbol: string;
-  expiration: string;
+  askPrice: number;
+  bidPrice: number;
   earningsDate: string;
+  expiration: string;
+  impliedVolatility: number;
+  openInterest: number;
   stockPrice: number;
   strike: number;
-  expectedPremium: number,
-  askPrice: number;
-  yieldPercent: number;
-  bidPrice: number;
+  symbol: string;
+  type: string;
   volume: number;
-  openInterest: number;
+  yieldPercent: number;
+  expectedPremium?: number; // Calculated field
 }

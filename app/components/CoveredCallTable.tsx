@@ -76,6 +76,7 @@ export function CoveredCallTable({option}:Tab) {
     maxPrice: 1000,
     minVol: 0,
     selectedExpiration: "",
+    pageNo: 1
   });
 
   const [hasSearched, setHasSearched] = useState(false);
@@ -84,7 +85,7 @@ export function CoveredCallTable({option}:Tab) {
 
   const [strikeFilter, setStrikeFilter] = useState<StrikeFilter>('ALL');
 
-  const { data, loading, error, fetchData } = useOptionsData(
+  const { data, loading, error, totalCount, fetchData } = useOptionsData(
     activeFilters.searchTerm,
     activeFilters.minYield,
     activeFilters.maxPrice,
@@ -101,15 +102,30 @@ export function CoveredCallTable({option}:Tab) {
       maxPrice,
       minVol,
       selectedExpiration,
+      pageNo: 1
     });
     fetchData(
       searchTerm, 
       minYield, 
       maxPrice, 
       minVol, 
-      selectedExpiration
+      selectedExpiration,
+      1
     ).catch(console.error);
     setCurrentPage(1);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    fetchData(
+      activeFilters.searchTerm,
+      activeFilters.minYield,
+      activeFilters.maxPrice,
+      activeFilters.minVol,
+      activeFilters.selectedExpiration,
+      newPage,
+      rowsPerPage
+    ).catch(console.error);
   };
 
   const handleSort = (field: keyof Option) => {            
@@ -135,10 +151,11 @@ export function CoveredCallTable({option}:Tab) {
     return 0;
   });
 
-  const paginatedData = sortedData.slice(
-    (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage
-  );
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   if (error) return <div className="text-red-500 p-4">{error}</div>;
 
@@ -163,6 +180,7 @@ export function CoveredCallTable({option}:Tab) {
           value={searchTerm}
           onChange={setSearchTerm}
           placeholder="Enter symbol..."
+          onKeyPress={handleKeyPress}
         />
         <FilterInput
           label="Min Yield %"
@@ -170,6 +188,7 @@ export function CoveredCallTable({option}:Tab) {
           onChange={setMinYield}
           placeholder="Min yield..."
           type="number"
+          onKeyPress={handleKeyPress}
         />
         <FilterInput
           label="Max Strike Price"
@@ -177,6 +196,7 @@ export function CoveredCallTable({option}:Tab) {
           onChange={setMaxPrice}
           placeholder="Max strike price..."
           type="number"
+          onKeyPress={handleKeyPress}
         />
         <FilterInput
           label="Min Volume"
@@ -184,6 +204,7 @@ export function CoveredCallTable({option}:Tab) {
           onChange={setMinVol}
           placeholder="Min vol..."
           type="number"
+          onKeyPress={handleKeyPress}
         />
         <div>
           <label className="block text-sm font-medium mb-1">Strike Filter</label>
@@ -241,20 +262,32 @@ export function CoveredCallTable({option}:Tab) {
       ) : (
         <div>
           <div className="text-sm text-gray-600 mb-4">
-            Showing {sortedData.length} contracts
+            Showing {totalCount} contracts
           </div>
           <OptionsTable 
-            data={paginatedData}
+            data={sortedData}
             sortConfig={sortConfig}
             onSort={handleSort}
           />
           <div className="flex justify-between items-center mt-4 px-4">
             <div className="text-sm text-gray-600">
-              Showing {((currentPage - 1) * rowsPerPage) + 1} to {Math.min(currentPage * rowsPerPage, sortedData.length)} of {sortedData.length} results
+              Showing {((currentPage - 1) * rowsPerPage) + 1} to {Math.min(currentPage * rowsPerPage, totalCount)} of {totalCount} results
             </div>
             <div className="flex gap-2">
               <Button 
-                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                onClick={() => {
+                  const prevPage = Math.max(1, currentPage - 1);
+                  setCurrentPage(prevPage);
+                  setActiveFilters(prev => ({ ...prev, pageNo: prevPage }));
+                  fetchData(
+                    activeFilters.searchTerm,
+                    activeFilters.minYield,
+                    activeFilters.maxPrice,
+                    activeFilters.minVol,
+                    activeFilters.selectedExpiration,
+                    prevPage
+                  ).catch(console.error);
+                }}
                 disabled={currentPage === 1}
                 variant="outline"
                 size="sm"
@@ -262,8 +295,20 @@ export function CoveredCallTable({option}:Tab) {
                 Previous
               </Button>
               <Button
-                onClick={() => setCurrentPage(p => p + 1)}
-                disabled={currentPage * rowsPerPage >= sortedData.length}
+                onClick={() => {
+                  const nextPage = currentPage + 1;
+                  setCurrentPage(nextPage);
+                  setActiveFilters(prev => ({ ...prev, pageNo: nextPage }));
+                  fetchData(
+                    activeFilters.searchTerm,
+                    activeFilters.minYield,
+                    activeFilters.maxPrice,
+                    activeFilters.minVol,
+                    activeFilters.selectedExpiration,
+                    nextPage
+                  ).catch(console.error);
+                }}
+                disabled={currentPage * rowsPerPage >= totalCount}
                 variant="outline"
                 size="sm"
               >

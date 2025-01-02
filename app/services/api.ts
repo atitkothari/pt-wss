@@ -6,13 +6,18 @@ interface Filter {
   value: string | number;
 }
 
-export async function fetchOptionsData(filters: Filter[] = []) {
-  const response = await fetch('https://wss-api.194.195.92.250.sslip.io/wheelstrat/filter', {
+export async function fetchOptionsData(filters: any[], pageNo: number = 1, pageSize: number = 50) {
+  const response = await fetch(`https://wss-api.194.195.92.250.sslip.io/wheelstrat/filter`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ filters }),
+    body: JSON.stringify({
+      filters,
+      paging: true,
+      pageNo,
+      pageSize
+    }),
   });
 
   if (!response.ok) {

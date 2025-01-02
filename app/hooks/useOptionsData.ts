@@ -16,14 +16,16 @@ export function useOptionsData(
   const [data, setData] = useState<Option[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [firstLoad, setFirstLoad] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
 
   const fetchData = async (
     searchTerm: string = symbol,
     minYieldVal: number = minYield,
     maxPriceVal: number = maxPrice,
     minVolVal: number = minVol,
-    selectedExpiration: string = expiration
+    selectedExpiration: string = expiration,
+    pageNo: number = 1,
+    pageSize: number = 50
   ) => {
     setLoading(true);
     try {
@@ -50,8 +52,8 @@ export function useOptionsData(
         filters.push({ operation: 'eq', field: 'expiration', value: `"${selectedExpiration}"` });      
       }
 
-      const result = await fetchOptionsData(filters);   
-      const updatedResult = result.map((option: any) => {
+      const result = await fetchOptionsData(filters, pageNo, pageSize);   
+      const updatedResult = result.options.map((option: any) => {
         const askPrice = option.askPrice || 0;
         const bidPrice = option.bidPrice || 0;
         const expectedPremium = ((askPrice + bidPrice) / 2) * 100;
@@ -67,14 +69,14 @@ export function useOptionsData(
       });
    
       setData(updatedResult);
+      setTotalCount(result["count"]);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch data');
     } finally {
       setLoading(false);
-      setFirstLoad(false);
     }
   };
 
-  return { data, loading, error, firstLoad, fetchData };
+  return { data, loading, error, totalCount, fetchData };
 }

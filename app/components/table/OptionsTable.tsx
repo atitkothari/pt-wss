@@ -13,6 +13,7 @@ import { OptionRow } from "./OptionRow";
 import { ColumnCustomizer, ColumnDef } from "./ColumnCustomizer";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { format, parseISO } from "date-fns";
 
 const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: "symbol", label: "Symbol" },
@@ -26,6 +27,7 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: "openInterest", label: "Open Interest" },
   { key: "expiration", label: "Expiration" },
   { key: "earningsDate", label: "Earnings" },
+  { key: "impliedVolatility", label: "IV %" },
 ];
 
 interface OptionsTableProps {

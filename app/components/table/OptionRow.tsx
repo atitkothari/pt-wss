@@ -48,6 +48,8 @@ export function OptionRow({ option, index, visibleColumns }: OptionRowProps) {
         return <TableCell className="text-right">
           {formatEarningsDate(option.earningsDate)}
         </TableCell>;
+      case 'impliedVolatility':
+        return <TableCell className="text-right">{option.impliedVolatility.toFixed(1)}%</TableCell>;
       default:
         return null;
     }

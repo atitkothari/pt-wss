@@ -4,8 +4,9 @@ interface FilterInputProps {
   label: string;
   value: string | number;
   onChange: (value: any) => void;
-  placeholder: string;
+  placeholder?: string;
   type?: string;
+  onKeyPress?: (e: React.KeyboardEvent) => void;
 }
 
 export function FilterInput({
@@ -13,7 +14,8 @@ export function FilterInput({
   value,
   onChange,
   placeholder,
-  type = "text"
+  type = "text",
+  onKeyPress
 }: FilterInputProps) {
   return (
     <div className="flex-1">
@@ -24,6 +26,7 @@ export function FilterInput({
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(type === "number" ? Number(e.target.value) : e.target.value)}
+        onKeyPress={onKeyPress}
       />
     </div>
   );
