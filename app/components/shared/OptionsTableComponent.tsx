@@ -44,7 +44,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
   const [hasSearched, setHasSearched] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [strikeFilter, setStrikeFilter] = useState<StrikeFilter>('ALL');
+  const [strikeFilter, setStrikeFilter] = useState<StrikeFilter>('ONE_OUT');
   const rowsPerPage = 50;
 
   const { data, loading, error, totalCount, fetchData } = useOptionsData(
@@ -75,7 +75,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       1,
       rowsPerPage,
       sortConfig.direction ? sortConfig : undefined,
-      strikeFilter !== 'ALL' ? strikeFilter : undefined
+      strikeFilter !== 'ALL' ? strikeFilter : undefined,
+      maxPrice
     ).catch(console.error);
     setCurrentPage(1);
   };
@@ -104,7 +105,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       currentPage,
       rowsPerPage,
       { field, direction: newDirection },
-      strikeFilter !== 'ALL' ? strikeFilter : undefined
+      strikeFilter !== 'ALL' ? strikeFilter : undefined,
+      maxPrice
     ).catch(console.error);
   };
 
@@ -206,7 +208,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
        activeFilters.minYield === 0 && 
        activeFilters.maxPrice === 1000 && 
        activeFilters.minVol === 0 && 
-       !activeFilters.selectedExpiration ? (
+       !activeFilters.selectedExpiration && 
+       strikeFilter === 'ONE_OUT' ? (
         <div className="text-center py-8 text-gray-600">
           Run a search to view results
         </div>
@@ -242,7 +245,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                     prevPage,
                     rowsPerPage,
                     sortConfig.direction ? sortConfig : undefined,
-                    strikeFilter !== 'ALL' ? strikeFilter : undefined
+                    strikeFilter !== 'ALL' ? strikeFilter : undefined,
+                    maxPrice
                   ).catch(console.error);
                 }}
                 disabled={currentPage === 1}
@@ -265,7 +269,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                     nextPage,
                     rowsPerPage,
                     sortConfig.direction ? sortConfig : undefined,
-                    strikeFilter !== 'ALL' ? strikeFilter : undefined
+                    strikeFilter !== 'ALL' ? strikeFilter : undefined,
+                    maxPrice
                   ).catch(console.error);
                 }}
                 disabled={currentPage * rowsPerPage >= totalCount}

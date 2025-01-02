@@ -27,7 +27,7 @@ export function useOptionsData(
     pageNo: number = 1,
     pageSize: number = 50,
     sortConfig?: { field: string; direction: 'asc' | 'desc' | null },
-    strikeFilter?: StrikeFilter
+    strikeFilter?: StrikeFilter,
   ) => {
     setLoading(true);
     try {
@@ -41,7 +41,7 @@ export function useOptionsData(
       if (minYieldVal > 0) {
         filters.push({ operation: 'gt', field: 'yieldPercent', value: minYieldVal });
       }
-      if (maxPriceVal < 1000) {
+      if (maxPriceVal) {
         filters.push({ operation: 'lt', field: 'strike', value: maxPriceVal });
       }
       if (minVolVal > 0) {
@@ -60,7 +60,7 @@ export function useOptionsData(
         pageSize, 
         sortConfig, 
         strikeFilter,
-        option
+        option        
       );   
       const updatedResult = result.options.map((option: any) => {
         const askPrice = option.askPrice || 0;
