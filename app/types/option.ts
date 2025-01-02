@@ -13,3 +13,5 @@ export interface Option {
   yieldPercent: number;
   premium?: number; // Calculated field
 }
+
+export type OptionType = 'call' | 'put';

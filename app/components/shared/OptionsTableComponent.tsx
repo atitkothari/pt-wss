@@ -4,7 +4,7 @@ import { useState } from "react";
 import { FilterInput } from "../filters/FilterInput";
 import { useOptionsData } from "../../hooks/useOptionsData";
 import { LoadingSpinner } from "../LoadingSpinner";
-import { Option } from "../../types/option";
+import { Option, OptionType } from "../../types/option";
 import { OptionsTable } from "../table/OptionsTable";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { Search } from "lucide-react";
 type StrikeFilter = 'ITM' | 'ONE_OUT' | 'THREE_PERCENT' | 'ALL';
 
 interface OptionsTableComponentProps {
-  option: 'call' | 'put';
+  option: OptionType;
 }
 
 function getNextFriday(date: Date): Date {
