@@ -11,7 +11,7 @@ export function useOptionsData(
   maxPrice: number = 1000,
   minVol: number = 0,
   expiration: string = '',
-  option: string = 'call'
+  option: OptionType = 'call'
 ) {
   const [data, setData] = useState<Option[]>([]);
   const [loading, setLoading] = useState(false);

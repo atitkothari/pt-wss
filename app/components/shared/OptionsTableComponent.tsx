@@ -55,8 +55,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     activeFilters.maxPrice,
     activeFilters.minVol,
     activeFilters.selectedExpiration,
-    option,
-    activeFilters.pageNo
+    option
   );
 
   const handleSearch = () => {
