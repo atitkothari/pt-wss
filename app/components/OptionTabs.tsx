@@ -3,19 +3,24 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CoveredCallTable } from "./CoveredCallTable";
 import { CashSecuredPutTable } from "./CashSecuredPutTable";
+import { OptionType } from "@/app/types/option";
+
+interface TabProps {
+  option: OptionType;
+}
 
 export function OptionTabs() {
   return (
-    <Tabs defaultValue="covered-calls" className="w-full">
-      <TabsList className="mb-4">
-        <TabsTrigger value="covered-calls">Covered Call</TabsTrigger>
-        <TabsTrigger value="cash-secured-puts">Cash Secured Puts</TabsTrigger>
+    <Tabs defaultValue="call" className="w-full">
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="call">Covered Calls</TabsTrigger>
+        <TabsTrigger value="put">Cash Secured Puts</TabsTrigger>
       </TabsList>
-      <TabsContent value="covered-calls">
-        <CoveredCallTable option="call"/>
+      <TabsContent value="call">
+        <CoveredCallTable />
       </TabsContent>
-      <TabsContent value="cash-secured-puts">
-        <CashSecuredPutTable option="put"/>
+      <TabsContent value="put">
+        <CashSecuredPutTable />
       </TabsContent>
     </Tabs>
   );
