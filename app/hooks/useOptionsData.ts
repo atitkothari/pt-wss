@@ -25,7 +25,8 @@ export function useOptionsData(
     minVolVal: number = minVol,
     selectedExpiration: string = expiration,
     pageNo: number = 1,
-    pageSize: number = 50
+    pageSize: number = 50,
+    sortConfig?: { field: string; direction: 'asc' | 'desc' | null }
   ) => {
     setLoading(true);
     try {
@@ -52,24 +53,24 @@ export function useOptionsData(
         filters.push({ operation: 'eq', field: 'expiration', value: `"${selectedExpiration}"` });      
       }
 
-      const result = await fetchOptionsData(filters, pageNo, pageSize);   
+      const result = await fetchOptionsData(filters, pageNo, pageSize, sortConfig);   
       const updatedResult = result.options.map((option: any) => {
         const askPrice = option.askPrice || 0;
         const bidPrice = option.bidPrice || 0;
-        const expectedPremium = ((askPrice + bidPrice) / 2) * 100;
+        const premium = ((askPrice + bidPrice) / 2) * 100;
 
         const expirationDate = addDays(parseISO(option.expiration), 1);
         const correctedExpiration = format(expirationDate, 'yyyy-MM-dd');
         
         return {
           ...option,
-          expectedPremium,
+          premium,
           expiration: correctedExpiration,
         };
       });
    
       setData(updatedResult);
-      setTotalCount(result["count"]);
+      setTotalCount(result.count);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch data');

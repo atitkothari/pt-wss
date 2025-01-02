@@ -28,8 +28,8 @@ export function OptionRow({ option, index, visibleColumns }: OptionRowProps) {
         return <TableCell>${option.stockPrice.toFixed(2)}</TableCell>;
       case 'strike':
         return <TableCell>${option.strike.toFixed(2)}</TableCell>;
-      case 'expectedPremium':
-        return <TableCell>${option.expectedPremium.toFixed(2)}</TableCell>;
+      case 'premium':
+        return <TableCell>${option.premium.toFixed(2)}</TableCell>;
       case 'yieldPercent':
         return <TableCell className="text-right">{option.yieldPercent.toFixed(2)}%</TableCell>;
       case 'bidPrice':

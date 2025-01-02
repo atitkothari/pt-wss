@@ -11,5 +11,5 @@ export interface Option {
   type: string;
   volume: number;
   yieldPercent: number;
-  expectedPremium?: number; // Calculated field
+  premium?: number; // Calculated field
 }
