@@ -16,39 +16,6 @@ interface OptionsTableComponentProps {
   option: 'call' | 'put';
 }
 
-const filterDataByStrike = (data: Option[], strikeFilter: StrikeFilter, optionType: 'call' | 'put'): Option[] => {
-  if (strikeFilter === 'ALL' || !data.length) return data;
-
-  return data.filter(option => {
-    if (!option.stockPrice) return false;
-
-    const strike = option.strike;
-    const stockPrice = option.stockPrice;
-
-    switch (strikeFilter) {
-      case 'ITM':
-        return optionType === 'call' 
-          ? strike < stockPrice 
-          : strike > stockPrice;
-      
-      case 'ONE_OUT':
-        if (optionType === 'call') {
-          return strike > stockPrice && strike <= stockPrice * 1.05;
-        } else {
-          return strike < stockPrice && strike >= stockPrice * 0.95;
-        }
-      
-      case 'THREE_PERCENT':
-        return optionType === 'call'
-          ? strike >= stockPrice * 1.03
-          : strike <= stockPrice * 0.97;
-      
-      default:
-        return true;
-    }
-  });
-};
-
 function getNextFriday(date: Date): Date {
   const dayOfWeek = date.getDay();
   const daysUntilFriday = (5 - dayOfWeek + 7) % 7;
@@ -108,7 +75,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       maxPrice, 
       minVol, 
       selectedExpiration,
-      1
+      1,
+      rowsPerPage,
+      sortConfig.direction ? sortConfig : undefined,
+      strikeFilter !== 'ALL' ? strikeFilter : undefined
     ).catch(console.error);
     setCurrentPage(1);
   };
@@ -136,11 +106,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       activeFilters.selectedExpiration,
       currentPage,
       rowsPerPage,
-      { field, direction: newDirection }
+      { field, direction: newDirection },
+      strikeFilter !== 'ALL' ? strikeFilter : undefined
     ).catch(console.error);
   };
-
-  const filteredData = filterDataByStrike(data, strikeFilter, option);
 
   const getNext4Fridays = (()=>{
     const nextFridays: Date[] = [];
@@ -200,7 +169,6 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             onChange={(e) => setStrikeFilter(e.target.value as StrikeFilter)}
           >
             <option value="ALL">All Strikes</option>
-            <option value="ITM">In The Money</option>
             <option value="ONE_OUT">One Strike Out</option>
             <option value="THREE_PERCENT">&gt; 3% Out</option>
           </select>
@@ -253,7 +221,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             Showing {totalCount} contracts
           </div>
           <OptionsTable 
-            data={filteredData}
+            data={data}
             sortConfig={sortConfig}
             onSort={handleSort}
           />
@@ -276,7 +244,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                     activeFilters.selectedExpiration,
                     prevPage,
                     rowsPerPage,
-                    sortConfig.direction ? sortConfig : undefined
+                    sortConfig.direction ? sortConfig : undefined,
+                    strikeFilter !== 'ALL' ? strikeFilter : undefined
                   ).catch(console.error);
                 }}
                 disabled={currentPage === 1}
@@ -298,7 +267,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                     activeFilters.selectedExpiration,
                     nextPage,
                     rowsPerPage,
-                    sortConfig.direction ? sortConfig : undefined
+                    sortConfig.direction ? sortConfig : undefined,
+                    strikeFilter !== 'ALL' ? strikeFilter : undefined
                   ).catch(console.error);
                 }}
                 disabled={currentPage * rowsPerPage >= totalCount}

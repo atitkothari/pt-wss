@@ -26,7 +26,8 @@ export function useOptionsData(
     selectedExpiration: string = expiration,
     pageNo: number = 1,
     pageSize: number = 50,
-    sortConfig?: { field: string; direction: 'asc' | 'desc' | null }
+    sortConfig?: { field: string; direction: 'asc' | 'desc' | null },
+    strikeFilter?: StrikeFilter
   ) => {
     setLoading(true);
     try {
@@ -53,7 +54,14 @@ export function useOptionsData(
         filters.push({ operation: 'eq', field: 'expiration', value: `"${selectedExpiration}"` });      
       }
 
-      const result = await fetchOptionsData(filters, pageNo, pageSize, sortConfig);   
+      const result = await fetchOptionsData(
+        filters, 
+        pageNo, 
+        pageSize, 
+        sortConfig, 
+        strikeFilter,
+        option
+      );   
       const updatedResult = result.options.map((option: any) => {
         const askPrice = option.askPrice || 0;
         const bidPrice = option.bidPrice || 0;
