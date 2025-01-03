@@ -39,13 +39,14 @@ export async function fetchOptionsData(
     if (strikeFilter === 'THREE_PERCENT') {
       body.filters.push({
         operation: "strikeFilter",
-        field: "strike",
+        field: optionType,
         value: 0.03
       });
     } else if (strikeFilter === 'ONE_OUT') {
       body.filters.push({
         operation: "strikeFilter",
-        field: optionType
+        field: optionType,
+        value: 0
       });
     }
   }
