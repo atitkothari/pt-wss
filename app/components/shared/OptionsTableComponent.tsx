@@ -75,8 +75,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       1,
       rowsPerPage,
       sortConfig.direction ? sortConfig : undefined,
-      strikeFilter !== 'ALL' ? strikeFilter : undefined,
-      maxPrice
+      strikeFilter !== 'ALL' ? strikeFilter : undefined,      
     ).catch(console.error);
     setCurrentPage(1);
   };
@@ -106,7 +105,6 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       rowsPerPage,
       { field, direction: newDirection },
       strikeFilter !== 'ALL' ? strikeFilter : undefined,
-      maxPrice
     ).catch(console.error);
   };
 
@@ -245,8 +243,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                     prevPage,
                     rowsPerPage,
                     sortConfig.direction ? sortConfig : undefined,
-                    strikeFilter !== 'ALL' ? strikeFilter : undefined,
-                    maxPrice
+                    strikeFilter !== 'ALL' ? strikeFilter : undefined,                    
                   ).catch(console.error);
                 }}
                 disabled={currentPage === 1}
@@ -269,8 +266,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                     nextPage,
                     rowsPerPage,
                     sortConfig.direction ? sortConfig : undefined,
-                    strikeFilter !== 'ALL' ? strikeFilter : undefined,
-                    maxPrice
+                    strikeFilter !== 'ALL' ? strikeFilter : undefined,    
                   ).catch(console.error);
                 }}
                 disabled={currentPage * rowsPerPage >= totalCount}
