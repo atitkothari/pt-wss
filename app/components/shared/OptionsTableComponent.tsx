@@ -244,7 +244,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                     rowsPerPage,
                     sortConfig.direction ? sortConfig : undefined,
                     strikeFilter !== 'ALL' ? strikeFilter : undefined,                    
-                  ).catch(console.error);
+                  ).catch(console.error); 
                 }}
                 disabled={currentPage === 1}
                 variant="outline"
