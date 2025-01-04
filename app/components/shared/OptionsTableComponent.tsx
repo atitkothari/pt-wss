@@ -9,6 +9,7 @@ import { OptionsTable } from "../table/OptionsTable";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
+import { useSearchParams, useRouter } from 'next/navigation';
 
 interface OptionsTableComponentProps {
   option: OptionType;
@@ -23,11 +24,16 @@ function getNextFriday(date: Date): Date {
 }
 
 export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [minYield, setMinYield] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(1000);
-  const [minVol, setMinVol] = useState(0);
-  const [selectedExpiration, setSelectedExpiration] = useState("");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const getParamKey = (key: string) => `${option}_${key}`;
+  
+  const [searchTerm, setSearchTerm] = useState(searchParams.get(getParamKey('search')) || "");
+  const [minYield, setMinYield] = useState(Number(searchParams.get(getParamKey('minYield'))) || 0);
+  const [maxPrice, setMaxPrice] = useState(Number(searchParams.get(getParamKey('maxPrice'))) || 1000);
+  const [minVol, setMinVol] = useState(Number(searchParams.get(getParamKey('minVol'))) || 0);
+  const [selectedExpiration, setSelectedExpiration] = useState(searchParams.get(getParamKey('expiration')) || "");
   const [sortConfig, setSortConfig] = useState<{ field: keyof Option; direction: 'asc' | 'desc' | null }>({ 
     field: "symbol", 
     direction: null 
@@ -44,7 +50,9 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
   const [hasSearched, setHasSearched] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [strikeFilter, setStrikeFilter] = useState<StrikeFilter>('ONE_OUT');
+  const [strikeFilter, setStrikeFilter] = useState<StrikeFilter>(
+    (searchParams.get(getParamKey('strikeFilter')) as StrikeFilter) || 'ONE_OUT'
+  );
   const rowsPerPage = 50;
 
   const { data, loading, error, totalCount, fetchData } = useOptionsData(
@@ -56,6 +64,21 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     option
   );
 
+  const updateURL = (filters: Record<string, string | number>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    
+    Object.entries(filters).forEach(([key, value]) => {
+      const paramKey = getParamKey(key);
+      if (value) {
+        params.set(paramKey, value.toString());
+      } else {
+        params.delete(paramKey);
+      }
+    });
+
+    router.push(`?${params.toString()}`);
+  };
+
   const handleSearch = () => {
     setHasSearched(true);
     setActiveFilters({
@@ -66,6 +89,16 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       selectedExpiration,
       pageNo: 1
     });
+
+    updateURL({
+      search: searchTerm,
+      minYield,
+      maxPrice,
+      minVol,
+      expiration: selectedExpiration,
+      strikeFilter
+    });
+
     fetchData(
       searchTerm, 
       minYield, 
