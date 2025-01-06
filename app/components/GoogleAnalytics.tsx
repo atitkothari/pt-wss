@@ -3,6 +3,11 @@
 import Script from 'next/script';
 
 export function GoogleAnalytics() {
+  // Only render GA scripts in production
+  if (process.env.NODE_ENV !== 'production') {
+    return null;
+  }
+
   return (
     <>
       <Script
