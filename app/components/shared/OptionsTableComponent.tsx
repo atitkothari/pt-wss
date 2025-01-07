@@ -8,7 +8,7 @@ import { Option, OptionType, StrikeFilter } from "../../types/option";
 import { OptionsTable } from "../table/OptionsTable";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Search, Mail } from "lucide-react";
 import { useSearchParams, useRouter } from 'next/navigation';
 
 interface OptionsTableComponentProps {
@@ -154,10 +154,26 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     return nextFridays;
   })();
 
+  const handleFeedback = () => {
+    window.location.href = "mailto:theproducttank@gmail.com?subject=Feedback about Wheel Strategy Screener";
+  };
+
   if (error) return <div className="text-red-500 p-4">{error}</div>;
 
   return (
     <div className="w-full">
+      <div className="flex justify-end mb-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleFeedback}
+          className="text-gray-600 hover:text-gray-800"
+        >
+          <Mail className="h-4 w-4 mr-2" />
+          Provide Feedback
+        </Button>
+      </div>
+
       {/* Filter Controls */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <FilterInput
@@ -312,8 +328,19 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           </div>
           
           {/* Add footnote */}
-          <div className="mt-6 text-sm text-gray-500 italic">
-            * Data is updated everyday end of day
+          <div className="mt-6 flex justify-between items-center text-sm text-gray-500">
+            <div className="italic">
+              * Data is updated everyday end of day
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleFeedback}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <Mail className="h-4 w-4 mr-2" />
+              Provide Feedback
+            </Button>
           </div>
         </div>
       )}
