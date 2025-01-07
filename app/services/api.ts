@@ -51,7 +51,7 @@ export async function fetchOptionsData(
     }
   }
 
-  const response = await fetch(`https://wss-api.194.195.92.250.sslip.io/wheelstrat/filter`, {
+  const response = await fetch(`https://api.wheelstrategyoptions.com/wheelstrat/filter`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
