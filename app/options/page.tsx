@@ -9,7 +9,7 @@ export default function OptionsPage() {
             The Wheel Strategy Screener
           </h1>
           <p className="text-gray-600">
-            Find and analyze covered call and cash secured put opportunities across various stocks
+            Find and analyze covered call and cash secured put opportunities for stocks in SP 500. We are working on adding more stocks to the list.
           </p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-sm">
