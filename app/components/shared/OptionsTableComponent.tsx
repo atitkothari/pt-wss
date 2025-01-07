@@ -310,6 +310,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
               </Button>
             </div>
           </div>
+          
+          {/* Add footnote */}
+          <div className="mt-6 text-sm text-gray-500 italic">
+            * Data is updated everyday end of day
+          </div>
         </div>
       )}
     </div>
