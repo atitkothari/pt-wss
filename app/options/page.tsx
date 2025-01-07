@@ -2,12 +2,20 @@ import { OptionTabs } from "../components/OptionTabs";
 
 export default function OptionsPage() {
   return (
-    <main className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gray-50">
+      <nav className="bg-gradient-to-b from-gray-900 to-gray-800 w-full border-b border-gray-700 p-4">
+        <div className="max-w-screen-xl mx-auto">
+          <a href="/" className="flex items-center">
+            <img src="/logo.png" className="h-12 mr-3" alt="Wheel Strategy Options Logo" />
+            <span className="self-center text-2xl font-semibold whitespace-nowrap text-white">
+              Wheel Strategy Options
+            </span>
+          </a>
+        </div>
+      </nav>
+
+      <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            The Wheel Strategy Screener
-          </h1>
           <p className="text-gray-600">
             Find and analyze covered call and cash secured put opportunities for stocks in SP 500. We are working on adding more stocks to the list.
           </p>
@@ -16,6 +24,6 @@ export default function OptionsPage() {
           <OptionTabs />
         </div>
       </div>
-    </main>
+    </div>
   );
 } 

@@ -7,8 +7,8 @@ import { GoogleAnalytics } from './components/GoogleAnalytics';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Options Screener',
-  description: 'Screen for covered calls and cash-secured puts',
+  title: 'Smart Options, Smarter Returns: Screen, Select, Succeed',
+  description: 'Dominate the options game. Our options screener delivers high-yield options trades maximizing premium income with real-time options data and intelligent filters. Select your perfect strategy; succeed in seconds.',
   metadataBase: new URL('https://wheelstrategyoptions.com/'),
   other: {
     'google-adsense-account': 'ca-pub-8741511572242021',
@@ -27,7 +27,9 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <GoogleAnalytics />
-        {children}
+        <main>
+          {children}
+        </main>
         <Toaster />
       </body>
     </html>

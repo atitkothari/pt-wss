@@ -14,18 +14,26 @@ import {
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+      {/* Logo Section */}
+      <div className="flex flex-col items-center justify-center pt-8">
+        <img src="/logo.png" className="h-24 mb-4" alt="Wheel Strategy Options Logo" />
+        <h2 className="text-3xl font-semibold text-white mb-6">
+          Wheel Strategy Options
+        </h2>
+      </div>
+
       {/* Hero Section */}
-      <div className="container mx-auto px-4 py-20">
+      <div className="container mx-auto px-4 py-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            Options Screening Made Simple
+          <h1 className="text-3xl md:text-4xl font-bold mb-6">
+            Smart Options, Smarter Returns: Screen, Select, Succeed
           </h1>
-          <p className="text-xl md:text-2xl text-gray-300 mb-8">
-            Find and analyze options trades that match your strategy. Screen for covered calls and cash-secured puts in seconds.
+          <p className="text-lg md:text-xl text-gray-300 mb-8">
+            Dominate the options game. Our options screener delivers high-yield options trades maximizing premium income with real-time options data and intelligent filters. Select your perfect strategy; succeed in seconds.
           </p>
           <Link href="/options">
             <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-6">
-              Start Screening <ArrowRight className="ml-2 h-5 w-5" />
+              Wheel Your Way to Higher Returns <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
         </div>
@@ -88,14 +96,14 @@ export default function LandingPage() {
       <div className="bg-gray-800 py-20">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Ready to Start Trading Smarter?
+            Ready to Maximize Your Returns?
           </h2>
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            Join thousands of options traders who use our platform to find and analyze trading opportunities.
+            Join successful options traders who use our platform to find and execute high-yield trades.
           </p>
           <Link href="/options">
             <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-6">
-              Get Started Now <Search className="ml-2 h-5 w-5" />
+              Wheel Your Way to Higher Returns <Search className="ml-2 h-5 w-5" />
             </Button>
           </Link>
         </div>
