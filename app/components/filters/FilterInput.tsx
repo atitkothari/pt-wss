@@ -18,7 +18,10 @@ export function FilterInput({
   onChange,
   placeholder,
   type = "text",
-  onKeyPress
+  onKeyPress,
+  step,
+  min,
+  max
 }: FilterInputProps) {
   return (
     <div className="flex-1">
@@ -28,8 +31,17 @@ export function FilterInput({
         className="w-full px-3 py-2 border rounded-md"
         placeholder={placeholder}
         value={value}
-        onChange={(e) => onChange(type === "number" ? Number(e.target.value) : e.target.value)}
+        onChange={(e) => {
+          const val = e.target.value;
+          // Allow empty string or valid numbers
+          if (val === '' || !isNaN(Number(val))) {
+            onChange(val === '' ? '' : Number(val));
+          }
+        }}
         onKeyPress={onKeyPress}
+        step={step}
+        min={min}
+        max={max}
       />
     </div>
   );
