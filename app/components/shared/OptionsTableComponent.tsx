@@ -10,6 +10,7 @@ import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Search, Mail } from "lucide-react";
 import { useSearchParams, useRouter } from 'next/navigation';
+import { useSymbols } from '../../hooks/useSymbols';
 
 interface OptionsTableComponentProps {
   option: OptionType;
@@ -40,6 +41,7 @@ const DEFAULT_VISIBLE_COLUMNS = [
 export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { symbols } = useSymbols();
 
   const getParamKey = (key: string) => `${option}_${key}`;
   
@@ -199,6 +201,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           onChange={setSearchTerm}
           placeholder="Enter symbol..."
           onKeyPress={handleKeyPress}
+          suggestions={symbols}
+          showSuggestions={true}
         />
         <FilterInput
           label="Min Yield %"
