@@ -14,6 +14,7 @@ interface FilterInputProps {
   max?: string;
   suggestions?: string[];
   showSuggestions?: boolean;
+  onSelect?: () => void;
 }
 
 export function FilterInput({
@@ -27,7 +28,8 @@ export function FilterInput({
   min,
   max,
   suggestions = [],
-  showSuggestions = false
+  showSuggestions = false,
+  onSelect
 }: FilterInputProps) {
   const [showDropdown, setShowDropdown] = useState(false);
   const filteredSuggestions = suggestions
@@ -76,6 +78,7 @@ export function FilterInput({
               onClick={() => {
                 onChange(suggestion);
                 setShowDropdown(false);
+                onSelect?.();
               }}
             >
               {suggestion}

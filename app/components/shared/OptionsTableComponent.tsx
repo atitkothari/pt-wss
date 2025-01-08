@@ -203,6 +203,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           onKeyPress={handleKeyPress}
           suggestions={symbols}
           showSuggestions={true}
+          onSelect={handleSearch}
         />
         <FilterInput
           label="Min Yield %"
