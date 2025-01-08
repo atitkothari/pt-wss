@@ -40,7 +40,7 @@ export function useOptionsData(
         filters.push({ operation: 'eq', field: 'type', value: `"${option}"` });
       }
       if (searchTerm) {
-        filters.push({ operation: 'like', field: 'symbol', value: searchTerm });
+        filters.push({ operation: 'eq', field: 'symbol', value: `"${searchTerm}"` });
       }
       if (minYieldVal > 0) {
         filters.push({ operation: 'gt', field: 'yieldPercent', value: minYieldVal });

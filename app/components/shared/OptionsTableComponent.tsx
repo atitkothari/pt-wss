@@ -177,6 +177,37 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
   const [deltaFilter, setDeltaFilter] = useState<[number, number]>([-1, 1]);
 
+  const handleSymbolSelect = (symbol: string) => {
+    setSearchTerm(symbol);
+    setActiveFilters(prev => ({
+      ...prev,
+      searchTerm: symbol,
+      pageNo: 1
+    }));
+
+    updateURL({
+      search: symbol,
+      minYield,
+      maxPrice,
+      minVol,
+      expiration: selectedExpiration,
+      strikeFilter
+    });
+
+    fetchData(
+      symbol,
+      minYield,
+      maxPrice,
+      minVol,
+      selectedExpiration,
+      1,
+      rowsPerPage,
+      sortConfig.direction ? sortConfig : undefined,
+      strikeFilter !== 'ALL' ? strikeFilter : undefined,
+      deltaFilter
+    ).catch(console.error);
+  };
+
   if (error) return <div className="text-red-500 p-4">{error}</div>;
 
   return (
@@ -203,7 +234,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           onKeyPress={handleKeyPress}
           suggestions={symbols}
           showSuggestions={true}
-          onSelect={handleSearch}
+          onSelect={handleSymbolSelect}
         />
         <FilterInput
           label="Min Yield %"
