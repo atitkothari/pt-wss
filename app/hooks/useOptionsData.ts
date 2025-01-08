@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { fetchOptionsData } from '../services/api';
 import { Option, OptionType, StrikeFilter } from '../types/option';
 import { parseISO, addDays, format } from 'date-fns';
@@ -11,12 +11,15 @@ export function useOptionsData(
   maxPrice: number = 1000,
   minVol: number = 0,
   expiration: string = '',
-  option: OptionType = 'call'
+  option: OptionType = 'call',
+  minDelta: number = -1,
+  maxDelta: number = 1
 ) {
   const [data, setData] = useState<Option[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [totalCount, setTotalCount] = useState(0);
+  const [deltaFilter, setDeltaFilter] = useState<[number, number]>([0.3, 0.7]);
 
   const fetchData = async (
     searchTerm: string = symbol,
@@ -28,6 +31,7 @@ export function useOptionsData(
     pageSize: number = 50,
     sortConfig?: { field: string; direction: 'asc' | 'desc' | null },
     strikeFilter?: StrikeFilter,
+    deltaRange?: [number, number]
   ) => {
     setLoading(true);
     try {
@@ -52,6 +56,11 @@ export function useOptionsData(
         filters.push({ operation: 'gt', field: 'expiration', value: `"${format(new Date(), 'yyyy-MM-dd')}"` });
       } else if (selectedExpiration) {            
         filters.push({ operation: 'eq', field: 'expiration', value: `"${selectedExpiration}"` });      
+      }
+
+      if (deltaRange) {
+        filters.push({ operation: 'gte', field: 'delta', value: deltaRange[0] });
+        filters.push({ operation: 'lte', field: 'delta', value: deltaRange[1] });
       }
 
       const result = await fetchOptionsData(

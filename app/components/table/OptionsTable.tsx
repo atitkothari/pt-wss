@@ -20,6 +20,7 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: "stockPrice", label: "Stock Price" },
   { key: "strike", label: "Strike" },
   { key: "premium", label: "Premium" },
+  { key: "delta", label: "Delta" },
   { key: "yieldPercent", label: "Yield %" },
   { key: "bidPrice", label: "Bid" },
   { key: "askPrice", label: "Ask" },

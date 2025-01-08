@@ -63,5 +63,13 @@ export async function fetchOptionsData(
     throw new Error('Failed to fetch data');
   }
 
-  return response.json();
+  const result = await response.json();
+  
+  return {
+    ...result,
+    options: result.options.map((opt: any) => ({
+      ...opt,
+      delta: opt.delta || null
+    }))
+  };
 }

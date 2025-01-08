@@ -7,6 +7,9 @@ interface FilterInputProps {
   placeholder?: string;
   type?: string;
   onKeyPress?: (e: React.KeyboardEvent) => void;
+  step?: string;
+  min?: string;
+  max?: string;
 }
 
 export function FilterInput({

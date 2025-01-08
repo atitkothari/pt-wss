@@ -50,6 +50,10 @@ export function OptionRow({ option, index, visibleColumns }: OptionRowProps) {
         </TableCell>;
       case 'impliedVolatility':
         return <TableCell className="text-right">{option.impliedVolatility.toFixed(1)}%</TableCell>;
+      case 'delta':
+        return <TableCell className="text-right">
+          {option.delta?.toFixed(2) ?? 'N/A'}
+        </TableCell>;
       default:
         return null;
     }

@@ -23,6 +23,20 @@ function getNextFriday(date: Date): Date {
   return nextFriday;
 }
 
+const DEFAULT_VISIBLE_COLUMNS = [
+  'symbol',
+  'stockPrice',
+  'strike',
+  'premium',
+  'yieldPercent',
+  'delta',
+  'volume',
+  'openInterest',
+  'expiration',
+  'earningsDate',
+  'impliedVolatility'
+];
+
 export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -108,7 +122,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       1,
       rowsPerPage,
       sortConfig.direction ? sortConfig : undefined,
-      strikeFilter !== 'ALL' ? strikeFilter : undefined,      
+      strikeFilter !== 'ALL' ? strikeFilter : undefined,
+      deltaFilter
     ).catch(console.error);
     setCurrentPage(1);
   };
@@ -158,6 +173,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     window.location.href = "mailto:theproducttank@gmail.com?subject=Feedback about Wheel Strategy Screener";
   };
 
+  const [deltaFilter, setDeltaFilter] = useState<[number, number]>([-1, 1]);
+
   if (error) return <div className="text-red-500 p-4">{error}</div>;
 
   return (
@@ -199,25 +216,51 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           type="number"
           onKeyPress={handleKeyPress}
         />
-        <FilterInput
-          label="Min Volume"
-          value={minVol}
-          onChange={setMinVol}
-          placeholder="Min vol..."
-          type="number"
-          onKeyPress={handleKeyPress}
-        />
-        <div>
-          <label className="block text-sm font-medium mb-1">Strike Filter</label>
-          <select
-            className="w-full px-3 py-2 border rounded-md"
-            value={strikeFilter}
-            onChange={(e) => setStrikeFilter(e.target.value as StrikeFilter)}
-          >
-            <option value="ALL">All Strikes</option>
-            <option value="ONE_OUT">One Strike Out</option>
-            <option value="THREE_PERCENT">&gt; 3% Out</option>
-          </select>
+        <div className="grid grid-cols-2 gap-4">
+          <FilterInput
+            label="Min Delta"
+            value={deltaFilter[0]}
+            onChange={(value) => setDeltaFilter([value, deltaFilter[1]])}
+            placeholder="Min delta..."
+            type="number"
+            step="0.1"
+            min="-1"
+            max="1"
+            onKeyPress={handleKeyPress}
+          />
+          <FilterInput
+            label="Max Delta"
+            value={deltaFilter[1]}
+            onChange={(value) => setDeltaFilter([deltaFilter[0], value])}
+            placeholder="Max delta..."
+            type="number"
+            step="0.1"
+            min="-1"
+            max="1"
+            onKeyPress={handleKeyPress}
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Strike Filter</label>
+            <select
+              className="w-full px-3 py-2 border rounded-md"
+              value={strikeFilter}
+              onChange={(e) => setStrikeFilter(e.target.value as StrikeFilter)}
+            >
+              <option value="ALL">All Strikes</option>
+              <option value="ONE_OUT">One Strike Out</option>
+              <option value="THREE_PERCENT">&gt; 3% Out</option>
+            </select>
+          </div>
+          <FilterInput
+            label="Min Volume"
+            value={minVol}
+            onChange={setMinVol}
+            placeholder="Min vol..."
+            type="number"
+            onKeyPress={handleKeyPress}
+          />
         </div>
         <div className="flex gap-2">
           <div className="flex-1">
