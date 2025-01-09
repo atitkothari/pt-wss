@@ -323,11 +323,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         </div>
 
         {/* Third Row - All Buttons */}
-        <div className="md:col-span-3 flex justify-end gap-2">
+        <div className="md:col-span-3 flex flex-col md:flex-row gap-2 md:justify-end">
           <Button 
             variant="outline"
             onClick={handleFeedback}
-            className="text-gray-600 hover:text-gray-800"
+            className="text-gray-600 hover:text-gray-800 w-full md:w-auto"
           >
             <Mail className="h-4 w-4 mr-2" />
             Provide Feedback
@@ -336,7 +336,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           <Button
             variant="outline"
             onClick={() => setShowSaveModal(true)}
-            className="text-gray-600 hover:text-gray-800"
+            className="text-gray-600 hover:text-gray-800 w-full md:w-auto"
           >
             <Save className="h-4 w-4 mr-2" />
             Save Query
@@ -344,6 +344,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
           <Button 
             onClick={handleSearch}
+            className="w-full md:w-auto"
           >
             <Search className="h-4 w-4 mr-2" />
             Search
