@@ -29,11 +29,11 @@ const DEFAULT_VISIBLE_COLUMNS = [
   'stockPrice',
   'strike',
   'premium',
-  'yieldPercent',
   'delta',
+  'yieldPercent',
+  'expiration',
   'volume',
   'openInterest',
-  'expiration',
   'earningsDate',
   'impliedVolatility'
 ];

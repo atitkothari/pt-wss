@@ -4,7 +4,7 @@ export default function OptionsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-gradient-to-b from-gray-900 to-gray-800 w-full border-b border-gray-700 p-4">
-        <div className="max-w-screen-xl mx-auto">
+        <div className="max-w-screen-2xl mx-auto">
           <a href="/" className="flex items-center">
             <img src="/logo.png" className="h-12 mr-3" alt="Wheel Strategy Options Logo" />
             <span className="self-center text-2xl font-semibold whitespace-nowrap text-white">
@@ -14,7 +14,7 @@ export default function OptionsPage() {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto p-8">
+      <div className="max-w-screen-2xl mx-auto p-8">
         <div className="mb-8">
           <p className="text-gray-600">
             Find and analyze covered call and cash secured put opportunities for stocks in SP 500. We are working on adding more stocks to the list.

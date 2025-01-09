@@ -22,11 +22,11 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: "premium", label: "Premium" },
   { key: "delta", label: "Delta" },
   { key: "yieldPercent", label: "Yield %" },
+  { key: "expiration", label: "Expiration" },
   { key: "bidPrice", label: "Bid" },
   { key: "askPrice", label: "Ask" },
   { key: "volume", label: "Volume" },
   { key: "openInterest", label: "Open Interest" },
-  { key: "expiration", label: "Expiration" },
   { key: "earningsDate", label: "Earnings" },
   { key: "impliedVolatility", label: "IV %" },
 ];
