@@ -26,6 +26,15 @@ export default function RootLayout({
         <meta name="google-adsense-account" content="ca-pub-8741511572242021" />
       </head>
       <body className={inter.className}>
+        {/* Google Tag Manager (noscript) */}
+        <noscript>
+          <iframe 
+            src="https://www.googletagmanager.com/ns.html?id=GTM-TPGFCVDV"
+            height="0" 
+            width="0" 
+            style={{display: 'none', visibility: 'hidden'}}
+          />
+        </noscript>
         <GoogleAnalytics />
         <main>
           {children}
