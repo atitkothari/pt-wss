@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { saveQuery } from "@/app/services/queryService";
 
 interface SaveQueryModalProps {
   isOpen: boolean;
@@ -30,31 +31,101 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
   const [frequency, setFrequency] = useState("daily");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const formatFilterData = (query: any) => {
+    const filterData = [];
+
+    // Add type filter using the option type directly
+    filterData.push({
+      operation: "eq",
+      field: "type",
+      value: `"${query.option}"`
+    });
+
+    // Always add symbol filter
+    filterData.push({
+      operation: "eq",
+      field: "symbol",
+      value: query.searchTerm ? `"${query.searchTerm.toUpperCase()}"` : '""'
+    });
+
+    // Always add strike price filter
+    filterData.push({
+      operation: "lt",
+      field: "strike",
+      value: query.maxPrice ? parseFloat(query.maxPrice) : 100000
+    });
+
+    // Always add min yield filter
+    filterData.push({
+      operation: "gte",
+      field: "yield",
+      value: query.minYield ? parseFloat(query.minYield) : 0
+    });
+
+    // Always add min volume filter
+    filterData.push({
+      operation: "gte",
+      field: "volume",
+      value: query.minVol ? parseInt(query.minVol) : 0
+    });
+
+    // Always add expiration filter
+    filterData.push({
+      operation: "eq",
+      field: "expiration",
+      value: query.selectedExpiration ? `"${query.selectedExpiration}"` : '""'
+    });
+
+    // Always add delta filters
+    filterData.push(
+      {
+        operation: "gte",
+        field: "delta",
+        value: query.deltaFilter ? query.deltaFilter[0] : -1
+      },
+      {
+        operation: "lte",
+        field: "delta",
+        value: query.deltaFilter ? query.deltaFilter[1] : 1
+      }
+    );
+
+    // Always add strike filter using the option type
+    filterData.push({
+      operation: "strikeFilter",
+      field: query.option,
+      value: query.strikeFilter === 'ITM' ? 1 : query.strikeFilter === 'OTM' ? -1 : 0
+    });
+
+    return filterData;
+  };
+
   const handleSubmit = async () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
     if (!email) {
-      toast.error("Please enter your email");
+      toast.error("Please enter your email address");
+      return;
+    }
+
+    if (!emailRegex.test(email)) {
+      toast.error("Please enter a valid email address");
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const response = await fetch('https://api.wheelstrategyoptions.com/wheelstrat/saveQuery', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          frequency,
-          query: currentQuery
-        }),
-      });
+      const requestBody = {
+        email,
+        frequency,
+        filter_data: formatFilterData(currentQuery)
+      };
 
-      if (!response.ok) throw new Error('Failed to save query');
-
+      await saveQuery(requestBody);
       toast.success("Query saved successfully!");
       onClose();
     } catch (error) {
+      console.error('Save query error:', error);
       toast.error("Failed to save query. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -62,14 +133,16 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
   };
 
   const formatQueryDisplay = (query: any) => {
-    const displayItems = [];
-    if (query.searchTerm) displayItems.push(`Symbol: ${query.searchTerm}`);
-    if (query.minYield) displayItems.push(`Min Yield: ${query.minYield}%`);
-    if (query.maxPrice) displayItems.push(`Max Strike: $${query.maxPrice}`);
-    if (query.minVol) displayItems.push(`Min Volume: ${query.minVol}`);
-    if (query.selectedExpiration) displayItems.push(`Expiration: ${query.selectedExpiration}`);
-    if (query.strikeFilter !== 'ALL') displayItems.push(`Strike Filter: ${query.strikeFilter}`);
-    if (query.deltaFilter) displayItems.push(`Delta Range: ${query.deltaFilter[0]} to ${query.deltaFilter[1]}`);
+    const displayItems = [
+      `Option Type: ${query.option === 'put' ? 'Put' : 'Call'}`,
+      `Symbol: ${query.searchTerm || 'Any'}`,
+      `Max Strike: ${query.maxPrice ? `$${query.maxPrice}` : 'No limit'}`,
+      `Min Yield: ${query.minYield ? `${query.minYield}%` : '0%'}`,
+      `Min Volume: ${query.minVol || '0'}`,
+      `Expiration: ${query.selectedExpiration || 'Any'}`,
+      `Strike Filter: ${query.strikeFilter || 'ALL'}`,
+      `Delta Range: ${query.deltaFilter ? `${query.deltaFilter[0]} to ${query.deltaFilter[1]}` : '-1 to 1'}`
+    ];
     return displayItems;
   };
 
