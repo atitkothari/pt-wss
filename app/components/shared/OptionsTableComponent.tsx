@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FilterInput } from "../filters/FilterInput";
 import { useOptionsData } from "../../hooks/useOptionsData";
 import { LoadingSpinner } from "../LoadingSpinner";
@@ -8,9 +8,10 @@ import { Option, OptionType, StrikeFilter } from "../../types/option";
 import { OptionsTable } from "../table/OptionsTable";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Search, Mail } from "lucide-react";
+import { Search, Mail, Save } from "lucide-react";
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSymbols } from '../../hooks/useSymbols';
+import { SaveQueryModal } from "../modals/SaveQueryModal";
 
 interface OptionsTableComponentProps {
   option: OptionType;
@@ -49,6 +50,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const [minYield, setMinYield] = useState(Number(searchParams.get(getParamKey('minYield'))) || 0);
   const [maxPrice, setMaxPrice] = useState(Number(searchParams.get(getParamKey('maxPrice'))) || 1000);
   const [minVol, setMinVol] = useState(Number(searchParams.get(getParamKey('minVol'))) || 0);
+  const [deltaFilter, setDeltaFilter] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_delta'))) || -1, Number(searchParams.get(getParamKey('max_delta'))) || 1]);
+
   const [selectedExpiration, setSelectedExpiration] = useState(searchParams.get(getParamKey('expiration')) || "");
   const [sortConfig, setSortConfig] = useState<{ field: keyof Option; direction: 'asc' | 'desc' | null }>({ 
     field: "symbol", 
@@ -95,8 +98,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     router.push(`?${params.toString()}`);
   };
 
+  const [isFromCache, setIsFromCache] = useState(false);
+
   const handleSearch = () => {
     setHasSearched(true);
+    setIsFromCache(false);
     setActiveFilters({
       searchTerm,
       minYield,
@@ -112,7 +118,9 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       maxPrice,
       minVol,
       expiration: selectedExpiration,
-      strikeFilter
+      strikeFilter,
+      min_delta: deltaFilter[0],
+      max_delta: deltaFilter[1]
     });
 
     fetchData(
@@ -129,6 +137,13 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     ).catch(console.error);
     setCurrentPage(1);
   };
+
+  useEffect(() => {
+    if (Array.from(searchParams.entries()).length > 0 && !isFromCache) {
+      handleSearch();
+      setIsFromCache(true);
+    }
+  }, []);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -173,9 +188,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
   const handleFeedback = () => {
     window.location.href = "mailto:theproducttank@gmail.com?subject=Feedback about Wheel Strategy Screener";
-  };
-
-  const [deltaFilter, setDeltaFilter] = useState<[number, number]>([-1, 1]);
+  };  
 
   const handleSymbolSelect = (symbol: string) => {
     setSearchTerm(symbol);
@@ -191,7 +204,9 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       maxPrice,
       minVol,
       expiration: selectedExpiration,
-      strikeFilter
+      strikeFilter,
+      min_delta: deltaFilter[0],
+      max_delta: deltaFilter[1]
     });
 
     fetchData(
@@ -208,24 +223,26 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     ).catch(console.error);
   };
 
+  const [showSaveModal, setShowSaveModal] = useState(false);
+
+  const getCurrentQuery = () => ({
+    searchTerm,
+    minYield,
+    maxPrice,
+    minVol,
+    selectedExpiration,
+    strikeFilter,
+    deltaFilter,
+    option
+  });
+
   if (error) return <div className="text-red-500 p-4">{error}</div>;
 
   return (
-    <div className="w-full">
-      <div className="flex justify-end mb-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleFeedback}
-          className="text-gray-600 hover:text-gray-800"
-        >
-          <Mail className="h-4 w-4 mr-2" />
-          Provide Feedback
-        </Button>
-      </div>
-
+    <div className="w-full">      
       {/* Filter Controls */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        {/* First Row */}
         <FilterInput
           label="Search Symbol"
           value={searchTerm}
@@ -234,7 +251,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           onKeyPress={handleKeyPress}
           suggestions={symbols}
           showSuggestions={true}
-          onSelect={handleSymbolSelect}
+          onSelect={(selectedSymbol: string) => handleSymbolSelect(selectedSymbol)}
         />
         <FilterInput
           label="Min Yield %"
@@ -252,6 +269,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           type="number"
           onKeyPress={handleKeyPress}
         />
+
+        {/* Second Row */}
         <div className="grid grid-cols-2 gap-4">
           <FilterInput
             label="Min Delta"
@@ -298,34 +317,52 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             onKeyPress={handleKeyPress}
           />
         </div>
-        <div className="flex gap-2">
-          <div className="flex-1">
-            <label className="block text-sm font-medium mb-1">Expiration</label>
-            <select
-              className="w-full px-3 py-2 border rounded-md"
-              value={selectedExpiration}
-              onChange={(e) => setSelectedExpiration(e.target.value)}
-            >
-              <option value="">All Dates</option>
-              {getNext4Fridays.map((date) => {
-                const formattedDate = format(date, "yyyy-MM-dd");
-                return (
-                  <option key={formattedDate} value={formattedDate}>
-                    {format(date, "MMM d, yyyy")}
-                  </option>
-                )
-              })}
-            </select>
-          </div>
-          <div className="flex items-end">
-            <Button 
-              onClick={handleSearch}
-              className="mb-0"
-            >
-              <Search className="h-4 w-4 mr-2" />
-              Search
-            </Button>
-          </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Expiration</label>
+          <select
+            className="w-full px-3 py-2 border rounded-md"
+            value={selectedExpiration}
+            onChange={(e) => setSelectedExpiration(e.target.value)}
+          >
+            <option value="">All Dates</option>
+            {getNext4Fridays.map((date) => {
+              const formattedDate = format(date, "yyyy-MM-dd");
+              return (
+                <option key={formattedDate} value={formattedDate}>
+                  {format(date, "MMM d, yyyy")}
+                </option>
+              )
+            })}
+          </select>
+        </div>
+
+        {/* Third Row - All Buttons */}
+        <div className="md:col-span-3 flex flex-col md:flex-row gap-2 md:justify-end">
+          <Button 
+            variant="outline"
+            onClick={handleFeedback}
+            className="text-gray-600 hover:text-gray-800 w-full md:w-auto"
+          >
+            <Mail className="h-4 w-4 mr-2" />
+            Provide Feedback
+          </Button>
+          
+          <Button
+            variant="outline"
+            onClick={() => setShowSaveModal(true)}
+            className="text-gray-600 hover:text-gray-800 w-full md:w-auto"
+          >
+            <Save className="h-4 w-4 mr-2" />
+            Save Query
+          </Button>
+
+          <Button 
+            onClick={handleSearch}
+            className="w-full md:w-auto"
+          >
+            <Search className="h-4 w-4 mr-2" />
+            Search
+          </Button>
         </div>
       </div>
 
@@ -423,6 +460,12 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           </div>
         </div>
       )}
+
+      <SaveQueryModal
+        isOpen={showSaveModal}
+        onClose={() => setShowSaveModal(false)}
+        currentQuery={getCurrentQuery()}
+      />
     </div>
   );
 } 
