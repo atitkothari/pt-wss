@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FilterInput } from "../filters/FilterInput";
 import { useOptionsData } from "../../hooks/useOptionsData";
 import { LoadingSpinner } from "../LoadingSpinner";
@@ -98,8 +98,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     router.push(`?${params.toString()}`);
   };
 
+  const [isFromCache, setIsFromCache] = useState(false);
+
   const handleSearch = () => {
     setHasSearched(true);
+    setIsFromCache(false);
     setActiveFilters({
       searchTerm,
       minYield,
@@ -134,6 +137,13 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     ).catch(console.error);
     setCurrentPage(1);
   };
+
+  useEffect(() => {
+    if (Array.from(searchParams.entries()).length > 0 && !isFromCache) {
+      handleSearch();
+      setIsFromCache(true);
+    }
+  }, []);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
