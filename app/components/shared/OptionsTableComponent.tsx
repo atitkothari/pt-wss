@@ -100,9 +100,26 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
   const [isFromCache, setIsFromCache] = useState(false);
 
+  const [searchCount, setSearchCount] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return Number(localStorage.getItem('searchCount') || '0');
+    }
+    return 0;
+  });
+
   const handleSearch = () => {
     setHasSearched(true);
     setIsFromCache(false);
+    
+    const newCount = searchCount + 1;
+    setSearchCount(newCount);
+    localStorage.setItem('searchCount', newCount.toString());
+    
+    if (newCount >= 3) {
+      setShowSaveModal(true);
+      setSearchCount(0)
+    }
+
     setActiveFilters({
       searchTerm,
       minYield,
