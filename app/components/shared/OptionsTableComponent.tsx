@@ -50,6 +50,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const [minYield, setMinYield] = useState(Number(searchParams.get(getParamKey('minYield'))) || 0);
   const [maxPrice, setMaxPrice] = useState(Number(searchParams.get(getParamKey('maxPrice'))) || 1000);
   const [minVol, setMinVol] = useState(Number(searchParams.get(getParamKey('minVol'))) || 0);
+  const [deltaFilter, setDeltaFilter] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_delta'))) || -1, Number(searchParams.get(getParamKey('max_delta'))) || 1]);
+
   const [selectedExpiration, setSelectedExpiration] = useState(searchParams.get(getParamKey('expiration')) || "");
   const [sortConfig, setSortConfig] = useState<{ field: keyof Option; direction: 'asc' | 'desc' | null }>({ 
     field: "symbol", 
@@ -113,7 +115,9 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       maxPrice,
       minVol,
       expiration: selectedExpiration,
-      strikeFilter
+      strikeFilter,
+      min_delta: deltaFilter[0],
+      max_delta: deltaFilter[1]
     });
 
     fetchData(
@@ -174,9 +178,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
   const handleFeedback = () => {
     window.location.href = "mailto:theproducttank@gmail.com?subject=Feedback about Wheel Strategy Screener";
-  };
-
-  const [deltaFilter, setDeltaFilter] = useState<[number, number]>([-1, 1]);
+  };  
 
   const handleSymbolSelect = (symbol: string) => {
     setSearchTerm(symbol);
@@ -192,7 +194,9 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       maxPrice,
       minVol,
       expiration: selectedExpiration,
-      strikeFilter
+      strikeFilter,
+      min_delta: deltaFilter[0],
+      max_delta: deltaFilter[1]
     });
 
     fetchData(
