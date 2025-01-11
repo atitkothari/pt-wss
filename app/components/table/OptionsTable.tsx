@@ -23,6 +23,7 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: "delta", label: "Delta" },
   { key: "yieldPercent", label: "Yield %" },
   { key: "expiration", label: "Expiration" },
+  { key: "annualizedReturn", label: "Ann %" },
   { key: "bidPrice", label: "Bid" },
   { key: "askPrice", label: "Ask" },
   { key: "volume", label: "Volume" },

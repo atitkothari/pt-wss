@@ -13,6 +13,7 @@ export interface Option {
   yieldPercent: number;
   premium?: number; // Calculated field
   delta?: number;  // Make it optional since some options might not have delta
+  annualizedReturn?: number;
 }
 
 export type OptionType = 'call' | 'put';
