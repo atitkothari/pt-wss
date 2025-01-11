@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 interface FilterInputProps {
+  id?: string;
   label: string;
   value: string | number;
   onChange: (value: any) => void;
@@ -18,6 +19,7 @@ interface FilterInputProps {
 }
 
 export function FilterInput({
+  id,
   label,
   value,
   onChange,
@@ -80,6 +82,7 @@ export function FilterInput({
     <div className="flex-1 relative">
       <label className="block text-sm font-medium mb-1">{label}</label>
       <input
+        id={id}
         type={type}
         className="w-full px-3 py-2 border rounded-md"
         placeholder={placeholder}

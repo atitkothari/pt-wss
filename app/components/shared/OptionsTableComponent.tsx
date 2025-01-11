@@ -244,6 +244,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         {/* First Row */}
         <FilterInput
+          id="input_screener_symbol"
           label="Search Symbol"
           value={searchTerm}
           onChange={setSearchTerm}
@@ -254,6 +255,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           onSelect={(selectedSymbol: string) => handleSymbolSelect(selectedSymbol)}
         />
         <FilterInput
+          id="input_screener_min_yield"
           label="Min Yield %"
           value={minYield}
           onChange={setMinYield}
@@ -262,6 +264,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           onKeyPress={handleKeyPress}
         />
         <FilterInput
+          id="input_screener_max_price"
           label="Max Strike Price"
           value={maxPrice}
           onChange={setMaxPrice}
@@ -273,6 +276,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         {/* Second Row */}
         <div className="grid grid-cols-2 gap-4">
           <FilterInput
+            id="input_screener_min_delta"
             label="Min Delta"
             value={deltaFilter[0]}
             onChange={(value) => setDeltaFilter([value, deltaFilter[1]])}
@@ -284,6 +288,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             onKeyPress={handleKeyPress}
           />
           <FilterInput
+            id="input_screener_max_delta"
             label="Max Delta"
             value={deltaFilter[1]}
             onChange={(value) => setDeltaFilter([deltaFilter[0], value])}
@@ -299,6 +304,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           <div>
             <label className="block text-sm font-medium mb-1">Strike Filter</label>
             <select
+              id="input_screener_strike_filter"
               className="w-full px-3 py-2 border rounded-md"
               value={strikeFilter}
               onChange={(e) => setStrikeFilter(e.target.value as StrikeFilter)}
@@ -309,6 +315,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             </select>
           </div>
           <FilterInput
+            id="input_screener_min_volume"
             label="Min Volume"
             value={minVol}
             onChange={setMinVol}
@@ -320,6 +327,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         <div>
           <label className="block text-sm font-medium mb-1">Expiration</label>
           <select
+            id="input_screener_expiration"
             className="w-full px-3 py-2 border rounded-md"
             value={selectedExpiration}
             onChange={(e) => setSelectedExpiration(e.target.value)}
