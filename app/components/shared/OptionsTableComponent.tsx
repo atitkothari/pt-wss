@@ -115,10 +115,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     setSearchCount(newCount);
     localStorage.setItem('searchCount', newCount.toString());
     
-    if (newCount >= 3) {
-      setShowSaveModal(true);
-      setSearchCount(0)
-    }
+    // if (newCount >= 3) {
+    //   setShowSaveModal(true);
+    //   setSearchCount(0)
+    // }
 
     setActiveFilters({
       searchTerm,
@@ -379,7 +379,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             className="text-gray-600 hover:text-gray-800 w-full md:w-auto"
           >
             <Save className="h-4 w-4 mr-2" />
-            Save Query
+            Alert
           </Button>
 
           <Button 
