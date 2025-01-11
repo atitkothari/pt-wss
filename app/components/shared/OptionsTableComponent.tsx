@@ -357,6 +357,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           </Button>
 
           <Button 
+            id="btn_screener_search"
             onClick={handleSearch}
             className="w-full md:w-auto"
           >
