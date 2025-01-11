@@ -356,6 +356,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           </Button>
           
           <Button
+            id="btn_screener_save"
             variant="outline"
             onClick={() => setShowSaveModal(true)}
             className="text-gray-600 hover:text-gray-800 w-full md:w-auto"
