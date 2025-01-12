@@ -198,7 +198,7 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit} disabled={isSubmitting}>
+          <Button onClick={handleSubmit} disabled={isSubmitting} id="btn_save_query">
             {isSubmitting ? "Saving..." : "Save Query"}
           </Button>
         </div>
