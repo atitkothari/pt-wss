@@ -364,6 +364,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         {/* Third Row - All Buttons */}
         <div className="md:col-span-3 flex flex-col md:flex-row gap-2 md:justify-end">
           <Button 
+            id="btn_screener_feedback_top"
             variant="outline"
             onClick={handleFeedback}
             className="text-gray-600 hover:text-gray-800 w-full md:w-auto"
@@ -476,6 +477,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
               * Data is updated everyday end of day
             </div>
             <Button
+              id="btn_screener_feedback_bottom"
               variant="ghost"
               size="sm"
               onClick={handleFeedback}

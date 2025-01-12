@@ -25,8 +25,18 @@ export function OptionTabs() {
   return (
     <Tabs defaultValue={defaultTab} className="w-full">
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="covered-call">Covered Call</TabsTrigger>
-        <TabsTrigger value="cash-secured-put">Cash Secured Put</TabsTrigger>
+        <TabsTrigger 
+          id="btn_covered_call_tab"
+          value="covered-call"
+        >
+          Covered Call
+        </TabsTrigger>
+        <TabsTrigger 
+          id="btn_cash_secured_put_tab"
+          value="cash-secured-put"
+        >
+          Cash Secured Put
+        </TabsTrigger>
       </TabsList>
       <TabsContent value="covered-call">
         <CoveredCallTable />
