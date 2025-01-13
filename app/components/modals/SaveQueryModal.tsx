@@ -187,9 +187,9 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
                 <SelectValue placeholder="Select frequency" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="daily">Daily</SelectItem>
-                <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
+                <SelectItem value="daily" id="daily">Daily</SelectItem>
+                <SelectItem value="weekly" id="weekly">Weekly</SelectItem>
+                <SelectItem value="monthly" id="monthly">Monthly</SelectItem>
               </SelectContent>
             </Select>
           </div>
