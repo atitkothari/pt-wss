@@ -58,7 +58,7 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
     // Always add min yield filter
     filterData.push({
       operation: "gte",
-      field: "yield",
+      field: "yieldPercent",
       value: query.minYield ? parseFloat(query.minYield) : 0
     });
 
