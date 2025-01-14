@@ -380,7 +380,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             className="text-gray-600 hover:text-gray-800 w-full md:w-auto"
           >
             <Save className="h-4 w-4 mr-2" />
-            Alert
+            Setup Email Alerts
           </Button>
 
           <Button 
