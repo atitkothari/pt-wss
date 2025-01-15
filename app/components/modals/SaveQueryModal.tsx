@@ -69,13 +69,13 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
       value: query.minVol ? parseInt(query.minVol) : 0
     });
 
-    // Always add expiration filter
+  if(query.selectedExpiration){    
     filterData.push({
       operation: "eq",
       field: "expiration",
       value: query.selectedExpiration ? `"${query.selectedExpiration}"` : '""'
     });
-
+    }
     // Always add delta filters
     filterData.push(
       {
@@ -181,10 +181,10 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
           <div className="grid gap-2">
             <label htmlFor="frequency" className="text-sm font-medium">
               Alert Frequency
-            </label>
+            </label>            
             <Select value={frequency} onValueChange={setFrequency}>
               <SelectTrigger>
-                <SelectValue placeholder="Select frequency" />
+                <SelectValue placeholder="Select frequency" id="frequency" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="daily" id="daily">Daily</SelectItem>
