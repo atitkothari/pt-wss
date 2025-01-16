@@ -8,7 +8,7 @@ import { Option, OptionType, StrikeFilter } from "../../types/option";
 import { OptionsTable } from "../table/OptionsTable";
 import { format, addDays } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Search, Mail, Save } from "lucide-react";
+import { Search, Mail, Save, Coffee } from "lucide-react";
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSymbols } from '../../hooks/useSymbols';
 import { SaveQueryModal } from "../modals/SaveQueryModal";
@@ -379,7 +379,6 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             <Save className="h-4 w-4 mr-2" />
             Email This!
           </Button>
-
           <Button 
             id="btn_screener_search"
             onClick={handleSearch}
@@ -476,14 +475,13 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
               * Data is updated everyday end of day
             </div>
             <Button
-              id="btn_screener_feedback_bottom"
-              variant="ghost"
+              id="btn_buy_coffee_bottom"
+              variant="outline"
               size="sm"
-              onClick={handleFeedback}
+              onClick={() => window.open('https://buymeacoffee.com/vizdam', '_blank')}
               className="text-gray-500 hover:text-gray-700"
             >
-              <Mail className="h-4 w-4 mr-2" />
-              Provide Feedback
+              Support
             </Button>
           </div>
         </div>
