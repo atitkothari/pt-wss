@@ -377,7 +377,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             className="text-gray-600 hover:text-gray-800 w-full sm:w-auto"
           >
             <Save className="h-4 w-4 mr-2" />
-            Setup Email Alerts
+            Email This!
           </Button>
 
           <Button 
