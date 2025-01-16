@@ -267,40 +267,49 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   return (
     <div className="w-full">      
       {/* Filter Controls */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        {/* First Row */}
-        <FilterInput
-          id="input_screener_symbol"
-          label="Search Symbol"
-          value={searchTerm}
-          onChange={setSearchTerm}
-          placeholder="Enter symbol..."
-          onKeyPress={handleKeyPress}
-          suggestions={symbols}
-          showSuggestions={true}
-          onSelect={(selectedSymbol: string) => handleSymbolSelect(selectedSymbol)}
-        />
-        <FilterInput
-          id="input_screener_min_yield"
-          label="Min Yield %"
-          value={minYield}
-          onChange={setMinYield}
-          placeholder="Min yield..."
-          type="number"
-          onKeyPress={handleKeyPress}
-        />
-        <FilterInput
-          id="input_screener_max_price"
-          label="Max Strike Price"
-          value={maxPrice}
-          onChange={setMaxPrice}
-          placeholder="Max strike price..."
-          type="number"
-          onKeyPress={handleKeyPress}
-        />
-
-        {/* Second Row */}
-        <div className="grid grid-cols-2 gap-4">
+      <div className="space-y-4 mb-4">
+        {/* All Rows - 2 columns on mobile, 4 on large screens */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <FilterInput
+            id="input_screener_symbol"
+            label="Search Symbol"
+            value={searchTerm}
+            onChange={setSearchTerm}
+            placeholder="Enter symbol..."
+            onKeyPress={handleKeyPress}
+            suggestions={symbols}
+            showSuggestions={true}
+            onSelect={(selectedSymbol: string) => handleSymbolSelect(selectedSymbol)}
+          />
+          <FilterInput
+            id="input_screener_min_yield"
+            label="Min Yield %"
+            value={minYield}
+            onChange={setMinYield}
+            placeholder="Min yield..."
+            type="number"
+            onKeyPress={handleKeyPress}
+          />
+          <FilterInput
+            id="input_screener_max_price"
+            label="Max Strike Price"
+            value={maxPrice}
+            onChange={setMaxPrice}
+            placeholder="Max strike price..."
+            type="number"
+            onKeyPress={handleKeyPress}
+          />
+          <FilterInput
+            id="input_screener_expiration"
+            label="Days to Expiration"
+            value={dte}
+            onChange={setDte}
+            placeholder="Days to expiration..."
+            type="number"
+            min="0"
+            max="1000"
+            onKeyPress={handleKeyPress}
+          />
           <FilterInput
             id="input_screener_min_delta"
             label="Min Delta"
@@ -325,8 +334,6 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             max="1"
             onKeyPress={handleKeyPress}
           />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1">Strike Filter</label>
             <select
@@ -350,28 +357,14 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             onKeyPress={handleKeyPress}
           />
         </div>
-        <div>
-          {/* <label className="block text-sm font-medium mb-1">Days to Expiration</label> */}
-          <FilterInput
-            id="input_screener_expiration"
-            label="Days to Expiration"
-            value={dte}
-            onChange={setDte}
-            placeholder="Days to expiration..."
-            type="number"
-            min="0"
-            max="1000"
-            onKeyPress={handleKeyPress}
-          />
-        </div>
 
-        {/* Third Row - All Buttons */}
-        <div className="md:col-span-3 flex flex-col md:flex-row gap-2 md:justify-end">
+        {/* Buttons */}
+        <div className="flex flex-col sm:flex-row justify-end gap-2">
           <Button 
             id="btn_screener_feedback_top"
             variant="outline"
             onClick={handleFeedback}
-            className="text-gray-600 hover:text-gray-800 w-full md:w-auto"
+            className="text-gray-600 hover:text-gray-800 w-full sm:w-auto"
           >
             <Mail className="h-4 w-4 mr-2" />
             Provide Feedback
@@ -381,7 +374,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             id="btn_screener_save"
             variant="outline"
             onClick={() => setShowSaveModal(true)}
-            className="text-gray-600 hover:text-gray-800 w-full md:w-auto"
+            className="text-gray-600 hover:text-gray-800 w-full sm:w-auto"
           >
             <Save className="h-4 w-4 mr-2" />
             Setup Email Alerts
@@ -390,7 +383,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           <Button 
             id="btn_screener_search"
             onClick={handleSearch}
-            className="w-full md:w-auto"
+            className="w-full sm:w-auto"
           >
             <Search className="h-4 w-4 mr-2" />
             Search
