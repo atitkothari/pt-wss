@@ -267,9 +267,9 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   return (
     <div className="w-full">      
       {/* Filter Controls */}
-      <div className="space-y-4 mb-4">
+      <div className="space-y-2 mb-2">
         {/* All Rows - 2 columns on mobile, 4 on large screens */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
           <FilterInput
             id="input_screener_symbol"
             label="Search Symbol"
@@ -359,7 +359,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         </div>
 
         {/* Buttons */}
-        <div className="flex flex-col sm:flex-row justify-end gap-2">
+        <div className="flex flex-col sm:flex-row justify-end gap-1">
           <Button 
             id="btn_screener_feedback_top"
             variant="outline"
@@ -405,7 +405,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         <LoadingSpinner />
       ) : (
         <div>
-          <div className="text-sm text-gray-600 mb-4">
+          <div className="text-xs text-gray-600 mb-0.5 md:mb-1">
             Showing {totalCount} contracts
           </div>
           <OptionsTable 
@@ -414,11 +414,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             onSort={handleSort}
           />
           {/* Pagination Controls */}
-          <div className="flex justify-between items-center mt-4 px-4">
-            <div className="text-sm text-gray-600">
+          <div className="flex justify-between items-center mt-0.5 md:mt-1 px-0.5 md:px-1 text-xs">
+            <div className="text-gray-600">
               Showing {((currentPage - 1) * rowsPerPage) + 1} to {Math.min(currentPage * rowsPerPage, totalCount)} of {totalCount} results
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-1">
               <Button 
                 onClick={() => {
                   const prevPage = Math.max(1, currentPage - 1);
@@ -439,6 +439,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                 disabled={currentPage === 1}
                 variant="outline"
                 size="sm"
+                className="px-1.5 py-0.5 text-xs"
               >
                 Previous
               </Button>
@@ -462,6 +463,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                 disabled={currentPage * rowsPerPage >= totalCount}
                 variant="outline"
                 size="sm"
+                className="px-1.5 py-0.5 text-xs"
               >
                 Next
               </Button>

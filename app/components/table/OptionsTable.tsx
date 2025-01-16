@@ -32,6 +32,49 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: "impliedVolatility", label: "IV %" },
 ];
 
+const formatCell = (value: any, columnKey: string): string => {
+  if (value === undefined || value === null) return '-';
+
+  switch (columnKey) {
+    case 'stockPrice':
+    case 'strike':
+    case 'premium':
+    case 'bidPrice':
+    case 'askPrice':
+      return `$${Number(value).toFixed(2)}`;
+    
+    case 'delta':
+      return Number(value).toFixed(3);
+    
+    case 'yieldPercent':
+    case 'annualizedReturn':
+    case 'impliedVolatility':
+      return `${Number(value).toFixed(2)}%`;
+    
+    case 'expiration':
+      try {
+        return format(parseISO(value), 'MMM d, yyyy');
+      } catch {
+        return value;
+      }
+    
+    case 'earningsDate':
+      if (!value) return '-';
+      try {
+        return format(parseISO(value), 'MMM d, yyyy');
+      } catch {
+        return value;
+      }
+    
+    case 'volume':
+    case 'openInterest':
+      return value.toLocaleString();
+    
+    default:
+      return String(value);
+  }
+};
+
 interface OptionsTableProps {
   data: Option[];
   sortConfig: {
@@ -62,7 +105,7 @@ export function OptionsTable({ data, sortConfig, onSort }: OptionsTableProps) {
 
   return (
     <div>
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-end mb-1">
         <ColumnCustomizer
           columns={DEFAULT_COLUMNS}
           visibleColumns={visibleColumns}
@@ -70,42 +113,48 @@ export function OptionsTable({ data, sortConfig, onSort }: OptionsTableProps) {
         />
       </div>
       <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {visibleColumns.map((columnKey) => {
-                const column = DEFAULT_COLUMNS.find(col => col.key === columnKey);
-                return (
-                  <TableHead key={columnKey}>
-                    <Button
-                      variant="ghost"
-                      onClick={() => onSort(columnKey as keyof Option)}
-                      className="flex items-center gap-1"
+        <div className="w-full overflow-x-auto">
+          <table className="w-full border-collapse text-xs md:text-sm">
+            <thead>
+              <tr className="border-b">
+                {visibleColumns.map((column) => {
+                  const columnDef = DEFAULT_COLUMNS.find(col => col.key === column);
+                  return (
+                    <th 
+                      key={column} 
+                      onClick={() => onSort(column as keyof Option)}
+                      className="text-left p-2 md:p-2.5 font-medium cursor-pointer hover:bg-gray-50"
                     >
-                      {column?.label}
-                      {/* <ArrowUpDown className="h-4 w-4" /> */}
-                      {sortConfig.field === columnKey && (
+                      {columnDef?.label}
+                      {sortConfig.field === column && (
                         <span className="ml-1">
                           {sortConfig.direction === 'asc' ? '↑' : '↓'}
                         </span>
                       )}
-                    </Button>
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.map((option, index) => (
-              <OptionRow 
-                key={`${option.symbol}-${option.strike}-${index}`}
-                option={option}
-                index={index}
-                visibleColumns={visibleColumns}
-              />
-            ))}
-          </TableBody>
-        </Table>
+                    </th>
+                  );
+                })}
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((option, index) => (
+                <tr 
+                  key={`${option.symbol}-${option.strike}-${index}`}
+                  className="border-b hover:bg-gray-50"
+                >
+                  {visibleColumns.map((column) => (
+                    <td 
+                      key={column} 
+                      className="p-2 md:p-2.5 whitespace-nowrap"
+                    >
+                      {formatCell(option[column as keyof Option], column)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

@@ -14,17 +14,17 @@ export default function OptionsPage() {
         </div>
       </nav>
 
-      <div className="max-w-screen-2xl mx-auto p-8">
-        <div className="mb-8">
+      <div className="max-w-screen-2xl mx-auto p-4">
+        <div className="mb-4">
           <p className="text-gray-600">
             Find and analyze covered call and cash secured put opportunities for stocks in SP 500. We are working on adding more stocks to the list.
           </p>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow-sm">
+        <div className="bg-white p-4 rounded-lg shadow-sm">
           <OptionTabs />
         </div>
 
-        <div className="mt-8 p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600">
+        <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600">
           <p>
             The data returned by this free screener is for information and educational purposes only. 
             It is not a recommendation to buy or sell a security. All investors should consult a qualified 
