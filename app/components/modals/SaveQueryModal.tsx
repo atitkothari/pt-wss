@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { saveQuery } from "@/app/services/queryService";
+import { format } from "date-fns";
 
 interface SaveQueryModalProps {
   isOpen: boolean;
@@ -71,10 +72,15 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
 
   if(query.selectedExpiration){    
     filterData.push({
-      operation: "eq",
+      operation: "gte",
+      field: "expiration",
+      value: `"${format(new Date(), 'yyyy-MM-dd')}"`
+    });
+    filterData.push({
+      operation: "lte",
       field: "expiration",
       value: query.selectedExpiration ? `"${query.selectedExpiration}"` : '""'
-    });
+    });    
     }
     // Always add delta filters
     filterData.push(

@@ -6,7 +6,7 @@ import { useOptionsData } from "../../hooks/useOptionsData";
 import { LoadingSpinner } from "../LoadingSpinner";
 import { Option, OptionType, StrikeFilter } from "../../types/option";
 import { OptionsTable } from "../table/OptionsTable";
-import { format } from "date-fns";
+import { format, addDays } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Search, Mail, Save } from "lucide-react";
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -253,6 +253,15 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     option
   });
 
+  const [dte, setDte] = useState(Number(searchParams.get(getParamKey('dte'))) || 30);
+
+  useEffect(() => {
+    const today = new Date();
+    const futureDate = addDays(today, dte);
+    const formattedDate = format(futureDate, 'yyyy-MM-dd');
+    setSelectedExpiration(formattedDate);
+  }, [dte]);
+
   if (error) return <div className="text-red-500 p-4">{error}</div>;
 
   return (
@@ -342,23 +351,18 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Expiration</label>
-          <select
+          {/* <label className="block text-sm font-medium mb-1">Days to Expiration</label> */}
+          <FilterInput
             id="input_screener_expiration"
-            className="w-full px-3 py-2 border rounded-md"
-            value={selectedExpiration}
-            onChange={(e) => setSelectedExpiration(e.target.value)}
-          >
-            <option value="">All Dates</option>
-            {getNext4Fridays.map((date) => {
-              const formattedDate = format(date, "yyyy-MM-dd");
-              return (
-                <option key={formattedDate} value={formattedDate}>
-                  {format(date, "MMM d, yyyy")}
-                </option>
-              )
-            })}
-          </select>
+            label="Days to Expiration"
+            value={dte}
+            onChange={setDte}
+            placeholder="Days to expiration..."
+            type="number"
+            min="0"
+            max="1000"
+            onKeyPress={handleKeyPress}
+          />
         </div>
 
         {/* Third Row - All Buttons */}

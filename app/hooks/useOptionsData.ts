@@ -53,9 +53,10 @@ export function useOptionsData(
       }
       
       if(selectedExpiration === "") {
-        filters.push({ operation: 'gt', field: 'expiration', value: `"${format(new Date(), 'yyyy-MM-dd')}"` });
+        filters.push({ operation: 'eq', field: 'expiration', value: `"${format(new Date(), 'yyyy-MM-dd')}"` });
       } else if (selectedExpiration) {            
-        filters.push({ operation: 'eq', field: 'expiration', value: `"${selectedExpiration}"` });      
+        filters.push({ operation: 'gte', field: 'expiration', value: `"${format(new Date(), 'yyyy-MM-dd')}"` });
+        filters.push({ operation: 'lte', field: 'expiration', value: `"${selectedExpiration}"` });      
       }
 
       if (deltaRange) {
