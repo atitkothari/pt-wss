@@ -478,7 +478,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
               id="btn_buy_coffee_bottom"
               variant="outline"
               size="sm"
-              onClick={() => window.open('https://buymeacoffee.com/vizdam', '_blank')}
+              onClick={() => window.open('https://buymeacoffee.com/wheelstrategyoptions', '_blank')}
               className="text-gray-500 hover:text-gray-700"
             >
               Support
