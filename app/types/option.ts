@@ -14,6 +14,7 @@ export interface Option {
   premium?: number; // Calculated field
   delta?: number;  // Make it optional since some options might not have delta
   annualizedReturn?: number;
+  lastUpdatedDate: string;
 }
 
 export type OptionType = 'call' | 'put';

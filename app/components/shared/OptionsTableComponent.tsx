@@ -262,6 +262,19 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     setSelectedExpiration(formattedDate);
   }, [dte]);
 
+  const getOldestUpdateDate = () => {
+    if (!data || data.length === 0) return null;
+    
+    const dates = data.map(item => new Date(item.lastUpdatedDate));
+    const oldestDate = new Date(Math.min(...dates.map(date => date.getTime())));
+    
+    return oldestDate.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   if (error) return <div className="text-red-500 p-4">{error}</div>;
 
   return (
@@ -471,9 +484,13 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           
           {/* Add footnote */}
           <div className="mt-6 flex justify-between items-center text-sm text-gray-500">
-            <div className="italic">
-              * Data is updated everyday end of day
-            </div>
+          <div className="text-xs text-gray-500 mt-2">
+        {loading ? (
+          <span>Loading update information...</span>
+        ) : (
+          <span>* Data last updated on {getOldestUpdateDate()}</span>
+        )}
+      </div>
             <Button
               id="btn_buy_coffee_bottom"
               variant="outline"
@@ -486,7 +503,6 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           </div>
         </div>
       )}
-
       <SaveQueryModal
         isOpen={showSaveModal}
         onClose={() => setShowSaveModal(false)}
