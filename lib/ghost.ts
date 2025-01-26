@@ -2,8 +2,8 @@ import GhostContentAPI from '@tryghost/content-api'
 
 // Create API instance with your Ghost credentials
 const api = new GhostContentAPI({
-    url: process.env.NEXT_PUBLIC_GHOST_URL!,
-    key: process.env.NEXT_PUBLIC_GHOST_CONTENT_API_KEY!,
+    url: process.env.NEXT_PUBLIC_GHOST_URL || 'https://ghost.wheelstrategyoptions.com',
+    key: process.env.NEXT_PUBLIC_GHOST_CONTENT_API_KEY || 'cad675fd1472b2cd797893e8d8',
     version: 'v5.0'
 })
 
