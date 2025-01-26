@@ -2,8 +2,14 @@
 
 import { Coffee } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export function NavBar() {
+  const navigation = [
+    { name: 'Home', href: '/' },
+    { name: 'Blog', href: '/blog' },
+  ];
+
   return (
     <nav className="bg-gradient-to-b from-gray-900 to-gray-800 w-full border-b border-gray-700 p-4">
       <div className="max-w-screen-2xl mx-auto flex justify-between items-center">
@@ -16,6 +22,18 @@ export function NavBar() {
             Wheel Strategy Options
           </span>
         </a>
+
+        <div className="flex-grow flex justify-end space-x-8 mr-8">
+          {navigation.map((item) => (
+            <Link
+              key={item.name}
+              href={item.href}
+              className="text-white hover:text-gray-300"
+            >
+              {item.name}
+            </Link>
+          ))}
+        </div>
 
         <Button
           id="btn_buy_coffee"
