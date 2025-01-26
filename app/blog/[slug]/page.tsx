@@ -1,6 +1,7 @@
 import { getSinglePost, getPosts, GhostPost } from '@/lib/ghost'
 import { notFound } from 'next/navigation'
 import { NavBar } from '@/app/components/NavBar'
+import { Metadata } from 'next'
 
 export const revalidate = 3600 // Revalidate every hour
 
@@ -15,6 +16,36 @@ export async function generateStaticParams() {
 interface BlogPostProps {
     params: {
         slug: string
+    }
+}
+
+// Generate metadata for each blog post
+export async function generateMetadata({ params }: BlogPostProps): Promise<Metadata> {
+    const post = await getSinglePost(params.slug) as GhostPost
+    
+    if (!post) {
+        return {
+            title: 'Post Not Found | Wheel Strategy Options'
+        }
+    }
+
+    return {
+        title: `${post.title} | Wheel Strategy Options`,
+        description: post.excerpt,
+        openGraph: {
+            title: post.title,
+            description: post.excerpt,
+            url: `https://wheelstrategyoptions.com/blog/${post.slug}`,
+            siteName: 'Wheel Strategy Options',
+            type: 'article',
+            images: post.feature_image ? [{ url: post.feature_image }] : [],
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: post.title,
+            description: post.excerpt,
+            images: post.feature_image ? [post.feature_image] : [],
+        }
     }
 }
 

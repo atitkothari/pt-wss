@@ -1,6 +1,24 @@
 import { getPosts, GhostPost } from '@/lib/ghost'
 import Link from 'next/link'
 import { NavBar } from '@/app/components/NavBar'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Blog | Wheel Strategy Options',
+  description: 'Learn about options trading strategies, wheel strategy, and investment insights.',
+  openGraph: {
+    title: 'Blog | Wheel Strategy Options',
+    description: 'Learn about options trading strategies, wheel strategy, and investment insights.',
+    url: 'https://wheelstrategyoptions.com/blog',
+    siteName: 'Wheel Strategy Options',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Blog | Wheel Strategy Options',
+    description: 'Learn about options trading strategies, wheel strategy, and investment insights.',
+  }
+}
 
 export const revalidate = 3600 // Revalidate every hour
 
