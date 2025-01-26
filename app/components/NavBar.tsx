@@ -21,7 +21,7 @@ export function NavBar() {
             Wheel Strategy Options
           </span>
           <span className="self-center text-lg md:text-2xl font-semibold whitespace-nowrap text-white sm:hidden">
-            WSO
+            Wheel Strategy Options
           </span>
         </a>
 
