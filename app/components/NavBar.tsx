@@ -1,10 +1,12 @@
 "use client";
 
-import { Coffee } from "lucide-react";
+import { Coffee, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useState } from "react";
 
 export function NavBar() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigation = [
     { name: 'Home', href: '/' },
     { name: 'Blog', href: '/blog' },
@@ -19,32 +21,69 @@ export function NavBar() {
             Wheel Strategy Options
           </span>
           <span className="self-center text-lg md:text-2xl font-semibold whitespace-nowrap text-white sm:hidden">
-            Wheel Strategy Options
+            WSO
           </span>
         </a>
 
-        <div className="flex-grow flex justify-end space-x-8 mr-8">
-          {navigation.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className="text-white hover:text-gray-300"
-            >
-              {item.name}
-            </Link>
-          ))}
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center space-x-8">
+          <div className="flex space-x-8">
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className="text-white hover:text-gray-300"
+              >
+                {item.name}
+              </Link>
+            ))}
+          </div>
+          
+          <Button
+            id="btn_buy_coffee"
+            variant="outline"
+            onClick={() => window.open('https://buymeacoffee.com/wheelstrategyoptions', '_blank')}
+            className="bg-white/10 text-white hover:bg-white/20 border-white/20"
+          >
+            <Coffee className="h-4 w-4 mr-2" />
+            <span>Support This Project</span>
+          </Button>
         </div>
 
-        <Button
-          id="btn_buy_coffee"
-          variant="outline"
-          onClick={() => window.open('https://buymeacoffee.com/wheelstrategyoptions', '_blank')}
-          className="bg-white/10 text-white hover:bg-white/20 border-white/20 text-xs md:text-sm px-2 md:px-4 h-8 md:h-10"
+        {/* Mobile Menu Button */}
+        <button
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="md:hidden text-white"
         >
-          <Coffee className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />
-          <span className="hidden sm:inline">Support This Project</span>
-          <span className="sm:hidden">Support</span>
-        </Button>
+          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+
+        {/* Mobile Navigation */}
+        {isMenuOpen && (
+          <div className="absolute top-[72px] left-0 right-0 bg-gray-900 border-b border-gray-700 p-4 md:hidden">
+            <div className="flex flex-col space-y-4">
+              {navigation.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="text-white hover:text-gray-300"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {item.name}
+                </Link>
+              ))}
+              <Button
+                id="btn_buy_coffee_mobile"
+                variant="outline"
+                onClick={() => window.open('https://buymeacoffee.com/wheelstrategyoptions', '_blank')}
+                className="bg-white/10 text-white hover:bg-white/20 border-white/20 w-full"
+              >
+                <Coffee className="h-4 w-4 mr-2" />
+                <span>Support This Project</span>
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );
