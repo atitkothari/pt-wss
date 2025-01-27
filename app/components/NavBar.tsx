@@ -9,11 +9,12 @@ export function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigation = [
     { name: 'Home', href: '/' },
+    { name: 'Options Screener', href: '/options' },
     { name: 'Blog', href: '/blog' },
   ];
 
   return (
-    <nav className="bg-gradient-to-b from-gray-900 to-gray-800 w-full border-b border-gray-700 p-4">
+    <nav className="bg-gradient-to-b from-gray-900 to-gray-800 w-full border-b border-gray-700 p-4 z-40 relative">
       <div className="max-w-screen-2xl mx-auto flex justify-between items-center">
         <a href="/" className="flex items-center">
           <img src="/logo.png" className="h-8 md:h-12 mr-2 md:mr-3" alt="Wheel Strategy Options Logo" />
@@ -60,7 +61,7 @@ export function NavBar() {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="absolute top-[72px] left-0 right-0 bg-gray-900 border-b border-gray-700 p-4 md:hidden">
+          <div className="absolute top-[72px] left-0 right-0 bg-gray-900 border-b border-gray-700 p-4 md:hidden z-50">
             <div className="flex flex-col space-y-4">
               {navigation.map((item) => (
                 <Link
