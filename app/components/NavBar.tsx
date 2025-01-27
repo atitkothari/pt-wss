@@ -10,7 +10,7 @@ export function NavBar() {
   const navigation = [
     { name: 'Home', href: '/' },
     { name: 'Options Screener', href: '/options' },
-    { name: 'Blog', href: '/blog' },
+    { name: 'Blog', href: 'https://wheelstrategyoptions.com/blog2/' },
   ];
 
   return (
