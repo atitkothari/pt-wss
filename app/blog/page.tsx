@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   }
 }
 
-export const revalidate = 60 // Check for new content every minute
+export const revalidate = 300 // Check for new content every minute
 
 export default async function BlogPage() {
     const posts = (await getPosts()) as GhostPost[]

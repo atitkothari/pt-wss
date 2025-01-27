@@ -28,13 +28,15 @@ export async function generateMetadata({ params }: BlogPostProps): Promise<Metad
         }
     }
 
+    const url = `https://wheelstrategyoptions.com/blog/${post.slug}`
+
     return {
         title: `${post.title} | Wheel Strategy Options`,
         description: post.excerpt,
         openGraph: {
             title: post.title,
             description: post.excerpt,
-            url: `https://wheelstrategyoptions.com/blog/${post.slug}`,
+            url: url,
             siteName: 'Wheel Strategy Options',
             type: 'article',
             images: post.feature_image ? [{ url: post.feature_image }] : [],
@@ -44,7 +46,13 @@ export async function generateMetadata({ params }: BlogPostProps): Promise<Metad
             title: post.title,
             description: post.excerpt,
             images: post.feature_image ? [post.feature_image] : [],
-        }
+        },
+        alternates: {
+            canonical: url,
+        },
+        authors: [{ name: 'Wheel Strategy Options' }],
+        publisher: 'Wheel Strategy Options',
+        keywords: post.tags?.map(tag => tag.name).join(', '),
     }
 }
 
@@ -82,9 +90,41 @@ export default async function BlogPost({ params }: BlogPostProps) {
         keywords: post.tags?.map(tag => tag.name).join(',')
     }
 
+    const breadcrumbSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+            {
+                '@type': 'ListItem',
+                position: 1,
+                item: {
+                    '@id': 'https://wheelstrategyoptions.com',
+                    name: 'Home'
+                }
+            },
+            {
+                '@type': 'ListItem',
+                position: 2,
+                item: {
+                    '@id': 'https://wheelstrategyoptions.com/blog',
+                    name: 'Blog'
+                }
+            },
+            {
+                '@type': 'ListItem',
+                position: 3,
+                item: {
+                    '@id': `https://wheelstrategyoptions.com/blog/${post.slug}`,
+                    name: post.title
+                }
+            }
+        ]
+    }
+
     return (
         <>
             <JsonLd data={articleSchema} />
+            <JsonLd data={breadcrumbSchema} />
             <NavBar />
             <main className="min-h-screen bg-gray-900">
                 <article className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -118,4 +158,4 @@ export default async function BlogPost({ params }: BlogPostProps) {
 }
 
 // Add back revalidation
-export const revalidate = 60 // Check for new content every minute 
+export const revalidate = 300 // Check for new content every minute 
