@@ -10,7 +10,7 @@ export function NavBar() {
   const navigation = [
     { name: 'Home', href: '/' },
     { name: 'Options Screener', href: '/options' },
-    { name: 'Blog', href: 'https://wheelstrategyoptions.com/blog/' },
+    { name: 'Blog', href: 'https://wheelstrategyoptions.com/blog/', external: true },
   ];
 
   return (
@@ -30,13 +30,23 @@ export function NavBar() {
         <div className="hidden md:flex items-center space-x-8">
           <div className="flex space-x-8">
             {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="text-white hover:text-gray-300"
-              >
-                {item.name}
-              </Link>
+              item.external ? (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  className="text-white hover:text-gray-300"
+                >
+                  {item.name}
+                </a>
+              ) : (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="text-white hover:text-gray-300"
+                >
+                  {item.name}
+                </Link>
+              )
             ))}
           </div>
           
@@ -64,14 +74,25 @@ export function NavBar() {
           <div className="absolute top-[72px] left-0 right-0 bg-gray-900 border-b border-gray-700 p-4 md:hidden z-50">
             <div className="flex flex-col space-y-4">
               {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="text-white hover:text-gray-300"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.name}
-                </Link>
+                item.external ? (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    className="text-white hover:text-gray-300"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {item.name}
+                  </a>
+                ) : (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className="text-white hover:text-gray-300"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {item.name}
+                  </Link>
+                )
               ))}
               <Button
                 id="btn_buy_coffee_mobile"
