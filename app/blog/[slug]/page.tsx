@@ -4,8 +4,6 @@ import { NavBar } from '@/app/components/NavBar'
 import { Metadata } from 'next'
 import JsonLd from '@/app/components/JsonLd'
 
-export const revalidate = 60 // Revalidate every minute
-
 // Add this function to generate static params
 export async function generateStaticParams() {
     const posts = await getPosts()
@@ -117,4 +115,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
             </main>
         </>
     )
-} 
+}
+
+// Add back revalidation
+export const revalidate = 60 // Check for new content every minute 

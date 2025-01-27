@@ -7,6 +7,9 @@ const api = new GhostContentAPI({
     version: 'v5.0'
 })
 
+// Cache the posts during build time
+let cachedPosts: any[] | null = null;
+
 // Define types for Ghost posts
 export interface GhostPost {
     title: string
