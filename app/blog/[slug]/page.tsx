@@ -2,8 +2,9 @@ import { getSinglePost, getPosts, GhostPost } from '@/lib/ghost'
 import { notFound } from 'next/navigation'
 import { NavBar } from '@/app/components/NavBar'
 import { Metadata } from 'next'
+import JsonLd from '@/app/components/JsonLd'
 
-export const revalidate = 3600 // Revalidate every hour
+export const revalidate = 60 // Revalidate every minute
 
 // Add this function to generate static params
 export async function generateStaticParams() {
@@ -56,8 +57,36 @@ export default async function BlogPost({ params }: BlogPostProps) {
         notFound()
     }
 
+    const articleSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'BlogPosting',
+        headline: post.title,
+        description: post.excerpt,
+        image: post.feature_image || undefined,
+        datePublished: post.published_at,
+        author: {
+            '@type': 'Organization',
+            name: 'Wheel Strategy Options'
+        },
+        publisher: {
+            '@type': 'Organization',
+            name: 'Wheel Strategy Options',
+            logo: {
+                '@type': 'ImageObject',
+                url: 'https://wheelstrategyoptions.com/logo.png'
+            }
+        },
+        mainEntityOfPage: {
+            '@type': 'WebPage',
+            '@id': `https://wheelstrategyoptions.com/blog/${post.slug}`
+        },
+        articleBody: post.html.replace(/<[^>]*>/g, ''), // Strip HTML tags
+        keywords: post.tags?.map(tag => tag.name).join(',')
+    }
+
     return (
         <>
+            <JsonLd data={articleSchema} />
             <NavBar />
             <main className="min-h-screen bg-gray-900">
                 <article className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

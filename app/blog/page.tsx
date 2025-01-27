@@ -2,6 +2,7 @@ import { getPosts, GhostPost } from '@/lib/ghost'
 import Link from 'next/link'
 import { NavBar } from '@/app/components/NavBar'
 import { Metadata } from 'next'
+import JsonLd from '@/app/components/JsonLd'
 
 export const metadata: Metadata = {
   title: 'Blog | Wheel Strategy Options',
@@ -20,13 +21,42 @@ export const metadata: Metadata = {
   }
 }
 
-export const revalidate = 3600 // Revalidate every hour
+export const revalidate = 60 // Revalidate every minute
 
 export default async function BlogPage() {
     const posts = (await getPosts()) as GhostPost[]
 
+    const blogSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'Blog',
+        name: 'Wheel Strategy Options Blog',
+        description: 'Learn about options trading strategies, wheel strategy, and investment insights.',
+        url: 'https://wheelstrategyoptions.com/blog',
+        publisher: {
+            '@type': 'Organization',
+            name: 'Wheel Strategy Options',
+            logo: {
+                '@type': 'ImageObject',
+                url: 'https://wheelstrategyoptions.com/logo.png'
+            }
+        },
+        blogPost: posts.map(post => ({
+            '@type': 'BlogPosting',
+            headline: post.title,
+            description: post.excerpt,
+            url: `https://wheelstrategyoptions.com/blog/${post.slug}`,
+            datePublished: post.published_at,
+            image: post.feature_image || undefined,
+            author: {
+                '@type': 'Organization',
+                name: 'Wheel Strategy Options'
+            }
+        }))
+    }
+
     return (
         <>
+            <JsonLd data={blogSchema} />
             <NavBar />
             <main className="min-h-screen bg-gray-900">
                 <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
