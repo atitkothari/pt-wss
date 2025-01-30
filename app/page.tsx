@@ -10,10 +10,12 @@ import {
   LineChart,
   ArrowRight
 } from "lucide-react";
+import { NavBar } from "./components/NavBar";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-gray-900 text-white">      
+      <NavBar />
       {/* Logo Section */}
       <div className="flex flex-col items-center justify-center pt-4 md:pt-8">
         <img src="/logo.png" className="h-20 md:h-24 mb-3 md:mb-4" alt="Wheel Strategy Options Logo" />
@@ -29,7 +31,7 @@ export default function LandingPage() {
             Smart Options, Smarter Returns: Screen, Select, Succeed
           </h1>
           <p className="text-base md:text-xl text-gray-300 mb-6 md:mb-8 px-2 md:px-0">
-            Dominate the options game. Our options screener delivers high-yield options trades maximizing premium income with real-time options data and intelligent filters. Select your perfect strategy; succeed in seconds.
+            Dominate the options game. Our options screener delivers high-yield options trades maximizing premium income with intelligent filters. Select your perfect strategy; succeed in seconds.
           </p>
           <Link href="/options">
             <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-base md:text-lg px-6 md:px-8 py-4 md:py-6">
@@ -43,9 +45,9 @@ export default function LandingPage() {
       <div className="bg-gray-800 py-12 md:py-20 mt-12 md:mt-20">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-4xl font-bold text-center mb-8 md:mb-12">
-            Everything You Need for Options Trading
+            Quick Screening for Covered Calls and Cash-Secured Puts
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
             <FeatureCard
               icon={<BarChart2 className="h-6 md:h-8 w-6 md:w-8 text-blue-400" />}
               title="Covered Call Screener"
@@ -56,11 +58,7 @@ export default function LandingPage() {
               title="Cash-Secured Put Screener"
               description="Screen for cash-secured put opportunities that match your risk tolerance and profit targets."
             />
-            <FeatureCard
-              icon={<Clock className="h-6 md:h-8 w-6 md:w-8 text-blue-400" />}
-              title="Real-Time Data"
-              description="Make informed decisions with real-time options data and pricing information."
-            />
+            
           </div>
         </div>
       </div>
