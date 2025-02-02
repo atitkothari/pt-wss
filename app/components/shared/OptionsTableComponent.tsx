@@ -387,10 +387,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             id="btn_screener_save"
             variant="outline"
             onClick={() => setShowSaveModal(true)}
-            className="text-gray-600 hover:text-gray-800 w-full sm:w-auto"
+            className="bg-orange-600 text-white hover:text-black w-full sm:w-auto"
           >
             <Save className="h-4 w-4 mr-2" />
-            Email This!
+            Save & Set Alerts
           </Button>
           <Button 
             id="btn_screener_search"
