@@ -32,7 +32,7 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: "impliedVolatility", label: "IV %" },
 ];
 
-const formatCell = (value: any, columnKey: string): string => {
+const formatCell = (value: any, columnKey: string): string|any => {
   if (value === undefined || value === null) return '-';
 
   switch (columnKey) {
@@ -69,6 +69,9 @@ const formatCell = (value: any, columnKey: string): string => {
     case 'volume':
     case 'openInterest':
       return value.toLocaleString();
+    case 'symbol':
+      let link = "https://screenwich.com/stock-details/"+value      
+      return <a href={link} target="_blank">{String(value)}</a>
     
     default:
       return String(value);
