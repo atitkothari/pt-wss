@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { FilterInput } from "../filters/FilterInput";
 import { useOptionsData } from "../../hooks/useOptionsData";
 import { LoadingSpinner } from "../LoadingSpinner";
@@ -275,6 +275,60 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     });
   };
 
+  // Get current sort parameters from URL
+  const sortColumn = searchParams.get('sortBy') || '';
+  const sortDirection = searchParams.get('sortDir') || 'asc';
+
+  // Handle sort change
+  const handleSortURL = useCallback((columnId: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    
+    let newSortDir: 'asc' | 'desc';
+    if (sortColumn === columnId) {
+      // Toggle direction if clicking same column
+      newSortDir = sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      // Set new column and default to ascending
+      newSortDir = 'asc';
+    }
+    
+    params.set('sortBy', columnId);
+    params.set('sortDir', newSortDir);
+    
+    router.push(`?${params.toString()}`);
+
+    // Fetch new data with updated sort configuration
+    fetchData(
+      activeFilters.searchTerm,
+      activeFilters.minYield,
+      activeFilters.maxPrice,
+      activeFilters.minVol,
+      activeFilters.selectedExpiration,
+      currentPage,
+      rowsPerPage,
+      { field: columnId as keyof Option, direction: newSortDir },
+      strikeFilter !== 'ALL' ? strikeFilter : undefined,
+      deltaFilter
+    ).catch(console.error);
+  }, [sortColumn, sortDirection, router, searchParams, activeFilters, currentPage, rowsPerPage, strikeFilter, deltaFilter, fetchData]);
+
+  // Sort data based on URL parameters
+  const sortedData = [...data].sort((a, b) => {
+    if (!sortColumn) return 0;
+    
+    const aValue = a[sortColumn as keyof Option];
+    const bValue = b[sortColumn as keyof Option];
+
+    if (typeof aValue === 'number' && typeof bValue === 'number') {
+      return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+    }
+
+    // Handle string comparison
+    return sortDirection === 'asc' 
+      ? String(aValue).localeCompare(String(bValue))
+      : String(bValue).localeCompare(String(aValue));
+  });
+
   if (error) return <div className="text-red-500 p-4">{error}</div>;
 
   return (
@@ -421,9 +475,9 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             Showing {totalCount} contracts
           </div>
           <OptionsTable 
-            data={data}
+            data={sortedData}
             sortConfig={sortConfig}
-            onSort={handleSort}
+            onSort={handleSortURL}
           />
           {/* Pagination Controls */}
           <div className="flex justify-between items-center mt-0.5 md:mt-1 px-0.5 md:px-1 text-xs">

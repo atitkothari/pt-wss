@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { fetchOptionsData } from '../services/api';
 import { Option, OptionType, StrikeFilter } from '../types/option';
 import { parseISO, addDays, format } from 'date-fns';
+import { useSearchParams } from 'next/navigation';
 
 export function useOptionsData(
   symbol: string = '',
@@ -19,7 +20,7 @@ export function useOptionsData(
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [totalCount, setTotalCount] = useState(0);
-  const [deltaFilter, setDeltaFilter] = useState<[number, number]>([0.3, 0.7]);
+  const searchParams = useSearchParams();
 
   const fetchData = async (
     searchTerm: string = symbol,
@@ -29,7 +30,7 @@ export function useOptionsData(
     selectedExpiration: string = expiration,
     pageNo: number = 1,
     pageSize: number = 50,
-    sortConfig?: { field: string; direction: 'asc' | 'desc' | null },
+    sortConfig?: { field: keyof Option; direction: 'asc' | 'desc' | null },
     strikeFilter?: StrikeFilter,
     deltaRange?: [number, number]
   ) => {
@@ -64,14 +65,24 @@ export function useOptionsData(
         filters.push({ operation: 'lte', field: 'delta', value: deltaRange[1] });
       }
 
+      // Get sort params from URL if not provided in sortConfig
+      const sortBy = sortConfig?.field || searchParams.get('sortBy');
+      const sortDir = sortConfig?.direction || searchParams.get('sortDir') as 'asc' | 'desc' | null;
+
+      const finalSortConfig = sortBy ? {
+        field: sortBy,
+        direction: sortDir || 'asc'
+      } : undefined;
+
       const result = await fetchOptionsData(
         filters, 
         pageNo, 
         pageSize, 
-        sortConfig, 
+        finalSortConfig, 
         strikeFilter,
         option        
       );   
+
       const updatedResult = result.options.map((option: any) => {
         const askPrice = option.askPrice || 0;
         const bidPrice = option.bidPrice || 0;

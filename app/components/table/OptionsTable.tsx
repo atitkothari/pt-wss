@@ -14,6 +14,7 @@ import { ColumnCustomizer, ColumnDef } from "./ColumnCustomizer";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format, parseISO } from "date-fns";
+import { useSearchParams } from 'next/navigation';
 
 const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: "symbol", label: "Symbol" },
@@ -80,14 +81,15 @@ const formatCell = (value: any, columnKey: string): string|any => {
 
 interface OptionsTableProps {
   data: Option[];
-  sortConfig: {
-    field: keyof Option;
-    direction: 'asc' | 'desc' | null;
-  };
-  onSort: (field: keyof Option) => void;
+  onSort: (field: string) => void;
+  sortConfig?: { field: keyof Option; direction: 'asc' | 'desc' | null };
 }
 
-export function OptionsTable({ data, sortConfig, onSort }: OptionsTableProps) {
+export function OptionsTable({ data, onSort }: OptionsTableProps) {
+  const searchParams = useSearchParams();
+  const sortColumn = searchParams.get('sortBy');
+  const sortDirection = searchParams.get('sortDir');
+
   const [visibleColumns, setVisibleColumns] = useState<string[]>(
     DEFAULT_COLUMNS.map(col => col.key)
   );
@@ -123,17 +125,19 @@ export function OptionsTable({ data, sortConfig, onSort }: OptionsTableProps) {
                 {visibleColumns.map((column) => {
                   const columnDef = DEFAULT_COLUMNS.find(col => col.key === column);
                   return (
-                    <th 
-                      key={column} 
-                      onClick={() => onSort(column as keyof Option)}
+                    <th
+                      key={column}
+                      onClick={() => onSort(column)}
                       className="text-left p-2 md:p-2.5 font-medium cursor-pointer hover:bg-gray-50"
                     >
-                      {columnDef?.label}
-                      {sortConfig.field === column && (
-                        <span className="ml-1">
-                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                        </span>
-                      )}
+                      <div className="flex items-center">
+                        {columnDef?.label}
+                        {sortColumn === column && (
+                          <span className="ml-1">
+                            {sortDirection === 'asc' ? '↑' : '↓'}
+                          </span>
+                        )}
+                      </div>
                     </th>
                   );
                 })}
