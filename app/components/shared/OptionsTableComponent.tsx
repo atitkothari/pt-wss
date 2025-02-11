@@ -42,8 +42,7 @@ const DEFAULT_VISIBLE_COLUMNS = [
   'impliedVolatility'
 ];
 
-export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
-  const { user } = useAuth();
+export function OptionsTableComponent({ option }: OptionsTableComponentProps) {  
   const searchParams = useSearchParams();
   const router = useRouter();
   const { symbols } = useSymbols();

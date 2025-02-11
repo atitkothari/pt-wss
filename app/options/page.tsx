@@ -7,7 +7,7 @@ import { useAuth } from "../context/AuthContext";
 import { useSearchParams } from 'next/navigation';
 
 export default function OptionsPage() {
-  const { user, loading } = useAuth();
+  const { loading } = useAuth();
   const searchParams = useSearchParams();
   const hasSearched = Object.keys(Object.fromEntries(searchParams.entries())).length > 0;
 
