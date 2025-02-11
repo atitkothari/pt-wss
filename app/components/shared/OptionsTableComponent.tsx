@@ -12,6 +12,9 @@ import { Search, Mail, Save, Coffee } from "lucide-react";
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSymbols } from '../../hooks/useSymbols';
 import { SaveQueryModal } from "../modals/SaveQueryModal";
+import { BlurredTable } from "../auth/BlurredTable";
+import { LoginOverlay } from "../auth/LoginOverlay";
+import { useAuth } from "@/app/context/AuthContext";
 
 interface OptionsTableComponentProps {
   option: OptionType;
@@ -40,6 +43,7 @@ const DEFAULT_VISIBLE_COLUMNS = [
 ];
 
 export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
+  const { user } = useAuth();
   const searchParams = useSearchParams();
   const router = useRouter();
   const { symbols } = useSymbols();
@@ -474,11 +478,13 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           <div className="text-xs text-gray-600 mb-0.5 md:mb-1">
             Showing {totalCount} contracts
           </div>
-          <OptionsTable 
-            data={sortedData}
-            sortConfig={sortConfig}
-            onSort={handleSortURL}
-          />
+          <BlurredTable hasSearched={hasSearched}>
+            <OptionsTable 
+              data={sortedData}
+              sortConfig={sortConfig}
+              onSort={handleSortURL}
+            />
+          </BlurredTable>
           {/* Pagination Controls */}
           <div className="flex justify-between items-center mt-0.5 md:mt-1 px-0.5 md:px-1 text-xs">
             <div className="text-gray-600">
