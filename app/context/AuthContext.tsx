@@ -9,10 +9,12 @@ import {
   onAuthStateChanged
 } from 'firebase/auth';
 import { auth } from '../config/firebase';
+import { toast } from "sonner";
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  error: string | null;
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -20,6 +22,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
+  error: null,
   signInWithGoogle: async () => {},
   logout: async () => {},
 });
@@ -33,39 +36,66 @@ export const AuthContextProvider = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
-      } else {
-        setUser(null);
-      }
-      setLoading(false);
-    });
+    try {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        if (user) {
+          setUser(user);
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
+      }, (error) => {
+        console.error('Auth state change error:', error);
+        setError(error.message);
+        setLoading(false);
+      });
 
-    return () => unsubscribe();
+      return () => unsubscribe();
+    } catch (error) {
+      console.error('Auth setup error:', error);
+      setError(error instanceof Error ? error.message : 'Authentication setup failed');
+      setLoading(false);
+    }
   }, []);
 
   const signInWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
     try {
+      setLoading(true);
+      setError(null);
+      const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
+      toast.success('Successfully signed in!');
     } catch (error) {
       console.error('Error signing in with Google:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to sign in with Google';
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
   const logout = async () => {
     try {
+      setLoading(true);
+      setError(null);
       await signOut(auth);
+      toast.success('Successfully signed out!');
     } catch (error) {
       console.error('Error signing out:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to sign out';
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, logout }}>
+    <AuthContext.Provider value={{ user, loading, error, signInWithGoogle, logout }}>
       {children}
     </AuthContext.Provider>
   );
