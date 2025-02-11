@@ -1,7 +1,7 @@
 'use client';
 
-import { initializeApp, getApps } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
+import { getAuth, Auth } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDlJzlnCIvwM0Gi8AJ59Ii_2gML-3iAd_I",
@@ -13,8 +13,8 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-let app;
-let auth;
+let app: FirebaseApp;
+let auth: Auth;
 
 try {
   if (!getApps().length) {
