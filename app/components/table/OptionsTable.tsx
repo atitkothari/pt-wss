@@ -9,7 +9,6 @@ import {
   TableBody,
   TableRow 
 } from "@/components/ui/table";
-import { OptionRow } from "./OptionRow";
 import { ColumnCustomizer, ColumnDef } from "./ColumnCustomizer";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -151,7 +150,7 @@ export function OptionsTable({ data, onSort }: OptionsTableProps) {
                 >
                   {visibleColumns.map((column) => (
                     <td 
-                      key={column} 
+                      key={`${column}-${index}`}
                       className="p-2 md:p-2.5 whitespace-nowrap"
                     >
                       {formatCell(option[column as keyof Option], column)}
