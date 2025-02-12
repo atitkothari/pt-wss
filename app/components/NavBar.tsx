@@ -81,10 +81,10 @@ export function NavBar() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
+                    {/* <Avatar className="h-8 w-8">
                       <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || 'User'} />
                       <AvatarFallback>{user?.displayName?.[0] || 'U'}</AvatarFallback>
-                    </Avatar>
+                    </Avatar> */}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="end">
