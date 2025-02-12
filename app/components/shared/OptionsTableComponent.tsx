@@ -334,6 +334,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
   if (error) return <div className="text-red-500 p-4">{error}</div>;
 
+  const { user } = useAuth();
+
   return (
     <div className="w-full">      
       {/* Filter Controls */}
@@ -477,7 +479,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           <div className="text-xs text-gray-600 mb-0.5 md:mb-1">
             Showing {totalCount} contracts
           </div>
-          <BlurredTable hasSearched={hasSearched}>
+          <BlurredTable hasSearched={hasSearched && !user}>
             <OptionsTable 
               data={sortedData}
               sortConfig={sortConfig}
@@ -569,4 +571,4 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       />
     </div>
   );
-} 
+}
