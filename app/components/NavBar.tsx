@@ -77,7 +77,7 @@ export function NavBar() {
               <span>Support This Project</span>
             </Button>
 
-            {loading ? null : user ? (
+            {/* {loading ? null : user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -102,7 +102,7 @@ export function NavBar() {
               >
                 Sign In
               </Button>
-            )}
+            )} */}
           </div>
         </div>
 
