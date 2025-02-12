@@ -15,7 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, signInWithGoogle, logout } = useAuth();
+  const { user, loading, signInWithGoogle, logout } = useAuth();
   
   const navigation = [
     { name: 'Home', href: '/' },
@@ -77,7 +77,7 @@ export function NavBar() {
               <span>Support This Project</span>
             </Button>
 
-            {user ? (
+            {loading ? null : user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -149,7 +149,7 @@ export function NavBar() {
                 <span>Support This Project</span>
               </Button>
               
-              {user ? (
+              {loading ? null : user ? (
                 <Button
                   variant="outline"
                   onClick={handleLogout}
@@ -174,4 +174,4 @@ export function NavBar() {
       </div>
     </nav>
   );
-} 
+}

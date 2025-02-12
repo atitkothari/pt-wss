@@ -15,7 +15,7 @@ export default function OptionsPage() {
     if (loading) {
       return (
         <div className="min-h-screen bg-gray-50">
-          {/* <NavBar /> */}
+          <NavBar />
           <div className="max-w-screen-2xl mx-auto p-4">
             <div className="flex justify-center items-center min-h-[400px]">
               <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
@@ -27,7 +27,7 @@ export default function OptionsPage() {
 
     return (
       <div className="min-h-screen bg-gray-50">
-        {/* <NavBar /> */}
+        <NavBar />
         <div className="max-w-screen-2xl mx-auto p-4">
           <div className="mb-4">
             <p className="text-gray-600">
