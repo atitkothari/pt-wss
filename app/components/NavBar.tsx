@@ -5,13 +5,6 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -78,22 +71,14 @@ export function NavBar() {
             </Button>
 
             {loading ? null : user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    {/* <Avatar className="h-8 w-8">
-                      <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || 'User'} />
-                      <AvatarFallback>{user?.displayName?.[0] || 'U'}</AvatarFallback>
-                    </Avatar> */}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end">
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Button
+                onClick={handleLogout}
+                variant="outline"
+                className="bg-white/10 text-white hover:bg-white/20 border-white/20"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </Button>
             ) : (
               <Button
                 onClick={signInWithGoogle}
