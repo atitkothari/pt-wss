@@ -77,13 +77,13 @@ export function NavBar() {
               <span>Support This Project</span>
             </Button>
 
-            {/* {loading ? null : user ? (
+            {loading ? null : user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user.photoURL || undefined} alt={user.displayName || 'User'} />
-                      <AvatarFallback>{user.displayName?.[0] || 'U'}</AvatarFallback>
+                      <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || 'User'} />
+                      <AvatarFallback>{user?.displayName?.[0] || 'U'}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
@@ -102,7 +102,7 @@ export function NavBar() {
               >
                 Sign In
               </Button>
-            )} */}
+            )}
           </div>
         </div>
 
