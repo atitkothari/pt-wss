@@ -15,7 +15,7 @@ import { NavBar } from "./components/NavBar";
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gray-900 text-white">      
-      <NavBar />
+      {/* <NavBar /> */}
       {/* Logo Section */}
       <div className="flex flex-col items-center justify-center pt-4 md:pt-8">
         <img src="/logo.png" className="h-20 md:h-24 mb-3 md:mb-4" alt="Wheel Strategy Options Logo" />

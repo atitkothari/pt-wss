@@ -13,7 +13,6 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useSymbols } from '../../hooks/useSymbols';
 import { SaveQueryModal } from "../modals/SaveQueryModal";
 import { BlurredTable } from "../auth/BlurredTable";
-import { LoginOverlay } from "../auth/LoginOverlay";
 import { useAuth } from "@/app/context/AuthContext";
 
 interface OptionsTableComponentProps {
