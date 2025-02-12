@@ -12,7 +12,7 @@ interface BlurredTableProps {
 
 export const BlurredTable = ({ children, className, hasSearched = false }: BlurredTableProps) => {
   const { user, loading, error, signInWithGoogle } = useAuth();
-  const shouldBlur = !user && hasSearched;
+  const shouldBlur = hasSearched && !user;
 
   const renderContent = () => {
     if (loading) {
@@ -94,4 +94,4 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
   };
 
   return renderContent();
-}; 
+};
