@@ -6,6 +6,13 @@ const config: Config = {
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  safelist: [
+    'bg-background',
+    'text-foreground',
+    'dark:bg-background',
+    'dark:text-foreground'
   ],
   theme: {
     extend: {
