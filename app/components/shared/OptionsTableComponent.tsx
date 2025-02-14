@@ -210,6 +210,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   };  
 
   const handleSymbolSelect = (symbol: string) => {
+    setHasSearched(true);
     setSearchTerm(symbol);
     setActiveFilters(prev => ({
       ...prev,
