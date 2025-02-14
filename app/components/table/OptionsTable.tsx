@@ -53,7 +53,9 @@ const formatCell = (value: any, columnKey: string): string|any => {
     
     case 'expiration':
       try {
-        return format(parseISO(value), 'MMM d, yyyy');
+        const date = parseISO(value);
+        const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        return format(utcDate, 'MMM d, yyyy');
       } catch {
         return value;
       }
@@ -61,7 +63,9 @@ const formatCell = (value: any, columnKey: string): string|any => {
     case 'earningsDate':
       if (!value) return '-';
       try {
-        return format(parseISO(value), 'MMM d, yyyy');
+        const date = parseISO(value);
+        const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        return format(utcDate, 'MMM d, yyyy');
       } catch {
         return value;
       }
