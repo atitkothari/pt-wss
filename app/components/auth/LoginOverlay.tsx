@@ -26,7 +26,7 @@ export const LoginOverlay = ({ hasSearched = false }: LoginOverlayProps) => {
           size="lg"
           className="bg-white hover:bg-gray-100 text-gray-900 border-0"
         >
-          Sign in with Google to unlock full access
+          Sign in with Google to unlock full access for FREE
         </Button>
       </div>
     </div>

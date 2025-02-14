@@ -46,7 +46,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
           >
             <div className="sticky top-0 flex flex-col items-center gap-4 p-4 sm:p-6 text-center bg-gradient-to-b from-gray-900 via-gray-900/95 to-transparent pointer-events-auto">
               <h2 className="text-xl sm:text-2xl font-bold text-white">
-                Sign in to see all results
+                Sign in to see all results for FREE!
               </h2>
               <p className="text-sm sm:text-base text-gray-200 max-w-md">
                 Get full access to all options data and screening capabilities by signing in with your Google account.
