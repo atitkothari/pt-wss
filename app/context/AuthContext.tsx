@@ -43,8 +43,16 @@ export const AuthContextProvider = ({
       const unsubscribe = onAuthStateChanged(auth, (user) => {
         if (user) {
           setUser(user);
+          // Set user ID for Google Analytics
+          if (typeof window !== 'undefined' && 'gtag' in window) {
+            ((window as any).gtag)('set', { user_id: user.uid });
+          }
         } else {
           setUser(null);
+          // Clear user ID from Google Analytics
+          if (typeof window !== 'undefined' && 'gtag' in window) {
+            ((window as any).gtag)('set', { user_id: undefined });
+          }
         }
         setLoading(false);
       }, (error) => {
@@ -99,4 +107,4 @@ export const AuthContextProvider = ({
       {children}
     </AuthContext.Provider>
   );
-}; 
+};
