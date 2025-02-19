@@ -9,23 +9,23 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: {
-    default: 'Wheel Strategy Options - Options Trading Screener',
-    template: '%s | Wheel Strategy Options'
+    default: 'Wheel Strategy Options - Options Selling Screener',
+    template: '%s | Wheel Strategy Options - Options Selling'
   },
-  description: 'Screen for high-yield options trades using our advanced options screener. Find the best covered calls and cash-secured puts for the wheel strategy.',
-  keywords: ['options trading', 'wheel strategy', 'covered calls', 'cash secured puts', 'options screener'],
+  description: 'Screen for high-yield options trades and selling opportunities using our advanced options screener. Find the best covered calls and cash-secured puts for the wheel strategy.',
+  keywords: ['options trading', 'wheel strategy', 'covered calls', 'cash secured puts', 'options screener', 'selling options', 'options selling'],
   metadataBase: new URL('https://wheelstrategyoptions.com'),
   openGraph: {
-    title: 'Wheel Strategy Options - Options Trading Screener',
-    description: 'Screen for high-yield options trades using our advanced options screener.',
+    title: 'Wheel Strategy Options - Options Selling Screener',
+    description: 'Screen for high-yield options trades and selling opportunities using our advanced options screener.',
     url: 'https://wheelstrategyoptions.com',
     siteName: 'Wheel Strategy Options',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Wheel Strategy Options - Options Trading Screener',
-    description: 'Screen for high-yield options trades using our advanced options screener.',
+    title: 'Wheel Strategy Options - Options Selling Screener',
+    description: 'Screen for high-yield options trades and selling opportunities using our advanced options screener.',
   },
   verification: {
     google: 'G-MD1P5NTF82',
