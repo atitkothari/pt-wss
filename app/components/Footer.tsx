@@ -10,7 +10,17 @@ export function Footer() {
           professional before trading in any security. Stock and option trading involves risk and is not 
           suitable for all investors.
         </p>
+        <div className="mt-2 text-center">
+          <a 
+            href="https://wheelstrategyoptions.com/blog/privacy-policy-for-wheel-strategy-options/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-800 underline"
+          >
+            Privacy Policy
+          </a>
+        </div>
       </div>
     </div>
   );
-} 
+}
