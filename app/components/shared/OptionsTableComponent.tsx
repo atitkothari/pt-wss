@@ -346,7 +346,22 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             id="input_screener_symbol"
             label="Search Symbol"
             value={searchTerm}
-            onChange={setSearchTerm}
+            onChange={async (value) => {
+              setSearchTerm(value);
+              if (value) {
+                try {
+                  await fetch(`https://api.wheelstrategyoptions.com/wheelstrat/searchAnalytics`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ symbol: value })
+                  });
+                } catch (analyticsError) {
+                  console.error('Failed to track search analytics:', analyticsError);
+                }
+              }
+            }}
             placeholder="Enter symbol..."
             onKeyPress={handleKeyPress}
             suggestions={symbols}
