@@ -356,8 +356,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                       'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ symbol: value,                       
-                      user_id: userId,
-                      option_type: option.toString()
+                      userId: userId,
+                      type: option.toString()
                       })
                   });
                 } catch (analyticsError) {
