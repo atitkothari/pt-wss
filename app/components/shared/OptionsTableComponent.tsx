@@ -334,7 +334,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
   if (error) return <div className="text-red-500 p-4">{error}</div>;
 
-  const { user } = useAuth();
+  const { user, userId } = useAuth();
 
   return (
     <div className="w-full">      
@@ -355,7 +355,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                     headers: {
                       'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ symbol: value })
+                    body: JSON.stringify({ symbol: value,                       
+                      user_id: userId,
+                      option_type: option.toString()
+                      })
                   });
                 } catch (analyticsError) {
                   console.error('Failed to track search analytics:', analyticsError);

@@ -84,18 +84,30 @@ export function useOptionsData(
       );   
 
       const updatedResult = result.options.map((option: any) => {
-        const askPrice = option.askPrice || 0;
-        const bidPrice = option.bidPrice || 0;
+        const askPrice = isNaN(option.askPrice) ? 0 : option.askPrice || 0;
+        const bidPrice = isNaN(option.bidPrice) ? 0 : option.bidPrice || 0;
         const premium = ((askPrice + bidPrice) / 2) * 100;
 
         const expirationDate = addDays(parseISO(option.expiration), 1);
         const correctedExpiration = format(expirationDate, 'yyyy-MM-dd');
         
-        return {
+        // Handle potential NaN values in numeric fields
+        const safeOption = {
           ...option,
-          premium,
+          premium: isNaN(premium) ? 0 : premium,
+          delta: isNaN(option.delta) ? null : option.delta,
+          yieldPercent: isNaN(option.yieldPercent) ? 0 : option.yieldPercent,
+          impliedVolatility: isNaN(option.impliedVolatility) ? 0 : option.impliedVolatility,
+          stockPrice: isNaN(option.stockPrice) ? 0 : option.stockPrice,
+          strike: isNaN(option.strike) ? 0 : option.strike,
+          volume: isNaN(option.volume) ? 0 : option.volume,
+          openInterest: isNaN(option.openInterest) ? 0 : option.openInterest,
           expiration: correctedExpiration,
+          askPrice: isNaN(askPrice)? 0 : askPrice,
+          bidPrice: isNaN(bidPrice)? 0 : bidPrice,
         };
+
+        return safeOption;
       });
    
       setData(updatedResult);
