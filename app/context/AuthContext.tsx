@@ -10,6 +10,7 @@ import {
 } from 'firebase/auth';
 import { auth } from '../config/firebase';
 import { toast } from "sonner";
+import { subscribeToGhost } from '../services/queryService';
 
 interface AuthContextType {
   user: User | null;  
@@ -79,7 +80,19 @@ export const AuthContextProvider = ({
       setLoading(true);
       setError(null);
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      
+      // Subscribe to Ghost mailing list
+      if (result.user.email) {
+        console.log('Email:', result.user)
+        try {
+          await subscribeToGhost(result.user.email, result.user.displayName??"")
+        } catch (subscribeError) {
+          console.error('Error subscribing to newsletter:', subscribeError);
+          // Don't throw error to prevent blocking sign-in
+        }
+      }
+      
       toast.success('Successfully signed in!');
     } catch (error) {
       console.error('Error signing in with Google:', error);
