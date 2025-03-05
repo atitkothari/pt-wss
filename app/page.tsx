@@ -11,6 +11,7 @@ import {
   ArrowRight
 } from "lucide-react";
 import { NavBar } from "./components/NavBar";
+import { Footer } from "./components/Footer";
 
 export default function LandingPage() {
   return (
@@ -106,6 +107,7 @@ export default function LandingPage() {
           </Link>
         </div>
       </div>
+      <Footer/>
     </div>
   );
 }
