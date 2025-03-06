@@ -62,7 +62,7 @@ export const subscribeToGhost = async (email: string, name?: string) => {
 };
 
 export const saveQuery = async (data: SaveQueryRequest) => {
-  const response = await fetch('/api/subscribe', {
+  const response = await fetch('https://api.wheelstrategyoptions.com/wheelstrat/saveQuery', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
