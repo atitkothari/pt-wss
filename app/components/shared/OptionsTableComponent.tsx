@@ -2,6 +2,9 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { FilterInput } from "../filters/FilterInput";
+import { AdvancedFilters } from "../filters/AdvancedFilters";
+import { RangeSlider } from "../filters/RangeSlider";
+import { SingleValueSlider } from "../filters/SingleValueSlider";
 import { useOptionsData } from "../../hooks/useOptionsData";
 import { LoadingSpinner } from "../LoadingSpinner";
 import { Option, OptionType, StrikeFilter } from "../../types/option";
@@ -14,6 +17,13 @@ import { useSymbols } from '../../hooks/useSymbols';
 import { SaveQueryModal } from "../modals/SaveQueryModal";
 import { BlurredTable } from "../auth/BlurredTable";
 import { useAuth } from "@/app/context/AuthContext";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface OptionsTableComponentProps {
   option: OptionType;
@@ -53,6 +63,12 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const [maxPrice, setMaxPrice] = useState(Number(searchParams.get(getParamKey('maxPrice'))) || 1000);
   const [minVol, setMinVol] = useState(Number(searchParams.get(getParamKey('minVol'))) || 0);
   const [deltaFilter, setDeltaFilter] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_delta'))) || -1, Number(searchParams.get(getParamKey('max_delta'))) || 1]);
+  
+  // Advanced filters
+  const [peRatio, setPeRatio] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_pe'))) || 0, Number(searchParams.get(getParamKey('max_pe'))) || 100]);
+  const [marketCap, setMarketCap] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_market_cap'))) || 0, Number(searchParams.get(getParamKey('max_market_cap'))) || 1000]);
+  const [movingAverageCrossover, setMovingAverageCrossover] = useState(searchParams.get(getParamKey('ma_crossover')) || "Any");
+  const [sector, setSector] = useState(searchParams.get(getParamKey('sector')) || "All Sectors");
 
   const [selectedExpiration, setSelectedExpiration] = useState(searchParams.get(getParamKey('expiration')) || "");
   const [sortConfig, setSortConfig] = useState<{ field: keyof Option; direction: 'asc' | 'desc' | null }>({ 
@@ -66,7 +82,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     maxPrice: 1000,
     minVol: 0,
     selectedExpiration: "",
-    pageNo: 1
+    pageNo: 1,
+    peRatio: [0, 100] as [number, number],
+    marketCap: [0, 1000] as [number, number],
+    movingAverageCrossover: "Any",
+    sector: "All Sectors"
   });
 
   const [hasSearched, setHasSearched] = useState(false);
@@ -128,7 +148,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       maxPrice,
       minVol,
       selectedExpiration,
-      pageNo: 1
+      pageNo: 1,
+      peRatio,
+      marketCap,
+      movingAverageCrossover,
+      sector
     });
 
     updateURL({
@@ -139,7 +163,13 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       expiration: selectedExpiration,
       strikeFilter,
       min_delta: deltaFilter[0],
-      max_delta: deltaFilter[1]
+      max_delta: deltaFilter[1],
+      min_pe: peRatio[0],
+      max_pe: peRatio[1],
+      min_market_cap: marketCap[0],
+      max_market_cap: marketCap[1],
+      ma_crossover: movingAverageCrossover,
+      sector: sector
     });
 
     fetchData(
@@ -152,7 +182,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       rowsPerPage,
       sortConfig.direction ? sortConfig : undefined,
       strikeFilter !== 'ALL' ? strikeFilter : undefined,
-      deltaFilter
+      deltaFilter,
+      peRatio,
+      marketCap,
+      movingAverageCrossover,
+      sector
     ).catch(console.error);
     setCurrentPage(1);
   };
@@ -370,81 +404,81 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             suggestions={symbols}
             showSuggestions={true}
             onSelect={(selectedSymbol: string) => handleSymbolSelect(selectedSymbol)}
+            tooltip="Enter a stock symbol (e.g., AAPL, MSFT) to filter options"
           />
-          <FilterInput
+          <SingleValueSlider
             id="input_screener_min_yield"
-            label="Min Yield %"
+            label="Yield %"
             value={minYield}
             onChange={setMinYield}
-            placeholder="Min yield..."
-            type="number"
-            onKeyPress={handleKeyPress}
+            min={0}
+            max={50}
+            step={0.1}
+            tooltip="Minimum percentage yield to filter options"
+            formatValue={(val) => `${val}%`}
           />
-          <FilterInput
+          <RangeSlider
             id="input_screener_max_price"
-            label="Max Strike Price"
-            value={maxPrice}
-            onChange={setMaxPrice}
-            placeholder="Max strike price..."
-            type="number"
-            onKeyPress={handleKeyPress}
+            label="Strike Price"
+            minValue={0}
+            maxValue={maxPrice}
+            value={[0, maxPrice]}
+            onChange={(value) => setMaxPrice(value[1])}
+            min={0}
+            max={2000}
+            step={1}
+            tooltip="Strike price range in dollars"
+            formatValue={(val) => `$${val}`}
           />
-          <FilterInput
+          <SingleValueSlider
             id="input_screener_expiration"
             label="Days to Expiration"
             value={dte}
             onChange={setDte}
-            placeholder="Days to expiration..."
-            type="number"
-            min="0"
-            max="1000"
-            onKeyPress={handleKeyPress}
+            min={0}
+            max={365}
+            step={1}
+            tooltip="Number of days until option expiration"
+            formatValue={(val) => `${val} days`}
           />
-          <FilterInput
-            id="input_screener_min_delta"
-            label="Min Delta"
-            value={deltaFilter[0]}
-            onChange={(value) => setDeltaFilter([value, deltaFilter[1]])}
-            placeholder="Min delta..."
-            type="number"
-            step="0.1"
-            min="-1"
-            max="1"
-            onKeyPress={handleKeyPress}
-          />
-          <FilterInput
-            id="input_screener_max_delta"
-            label="Max Delta"
-            value={deltaFilter[1]}
-            onChange={(value) => setDeltaFilter([deltaFilter[0], value])}
-            placeholder="Max delta..."
-            type="number"
-            step="0.1"
-            min="-1"
-            max="1"
-            onKeyPress={handleKeyPress}
-          />
-          <div>
-            <label className="block text-sm font-medium mb-1">Strike Filter</label>
-            <select
-              id="input_screener_strike_filter"
-              className="w-full px-3 py-2 border rounded-md"
+          <div className="relative">
+            <label className="block text-sm font-medium mb-1">Moneyness</label>
+            <Select
               value={strikeFilter}
-              onChange={(e) => setStrikeFilter(e.target.value as StrikeFilter)}
+              onValueChange={(value) => setStrikeFilter(value as StrikeFilter)}
             >
-              <option value="ALL">All Strikes</option>
-              <option value="ONE_OUT">One Strike Out</option>
-              <option value="THREE_PERCENT">&gt; 3% Out</option>
-            </select>
+              <SelectTrigger id="input_screener_strike_filter" className="h-10">
+                <SelectValue placeholder="Select moneyness" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Strikes</SelectItem>
+                <SelectItem value="ONE_OUT">One Strike Out</SelectItem>
+                <SelectItem value="THREE_PERCENT">&gt; 3% Out</SelectItem>
+              </SelectContent>
+            </Select>
+            <div className="text-xs text-gray-500 mt-1">
+              Filter options based on strike price distance from current price
+            </div>
           </div>
-          <FilterInput
-            id="input_screener_min_volume"
-            label="Min Volume"
-            value={minVol}
-            onChange={setMinVol}
-            placeholder="Min vol..."
-            type="number"
-            onKeyPress={handleKeyPress}
+
+        </div>
+        
+        {/* Advanced Filters */}
+        <div className="mt-4">
+          <AdvancedFilters
+            peRatio={peRatio}
+            onPeRatioChange={setPeRatio}
+            marketCap={marketCap}
+            onMarketCapChange={setMarketCap}
+            movingAverageCrossover={movingAverageCrossover}
+            onMovingAverageCrossoverChange={setMovingAverageCrossover}
+            sector={sector}
+            onSectorChange={setSector}
+            deltaFilter={deltaFilter}
+            onDeltaFilterChange={setDeltaFilter}
+            minVol={minVol}
+            onMinVolChange={setMinVol}
+            handleKeyPress={handleKeyPress}
           />
         </div>
 

@@ -32,7 +32,11 @@ export function useOptionsData(
     pageSize: number = 50,
     sortConfig?: { field: keyof Option; direction: 'asc' | 'desc' | null },
     strikeFilter?: StrikeFilter,
-    deltaRange?: [number, number]
+    deltaRange?: [number, number],
+    peRatio?: [number, number],
+    marketCap?: [number, number],
+    movingAverageCrossover?: string,
+    sector?: string
   ) => {
     setLoading(true);
     try {
@@ -63,6 +67,40 @@ export function useOptionsData(
       if (deltaRange) {
         filters.push({ operation: 'gte', field: 'delta', value: deltaRange[0] });
         filters.push({ operation: 'lte', field: 'delta', value: deltaRange[1] });
+      }
+      
+      // Add PE Ratio filters
+      if (peRatio && peRatio[0] > 0) {
+        filters.push({ operation: 'gte', field: 'peRatio', value: peRatio[0] });
+      }
+      if (peRatio && peRatio[1] < 100) {
+        filters.push({ operation: 'lte', field: 'peRatio', value: peRatio[1] });
+      }
+      
+      // Add Market Cap filters (in billions)
+      if (marketCap && marketCap[0] > 0) {
+        filters.push({ operation: 'gte', field: 'marketCap', value: marketCap[0] });
+      }
+      if (marketCap && marketCap[1] < 1000) {
+        filters.push({ operation: 'lte', field: 'marketCap', value: marketCap[1] });
+      }
+      
+      // Add Moving Average Crossover filter
+      if (movingAverageCrossover && movingAverageCrossover !== 'Any') {
+        filters.push({ 
+          operation: 'eq', 
+          field: 'movingAverageCrossover', 
+          value: `"${movingAverageCrossover}"` 
+        });
+      }
+      
+      // Add Sector filter
+      if (sector && sector !== 'All Sectors') {
+        filters.push({ 
+          operation: 'eq', 
+          field: 'sector', 
+          value: `"${sector}"` 
+        });
       }
 
       // Get sort params from URL if not provided in sortConfig

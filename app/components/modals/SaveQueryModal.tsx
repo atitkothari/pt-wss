@@ -104,6 +104,60 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
       field: query.option,
       value: query.strikeFilter === 'ITM' ? 1 : query.strikeFilter === 'OTM' ? -1 : 0
     });
+    
+    // Add PE Ratio filters
+    if (query.peRatio) {
+      if (query.peRatio[0] > 0) {
+        filterData.push({
+          operation: "gte",
+          field: "peRatio",
+          value: query.peRatio[0]
+        });
+      }
+      if (query.peRatio[1] < 100) {
+        filterData.push({
+          operation: "lte",
+          field: "peRatio",
+          value: query.peRatio[1]
+        });
+      }
+    }
+    
+    // Add Market Cap filters
+    if (query.marketCap) {
+      if (query.marketCap[0] > 0) {
+        filterData.push({
+          operation: "gte",
+          field: "marketCap",
+          value: query.marketCap[0]
+        });
+      }
+      if (query.marketCap[1] < 1000) {
+        filterData.push({
+          operation: "lte",
+          field: "marketCap",
+          value: query.marketCap[1]
+        });
+      }
+    }
+    
+    // Add Moving Average Crossover filter
+    if (query.movingAverageCrossover && query.movingAverageCrossover !== 'Any') {
+      filterData.push({ 
+        operation: "eq", 
+        field: "movingAverageCrossover", 
+        value: `"${query.movingAverageCrossover}"` 
+      });
+    }
+    
+    // Add Sector filter
+    if (query.sector && query.sector !== 'All Sectors') {
+      filterData.push({ 
+        operation: "eq", 
+        field: "sector", 
+        value: `"${query.sector}"` 
+      });
+    }
 
     return filterData;
   };
@@ -151,6 +205,24 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
       `Strike Filter: ${query.strikeFilter || 'ALL'}`,
       `Delta Range: ${query.deltaFilter ? `${query.deltaFilter[0]} to ${query.deltaFilter[1]}` : '-1 to 1'}`
     ];
+    
+    // Add advanced filter display items
+    if (query.peRatio) {
+      displayItems.push(`P/E Ratio: ${query.peRatio[0]} to ${query.peRatio[1]}`);
+    }
+    
+    if (query.marketCap) {
+      displayItems.push(`Market Cap: ${query.marketCap[0]}B to ${query.marketCap[1]}B`);
+    }
+    
+    if (query.movingAverageCrossover && query.movingAverageCrossover !== 'Any') {
+      displayItems.push(`Moving Average: ${query.movingAverageCrossover}`);
+    }
+    
+    if (query.sector && query.sector !== 'All Sectors') {
+      displayItems.push(`Sector: ${query.sector}`);
+    }
+    
     return displayItems;
   };
 
@@ -291,4 +363,4 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
   };
 
   return renderContent();
-} 
+}
