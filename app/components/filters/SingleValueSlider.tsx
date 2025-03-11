@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { Slider } from "@/components/ui/slider";
-import { Input } from "@/components/ui/input";
 import { Info } from "lucide-react";
 import {
   Tooltip,
@@ -37,44 +36,16 @@ export function SingleValueSlider({
   className
 }: SingleValueSliderProps) {
   const [localValue, setLocalValue] = useState<number>(value);
-  const [inputValue, setInputValue] = useState<string>(value.toString());
   
   // Update local state when props change
   useEffect(() => {
     setLocalValue(value);
-    setInputValue(value.toString());
   }, [value]);
 
   const handleSliderChange = (newValue: number[]) => {
     const singleValue = newValue[0];
     setLocalValue(singleValue);
-    setInputValue(singleValue.toString());
     onChange(singleValue);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    setInputValue(newValue);
-    
-    if (newValue === '' || isNaN(Number(newValue))) return;
-    
-    const numValue = Number(newValue);
-    setLocalValue(numValue);
-    onChange(numValue);
-  };
-
-  const handleInputBlur = () => {
-    if (inputValue === '' || isNaN(Number(inputValue))) {
-      setInputValue(localValue.toString());
-      return;
-    }
-    
-    const numValue = Number(inputValue);
-    const validValue = Math.max(min, Math.min(numValue, max));
-    
-    setLocalValue(validValue);
-    setInputValue(validValue.toString());
-    onChange(validValue);
   };
 
   return (
@@ -96,7 +67,7 @@ export function SingleValueSlider({
           )}
         </div>
         <div className="text-xs text-gray-500">
-          Range: {formatValue(min)} to {formatValue(max)}
+          Current: {formatValue(localValue)}
         </div>
       </div>
       
@@ -110,18 +81,9 @@ export function SingleValueSlider({
           onValueChange={handleSliderChange}
           className="mb-4"
         />
-      </div>
-      
-      <div className="flex items-center">
-        <div className="flex-1">
-          <Input
-            type="text"
-            value={inputValue}
-            onChange={handleInputChange}
-            onBlur={handleInputBlur}
-            className="text-center text-sm"
-            aria-label={`${label} value`}
-          />
+        <div className="flex justify-between text-xs text-gray-500 mt-1">
+          <span>{formatValue(min)}</span>
+          <span>{formatValue(max)}</span>
         </div>
       </div>
     </div>

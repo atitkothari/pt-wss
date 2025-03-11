@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { Slider } from "@/components/ui/slider";
-import { Input } from "@/components/ui/input";
 import { Info } from "lucide-react";
 import {
   Tooltip,
@@ -41,80 +40,16 @@ export function RangeSlider({
   className
 }: RangeSliderProps) {
   const [localValue, setLocalValue] = useState<[number, number]>(value);
-  const [inputMin, setInputMin] = useState<string>(value[0].toString());
-  const [inputMax, setInputMax] = useState<string>(value[1].toString());
   
   // Update local state when props change
   useEffect(() => {
     setLocalValue(value);
-    setInputMin(value[0].toString());
-    setInputMax(value[1].toString());
   }, [value]);
 
   const handleSliderChange = (newValue: number[]) => {
     const typedValue: [number, number] = [newValue[0], newValue[1]];
     setLocalValue(typedValue);
-    setInputMin(typedValue[0].toString());
-    setInputMax(typedValue[1].toString());
     onChange(typedValue);
-  };
-
-  const handleMinInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newMin = e.target.value;
-    setInputMin(newMin);
-    
-    if (newMin === '' || isNaN(Number(newMin))) return;
-    
-    const numValue = Number(newMin);
-    if (numValue <= localValue[1]) {
-      const newValue: [number, number] = [numValue, localValue[1]];
-      setLocalValue(newValue);
-      onChange(newValue);
-    }
-  };
-
-  const handleMaxInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newMax = e.target.value;
-    setInputMax(newMax);
-    
-    if (newMax === '' || isNaN(Number(newMax))) return;
-    
-    const numValue = Number(newMax);
-    if (numValue >= localValue[0]) {
-      const newValue: [number, number] = [localValue[0], numValue];
-      setLocalValue(newValue);
-      onChange(newValue);
-    }
-  };
-
-  const handleMinInputBlur = () => {
-    if (inputMin === '' || isNaN(Number(inputMin))) {
-      setInputMin(localValue[0].toString());
-      return;
-    }
-    
-    const numValue = Number(inputMin);
-    const validValue = Math.max(min, Math.min(numValue, localValue[1]));
-    const newValue: [number, number] = [validValue, localValue[1]];
-    
-    setLocalValue(newValue);
-    setInputMin(validValue.toString());
-    onChange(newValue);
-  };
-
-  const handleMaxInputBlur = () => {
-    if (inputMax === '' || isNaN(Number(inputMax))) {
-      setInputMax(localValue[1].toString());
-      return;
-    }
-    
-    const numValue = Number(inputMax);
-    const validValue = Math.min(max, Math.max(numValue, localValue[0]));
-    const newValue: [number, number] = [localValue[0], validValue];
-    
-    setLocalValue(newValue);
-    setInputMax(validValue.toString());
-    onChange(newValue);
   };
 
   return (
@@ -136,7 +71,7 @@ export function RangeSlider({
           )}
         </div>
         <div className="text-xs text-gray-500">
-          Range: {formatValue(min)} to {formatValue(max)}
+          Current: {formatValue(localValue[0])} to {formatValue(localValue[1])}
         </div>
       </div>
       
@@ -150,29 +85,9 @@ export function RangeSlider({
           onValueChange={handleSliderChange}
           className="mb-4"
         />
-      </div>
-      
-      <div className="flex items-center gap-2">
-        <div className="flex-1">
-          <Input
-            type="text"
-            value={inputMin}
-            onChange={handleMinInputChange}
-            onBlur={handleMinInputBlur}
-            className="text-center text-sm"
-            aria-label={`Minimum ${label}`}
-          />
-        </div>
-        <span className="text-gray-400">to</span>
-        <div className="flex-1">
-          <Input
-            type="text"
-            value={inputMax}
-            onChange={handleMaxInputChange}
-            onBlur={handleMaxInputBlur}
-            className="text-center text-sm"
-            aria-label={`Maximum ${label}`}
-          />
+        <div className="flex justify-between text-xs text-gray-500 mt-1">
+          <span>{formatValue(min)}</span>
+          <span>{formatValue(max)}</span>
         </div>
       </div>
     </div>

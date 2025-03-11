@@ -75,7 +75,7 @@ export function AdvancedFilters({
         className="w-full flex justify-between items-center p-0 h-auto mb-2"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <span className="font-medium">Advanced Filters</span>
+        <span className="text-lg font-semibold text-primary">Advanced Filters</span>
         {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
       </Button>
 
