@@ -8,11 +8,11 @@ import { useSymbols } from "../hooks/useSymbols";
 import { fetchOptionsData } from "../services/api";
 import { format, parseISO, addDays, addMonths, isLastDayOfMonth } from 'date-fns';
 import Link from 'next/link';
-
 interface CalculatorResult {
   expiration: string;
   income: number;
   annualizedReturn: number;
+  option?: any;
 }
 
 export default function CoveredCallCalculatorPage() {
@@ -27,6 +27,7 @@ export default function CoveredCallCalculatorPage() {
   const [results, setResults] = useState<CalculatorResult[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [expandedRowIndex, setExpandedRowIndex] = useState<number | null>(null);
   const { symbols, loading: symbolsLoading } = useSymbols();
 
   const calculateIncome = async () => {
@@ -170,7 +171,8 @@ export default function CoveredCallCalculatorPage() {
           return {
             expiration: formattedExpiration,
             income: income,
-            annualizedReturn: annualizedReturn
+            annualizedReturn: annualizedReturn,
+            option: option
           };
         })
         .filter(Boolean) as CalculatorResult[];
@@ -258,12 +260,38 @@ export default function CoveredCallCalculatorPage() {
                   </thead>
                   <tbody>
                     {results.map((result, index) => (
-                      <tr key={index} className="border-b hover:bg-gray-50">
-                        
-                        <td className="p-3">{result.expiration}</td>
-                        <td className="p-3">${result.income.toFixed(2)}</td>
-                        <td className="p-3">{result.annualizedReturn.toFixed(2)}%</td>
-                      </tr>
+                      <>
+                        <tr 
+                          key={index} 
+                          className="border-b hover:bg-gray-50 cursor-pointer" 
+                          onClick={() => setExpandedRowIndex(expandedRowIndex === index ? null : index)}
+                        >
+                          <td className="p-3">{result.expiration}</td>
+                          <td className="p-3">${result.income.toFixed(2)}</td>
+                          <td className="p-3">{result.annualizedReturn.toFixed(2)}%</td>
+                        </tr>
+                        {expandedRowIndex === index && (
+                          <tr key={`${index}-expanded`} className="bg-gray-50">
+                            <td colSpan={3} className="p-4 border-b">
+                              <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                  <p className="font-medium mb-2">Option Details</p>
+                                  <p>Strike Price: ${result.option.strike}</p>
+                                  <p>Stock Price: ${result.option.stockPrice}</p>
+                                  <p>Bid: ${result.option.bidPrice}</p>
+                                  <p>Ask: ${result.option.askPrice}</p>
+                                </div>
+                                <div>
+                                  <p className="font-medium mb-2">Additional Info</p>
+                                  <p>Volume: {result.option.volume}</p>
+                                  <p>Open Interest: {result.option.openInterest}</p>
+                                  <p>Implied Volatility: {(result.option.impliedVolatility).toFixed(2)}%</p>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </>
                     ))}
                   </tbody>
                 </table>
@@ -282,6 +310,8 @@ export default function CoveredCallCalculatorPage() {
               </div>
             </div>
           )}
+
+
         </div>
         <Footer />
       </div>
