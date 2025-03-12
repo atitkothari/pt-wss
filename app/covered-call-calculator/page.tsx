@@ -276,8 +276,8 @@ export default function CoveredCallCalculatorPage() {
                               <div className="grid grid-cols-2 gap-4 text-sm">
                                 <div>
                                   <p className="font-medium mb-2">Option Details</p>
-                                  <p>Strike Price: ${result.option.strike}</p>
-                                  <p>Stock Price: ${result.option.stockPrice}</p>
+                                  <p>Current Price: ${result.option.stockPrice}</p>
+                                  <p>Strike Price: ${result.option.strike}</p>                                  
                                   <p>Bid: ${result.option.bidPrice}</p>
                                   <p>Ask: ${result.option.askPrice}</p>
                                 </div>
@@ -285,8 +285,9 @@ export default function CoveredCallCalculatorPage() {
                                   <p className="font-medium mb-2">Additional Info</p>
                                   <p>Volume: {result.option.volume}</p>
                                   <p>Open Interest: {result.option.openInterest}</p>
-                                  <p>Implied Volatility: {(result.option.impliedVolatility).toFixed(2)}%</p>
+                                  <p>Implied Volatility: {(result.option.impliedVolatility).toFixed(2)}%</p>                                  
                                 </div>
+                                <p><Link href="/options" className="underline font-medium">Try our Options Screener</Link> to get more details.</p>
                               </div>
                             </td>
                           </tr>
