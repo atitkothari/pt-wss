@@ -116,7 +116,7 @@ export function NavBar() {
                   </Link>
                 )
               ))}
-              <Button
+              {/* <Button
                 id="btn_buy_coffee_mobile"
                 variant="outline"
                 onClick={() => window.open('https://buymeacoffee.com/wheelstrategyoptions', '_blank')}
@@ -124,7 +124,7 @@ export function NavBar() {
               >
                 <Coffee className="h-4 w-4 mr-2" />
                 <span>Support This Project</span>
-              </Button>
+              </Button> */}
               
               {loading ? null : user ? (
                 <Button
