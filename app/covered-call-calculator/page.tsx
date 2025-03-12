@@ -256,6 +256,14 @@ export default function CoveredCallCalculatorPage() {
               <h2 className="text-xl font-semibold mb-4">{inputSymbol}</h2>
               
               <div className="overflow-x-auto">
+                <div className="text-sm text-gray-600 mb-2 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                    <polyline points="10 17 15 12 10 7"/>
+                    <line x1="15" y1="12" x2="3" y2="12"/>
+                  </svg>
+                  Click on any row to see detailed option information
+                </div>
                 <table className="w-full border-collapse">
                   <thead>
                     <tr className="bg-gray-100">
@@ -269,12 +277,26 @@ export default function CoveredCallCalculatorPage() {
                       <>
                         <tr 
                           key={index} 
-                          className="border-b hover:bg-gray-50 cursor-pointer" 
+                          className={`border-b hover:bg-blue-50 cursor-pointer transition-colors duration-150 relative group ${expandedRowIndex === index ? 'bg-blue-50 border-l-4 border-l-blue-500' : 'hover:border-l-4 hover:border-l-blue-300'}`} 
                           onClick={() => setExpandedRowIndex(expandedRowIndex === index ? null : index)}
+                          title="Click to see more details"
                         >
                           <td className="p-3 text-center">{result.expiration}</td>
                           <td className="p-3 text-center">${result.income.toFixed(0)}</td>
-                          <td className="p-3 text-center">{result.annualizedReturn.toFixed(0)}%</td>
+                          <td className="p-3 text-center flex items-center justify-center gap-2">
+                            {result.annualizedReturn.toFixed(0)}%
+                            <span className="text-gray-400 group-hover:text-blue-500 transition-colors ml-2">
+                              {expandedRowIndex === index ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="m18 15-6-6-6 6"/>
+                                </svg>
+                              ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="m6 9 6 6 6-6"/>
+                                </svg>
+                              )}
+                            </span>
+                          </td>
                         </tr>
                         {expandedRowIndex === index && (
                           <tr key={`${index}-expanded`} className="bg-gray-50">
@@ -325,7 +347,7 @@ export default function CoveredCallCalculatorPage() {
                                   </div>
                                 </div>
                                 <div className="text-center mt-2">
-                                  <Link href="/options" className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                                  <Link href={`/options?call_search=${inputSymbol}&call_expiration=${result.option.expiration}`} className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors">
                                     Try our Options Screener
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -350,7 +372,7 @@ export default function CoveredCallCalculatorPage() {
                   The best part? You can repeat this strategy month after month, creating a consistent income stream from stocks you already own.
                 </p>
                 <p className="mt-2">
-                  Ready to maximize your portfolio's earning potential? <Link href="/options" className="underline font-medium">Try our Options Screener</Link> to find the perfect covered call opportunities and start generating passive income today!
+                  Ready to maximize your portfolio's earning potential? <Link href={`/options?call_search=${calculationSymbol}&call_expiration=${results[0].option.expiration}`} className="underline font-medium">Try our Options Screener</Link> to find the perfect covered call opportunities and start generating passive income today!
                 </p>
               </div>
             </div>
