@@ -13,6 +13,7 @@ export function NavBar() {
   const navigation = [
     { name: 'Home', href: '/' },
     { name: 'Options Screener', href: '/options' },
+    { name: 'Covered Call Calculator', href: '/covered-call-calculator' },
     { name: 'Blog', href: 'https://wheelstrategyoptions.com/blog/', external: true },
     { name: 'Provide Feedback', href: 'mailto:theproducttank@gmail.com?subject=Feedback about Wheel Strategy Screener', external: true },
   ];

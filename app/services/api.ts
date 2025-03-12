@@ -42,6 +42,12 @@ export async function fetchOptionsData(
         field: optionType,
         value: 0.03
       });
+    } else if (strikeFilter === 'FIVE_PERCENT') {
+      body.filters.push({
+        operation: "strikeFilter",
+        field: optionType,
+        value: 0.05
+      });
     } else if (strikeFilter === 'ONE_OUT') {
       body.filters.push({
         operation: "strikeFilter",
