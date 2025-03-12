@@ -8,6 +8,8 @@ import { useSymbols } from "../hooks/useSymbols";
 import { fetchOptionsData } from "../services/api";
 import { format, parseISO, addDays, addMonths, isLastDayOfMonth } from 'date-fns';
 import Link from 'next/link';
+import { Button } from "@/components/ui/button";
+import { Search } from 'lucide-react';
 interface CalculatorResult {
   expiration: string;
   income: number;
@@ -217,6 +219,7 @@ export default function CoveredCallCalculatorPage() {
                 suggestions={symbols}
                 showSuggestions={true}
                 onSelect={handleSymbolSelect}
+                id={"covered_call_calculator_symbol"}
               />
               
               <FilterInput
@@ -227,16 +230,19 @@ export default function CoveredCallCalculatorPage() {
                 min="100"
                 step="100"
                 placeholder="Enter number of shares (100 or more)"
+                id={"covered_call_calculator_shares"}
               />
             </div>
             
-            <button
+            <Button
               onClick={calculateIncome}
-              disabled={loading}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors"
+              disabled={loading}              
+              className="w-full sm:w-auto"
+              id="btn_covered_call_calculator_search"
             >
+              <Search className="h-4 w-4 mr-2" />
               {loading ? 'Calculating...' : 'Calculate Income'}
-            </button>
+            </Button>
             
             {error && (
               <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-md">
@@ -338,7 +344,7 @@ export default function CoveredCallCalculatorPage() {
               
               <div className="mt-4 p-3 bg-gray-100 rounded-md">
                 <p>
-                With your {calculationShares} shares of {calculationSymbol}, you could pocket an extra ${results[0].income.toFixed(2)} by {results.length > 0 ? results[0].expiration : 'the next few months'} by selling covered calls.
+                Selling covered calls on your {calculationShares} shares of {calculationSymbol} can provide an extra income of ${results[0].income.toFixed(2)} by Mar 28                
                 </p>
                 <p className="mt-2">
                   The best part? You can repeat this strategy month after month, creating a consistent income stream from stocks you already own.

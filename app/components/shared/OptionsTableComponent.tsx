@@ -450,15 +450,6 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row justify-end gap-1">
-          {/* <Button 
-            id="btn_screener_feedback_top"
-            variant="outline"
-            onClick={handleFeedback}
-            className="text-gray-600 hover:text-gray-800 w-full sm:w-auto"
-          >
-            <Mail className="h-4 w-4 mr-2" />
-            Provide Feedback
-          </Button> */}
           
           <Button
             id="btn_screener_save"
