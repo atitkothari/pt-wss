@@ -94,7 +94,7 @@ export default function CoveredCallCalculatorPage() {
           if (!options || options.length === 0) return null;
           
           // Sort options by strike price
-          options.sort((a: { strikePrice: number; }, b: { strikePrice: number; }) => b.strikePrice - a.strikePrice);
+          options.sort((a: { strike: number; }, b: { strike: number; }) => b.strike - a.strike);
           
           const expiryDate = parseISO(expiration);
           
@@ -264,47 +264,48 @@ export default function CoveredCallCalculatorPage() {
                   </svg>
                   Click on any row to see detailed option information
                 </div>
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="bg-gray-100">
-                      <th className="p-3 text-center font-medium">Option Expiration Date</th>
-                      <th className="p-3 text-center font-medium">Your Income</th>
-                      <th className="p-3 text-center font-medium">Annualized Return</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {results.map((result, index) => (
-                      <>
-                        <tr 
-                          key={index} 
-                          className={`border-b hover:bg-blue-50 cursor-pointer transition-colors duration-150 relative group ${expandedRowIndex === index ? 'bg-blue-50 border-l-4 border-l-blue-500' : 'hover:border-l-4 hover:border-l-blue-300'}`} 
-                          onClick={() => setExpandedRowIndex(expandedRowIndex === index ? null : index)}
-                          title="Click to see more details"
-                        >
-                          <td className="p-3 text-center">{result.expiration}</td>
-                          <td className="p-3 text-center">${result.income.toFixed(0)}</td>
-                          <td className="p-3 text-center flex items-center justify-center gap-2">
-                            {result.annualizedReturn.toFixed(0)}%
-                            <span className="text-gray-400 group-hover:text-blue-500 transition-colors ml-2">
-                              {expandedRowIndex === index ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="m18 15-6-6-6 6"/>
-                                </svg>
-                              ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="m6 9 6 6 6-6"/>
-                                </svg>
-                              )}
-                            </span>
-                          </td>
-                        </tr>
-                        {expandedRowIndex === index && (
-                          <tr key={`${index}-expanded`} className="bg-gray-50">
-                            <td colSpan={3} className="p-6 border-b">
-                              <div className="bg-white rounded-lg shadow-sm p-5 border border-gray-200">
-                                <div className="grid grid-cols-2 gap-6 text-sm mb-4">
-                                  <div className="bg-blue-50 rounded-lg p-4">
-                                    <p className="font-semibold text-blue-800 mb-3 text-center border-b border-blue-100 pb-2">Option Details</p>
+                <div className="rounded-md border overflow-hidden">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="p-2 sm:p-3 text-center font-medium text-xs sm:text-sm">Option Expiration Date</th>
+                        <th className="p-2 sm:p-3 text-center font-medium text-xs sm:text-sm">Your Income</th>
+                        <th className="p-2 sm:p-3 text-center font-medium text-xs sm:text-sm">Annualized Return</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {results.map((result, index) => (
+                        <>
+                          <tr 
+                            key={index} 
+                            className={`border-b hover:bg-blue-50 cursor-pointer transition-colors duration-150 relative group ${expandedRowIndex === index ? 'bg-blue-50 border-l-4 border-l-blue-500' : 'hover:border-l-4 hover:border-l-blue-300'}`} 
+                            onClick={() => setExpandedRowIndex(expandedRowIndex === index ? null : index)}
+                            title="Click to see more details"
+                          >
+                            <td className="p-2 sm:p-3 text-center text-xs sm:text-sm">{result.expiration}</td>
+                            <td className="p-2 sm:p-3 text-center text-xs sm:text-sm">${result.income.toFixed(0)}</td>
+                            <td className="p-2 sm:p-3 text-center flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                              {result.annualizedReturn.toFixed(0)}%
+                              <span className="text-gray-400 group-hover:text-blue-500 transition-colors ml-1 sm:ml-2">
+                                {expandedRowIndex === index ? (
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="m18 15-6-6-6 6"/>
+                                  </svg>
+                                ) : (
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="m6 9 6 6 6-6"/>
+                                  </svg>
+                                )}
+                              </span>
+                            </td>
+                          </tr>
+                          {expandedRowIndex === index && (
+                            <tr key={`${index}-expanded`} className="bg-gray-50">
+                              <td colSpan={3} className="p-2 sm:p-6 border-b">
+                              <div className="bg-white rounded-lg shadow-sm p-3 sm:p-5 border border-gray-200">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 text-sm mb-4">
+                                  <div className="bg-blue-50 rounded-lg p-3 sm:p-4">
+                                    <p className="font-semibold text-blue-800 mb-2 sm:mb-3 text-center border-b border-blue-100 pb-2 text-sm sm:text-base">Option Details</p>
                                     <div className="space-y-2">
                                       <div className="flex justify-between items-center">
                                         <span className="text-gray-600">Current Price:</span>
@@ -324,8 +325,8 @@ export default function CoveredCallCalculatorPage() {
                                       </div>
                                     </div>
                                   </div>
-                                  <div className="bg-green-50 rounded-lg p-4">
-                                    <p className="font-semibold text-green-800 mb-3 text-center border-b border-green-100 pb-2">Additional Info</p>
+                                  <div className="bg-green-50 rounded-lg p-3 sm:p-4 mt-4 sm:mt-0">
+                                    <p className="font-semibold text-green-800 mb-2 sm:mb-3 text-center border-b border-green-100 pb-2 text-sm sm:text-base">Additional Info</p>
                                     <div className="space-y-2">
                                       <div className="flex justify-between items-center">
                                         <span className="text-gray-600">Volume:</span>
@@ -346,10 +347,10 @@ export default function CoveredCallCalculatorPage() {
                                     </div>
                                   </div>
                                 </div>
-                                <div className="text-center mt-2">
-                                  <Link href={`/options?call_search=${inputSymbol}&call_expiration=${result.option.expiration}`} className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                                <div className="text-center mt-3 sm:mt-2">
+                                  <Link href={`/options?call_search=${inputSymbol}&call_expiration=${result.option.expiration}`} className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors text-xs sm:text-sm py-2">
                                     Try our Options Screener
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 sm:h-4 sm:w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                     </svg>
                                   </Link>
@@ -364,9 +365,9 @@ export default function CoveredCallCalculatorPage() {
                 </table>
               </div>
               
-              <div className="mt-4 p-3 bg-gray-100 rounded-md">
+              <div className="mt-4 p-3 sm:p-4 bg-gray-100 rounded-md text-xs sm:text-sm">
                 <p>
-                Selling covered calls on your {calculationShares} shares of {calculationSymbol} can provide an extra income of ${results[0].income.toFixed(2)} by Mar 28                
+                Selling covered calls on your {calculationShares} shares of {calculationSymbol} can provide an extra income of ${results[0].income.toFixed(2)} by {results[0].expiration}                
                 </p>
                 <p className="mt-2">
                   The best part? You can repeat this strategy month after month, creating a consistent income stream from stocks you already own.
@@ -376,12 +377,11 @@ export default function CoveredCallCalculatorPage() {
                 </p>
               </div>
             </div>
-          )}
-
-
-        </div>
+            </div>
+          )}       
         <Footer />
       </div>
+    </div>
     </div>
   );
 }
