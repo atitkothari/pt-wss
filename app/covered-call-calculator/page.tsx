@@ -7,6 +7,7 @@ import { Footer } from "../components/Footer";
 import { useSymbols } from "../hooks/useSymbols";
 import { fetchOptionsData } from "../services/api";
 import { format, parseISO, addDays, addMonths, isLastDayOfMonth } from 'date-fns';
+import Link from 'next/link';
 
 interface CalculatorResult {
   expiration: string;
@@ -164,7 +165,7 @@ export default function CoveredCallCalculatorPage() {
           
           // Format expiration date
           const expirationDate = parseISO(contract.expiration);
-          const formattedExpiration = format(expirationDate, 'MMM d, yyyy');
+          const formattedExpiration = format(expirationDate, 'MMM d');
           
           return {
             expiration: formattedExpiration,
@@ -244,7 +245,7 @@ export default function CoveredCallCalculatorPage() {
           
           {results.length > 0 && (
             <div>
-              <h2 className="text-xl font-semibold mb-4">Your Potential Income</h2>
+              <h2 className="text-xl font-semibold mb-4">{inputSymbol}</h2>
               
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse">
@@ -264,19 +265,20 @@ export default function CoveredCallCalculatorPage() {
                         <td className="p-3">{result.annualizedReturn.toFixed(2)}%</td>
                       </tr>
                     ))}
-                    <tr className="bg-gray-100 font-semibold">
-                      <td className="p-3">Total Potential Premium</td>
-                      <td className="p-3">${results.reduce((sum, result) => sum + result.income, 0).toFixed(2)}</td>
-                      <td className="p-3"></td>
-                    </tr>
                   </tbody>
                 </table>
               </div>
               
-              <div className="mt-4 p-3 bg-blue-50 text-blue-700 rounded-md">
-                <p>This shows your potential income from selling covered call options for monthly contracts within the next 3 months. 
-                If you own {calculationShares} shares of {calculationSymbol}, you can earn a total of ${results.reduce((sum, result) => sum + result.income, 0).toFixed(2)} in premium income 
-                by selling these covered call options.</p>
+              <div className="mt-4 p-3 bg-gray-100 rounded-md">
+                <p>
+                With your {calculationShares} shares of {calculationSymbol}, you could pocket an extra ${results[0].income.toFixed(2)} by {results.length > 0 ? results[0].expiration : 'the next few months'} by selling covered calls.
+                </p>
+                <p className="mt-2">
+                  The best part? You can repeat this strategy month after month, creating a consistent income stream from stocks you already own.
+                </p>
+                <p className="mt-2">
+                  Ready to maximize your portfolio's earning potential? <Link href="/options" className="underline font-medium">Try our Options Screener</Link> to find the perfect covered call opportunities and start generating passive income today!
+                </p>
               </div>
             </div>
           )}
