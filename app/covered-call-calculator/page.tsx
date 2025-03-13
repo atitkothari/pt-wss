@@ -206,8 +206,7 @@ export default function CoveredCallCalculatorPage() {
           
           <div className="mb-8">
             <p className="text-gray-600 mb-4">
-              Generate income by selling options on stocks you already own.
-              Enter a stock symbol and the number of shares you own to see potential income from selling monthly call options within the next 3 months.
+            Earn income by selling call options on stocks you own. Enter the details below and view potential monthly income.
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
