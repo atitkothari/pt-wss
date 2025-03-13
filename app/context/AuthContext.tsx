@@ -83,15 +83,15 @@ export const AuthContextProvider = ({
       const result = await signInWithPopup(auth, provider);
       
       // Subscribe to Ghost mailing list
-      if (result.user.email) {
-        console.log('Email:', result.user)
-        try {
-          await subscribeToGhost(result.user.email, result.user.displayName??"")
-        } catch (subscribeError) {
-          console.error('Error subscribing to newsletter:', subscribeError);
-          // Don't throw error to prevent blocking sign-in
-        }
-      }
+      // if (result.user.email) {
+      //   console.log('Email:', result.user)
+      //   try {
+      //     await subscribeToGhost(result.user.email, result.user.displayName??"")
+      //   } catch (subscribeError) {
+      //     console.error('Error subscribing to newsletter:', subscribeError);
+      //     // Don't throw error to prevent blocking sign-in
+      //   }
+      // }
       
       toast.success('Successfully signed in!');
     } catch (error) {
