@@ -348,22 +348,22 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             value={searchTerm}
             onChange={async (value) => {
               setSearchTerm(value);
-              if (value) {
-                try {
-                  await fetch(`https://api.wheelstrategyoptions.com/wheelstrat/searchAnalytics`, {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ symbol: value,                       
-                      userId: userId,
-                      type: option.toString()
-                      })
-                  });
-                } catch (analyticsError) {
-                  console.error('Failed to track search analytics:', analyticsError);
-                }
-              }
+              // if (value) {
+              //   try {
+              //     await fetch(`https://api.wheelstrategyoptions.com/wheelstrat/searchAnalytics`, {
+              //       method: 'POST',
+              //       headers: {
+              //         'Content-Type': 'application/json'
+              //       },
+              //       body: JSON.stringify({ symbol: value,                       
+              //         userId: userId,
+              //         type: option.toString()
+              //         })
+              //     });
+              //   } catch (analyticsError) {
+              //     console.error('Failed to track search analytics:', analyticsError);
+              //   }
+              // }
             }}
             placeholder="Enter symbol..."
             onKeyPress={handleKeyPress}
