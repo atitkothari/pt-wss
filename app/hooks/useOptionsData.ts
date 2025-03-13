@@ -36,7 +36,8 @@ export function useOptionsData(
     peRatio?: [number, number],
     marketCap?: [number, number],
     movingAverageCrossover?: string,
-    sector?: string
+    sector?: string,
+    moneynessRange?: [number, number]
   ) => {
     setLoading(true);
     try {
@@ -67,6 +68,11 @@ export function useOptionsData(
       if (deltaRange) {
         filters.push({ operation: 'gte', field: 'delta', value: deltaRange[0] });
         filters.push({ operation: 'lte', field: 'delta', value: deltaRange[1] });
+      }
+      
+      // Add moneyness range filters
+      if (moneynessRange) {
+        filters.push({ operation: 'moneynessRange', field: option, value: [moneynessRange[0] / 100, moneynessRange[1] / 100] });
       }
       
       // Add PE Ratio filters

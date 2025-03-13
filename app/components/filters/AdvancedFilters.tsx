@@ -28,6 +28,9 @@ interface AdvancedFiltersProps {
   minVol: number;
   onMinVolChange: (value: number) => void;
   handleKeyPress?: (e: React.KeyboardEvent) => void;
+  // Add strike price filter props
+  strikePrice: [number, number];
+  onStrikePriceChange: (value: [number, number]) => void;
 }
 
 export function AdvancedFilters({
@@ -43,7 +46,10 @@ export function AdvancedFilters({
   onDeltaFilterChange,
   minVol,
   onMinVolChange,
-  handleKeyPress
+  handleKeyPress,
+  // Add strike price filter props
+  strikePrice,
+  onStrikePriceChange
 }: AdvancedFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -82,6 +88,22 @@ export function AdvancedFilters({
       {isExpanded && (
         <div className="space-y-4 mt-4 animate-in fade-in-50 duration-300">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {/* Add Strike Price filter before P/E Ratio */}
+            <RangeSlider
+              id="input_screener_strike_price"
+              label="Strike Price"
+              value={strikePrice}
+              minValue={strikePrice[0]}
+              maxValue={strikePrice[1]}
+              onChange={onStrikePriceChange}
+              min={0}
+              max={2000}
+              step={1}
+              tooltip="Strike price range in dollars"
+              formatValue={(val) => `$${val}`}
+              className="col-span-1"
+            />
+            
             <RangeSlider
               id="input_screener_pe_ratio"
               label="P/E Ratio"
@@ -136,28 +158,7 @@ export function AdvancedFilters({
               tooltip="Minimum trading volume to ensure liquidity"
               formatValue={(val) => val.toString()}
               className="col-span-1"
-            />
-            <div className="relative">
-              <label className="block text-sm font-medium mb-1">Moving Average</label>
-              <Select 
-                value={movingAverageCrossover} 
-                onValueChange={onMovingAverageCrossoverChange}
-              >
-                <SelectTrigger id="input_screener_ma_crossover" className="h-10">
-                  <SelectValue placeholder="Select MA Crossover" />
-                </SelectTrigger>
-                <SelectContent>
-                  {movingAverageCrossoverOptions.map((option) => (
-                    <SelectItem key={option} value={option}>
-                      {option}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <div className="text-xs text-gray-500 mt-1">
-                Filter by moving average crossover patterns
-              </div>
-            </div>
+            />            
             <div className="relative">
               <label className="block text-sm font-medium mb-1">Sector</label>
               <Select 

@@ -99,11 +99,14 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
       }
     );
 
-    filterData.push({
-      operation: "strikeFilter",
-      field: query.option,
-      value: query.strikeFilter === 'ITM' ? 1 : query.strikeFilter === 'OTM' ? -1 : 0
-    });
+    // Replace strikeFilter with moneynessRange
+    if (query.moneynessRange) {
+      filterData.push({
+        operation: "moneynessRange",
+        field: query.option,
+        value: [query.moneynessRange[0] / 100, query.moneynessRange[1] / 100]
+      });
+    }
     
     // Add PE Ratio filters
     if (query.peRatio) {
@@ -183,7 +186,18 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
         filter_data: formatFilterData(currentQuery)
       };
 
-      await saveQuery(requestBody);
+      // Convert array values to string/number before saving
+      const sanitizedRequestBody = {
+        ...requestBody,
+        filter_data: requestBody.filter_data.map(filter => ({
+          operation: filter.operation,
+          field: filter.field,
+          value: Array.isArray(filter.value) 
+            ? JSON.stringify(filter.value) 
+            : filter.value
+        }))
+      };
+      await saveQuery(sanitizedRequestBody);
       toast.success("Query saved successfully!");
       onClose();
     } catch (error) {
@@ -213,10 +227,6 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
     
     if (query.marketCap) {
       displayItems.push(`Market Cap: ${query.marketCap[0]}B to ${query.marketCap[1]}B`);
-    }
-    
-    if (query.movingAverageCrossover && query.movingAverageCrossover !== 'Any') {
-      displayItems.push(`Moving Average: ${query.movingAverageCrossover}`);
     }
     
     if (query.sector && query.sector !== 'All Sectors') {

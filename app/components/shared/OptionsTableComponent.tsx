@@ -60,15 +60,19 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   
   const [searchTerm, setSearchTerm] = useState(searchParams.get(getParamKey('search')) || "");
   const [minYield, setMinYield] = useState(Number(searchParams.get(getParamKey('minYield'))) || 0);
+  const [minPrice, setMinPrice] = useState(Number(searchParams.get(getParamKey('minPrice'))) || 0);
   const [maxPrice, setMaxPrice] = useState(Number(searchParams.get(getParamKey('maxPrice'))) || 1000);
   const [minVol, setMinVol] = useState(Number(searchParams.get(getParamKey('minVol'))) || 0);
   const [deltaFilter, setDeltaFilter] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_delta'))) || -1, Number(searchParams.get(getParamKey('max_delta'))) || 1]);
+  const [minDte, setMinDte] = useState(Number(searchParams.get(getParamKey('min_dte'))) || 0);
+  const [maxDte, setMaxDte] = useState(Number(searchParams.get(getParamKey('max_dte'))) || 365);
   
   // Advanced filters
   const [peRatio, setPeRatio] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_pe'))) || 0, Number(searchParams.get(getParamKey('max_pe'))) || 100]);
   const [marketCap, setMarketCap] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_market_cap'))) || 0, Number(searchParams.get(getParamKey('max_market_cap'))) || 1000]);
   const [movingAverageCrossover, setMovingAverageCrossover] = useState(searchParams.get(getParamKey('ma_crossover')) || "Any");
   const [sector, setSector] = useState(searchParams.get(getParamKey('sector')) || "All Sectors");
+  const [moneynessRange, setMoneynessRange] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_moneyness'))) || -10, Number(searchParams.get(getParamKey('max_moneyness'))) || 10]);
 
   const [selectedExpiration, setSelectedExpiration] = useState(searchParams.get(getParamKey('expiration')) || "");
   const [sortConfig, setSortConfig] = useState<{ field: keyof Option; direction: 'asc' | 'desc' | null }>({ 
@@ -86,7 +90,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     peRatio: [0, 100] as [number, number],
     marketCap: [0, 1000] as [number, number],
     movingAverageCrossover: "Any",
-    sector: "All Sectors"
+    sector: "All Sectors",
+    moneynessRange: [-10, 10] as [number, number]
   });
 
   const [hasSearched, setHasSearched] = useState(false);
@@ -152,7 +157,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       peRatio,
       marketCap,
       movingAverageCrossover,
-      sector
+      sector,
+      moneynessRange
     });
 
     updateURL({
@@ -161,7 +167,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       maxPrice,
       minVol,
       expiration: selectedExpiration,
-      strikeFilter,
+      min_moneyness: moneynessRange[0],
+      max_moneyness: moneynessRange[1],
       min_delta: deltaFilter[0],
       max_delta: deltaFilter[1],
       min_pe: peRatio[0],
@@ -181,12 +188,13 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       1,
       rowsPerPage,
       sortConfig.direction ? sortConfig : undefined,
-      strikeFilter !== 'ALL' ? strikeFilter : undefined,
+      undefined,
       deltaFilter,
       peRatio,
       marketCap,
       movingAverageCrossover,
-      sector
+      sector,
+      moneynessRange
     ).catch(console.error);
     setCurrentPage(1);
   };
@@ -285,8 +293,12 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     maxPrice,
     minVol,
     selectedExpiration,
-    strikeFilter,
+    moneynessRange,
     deltaFilter,
+    peRatio,
+    marketCap,
+    movingAverageCrossover,
+    sector,
     option
   });
 
@@ -418,49 +430,36 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             formatValue={(val) => `${val}%`}
           />
           <RangeSlider
-            id="input_screener_max_price"
-            label="Strike Price"
-            minValue={0}
-            maxValue={maxPrice}
-            value={[0, maxPrice]}
-            onChange={(value) => setMaxPrice(value[1])}
-            min={0}
-            max={2000}
-            step={1}
-            tooltip="Strike price range in dollars"
-            formatValue={(val) => `$${val}`}
+            id="input_screener_moneyness_range"
+            label="Moneyness %"
+            minValue={moneynessRange[0]}
+            maxValue={moneynessRange[1]}
+            value={moneynessRange}
+            onChange={(value) => {
+              setMoneynessRange(value);
+            }}
+            min={-20}
+            max={20}
+            step={0.5}
+            tooltip="Percentage difference between strike price and current stock price"
+            formatValue={(val) => `${val}%`}
           />
-          <SingleValueSlider
+          <RangeSlider
             id="input_screener_expiration"
             label="Days to Expiration"
-            value={dte}
-            onChange={setDte}
+            minValue={minDte}
+            maxValue={maxDte}
+            value={[minDte, maxDte]}
+            onChange={(value) => {
+              setMinDte(value[0]);
+              setMaxDte(value[1]);
+            }}
             min={0}
             max={365}
             step={1}
             tooltip="Number of days until option expiration"
             formatValue={(val) => `${val} days`}
           />
-          <div className="relative">
-            <label className="block text-sm font-medium mb-1">Moneyness</label>
-            <Select
-              value={strikeFilter}
-              onValueChange={(value) => setStrikeFilter(value as StrikeFilter)}
-            >
-              <SelectTrigger id="input_screener_strike_filter" className="h-10">
-                <SelectValue placeholder="Select moneyness" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">All Strikes</SelectItem>
-                <SelectItem value="ONE_OUT">One Strike Out</SelectItem>
-                <SelectItem value="THREE_PERCENT">&gt; 3% Out</SelectItem>
-              </SelectContent>
-            </Select>
-            <div className="text-xs text-gray-500 mt-1">
-              Filter options based on strike price distance from current price
-            </div>
-          </div>
-
         </div>
         
         {/* Advanced Filters */}
@@ -479,6 +478,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             minVol={minVol}
             onMinVolChange={setMinVol}
             handleKeyPress={handleKeyPress}
+            strikePrice={[minPrice, maxPrice]}
+            onStrikePriceChange={(value) => {
+              setMinPrice(value[0]);
+              setMaxPrice(value[1]);
+            }}
           />
         </div>
 
