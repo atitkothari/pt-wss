@@ -256,14 +256,6 @@ export default function CoveredCallCalculatorPage() {
               <h2 className="text-xl font-semibold mb-4">{inputSymbol}</h2>
               
               <div className="overflow-x-auto">
-                <div className="text-sm text-gray-600 mb-2 flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
-                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-                    <polyline points="10 17 15 12 10 7"/>
-                    <line x1="15" y1="12" x2="3" y2="12"/>
-                  </svg>
-                  Click on any row to see detailed option information
-                </div>
                 <div className="rounded-md border overflow-hidden">
                   <table className="w-full border-collapse">
                     <thead>
@@ -367,7 +359,7 @@ export default function CoveredCallCalculatorPage() {
               
               <div className="mt-4 p-3 sm:p-4 bg-gray-100 rounded-md text-xs sm:text-sm">
                 <p>
-                Selling covered calls on your {calculationShares} shares of {calculationSymbol} can provide an extra income of ${results[0].income.toFixed(2)} by {results[0].expiration}                
+                Selling covered calls on your {calculationShares} shares of {calculationSymbol} can provide an extra income of ${results[0].income.toFixed(2)} by {results[0].expiration}.                
                 </p>
                 <p className="mt-2">
                   The best part? You can repeat this strategy month after month, creating a consistent income stream from stocks you already own.
