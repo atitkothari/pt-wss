@@ -11,10 +11,11 @@ export function NavBar() {
   const { user, loading, signInWithGoogle, logout } = useAuth();
   
   const navigation = [
-    { name: 'Home', href: '/' },
+    // { name: 'Home', href: '/' },
     { name: 'Options Screener', href: '/options' },
+    { name: 'Covered Call Calculator', href: '/covered-call-calculator' },
     { name: 'Blog', href: 'https://wheelstrategyoptions.com/blog/', external: true },
-    { name: 'Provide Feedback', href: 'mailto:theproducttank@gmail.com?subject=Feedback about Wheel Strategy Screener', external: true },
+    // { name: 'Provide Feedback', href: 'mailto:theproducttank@gmail.com?subject=Feedback about Wheel Strategy Screener', external: true },
   ];
 
   const handleLogout = async () => {
@@ -59,16 +60,7 @@ export function NavBar() {
             ))}
           </div>
           
-          <div className="flex items-center gap-4">
-            <Button
-              id="btn_buy_coffee"
-              variant="outline"
-              onClick={() => window.open('https://buymeacoffee.com/wheelstrategyoptions', '_blank')}
-              className="bg-white/10 text-white hover:bg-white/20 border-white/20"
-            >
-              <Coffee className="h-4 w-4 mr-2" />
-              <span>Support This Project</span>
-            </Button>
+          <div className="flex items-center gap-4">            
 
             {loading ? null : user ? (
               <Button
@@ -124,7 +116,7 @@ export function NavBar() {
                   </Link>
                 )
               ))}
-              <Button
+              {/* <Button
                 id="btn_buy_coffee_mobile"
                 variant="outline"
                 onClick={() => window.open('https://buymeacoffee.com/wheelstrategyoptions', '_blank')}
@@ -132,7 +124,7 @@ export function NavBar() {
               >
                 <Coffee className="h-4 w-4 mr-2" />
                 <span>Support This Project</span>
-              </Button>
+              </Button> */}
               
               {loading ? null : user ? (
                 <Button
