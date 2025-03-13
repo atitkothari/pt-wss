@@ -205,7 +205,7 @@ export default function CoveredCallCalculatorPage() {
           <h1 className="text-2xl font-bold mb-6">Covered Call Calculator</h1>
           
           <div className="mb-8">
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 mb-4 text-sm">
             Earn income by selling call options on stocks you own. Enter the details below and view potential monthly income.
             </p>
             
@@ -260,8 +260,9 @@ export default function CoveredCallCalculatorPage() {
                     <thead>
                       <tr className="bg-gray-100">
                         <th className="p-2 sm:p-3 text-center font-medium text-xs sm:text-sm">Option Expiration Date</th>
-                        <th className="p-2 sm:p-3 text-center font-medium text-xs sm:text-sm">Your Income</th>
-                        <th className="p-2 sm:p-3 text-center font-medium text-xs sm:text-sm">Annualized Return</th>
+                        <th className="p-2 sm:p-3 text-right font-medium text-xs sm:text-sm">Your Income</th>
+                        <th className="p-2 sm:p-3 text-right font-medium text-xs sm:text-sm">Annualized Return</th>
+                        <th className="p-2 sm:p-3 text-center font-medium text-xs sm:text-sm w-10"></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -274,25 +275,28 @@ export default function CoveredCallCalculatorPage() {
                             title="Click to see more details"
                           >
                             <td className="p-2 sm:p-3 text-center text-xs sm:text-sm">{result.expiration}</td>
-                            <td className="p-2 sm:p-3 text-center text-xs sm:text-sm">${result.income.toFixed(0)}</td>
-                            <td className="p-2 sm:p-3 text-center flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                            <td className="p-2 sm:p-3 text-right text-xs sm:text-sm">${result.income.toFixed(0)}</td>
+                            <td className="p-2 sm:p-3 text-right text-xs sm:text-sm">
                               {result.annualizedReturn.toFixed(0)}%
-                              <span className="text-gray-400 group-hover:text-blue-500 transition-colors ml-1 sm:ml-2">
+                            </td>
+                            <td className="p-2 sm:p-3 text-center">
+                              <div className="flex items-center justify-center w-5 h-5 rounded-full bg-orange-500 text-white">
                                 {expandedRowIndex === index ? (
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="m18 15-6-6-6 6"/>
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
                                   </svg>
                                 ) : (
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="m6 9 6 6 6-6"/>
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
                                   </svg>
                                 )}
-                              </span>
+                              </div>
                             </td>
                           </tr>
                           {expandedRowIndex === index && (
                             <tr key={`${index}-expanded`} className="bg-gray-50">
-                              <td colSpan={3} className="p-2 sm:p-6 border-b">
+                              <td colSpan={4} className="p-2 sm:p-6 border-b">
                               <div className="bg-white rounded-lg shadow-sm p-3 sm:p-5 border border-gray-200">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 text-sm mb-4">
                                   <div className="bg-blue-50 rounded-lg p-3 sm:p-4">
@@ -350,23 +354,25 @@ export default function CoveredCallCalculatorPage() {
                             </td>
                           </tr>
                         )}
-                      </>
-                    ))}
+                        </>
+                      ))}
                   </tbody>
                 </table>
               </div>
               
               <div className="mt-4 p-3 sm:p-4 bg-gray-100 rounded-md text-xs sm:text-sm">
                 <p>
-                Selling covered calls on your {calculationShares} shares of {calculationSymbol} can provide an extra income of ${results[0].income.toFixed(2)} by {results[0].expiration}.                
-                </p>
-                <p className="mt-2">
+                💡Selling covered calls on your {calculationShares} shares of {calculationSymbol} can provide an extra income of ${results[0].income.toFixed(0)} by {results[0].expiration}.                
+                </p>               
+              </div>        
+              <div>      
+              <p className="mt-2 text-gray-600 mb-4 text-sm">
                   The best part? You can repeat this strategy month after month, creating a consistent income stream from stocks you already own.
                 </p>
-                <p className="mt-2">
+                <p className="mt-2 text-gray-600 mb-4 text-sm">
                   Ready to maximize your portfolio's earning potential? <Link href={`/options?call_search=${calculationSymbol}&call_expiration=${results[0].option.expiration}`} className="underline font-medium">Try our Options Screener</Link> to find the perfect covered call opportunities and start generating passive income today!
                 </p>
-              </div>
+                </div>
             </div>
             </div>
           )}       
