@@ -28,6 +28,9 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: "askPrice", label: "Ask" },
   { key: "volume", label: "Volume" },
   { key: "openInterest", label: "Open Interest" },
+  { key: "peRatio", label: "P/E Ratio" },
+  { key: "marketCap", label: "Market Cap" },
+  { key: "sector", label: "Sector" },
   { key: "earningsDate", label: "Earnings" },
   { key: "impliedVolatility", label: "IV %" },
 ];
@@ -77,9 +80,15 @@ const formatCell = (value: any, columnKey: string): string|any => {
       let link = "https://screenwich.com/stock-details/"+value      
       return <a href={link} target="_blank">{String(value)}</a>
     
+    case 'peRatio':
+      return value ? Number(value).toFixed(2) : '-';
+      
+    case 'marketCap':
+      return value ? `$${Number(value).toFixed(1)}B` : '-';
+      
     default:
       return String(value);
-  }
+  };
 };
 
 interface OptionsTableProps {

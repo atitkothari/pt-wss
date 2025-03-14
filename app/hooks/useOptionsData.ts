@@ -74,7 +74,9 @@ export function useOptionsData(
       
       // Add moneyness range filters
       if (moneynessRange) {
-        filters.push({ operation: 'moneynessRange', field: option, value: [moneynessRange[0] / 100, moneynessRange[1] / 100] });
+        filters.push({ operation: 'strikeFilter', field: option, 
+          value: moneynessRange[0]/100//[moneynessRange[0] / 100, moneynessRange[1] / 100] 
+        });
       }
       
       // Add PE Ratio filters

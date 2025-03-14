@@ -102,9 +102,10 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
     // Replace strikeFilter with moneynessRange
     if (query.moneynessRange) {
       filterData.push({
-        operation: "moneynessRange",
+        operation: "strikeFilter",
         field: query.option,
-        value: [query.moneynessRange[0] / 100, query.moneynessRange[1] / 100]
+        //value: [query.moneynessRange[0] / 100, query.moneynessRange[1] / 100]
+        value: query.moneynessRange[0]/100
       });
     }
     
