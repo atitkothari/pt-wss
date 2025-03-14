@@ -366,17 +366,8 @@ export default function CoveredCallCalculatorPage() {
                         ))}
                     </tbody>
                   </table>
-                </div>
-                
-                <div className="mt-4 p-3 sm:p-4 bg-gray-100 rounded-md text-xs sm:text-sm">
-                  <p>
-                  💡Selling covered calls on your {calculationShares} shares of {calculationSymbol} can provide an extra income of ${results[0].income.toFixed(0)} by {results[0].expiration}.                
-                  </p>               
-                </div>        
-                <div>      
-                <p className="mt-2 text-gray-600 mb-4 text-sm">
-                    The best part? You can repeat this strategy month after month, creating a consistent income stream from stocks you already own.
-                  </p>
+                </div>                                
+                <div>              
                   <p className="mt-2 text-gray-600 mb-4 text-sm">
                     Ready to maximize your portfolio's earning potential? <Link href={`/options?call_search=${calculationSymbol}&call_expiration=${results[0].option.expiration}`} className="underline font-medium">Try our Options Screener</Link> to find the perfect covered call opportunities and start generating passive income today!
                   </p>
