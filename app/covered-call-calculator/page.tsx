@@ -23,6 +23,7 @@ export default function CoveredCallCalculatorPage() {
   // Input state (what user types)
   const [inputSymbol, setInputSymbol] = useState<string>('');
   const [inputShares, setInputShares] = useState<number>(100);
+  const [optionType, setOptionType] = useState<'weekly' | 'monthly'>('weekly');
   
   // Calculation state (used for results and display)
   const [calculationSymbol, setCalculationSymbol] = useState<string>('');
@@ -60,13 +61,13 @@ export default function CoveredCallCalculatorPage() {
     try {
       // Fetch call options for the selected symbol with date range filtering
       const today = new Date();
-      const threeMonthsLater = addMonths(today, 3);
+      const sixMonthsLater = addMonths(today, 6);
       const minVol = 10;
       const filters = [
         { operation: 'eq', field: 'symbol', value: `"${inputSymbol}"` },
         { operation: 'eq', field: 'type', value: '"call"' },
         { operation: 'gte', field: 'expiration', value: `"${format(today, 'yyyy-MM-dd')}"` },
-        { operation: 'lte', field: 'expiration', value: `"${format(threeMonthsLater, 'yyyy-MM-dd')}"` },
+        { operation: 'lte', field: 'expiration', value: `"${format(sixMonthsLater, 'yyyy-MM-dd')}"` },
         { operation: 'gt', field: 'volume', value: minVol },        
       ];
 
@@ -92,6 +93,10 @@ export default function CoveredCallCalculatorPage() {
       const target14Days = 13; // 2 weeks out
       const target30Days = 30; // 1 month out
       const target60Days = 60; // 2 months out
+      const target90Days = 90; // 3 months out
+      const target120Days = 120; // 4 months out
+      const target150Days = 150; // 5 months out
+
       
       // First, calculate days to expiry for each contract
       const validContracts = Object.keys(optionsByExpiration)
@@ -133,16 +138,28 @@ export default function CoveredCallCalculatorPage() {
             : closest;
         }, null);
       };
-      
+
       // Get contracts closest to our target timeframes
       const twoWeeksContract = findClosestContract(target14Days);
       const oneMonthContract = findClosestContract(target30Days);
       const twoMonthsContract = findClosestContract(target60Days);
+      const threeMonthsContract = findClosestContract(target90Days);
+      const fourMonthsContract = findClosestContract(target120Days);
+      const fiveMonthsContract = findClosestContract(target150Days);
 
+      //find for 1 through 5 weeks as well
+      const oneWeekContract = findClosestContract(7);
+      const threeWeeksContract = findClosestContract(14);
+      const fourWeeksContract = findClosestContract(21);
+      const fiveWeeksContract = findClosestContract(28);
+      const sixWeeksContract = findClosestContract(35);
+      const isWeekly = optionType === 'weekly';
+      const timeFrame = !isWeekly? [twoWeeksContract, oneMonthContract, twoMonthsContract, threeMonthsContract, fourMonthsContract, fiveMonthsContract] 
+      : [oneWeekContract, twoWeeksContract, threeWeeksContract, fourWeeksContract, fiveWeeksContract, sixWeeksContract];
       // Combine the selected contracts, filtering out duplicates
       const selectedContractsMap = new Map();
       
-      [twoWeeksContract, oneMonthContract, twoMonthsContract].forEach(contract => {
+      timeFrame.forEach(contract => {
         if (contract) {
           selectedContractsMap.set(contract.expiration, contract);
         }
@@ -216,28 +233,45 @@ export default function CoveredCallCalculatorPage() {
             Earn income by selling call options on stocks you own. Enter the details below and view potential monthly income.
             </p>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <FilterInput
-                label="Symbol"
-                value={inputSymbol}
-                onChange={setInputSymbol}
-                placeholder="Enter stock symbol (e.g. AAPL)"
-                suggestions={symbols}
-                showSuggestions={true}
-                onSelect={handleSymbolSelect}
-                id={"covered_call_calculator_symbol"}
-              />
+            <div className="flex flex-wrap items-end gap-4 mb-6">
+              <div className="flex-1 min-w-[200px]">
+                <FilterInput
+                  label="Symbol"
+                  value={inputSymbol}
+                  onChange={setInputSymbol}
+                  placeholder="Enter stock symbol (e.g. AAPL)"
+                  suggestions={symbols}
+                  showSuggestions={true}
+                  onSelect={handleSymbolSelect}
+                  id={"covered_call_calculator_symbol"}
+                />
+              </div>
               
-              <FilterInput
-                label="Number of Shares"
-                value={inputShares}
-                onChange={setInputShares}
-                type="number"
-                min="100"
-                step="100"
-                placeholder="Enter number of shares (100 or more)"
-                id={"covered_call_calculator_shares"}
-              />
+              {/* <div className="flex-1 min-w-[200px]">
+                <FilterInput
+                  label="Number of Shares"
+                  value={inputShares}
+                  onChange={setInputShares}
+                  type="number"
+                  min="100"
+                  step="100"
+                  placeholder="Enter number of shares (100 or more)"
+                  id={"covered_call_calculator_shares"}
+                />
+              </div> */}
+              
+              <div className="flex-1 min-w-[200px]">
+                <label className="block text-sm font-medium mb-1">Option Timeframe</label>
+                <select 
+                  className="w-full px-3 py-2 border rounded-md"
+                  value={optionType}
+                  onChange={(e) => setOptionType(e.target.value as 'weekly' | 'monthly')}
+                  id="covered_call_calculator_option_type"
+                >
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                </select>
+              </div>
             </div>
             
             <Button
@@ -268,7 +302,7 @@ export default function CoveredCallCalculatorPage() {
                       <thead>
                         <tr className="bg-gray-100">
                           <th className="p-2 sm:p-3 text-center font-medium text-xs sm:text-sm">Option Expiration Date</th>
-                          <th className="p-2 sm:p-3 text-right font-medium text-xs sm:text-sm">Your Income</th>
+                          <th className="p-2 sm:p-3 text-right font-medium text-xs sm:text-sm">Premium (per 100 shares owned)</th>
                           <th className="p-2 sm:p-3 text-right font-medium text-xs sm:text-sm">Annualized Return</th>
                           <th className="p-2 sm:p-3 text-center font-medium text-xs sm:text-sm w-10"></th>
                         </tr>
@@ -369,7 +403,7 @@ export default function CoveredCallCalculatorPage() {
                 </div>                                
                 <div>              
                   <p className="mt-2 text-gray-600 mb-4 text-sm">
-                    Ready to maximize your portfolio's earning potential? <Link href={`/options?call_search=${calculationSymbol}&call_expiration=${results[0].option.expiration}`} className="underline font-medium">Try our Options Screener</Link> to find the perfect covered call opportunities and start generating passive income today!
+                    <Link href={`/options?call_search=${calculationSymbol}&call_expiration=${results[0].option.expiration}`} className="underline font-medium">Try our Options Screener</Link> to find the perfect covered call and cash secured puts opportunities and start generating passive income today!
                   </p>
                   </div>
               </div>
