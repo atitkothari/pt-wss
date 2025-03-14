@@ -33,7 +33,7 @@ export default function CoveredCallCalculatorPage() {
   const [error, setError] = useState<string | null>(null);
   const [expandedRowIndex, setExpandedRowIndex] = useState<number | null>(null);
   const { symbols, loading: symbolsLoading } = useSymbols();
-  const { user } = useAuth();
+  const { user, userId } = useAuth(); // Get userId from auth context
   const [hasSearched, setHasSearched] = useState<boolean>(false);
 
   const calculateIncome = async () => {
@@ -70,7 +70,7 @@ export default function CoveredCallCalculatorPage() {
         { operation: 'gt', field: 'volume', value: minVol },        
       ];
 
-      const result = await fetchOptionsData(filters, 1, 1000, undefined, 'ONE_OUT', 'call');
+      const result = await fetchOptionsData(filters, 1, 1000, undefined, 'ONE_OUT', 'call', userId);
       
       if (!result.options || result.options.length === 0) {
         setError("No options data found for this symbol");

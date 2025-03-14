@@ -5,6 +5,7 @@ import { fetchOptionsData } from '../services/api';
 import { Option, OptionType, StrikeFilter } from '../types/option';
 import { parseISO, addDays, format } from 'date-fns';
 import { useSearchParams } from 'next/navigation';
+import { useAuth } from '../context/AuthContext';
 
 export function useOptionsData(
   symbol: string = '',
@@ -21,6 +22,7 @@ export function useOptionsData(
   const [error, setError] = useState<string | null>(null);
   const [totalCount, setTotalCount] = useState(0);
   const searchParams = useSearchParams();
+  const { userId } = useAuth(); // Get userId from auth context
 
   const fetchData = async (
     searchTerm: string = symbol,
@@ -80,7 +82,8 @@ export function useOptionsData(
         pageSize, 
         finalSortConfig, 
         strikeFilter,
-        option        
+        option,
+        userId // Pass userId to the API call
       );   
 
       const updatedResult = result.options.map((option: any) => {

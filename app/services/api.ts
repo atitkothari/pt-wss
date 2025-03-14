@@ -18,7 +18,8 @@ export async function fetchOptionsData(
   pageSize: number = 50,
   sortConfig?: SortConfig,
   strikeFilter?: StrikeFilterType,
-  optionType: OptionType = 'call'
+  optionType: OptionType = 'call',
+  userId?: string | null
 ) {
   const body: any = {
     filters,
@@ -26,6 +27,11 @@ export async function fetchOptionsData(
     pageNo,
     pageSize
   };
+
+  // Add userId to the request body if available
+  if (userId) {
+    body.userId = userId;
+  }
 
   if (sortConfig && sortConfig.direction) {
     body.filters.push({
