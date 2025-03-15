@@ -31,7 +31,7 @@ export default function OptionsPage() {
         <NavBar />
         <div className="max-w-screen-2xl mx-auto p-4">
           <div className="mb-4">
-          <h1 className="text-2xl font-bold mb-6">Covered Call and Cash Secured Put Screnner</h1>
+          <h1 className="text-2xl font-bold mb-6">Covered Call and Cash Secured Put Screener</h1>
             <p className="text-gray-600">
               Find and analyze covered call and cash secured put opportunities for stocks in SP 500. We are working on adding more stocks to the list.
             </p>
