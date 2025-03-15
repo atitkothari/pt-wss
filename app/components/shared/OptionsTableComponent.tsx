@@ -5,6 +5,7 @@ import { FilterInput } from "../filters/FilterInput";
 import { AdvancedFilters } from "../filters/AdvancedFilters";
 import { RangeSlider } from "../filters/RangeSlider";
 import { SingleValueSlider } from "../filters/SingleValueSlider";
+import { MultiStockSelect } from "../filters/MultiStockSelect";
 import { useOptionsData } from "../../hooks/useOptionsData";
 import { LoadingSpinner } from "../LoadingSpinner";
 import { Option, OptionType, StrikeFilter } from "../../types/option";
@@ -59,6 +60,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const getParamKey = (key: string) => `${option}_${key}`;
   
   const [searchTerm, setSearchTerm] = useState(searchParams.get(getParamKey('search')) || "");
+  const [selectedStocks, setSelectedStocks] = useState<string[]>(() => {
+    const searchParam = searchParams.get(getParamKey('search'));
+    return searchParam ? searchParam.split(',') : [];
+  });
   const [minYield, setMinYield] = useState(Number(searchParams.get(getParamKey('minYield'))) || 0);
   const [minPrice, setMinPrice] = useState(Number(searchParams.get(getParamKey('minPrice'))) || 0);
   const [maxPrice, setMaxPrice] = useState(Number(searchParams.get(getParamKey('maxPrice'))) || 1000);
@@ -102,7 +107,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const rowsPerPage = 50;
 
   const { data, loading, error, totalCount, fetchData } = useOptionsData(
-    activeFilters.searchTerm,
+    activeFilters.searchTerm.split(","),
     activeFilters.minYield,
     activeFilters.maxPrice,
     activeFilters.minVol,
@@ -148,7 +153,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     // }
 
     setActiveFilters({
-      searchTerm,
+      searchTerm: selectedStocks.join(','),
       minYield,
       maxPrice,
       minVol,
@@ -162,7 +167,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     });
 
     updateURL({
-      search: searchTerm,
+      search: selectedStocks.join(','),
       minYield,
       maxPrice,
       minVol,
@@ -180,7 +185,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     });
 
     fetchData(
-      searchTerm, 
+      selectedStocks, 
       minYield, 
       maxPrice, 
       minVol, 
@@ -222,7 +227,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     
     // Fetch sorted data from server
     fetchData(
-      activeFilters.searchTerm,
+      activeFilters.searchTerm.split(","),
       activeFilters.minYield,
       activeFilters.maxPrice,
       activeFilters.minVol,
@@ -253,15 +258,17 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
   const handleSymbolSelect = (symbol: string) => {
     setHasSearched(true);
+    const newSelectedStocks = [...selectedStocks, symbol];
+    setSelectedStocks(newSelectedStocks);
     setSearchTerm(symbol);
     setActiveFilters(prev => ({
       ...prev,
-      searchTerm: symbol,
+      searchTerm: newSelectedStocks.join(','),
       pageNo: 1
     }));
 
     updateURL({
-      search: symbol,
+      search: newSelectedStocks.join(','),
       minYield,
       maxPrice,
       minVol,
@@ -272,7 +279,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     });
 
     fetchData(
-      symbol,
+      newSelectedStocks,
       minYield,
       maxPrice,
       minVol,
@@ -348,7 +355,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
     // Fetch new data with updated sort configuration
     fetchData(
-      activeFilters.searchTerm,
+      activeFilters.searchTerm.split(","),
       activeFilters.minYield,
       activeFilters.maxPrice,
       activeFilters.minVol,
@@ -388,35 +395,23 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       <div className="space-y-2 mb-2">
         {/* All Rows - 2 columns on mobile, 4 on large screens */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-          <FilterInput
+          <MultiStockSelect
             id="input_screener_symbol"
             label="Search Symbol"
-            value={searchTerm}
-            onChange={async (value) => {
-              setSearchTerm(value);
-              // if (value) {
-              //   try {
-              //     await fetch(`https://api.wheelstrategyoptions.com/wheelstrat/searchAnalytics`, {
-              //       method: 'POST',
-              //       headers: {
-              //         'Content-Type': 'application/json'
-              //       },
-              //       body: JSON.stringify({ symbol: value,                       
-              //         userId: userId,
-              //         type: option.toString()
-              //         })
-              //     });
-              //   } catch (analyticsError) {
-              //     console.error('Failed to track search analytics:', analyticsError);
-              //   }
-              // }
+            selectedStocks={selectedStocks}
+            onChange={(stocks) => {
+              setSelectedStocks(stocks);
+              if (stocks.length === 1) {
+                setSearchTerm(stocks[0]);
+              } else {
+                setSearchTerm(stocks.join(','));
+              }
             }}
-            placeholder="Enter symbol..."
+            placeholder="Enter symbols..."
             onKeyPress={handleKeyPress}
             suggestions={symbols}
             showSuggestions={true}
-            onSelect={(selectedSymbol: string) => handleSymbolSelect(selectedSymbol)}
-            tooltip="Enter a stock symbol (e.g., AAPL, MSFT) to filter options"
+            tooltip="Enter stock symbols (e.g., AAPL, MSFT) to filter options"
           />
           <SingleValueSlider
             id="input_screener_min_yield"
@@ -545,7 +540,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                   setCurrentPage(prevPage);
                   setActiveFilters(prev => ({ ...prev, pageNo: prevPage }));
                   fetchData(
-                    activeFilters.searchTerm,
+                    activeFilters.searchTerm.split(","),
                     activeFilters.minYield,
                     activeFilters.maxPrice,
                     activeFilters.minVol,
@@ -569,7 +564,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                   setCurrentPage(nextPage);
                   setActiveFilters(prev => ({ ...prev, pageNo: nextPage }));
                   fetchData(
-                    activeFilters.searchTerm,
+                    activeFilters.searchTerm.split(","),
                     activeFilters.minYield,
                     activeFilters.maxPrice,
                     activeFilters.minVol,

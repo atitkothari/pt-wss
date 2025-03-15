@@ -8,7 +8,7 @@ import { useSearchParams } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 
 export function useOptionsData(
-  symbol: string = '',
+  symbols: string[] = [],
   minYield: number = 0,
   maxPrice: number = 1000,
   minVol: number = 0,
@@ -25,7 +25,7 @@ export function useOptionsData(
   const { userId } = useAuth(); // Get userId from auth context
 
   const fetchData = async (
-    searchTerm: string = symbol,
+    searchTerms: string[] = symbols,
     minYieldVal: number = minYield,
     maxPriceVal: number = maxPrice,
     minVolVal: number = minVol,
@@ -47,8 +47,16 @@ export function useOptionsData(
       if(option) {
         filters.push({ operation: 'eq', field: 'type', value: `"${option}"` });
       }
-      if (searchTerm) {
-        filters.push({ operation: 'eq', field: 'symbol', value: `"${searchTerm}"` });
+      if (searchTerms && searchTerms.length > 0) {
+        if (searchTerms.length === 1) {
+          filters.push({ operation: 'eq', field: 'symbol', value: `"${searchTerms[0]}"` });
+        } else {
+          filters.push({ 
+            operation: 'in', 
+            field: 'symbol', 
+            value: `${searchTerms.join(',')}`
+          });
+        }
       }
       if (minYieldVal > 0) {
         filters.push({ operation: 'gt', field: 'yieldPercent', value: minYieldVal });
