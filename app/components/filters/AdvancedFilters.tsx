@@ -13,6 +13,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  priceFilterConfig,
+  volumeFilterConfig,
+  deltaFilterConfig,
+  peRatioFilterConfig,
+  marketCapFilterConfig,
+  movingAverageCrossoverOptions,
+  sectorOptions
+} from "@/app/config/filterConfig";
 
 interface AdvancedFiltersProps {
   peRatio: [number, number];
@@ -53,26 +62,7 @@ export function AdvancedFilters({
 }: AdvancedFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const sectors = [
-    "All Sectors",
-    "Basic Materials",
-    "Communication Services",
-    "Consumer Cyclical",
-    "Consumer Defensive",
-    "Energy",
-    "Financial Services",
-    "Healthcare",
-    "Industrials",
-    "Real Estate",
-    "Technology",
-    "Utilities"
-  ];
-
-  const movingAverageCrossoverOptions = [
-    "Any",
-    "200 > 50",
-    "50 > 200"
-  ];
+  // Using centralized sector options and moving average crossover options from filterConfig
 
   return (
     <div className="w-full border rounded-md p-3 mb-4 transition-all hover:border-gray-400">
@@ -96,10 +86,10 @@ export function AdvancedFilters({
               minValue={strikePrice[0]}
               maxValue={strikePrice[1]}
               onChange={onStrikePriceChange}
-              min={0}
-              max={2000}
-              step={1}
-              tooltip="Strike price range in dollars"
+              min={priceFilterConfig.min}
+              max={priceFilterConfig.max}
+              step={priceFilterConfig.step}
+              tooltip={priceFilterConfig.tooltip}
               formatValue={(val) => `$${val}`}
               className="col-span-1"
             />
@@ -111,10 +101,10 @@ export function AdvancedFilters({
               minValue={peRatio[0]}
               maxValue={peRatio[1]}
               onChange={onPeRatioChange}
-              min={0}
-              max={100}
-              step={0.1}
-              tooltip="Price-to-Earnings ratio to filter stocks"
+              min={peRatioFilterConfig.min}
+              max={peRatioFilterConfig.max}
+              step={peRatioFilterConfig.step}
+              tooltip={peRatioFilterConfig.tooltip}
               className="col-span-1"
             />
             
@@ -125,10 +115,10 @@ export function AdvancedFilters({
               minValue={marketCap[0]}
               maxValue={marketCap[1]}
               onChange={onMarketCapChange}
-              min={0}
-              max={1000}
-              step={0.1}
-              tooltip="Market capitalization in billions of dollars"
+              min={marketCapFilterConfig.min}
+              max={marketCapFilterConfig.max}
+              step={marketCapFilterConfig.step}
+              tooltip={marketCapFilterConfig.tooltip}
               formatValue={(val) => `$${val}B`}
               className="col-span-1"
             />
@@ -140,10 +130,10 @@ export function AdvancedFilters({
               minValue={deltaFilter[0]}
               maxValue={deltaFilter[1]}
               onChange={onDeltaFilterChange}
-              min={-1}
-              max={1}
-              step={0.01}
-              tooltip="Delta value (-1 to 1). Delta measures the rate of change of option price with respect to the underlying asset's price."
+              min={deltaFilterConfig.min}
+              max={deltaFilterConfig.max}
+              step={deltaFilterConfig.step}
+              tooltip={deltaFilterConfig.tooltip}
               className="col-span-1"
             />
             
@@ -152,10 +142,10 @@ export function AdvancedFilters({
               label="Volume"
               value={minVol}
               onChange={onMinVolChange}
-              min={0}
-              max={10000}
-              step={10}
-              tooltip="Minimum trading volume to ensure liquidity"
+              min={volumeFilterConfig.min}
+              max={volumeFilterConfig.max}
+              step={volumeFilterConfig.step}
+              tooltip={volumeFilterConfig.tooltip}
               formatValue={(val) => val.toString()}
               className="col-span-1"
             />            
@@ -169,7 +159,7 @@ export function AdvancedFilters({
                   <SelectValue placeholder="Select Sector" />
                 </SelectTrigger>
                 <SelectContent>
-                  {sectors.map((sectorOption) => (
+                  {sectorOptions.map((sectorOption) => (
                     <SelectItem key={sectorOption} value={sectorOption}>
                       {sectorOption}
                     </SelectItem>

@@ -25,6 +25,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  yieldFilterConfig,
+  priceFilterConfig,
+  volumeFilterConfig,
+  deltaFilterConfig,
+  dteFilterConfig,
+  peRatioFilterConfig,
+  marketCapFilterConfig,
+  moneynessFilterConfig,
+  movingAverageCrossoverOptions,
+  sectorOptions,
+  strikeFilterOptions,
+  defaultVisibleColumns as configDefaultVisibleColumns
+} from "@/app/config/filterConfig";
 
 interface OptionsTableComponentProps {
   option: OptionType;
@@ -38,19 +52,8 @@ function getNextFriday(date: Date): Date {
   return nextFriday;
 }
 
-const DEFAULT_VISIBLE_COLUMNS = [
-  'symbol',
-  'stockPrice',
-  'strike',
-  'premium',
-  'delta',
-  'yieldPercent',
-  'expiration',
-  'volume',
-  'openInterest',
-  'earningsDate',
-  'impliedVolatility'
-];
+// Using the centralized default visible columns from filterConfig
+const DEFAULT_VISIBLE_COLUMNS = configDefaultVisibleColumns;
 
 export function OptionsTableComponent({ option }: OptionsTableComponentProps) {  
   const searchParams = useSearchParams();
@@ -64,20 +67,20 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     const searchParam = searchParams.get(getParamKey('search'));
     return searchParam ? searchParam.split(',') : [];
   });
-  const [minYield, setMinYield] = useState(Number(searchParams.get(getParamKey('minYield'))) || 0);
-  const [minPrice, setMinPrice] = useState(Number(searchParams.get(getParamKey('minPrice'))) || 0);
-  const [maxPrice, setMaxPrice] = useState(Number(searchParams.get(getParamKey('maxPrice'))) || 1000);
-  const [minVol, setMinVol] = useState(Number(searchParams.get(getParamKey('minVol'))) || 0);
-  const [deltaFilter, setDeltaFilter] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_delta'))) || -1, Number(searchParams.get(getParamKey('max_delta'))) || 1]);
-  const [minDte, setMinDte] = useState(Number(searchParams.get(getParamKey('min_dte'))) || 0);
-  const [maxDte, setMaxDte] = useState(Number(searchParams.get(getParamKey('max_dte'))) || 365);
+  const [minYield, setMinYield] = useState(Number(searchParams.get(getParamKey('minYield'))) || yieldFilterConfig.default);
+  const [minPrice, setMinPrice] = useState(Number(searchParams.get(getParamKey('minPrice'))) || priceFilterConfig.defaultMin);
+  const [maxPrice, setMaxPrice] = useState(Number(searchParams.get(getParamKey('maxPrice'))) || priceFilterConfig.defaultMax);
+  const [minVol, setMinVol] = useState(Number(searchParams.get(getParamKey('minVol'))) || volumeFilterConfig.default);
+  const [deltaFilter, setDeltaFilter] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_delta'))) || deltaFilterConfig.defaultMin, Number(searchParams.get(getParamKey('max_delta'))) || deltaFilterConfig.defaultMax]);
+  const [minDte, setMinDte] = useState(Number(searchParams.get(getParamKey('min_dte'))) || dteFilterConfig.defaultMin);
+  const [maxDte, setMaxDte] = useState(Number(searchParams.get(getParamKey('max_dte'))) || dteFilterConfig.defaultMax);
   
   // Advanced filters
-  const [peRatio, setPeRatio] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_pe'))) || 0, Number(searchParams.get(getParamKey('max_pe'))) || 100]);
-  const [marketCap, setMarketCap] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_market_cap'))) || 0, Number(searchParams.get(getParamKey('max_market_cap'))) || 1000]);
-  const [movingAverageCrossover, setMovingAverageCrossover] = useState(searchParams.get(getParamKey('ma_crossover')) || "Any");
-  const [sector, setSector] = useState(searchParams.get(getParamKey('sector')) || "All Sectors");
-  const [moneynessRange, setMoneynessRange] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_moneyness'))) || -10, Number(searchParams.get(getParamKey('max_moneyness'))) || 10]);
+  const [peRatio, setPeRatio] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_pe'))) || peRatioFilterConfig.defaultMin, Number(searchParams.get(getParamKey('max_pe'))) || peRatioFilterConfig.defaultMax]);
+  const [marketCap, setMarketCap] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_market_cap'))) || marketCapFilterConfig.defaultMin, Number(searchParams.get(getParamKey('max_market_cap'))) || marketCapFilterConfig.defaultMax]);
+  const [movingAverageCrossover, setMovingAverageCrossover] = useState(searchParams.get(getParamKey('ma_crossover')) || movingAverageCrossoverOptions[0]);
+  const [sector, setSector] = useState(searchParams.get(getParamKey('sector')) || sectorOptions[0]);
+  const [moneynessRange, setMoneynessRange] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_moneyness'))) || moneynessFilterConfig.defaultMin, Number(searchParams.get(getParamKey('max_moneyness'))) || moneynessFilterConfig.defaultMax]);
 
   const [selectedExpiration, setSelectedExpiration] = useState(searchParams.get(getParamKey('expiration')) || "");
   const [sortConfig, setSortConfig] = useState<{ field: keyof Option; direction: 'asc' | 'desc' | null }>({ 
@@ -87,16 +90,16 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   
   const [activeFilters, setActiveFilters] = useState({
     searchTerm: "",
-    minYield: 0,
-    maxPrice: 1000,
-    minVol: 0,
+    minYield: yieldFilterConfig.default,
+    maxPrice: priceFilterConfig.defaultMax,
+    minVol: volumeFilterConfig.default,
     selectedExpiration: "",
     pageNo: 1,
-    peRatio: [0, 100] as [number, number],
-    marketCap: [0, 1000] as [number, number],
-    movingAverageCrossover: "Any",
-    sector: "All Sectors",
-    moneynessRange: [-10, 10] as [number, number]
+    peRatio: [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax] as [number, number],
+    marketCap: [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax] as [number, number],
+    movingAverageCrossover: movingAverageCrossoverOptions[0],
+    sector: sectorOptions[0],
+    moneynessRange: [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax] as [number, number]
   });
 
   const [hasSearched, setHasSearched] = useState(false);
@@ -418,25 +421,25 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             label="Yield %"
             value={minYield}
             onChange={setMinYield}
-            min={0}
-            max={50}
-            step={0.1}
-            tooltip="Minimum percentage yield to filter options"
+            min={yieldFilterConfig.min}
+            max={yieldFilterConfig.max}
+            step={yieldFilterConfig.step}
+            tooltip={yieldFilterConfig.tooltip}
             formatValue={(val) => `${val}%`}
           />
           <RangeSlider
             id="input_screener_moneyness_range"
-            label="Moneyness %"
+            label="Strike Filter %"
             minValue={moneynessRange[0]}
             maxValue={moneynessRange[1]}
             value={moneynessRange}
             onChange={(value) => {
               setMoneynessRange(value);
             }}
-            min={-20}
-            max={20}
-            step={0.5}
-            tooltip="Percentage difference between strike price and current stock price"
+            min={moneynessFilterConfig.min}
+            max={moneynessFilterConfig.max}
+            step={moneynessFilterConfig.step}
+            tooltip={moneynessFilterConfig.tooltip}
             formatValue={(val) => `${val}%`}
           />
           <RangeSlider
@@ -449,10 +452,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
               setMinDte(value[0]);
               setMaxDte(value[1]);
             }}
-            min={0}
-            max={365}
-            step={1}
-            tooltip="Number of days until option expiration"
+            min={dteFilterConfig.min}
+            max={dteFilterConfig.max}
+            step={dteFilterConfig.step}
+            tooltip={dteFilterConfig.tooltip}
             formatValue={(val) => `${val} days`}
           />
         </div>
