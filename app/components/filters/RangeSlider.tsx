@@ -23,6 +23,9 @@ interface RangeSliderProps {
   tooltip?: string;
   formatValue?: (value: number) => string;
   className?: string;
+  isExponential?: boolean;
+  toExponential?: (linearValue: number) => number;
+  fromExponential?: (exponentialValue: number) => number;
 }
 
 export function RangeSlider({
@@ -37,7 +40,10 @@ export function RangeSlider({
   max = 100,
   tooltip,
   formatValue = (val) => val.toString(),
-  className
+  className,
+  isExponential = false,
+  toExponential = (val) => val,
+  fromExponential = (val) => val
 }: RangeSliderProps) {
   const [localValue, setLocalValue] = useState<[number, number]>(value);
   
@@ -47,10 +53,23 @@ export function RangeSlider({
   }, [value]);
 
   const handleSliderChange = (newValue: number[]) => {
-    const typedValue: [number, number] = [newValue[0], newValue[1]];
+    let typedValue: [number, number];
+    
+    if (isExponential) {
+      // Convert from linear slider position to exponential value
+      typedValue = [toExponential(newValue[0]), toExponential(newValue[1])];
+    } else {
+      typedValue = [newValue[0], newValue[1]];
+    }
+    
     setLocalValue(typedValue);
     onChange(typedValue);
   };
+  
+  // Convert exponential values back to linear for slider position
+  const sliderValue = isExponential 
+    ? [fromExponential(localValue[0]), fromExponential(localValue[1])] 
+    : localValue;
 
   return (
     <div className={`flex-1 relative ${className || ''}`}>
@@ -78,7 +97,7 @@ export function RangeSlider({
       <div className="pt-6 pb-2 px-1">
         <Slider
           id={id}
-          value={[localValue[0], localValue[1]]}
+          value={sliderValue}
           min={min}
           max={max}
           step={step}

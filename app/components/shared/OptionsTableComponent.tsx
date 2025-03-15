@@ -457,6 +457,9 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             step={dteFilterConfig.step}
             tooltip={dteFilterConfig.tooltip}
             formatValue={(val) => `${val} days`}
+            isExponential={dteFilterConfig.isExponential}
+            toExponential={dteFilterConfig.toExponential}
+            fromExponential={dteFilterConfig.fromExponential}
           />
         </div>
         

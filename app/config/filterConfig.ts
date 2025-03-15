@@ -48,10 +48,24 @@ export const dteFilterConfig = {
   min: 0,
   max: 365,
   defaultMin: 0,
-  defaultMax: 365,
+  defaultMax: 30,
   default: 30, // For single value DTE selector
   step: 1,
-  tooltip: "Number of days until option expiration"
+  tooltip: "Number of days until option expiration",
+  // Exponential scale parameters
+  isExponential: true,
+  exponent: 2, // Power for exponential scaling
+  // Helper functions for exponential scaling
+  toExponential: (linearValue: number) => {
+    const maxValue = 365;
+    const normalizedValue = linearValue / maxValue;
+    return Math.round(Math.pow(normalizedValue, dteFilterConfig.exponent) * maxValue);
+  },
+  fromExponential: (exponentialValue: number) => {
+    const maxValue = 365;
+    const normalizedValue = exponentialValue / maxValue;
+    return Math.round(Math.pow(normalizedValue, 1/dteFilterConfig.exponent) * maxValue);
+  }
 };
 
 // P/E Ratio Filter Configuration
@@ -67,7 +81,7 @@ export const peRatioFilterConfig = {
 // Market Cap Filter Configuration (in billions)
 export const marketCapFilterConfig = {
   min: 0,
-  max: 5000,
+  max: 1000,
   defaultMin: 0,
   defaultMax: 10,
   step: 10,
