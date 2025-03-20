@@ -82,6 +82,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const [moneynessRange, setMoneynessRange] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_moneyness'))) || moneynessFilterConfig.defaultMin, Number(searchParams.get(getParamKey('max_moneyness'))) || moneynessFilterConfig.defaultMax]);
 
   const [selectedExpiration, setSelectedExpiration] = useState(searchParams.get(getParamKey('expiration')) || "");
+  const [minSelectedExpiration, setMinSelectedExpiration] = useState(searchParams.get(getParamKey('min_expiration')) || "");
   const [sortConfig, setSortConfig] = useState<{ field: keyof Option; direction: 'asc' | 'desc' | null }>({ 
     field: "symbol", 
     direction: null 
@@ -116,8 +117,26 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     activeFilters.volumeRange[0],
     activeFilters.volumeRange[1],
     activeFilters.selectedExpiration,
-    option
+    option,
+    deltaFilterConfig.defaultMin,
+    deltaFilterConfig.defaultMax,
+    activeFilters.minSelectedExpiration
   );
+
+  // Calculate expiration dates based on minDte and maxDte whenever they change
+  useEffect(() => {
+    const today = new Date();
+    
+    // Calculate min expiration date based on minDte
+    const minDate = addDays(today, minDte);
+    const minFormattedDate = format(minDate, 'yyyy-MM-dd');
+    setMinSelectedExpiration(minFormattedDate);
+    
+    // Calculate max expiration date based on maxDte
+    const maxDate = addDays(today, maxDte);
+    const maxFormattedDate = format(maxDate, 'yyyy-MM-dd');
+    setSelectedExpiration(maxFormattedDate);
+  }, [minDte, maxDte]);
 
   const updateURL = (filters: Record<string, string | number>) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -164,6 +183,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       maxPrice,
       volumeRange,
       selectedExpiration,
+      minSelectedExpiration,
       pageNo: 1,
       peRatio,
       marketCap,
@@ -180,6 +200,9 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       min_vol: volumeRange[0],
       max_vol: volumeRange[1],
       expiration: selectedExpiration,
+      min_expiration: minSelectedExpiration,
+      min_dte: minDte,
+      max_dte: maxDte,
       min_moneyness: moneynessRange[0],
       max_moneyness: moneynessRange[1],
       min_delta: deltaFilter[0],
@@ -209,7 +232,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       marketCap,
       movingAverageCrossover,
       sector,
-      moneynessRange
+      moneynessRange,
+      minSelectedExpiration
     ).catch(console.error);
     setCurrentPage(1);
   };
@@ -534,6 +558,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             onChange={(value) => {
               setMinDte(value[0]);
               setMaxDte(value[1]);
+              // The useEffect will update selectedExpiration based on maxDte
             }}
             min={dteFilterConfig.min}
             max={dteFilterConfig.max}

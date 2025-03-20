@@ -18,7 +18,8 @@ export function useOptionsData(
   expiration: string = '',
   option: OptionType = 'call',
   minDelta: number = -1,
-  maxDelta: number = 1
+  maxDelta: number = 1,
+  minExpiration: string = ''
 ) {
   const [data, setData] = useState<Option[]>([]);
   const [loading, setLoading] = useState(false);
@@ -44,7 +45,8 @@ export function useOptionsData(
     marketCap?: [number, number],
     movingAverageCrossover?: string,
     sector?: string,
-    moneynessRange?: [number, number]
+    moneynessRange?: [number, number],
+    minSelectedExpiration: string = minExpiration
   ) => {
     setLoading(true);
     try {
@@ -81,8 +83,11 @@ export function useOptionsData(
       
       if(selectedExpiration === "") {
         filters.push({ operation: 'eq', field: 'expiration', value: `"${format(new Date(), 'yyyy-MM-dd')}"` });
-      } else if (selectedExpiration) {            
-        filters.push({ operation: 'gte', field: 'expiration', value: `"${format(new Date(), 'yyyy-MM-dd')}"` });
+      } else if (selectedExpiration) {
+        // If minSelectedExpiration is provided, use it as the lower bound
+        // Otherwise, use today's date as the lower bound
+        const lowerBoundDate = minSelectedExpiration ? minSelectedExpiration : format(new Date(), 'yyyy-MM-dd');
+        filters.push({ operation: 'gte', field: 'expiration', value: `"${lowerBoundDate}"` });
         filters.push({ operation: 'lte', field: 'expiration', value: `"${selectedExpiration}"` });      
       }
 
