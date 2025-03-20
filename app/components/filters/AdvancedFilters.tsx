@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { FilterInput } from "./FilterInput";
 import { RangeSlider } from "./RangeSlider";
 import { SingleValueSlider } from "./SingleValueSlider";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -62,7 +63,44 @@ export function AdvancedFilters({
 }: AdvancedFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Using centralized sector options and moving average crossover options from filterConfig
+  // Check if any filter has been modified from default values
+  const hasModifiedFilters = useMemo(() => {
+    // Check if PE Ratio has been modified
+    const isPeRatioModified = 
+      peRatio[0] !== peRatioFilterConfig.defaultMin || 
+      peRatio[1] !== peRatioFilterConfig.defaultMax;
+    
+    // Check if Market Cap has been modified
+    const isMarketCapModified = 
+      marketCap[0] !== marketCapFilterConfig.defaultMin || 
+      marketCap[1] !== marketCapFilterConfig.defaultMax;
+    
+    // Check if Moving Average Crossover has been modified
+    const isMovingAverageModified = 
+      movingAverageCrossover !== movingAverageCrossoverOptions[0];
+    
+    // Check if Sector has been modified
+    const isSectorModified = 
+      sector !== sectorOptions[0];
+    
+    // Check if Delta Filter has been modified
+    const isDeltaModified = 
+      deltaFilter[0] !== deltaFilterConfig.defaultMin || 
+      deltaFilter[1] !== deltaFilterConfig.defaultMax;
+    
+    // Check if Volume Range has been modified
+    const isVolumeModified = 
+      volumeRange[0] !== volumeFilterConfig.min || 
+      volumeRange[1] !== volumeFilterConfig.max;
+    
+    // Check if Strike Price has been modified
+    const isStrikePriceModified = 
+      strikePrice[0] !== priceFilterConfig.defaultMin || 
+      strikePrice[1] !== priceFilterConfig.defaultMax;
+    
+    return isPeRatioModified || isMarketCapModified || isMovingAverageModified || 
+           isSectorModified || isDeltaModified || isVolumeModified || isStrikePriceModified;
+  }, [peRatio, marketCap, movingAverageCrossover, sector, deltaFilter, volumeRange, strikePrice]);
 
   return (
     <div className="w-full border rounded-md p-3 mb-4 transition-all hover:border-gray-400">
@@ -71,7 +109,12 @@ export function AdvancedFilters({
         className="w-full flex justify-between items-center p-0 h-auto mb-2"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <span className="text-lg font-semibold text-primary">Advanced Filters</span>
+        <div className="flex items-center gap-2">
+          <span className="text-lg font-semibold text-primary">Advanced Filters</span>
+          {hasModifiedFilters && !isExpanded && (
+            <Badge variant="secondary" className="bg-blue-500 text-white h-2 w-2 p-0 rounded-full" />
+          )}
+        </div>
         {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
       </Button>
 

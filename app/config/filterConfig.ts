@@ -19,7 +19,7 @@ export const priceFilterConfig = {
   min: 0,
   max: 2000,
   defaultMin: 0,
-  defaultMax: 1000,
+  defaultMax: 2000,
   step: 50,
   tooltip: "Strike price range in dollars"
 };
