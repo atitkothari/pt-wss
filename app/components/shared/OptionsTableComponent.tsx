@@ -36,7 +36,6 @@ import {
   moneynessFilterConfig,
   movingAverageCrossoverOptions,
   sectorOptions,
-  strikeFilterOptions,
   defaultVisibleColumns as configDefaultVisibleColumns
 } from "@/app/config/filterConfig";
 
@@ -105,7 +104,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const [hasSearched, setHasSearched] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [strikeFilter, setStrikeFilter] = useState<StrikeFilter>(
-    (searchParams.get(getParamKey('strikeFilter')) as StrikeFilter) || 'ONE_OUT'
+    (searchParams.get(getParamKey('strikeFilter')) as StrikeFilter)
   );
   const rowsPerPage = 50;
 

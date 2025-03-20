@@ -140,7 +140,7 @@ export function useOptionsData(
         field: sortBy,
         direction: sortDir || 'asc'
       } : undefined;
-
+      console.log(strikeFilter)
       const result = await fetchOptionsData(
         filters, 
         pageNo, 

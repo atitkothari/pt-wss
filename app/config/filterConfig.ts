@@ -122,10 +122,10 @@ export const sectorOptions = [
 ];
 
 // Strike Filter Options
-export const strikeFilterOptions = {
-  default: 'ONE_OUT',
-  options: [ 'ONE_OUT', 'THREE_PERCENT','ALL']
-};
+// export const strikeFilterOptions = {
+//   default: 'ONE_OUT',
+//   options: [ 'ONE_OUT', 'THREE_PERCENT','ALL']
+// };
 
 // Default visible columns for options tables
 export const defaultVisibleColumns = [
