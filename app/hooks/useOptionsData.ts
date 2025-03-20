@@ -97,10 +97,10 @@ export function useOptionsData(
       
       // Add Market Cap filters (in billions)
       if (marketCap && marketCap[0] > 0) {
-        filters.push({ operation: 'gte', field: 'marketCap', value: marketCap[0] });
+        filters.push({ operation: 'gte', field: 'marketCap', value: marketCap[0] * 1000000000 });
       }
       if (marketCap && marketCap[1] < 1000) {
-        filters.push({ operation: 'lte', field: 'marketCap', value: marketCap[1] });
+        filters.push({ operation: 'lte', field: 'marketCap', value: marketCap[1] * 1000000000});
       }
       
       // Add Moving Average Crossover filter

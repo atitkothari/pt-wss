@@ -28,7 +28,7 @@ export const priceFilterConfig = {
 export const volumeFilterConfig = {
   min: 0,
   max: 10000,
-  default: 0,
+  default: 100,
   step: 50,
   tooltip: "Minimum trading volume to ensure liquidity"
 };
@@ -70,7 +70,7 @@ export const dteFilterConfig = {
 
 // P/E Ratio Filter Configuration
 export const peRatioFilterConfig = {
-  min: 1,
+  min: 0,
   max: 100,
   defaultMin: 0,
   defaultMax: 100,
@@ -83,7 +83,7 @@ export const marketCapFilterConfig = {
   min: 0,
   max: 1000,
   defaultMin: 0,
-  defaultMax: 10,
+  defaultMax: 1000,
   step: 10,
   tooltip: "Market capitalization in billions of dollars"
 };
@@ -92,8 +92,8 @@ export const marketCapFilterConfig = {
 export const moneynessFilterConfig = {
   min: -15,
   max: 15,
-  defaultMin: 0,
-  defaultMax: 6,
+  defaultMin: -15,
+  defaultMax: 15,
   step: 1,
   tooltip: "Percentage difference between strike price and current stock price"
 };
