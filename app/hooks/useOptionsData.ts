@@ -6,12 +6,15 @@ import { Option, OptionType, StrikeFilter } from '../types/option';
 import { parseISO, addDays, format } from 'date-fns';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
+import { yieldFilterConfig, volumeFilterConfig } from '../config/filterConfig';
 
 export function useOptionsData(
   symbols: string[] = [],
   minYield: number = 0,
+  maxYield: number = 10,
   maxPrice: number = 1000,
   minVol: number = 0,
+  maxVol: number = 10000,
   expiration: string = '',
   option: OptionType = 'call',
   minDelta: number = -1,
@@ -27,8 +30,10 @@ export function useOptionsData(
   const fetchData = async (
     searchTerms: string[] = symbols,
     minYieldVal: number = minYield,
+    maxYieldVal: number = maxYield,
     maxPriceVal: number = maxPrice,
     minVolVal: number = minVol,
+    maxVolVal: number = maxVol,
     selectedExpiration: string = expiration,
     pageNo: number = 1,
     pageSize: number = 50,
@@ -61,11 +66,17 @@ export function useOptionsData(
       if (minYieldVal > 0) {
         filters.push({ operation: 'gt', field: 'yieldPercent', value: minYieldVal });
       }
+      if (maxYieldVal < yieldFilterConfig.max) {
+        filters.push({ operation: 'lt', field: 'yieldPercent', value: maxYieldVal });
+      }
       if (maxPriceVal) {
         filters.push({ operation: 'lt', field: 'strike', value: maxPriceVal });
       }
       if (minVolVal > 0) {
         filters.push({ operation: 'gt', field: 'volume', value: minVolVal });
+      }
+      if (maxVolVal < volumeFilterConfig.max) {
+        filters.push({ operation: 'lt', field: 'volume', value: maxVolVal });
       }
       
       if(selectedExpiration === "") {

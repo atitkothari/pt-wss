@@ -67,10 +67,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     const searchParam = searchParams.get(getParamKey('search'));
     return searchParam ? searchParam.split(',') : [];
   });
-  const [minYield, setMinYield] = useState(Number(searchParams.get(getParamKey('minYield'))) || yieldFilterConfig.default);
+  const [yieldRange, setYieldRange] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_yield'))) || yieldFilterConfig.min, Number(searchParams.get(getParamKey('max_yield'))) || yieldFilterConfig.max]);
   const [minPrice, setMinPrice] = useState(Number(searchParams.get(getParamKey('minPrice'))) || priceFilterConfig.defaultMin);
   const [maxPrice, setMaxPrice] = useState(Number(searchParams.get(getParamKey('maxPrice'))) || priceFilterConfig.defaultMax);
-  const [minVol, setMinVol] = useState(Number(searchParams.get(getParamKey('minVol'))) || volumeFilterConfig.default);
+  const [volumeRange, setVolumeRange] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_vol'))) || volumeFilterConfig.min, Number(searchParams.get(getParamKey('max_vol'))) || volumeFilterConfig.max]);
   const [deltaFilter, setDeltaFilter] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_delta'))) || deltaFilterConfig.defaultMin, Number(searchParams.get(getParamKey('max_delta'))) || deltaFilterConfig.defaultMax]);
   const [minDte, setMinDte] = useState(Number(searchParams.get(getParamKey('min_dte'))) || dteFilterConfig.defaultMin);
   const [maxDte, setMaxDte] = useState(Number(searchParams.get(getParamKey('max_dte'))) || dteFilterConfig.defaultMax);
@@ -90,9 +90,9 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   
   const [activeFilters, setActiveFilters] = useState({
     searchTerm: "",
-    minYield: yieldFilterConfig.default,
+    yieldRange: [yieldFilterConfig.min, yieldFilterConfig.max] as [number, number],
     maxPrice: priceFilterConfig.defaultMax,
-    minVol: volumeFilterConfig.default,
+    volumeRange: [volumeFilterConfig.min, volumeFilterConfig.max] as [number, number],
     selectedExpiration: "",
     pageNo: 1,
     peRatio: [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax] as [number, number],
@@ -111,9 +111,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
   const { data, loading, error, totalCount, fetchData } = useOptionsData(
     activeFilters.searchTerm.split(","),
-    activeFilters.minYield,
+    activeFilters.yieldRange[0],
+    activeFilters.yieldRange[1],
     activeFilters.maxPrice,
-    activeFilters.minVol,
+    activeFilters.volumeRange[0],
+    activeFilters.volumeRange[1],
     activeFilters.selectedExpiration,
     option
   );
@@ -157,9 +159,9 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
     setActiveFilters({
       searchTerm: selectedStocks.join(','),
-      minYield,
+      yieldRange,
       maxPrice,
-      minVol,
+      volumeRange,
       selectedExpiration,
       pageNo: 1,
       peRatio,
@@ -171,9 +173,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
     updateURL({
       search: selectedStocks.join(','),
-      minYield,
+      min_yield: yieldRange[0],
+      max_yield: yieldRange[1],
       maxPrice,
-      minVol,
+      min_vol: volumeRange[0],
+      max_vol: volumeRange[1],
       expiration: selectedExpiration,
       min_moneyness: moneynessRange[0],
       max_moneyness: moneynessRange[1],
@@ -189,9 +193,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
     fetchData(
       selectedStocks, 
-      minYield, 
+      yieldRange[0], 
+      yieldRange[1],
       maxPrice, 
-      minVol, 
+      volumeRange[0],
+      volumeRange[1], 
       selectedExpiration,
       1,
       rowsPerPage,
@@ -231,9 +237,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     // Fetch sorted data from server
     fetchData(
       activeFilters.searchTerm.split(","),
-      activeFilters.minYield,
+      activeFilters.yieldRange[0],
+      activeFilters.yieldRange[1],
       activeFilters.maxPrice,
-      activeFilters.minVol,
+      activeFilters.volumeRange[0],
+      activeFilters.volumeRange[1],
       activeFilters.selectedExpiration,
       currentPage,
       rowsPerPage,
@@ -272,9 +280,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
     updateURL({
       search: newSelectedStocks.join(','),
-      minYield,
+      min_yield: yieldRange[0],
+      max_yield: yieldRange[1],
       maxPrice,
-      minVol,
+      min_vol: volumeRange[0],
+      max_vol: volumeRange[1],
       expiration: selectedExpiration,
       strikeFilter,
       min_delta: deltaFilter[0],
@@ -283,9 +293,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
     fetchData(
       newSelectedStocks,
-      minYield,
+      yieldRange[0],
+      yieldRange[1],
       maxPrice,
-      minVol,
+      volumeRange[0],
+      volumeRange[1],
       selectedExpiration,
       1,
       rowsPerPage,
@@ -299,9 +311,9 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
   const getCurrentQuery = () => ({
     searchTerm,
-    minYield,
+    yieldRange,
     maxPrice,
-    minVol,
+    volumeRange,
     selectedExpiration,
     moneynessRange,
     deltaFilter,
@@ -359,9 +371,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     // Fetch new data with updated sort configuration
     fetchData(
       activeFilters.searchTerm.split(","),
-      activeFilters.minYield,
+      activeFilters.yieldRange[0],
+      activeFilters.yieldRange[1],
       activeFilters.maxPrice,
-      activeFilters.minVol,
+      activeFilters.volumeRange[0],
+      activeFilters.volumeRange[1],
       activeFilters.selectedExpiration,
       currentPage,
       rowsPerPage,
@@ -416,11 +430,15 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             showSuggestions={true}
             tooltip="Enter stock symbols (e.g., AAPL, MSFT) to filter options"
           />
-          <SingleValueSlider
-            id="input_screener_min_yield"
+          <RangeSlider
+            id="input_screener_yield_range"
             label="Yield %"
-            value={minYield}
-            onChange={setMinYield}
+            minValue={yieldRange[0]}
+            maxValue={yieldRange[1]}
+            value={yieldRange}
+            onChange={(value) => {
+              setYieldRange(value);
+            }}
             min={yieldFilterConfig.min}
             max={yieldFilterConfig.max}
             step={yieldFilterConfig.step}
@@ -476,8 +494,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             onSectorChange={setSector}
             deltaFilter={deltaFilter}
             onDeltaFilterChange={setDeltaFilter}
-            minVol={minVol}
-            onMinVolChange={setMinVol}
+            volumeRange={volumeRange}
+            onVolumeRangeChange={setVolumeRange}
             handleKeyPress={handleKeyPress}
             strikePrice={[minPrice, maxPrice]}
             onStrikePriceChange={(value) => {
@@ -512,9 +530,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
       {/* Results Section */}
       {!hasSearched && !activeFilters.searchTerm && 
-       activeFilters.minYield === 0 && 
+       activeFilters.yieldRange[0] === yieldFilterConfig.min && 
+       activeFilters.yieldRange[1] === yieldFilterConfig.max && 
        activeFilters.maxPrice === 1000 && 
-       activeFilters.minVol === 0 && 
+       activeFilters.volumeRange[0] === volumeFilterConfig.min && 
+       activeFilters.volumeRange[1] === volumeFilterConfig.max && 
        !activeFilters.selectedExpiration && 
        strikeFilter === 'ONE_OUT' ? (
         <div className="text-center py-8 text-gray-600">
@@ -547,9 +567,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                   setActiveFilters(prev => ({ ...prev, pageNo: prevPage }));
                   fetchData(
                     activeFilters.searchTerm.split(","),
-                    activeFilters.minYield,
+                    activeFilters.yieldRange[0],
+                    activeFilters.yieldRange[1],
                     activeFilters.maxPrice,
-                    activeFilters.minVol,
+                    activeFilters.volumeRange[0],
+                    activeFilters.volumeRange[1],
                     activeFilters.selectedExpiration,
                     prevPage,
                     rowsPerPage,
@@ -571,9 +593,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                   setActiveFilters(prev => ({ ...prev, pageNo: nextPage }));
                   fetchData(
                     activeFilters.searchTerm.split(","),
-                    activeFilters.minYield,
+                    activeFilters.yieldRange[0],
+                    activeFilters.yieldRange[1],
                     activeFilters.maxPrice,
-                    activeFilters.minVol,
+                    activeFilters.volumeRange[0],
+                    activeFilters.volumeRange[1],
                     activeFilters.selectedExpiration,
                     nextPage,
                     rowsPerPage,

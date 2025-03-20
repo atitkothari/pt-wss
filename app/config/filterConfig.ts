@@ -27,7 +27,7 @@ export const priceFilterConfig = {
 // Volume Filter Configuration
 export const volumeFilterConfig = {
   min: 0,
-  max: 10000,
+  max: 1000,
   default: 100,
   step: 50,
   tooltip: "Minimum trading volume to ensure liquidity"

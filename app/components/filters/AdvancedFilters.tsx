@@ -34,8 +34,8 @@ interface AdvancedFiltersProps {
   onSectorChange: (value: string) => void;
   deltaFilter: [number, number];
   onDeltaFilterChange: (value: [number, number]) => void;
-  minVol: number;
-  onMinVolChange: (value: number) => void;
+  volumeRange: [number, number];
+  onVolumeRangeChange: (value: [number, number]) => void;
   handleKeyPress?: (e: React.KeyboardEvent) => void;
   // Add strike price filter props
   strikePrice: [number, number];
@@ -53,8 +53,8 @@ export function AdvancedFilters({
   onSectorChange,
   deltaFilter,
   onDeltaFilterChange,
-  minVol,
-  onMinVolChange,
+  volumeRange,
+  onVolumeRangeChange,
   handleKeyPress,
   // Add strike price filter props
   strikePrice,
@@ -138,11 +138,13 @@ export function AdvancedFilters({
               className="col-span-1"
             />
             
-            <SingleValueSlider
-              id="input_screener_min_volume"
-              label="Min Volume"
-              value={minVol}
-              onChange={onMinVolChange}
+            <RangeSlider
+              id="input_screener_volume_range"
+              label="Volume"
+              value={volumeRange}
+              minValue={volumeRange[0]}
+              maxValue={volumeRange[1]}
+              onChange={onVolumeRangeChange}
               min={volumeFilterConfig.min}
               max={volumeFilterConfig.max}
               step={volumeFilterConfig.step}
