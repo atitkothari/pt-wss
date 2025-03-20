@@ -77,6 +77,9 @@ export function RangeSlider({
     onChange(finalValue);
   };
   
+  // We don't need to debounce here since the parent component (AdvancedFilters)
+  // already implements debouncing for all filter changes
+  
   // Convert exponential values back to linear for slider position
   const sliderValue = isExponential 
     ? [fromExponential(localValue[0]), fromExponential(localValue[1])] 

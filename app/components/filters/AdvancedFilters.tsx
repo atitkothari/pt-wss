@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { FilterInput } from "./FilterInput";
 import { RangeSlider } from "./RangeSlider";
 import { SingleValueSlider } from "./SingleValueSlider";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { debounce } from "@/app/lib/debounce";
 import {
   Select,
   SelectContent,
@@ -41,6 +42,9 @@ interface AdvancedFiltersProps {
   // Add strike price filter props
   strikePrice: [number, number];
   onStrikePriceChange: (value: [number, number]) => void;
+  // Optional prop to trigger search automatically
+  autoSearch?: boolean;
+  onSearch?: () => void;
 }
 
 export function AdvancedFilters({
@@ -59,9 +63,35 @@ export function AdvancedFilters({
   handleKeyPress,
   // Add strike price filter props
   strikePrice,
-  onStrikePriceChange
+  onStrikePriceChange,
+  // Auto search props
+  autoSearch = true,
+  onSearch
 }: AdvancedFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  
+  // Create debounced search function
+  const debouncedSearch = useMemo(
+    () => onSearch && debounce(onSearch, 800),
+    [onSearch]
+  );
+
+  // Trigger search when filters change
+  useEffect(() => {
+    if (autoSearch && debouncedSearch) {
+      debouncedSearch();
+    }
+  }, [
+    peRatio,
+    marketCap,
+    movingAverageCrossover,
+    sector,
+    deltaFilter,
+    volumeRange,
+    strikePrice,
+    autoSearch,
+    debouncedSearch
+  ]);
 
   // Check if any filter has been modified from default values
   const hasModifiedFilters = useMemo(() => {

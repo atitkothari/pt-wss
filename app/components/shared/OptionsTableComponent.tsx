@@ -136,6 +136,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   };
 
   const [isFromCache, setIsFromCache] = useState(false);
+  const [filtersChanged, setFiltersChanged] = useState(false);
 
   const [searchCount, setSearchCount] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -147,6 +148,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const handleSearch = () => {
     setHasSearched(true);
     setIsFromCache(false);
+    setFiltersChanged(false); // Reset the filters changed flag when search is performed
     
     const newCount = searchCount + 1;
     setSearchCount(newCount);
@@ -214,11 +216,75 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   };
 
   useEffect(() => {
+    // Only perform search on initial load if URL has parameters and we haven't already loaded from cache
     if (Array.from(searchParams.entries()).length > 0 && !isFromCache) {
-      handleSearch();
+      // Set isFromCache first to prevent multiple API calls
       setIsFromCache(true);
+      // Use a small timeout to prevent immediate API call on page load
+      const timer = setTimeout(() => {
+        handleSearch();
+      }, 100);
+      return () => clearTimeout(timer);
     }
   }, []);
+  
+  // Track filter changes
+  useEffect(() => {
+    // Only track changes after initial load and if we've already searched once
+    if (isFromCache && hasSearched) {
+      // Check if current filter values differ from active filters
+      const currentFilters = {
+        searchTerm: selectedStocks.join(','),
+        yieldRange,
+        maxPrice,
+        volumeRange,
+        selectedExpiration,
+        deltaFilter,
+        peRatio,
+        marketCap,
+        movingAverageCrossover,
+        sector,
+        moneynessRange
+      };
+      
+      // Compare current filters with active filters
+      const hasChanged = 
+        currentFilters.searchTerm !== activeFilters.searchTerm ||
+        currentFilters.yieldRange[0] !== activeFilters.yieldRange[0] ||
+        currentFilters.yieldRange[1] !== activeFilters.yieldRange[1] ||
+        currentFilters.maxPrice !== activeFilters.maxPrice ||
+        currentFilters.volumeRange[0] !== activeFilters.volumeRange[0] ||
+        currentFilters.volumeRange[1] !== activeFilters.volumeRange[1] ||
+        currentFilters.selectedExpiration !== activeFilters.selectedExpiration ||
+        currentFilters.deltaFilter[0] !== deltaFilter[0] ||
+        currentFilters.deltaFilter[1] !== deltaFilter[1] ||
+        currentFilters.peRatio[0] !== activeFilters.peRatio[0] ||
+        currentFilters.peRatio[1] !== activeFilters.peRatio[1] ||
+        currentFilters.marketCap[0] !== activeFilters.marketCap[0] ||
+        currentFilters.marketCap[1] !== activeFilters.marketCap[1] ||
+        currentFilters.movingAverageCrossover !== activeFilters.movingAverageCrossover ||
+        currentFilters.sector !== activeFilters.sector ||
+        currentFilters.moneynessRange[0] !== activeFilters.moneynessRange[0] ||
+        currentFilters.moneynessRange[1] !== activeFilters.moneynessRange[1];
+      
+      setFiltersChanged(hasChanged);
+    }
+  }, [
+    selectedStocks, 
+    yieldRange, 
+    maxPrice, 
+    volumeRange, 
+    selectedExpiration, 
+    deltaFilter,
+    peRatio,
+    marketCap,
+    movingAverageCrossover,
+    sector,
+    moneynessRange,
+    hasSearched,
+    isFromCache,
+    activeFilters
+  ]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -502,6 +568,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
               setMinPrice(value[0]);
               setMaxPrice(value[1]);
             }}
+            autoSearch={false}
+            onSearch={handleSearch}
           />
         </div>
 
@@ -520,10 +588,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           <Button 
             id="btn_screener_search"
             onClick={handleSearch}
-            className="w-full sm:w-auto"
+            className={`w-full sm:w-auto ${filtersChanged ? 'bg-amber-500 hover:bg-amber-600' : ''}`}
           >
             <Search className="h-4 w-4 mr-2" />
-            Search
+            {filtersChanged ? 'Search (Updated Filters)' : 'Search'}
           </Button>
         </div>
       </div>
