@@ -54,7 +54,7 @@ export const dteFilterConfig = {
   tooltip: "Number of days until option expiration",
   // Exponential scale parameters
   isExponential: true,
-  exponent: 2, // Power for exponential scaling
+  exponent: 3, // Power for exponential scaling
   // Helper functions for exponential scaling
   toExponential: (linearValue: number) => {
     const maxValue = 365;
