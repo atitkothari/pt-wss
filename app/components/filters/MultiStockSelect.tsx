@@ -100,7 +100,7 @@ export function MultiStockSelect({
     <div className={`flex-1 relative ${className || ''}`}>
       <div className="flex items-center gap-1 mb-1">
         <label htmlFor={id} className="block text-sm font-medium">{label}</label>
-        {tooltip && (
+        {/* {tooltip && (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -111,7 +111,7 @@ export function MultiStockSelect({
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-        )}
+        )} */}
       </div>
       
       <div className="relative">

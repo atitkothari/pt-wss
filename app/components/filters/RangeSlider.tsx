@@ -90,7 +90,7 @@ export function RangeSlider({
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-1">
           <label htmlFor={id} className="block text-sm font-medium">{label}</label>
-          {tooltip && (
+          {/* {tooltip && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -101,7 +101,7 @@ export function RangeSlider({
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-          )}
+          )} */}
         </div>
         <div className="text-xs text-gray-500">
           {formatValue(localValue[0])} to {formatValue(localValue[1])}

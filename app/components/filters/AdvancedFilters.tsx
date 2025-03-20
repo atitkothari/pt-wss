@@ -192,6 +192,9 @@ export function AdvancedFilters({
               max={marketCapFilterConfig.max}
               step={marketCapFilterConfig.step}
               tooltip={marketCapFilterConfig.tooltip}
+              isExponential={marketCapFilterConfig.isExponential}
+              toExponential={marketCapFilterConfig.toExponential}
+              fromExponential={marketCapFilterConfig.fromExponential}
               formatValue={(val) => `${val}B`}
               className="col-span-1"
             />

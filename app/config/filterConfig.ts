@@ -85,7 +85,21 @@ export const marketCapFilterConfig = {
   defaultMin: 0,
   defaultMax: 1000,
   step: 10,
-  tooltip: "Market capitalization in billions of dollars"
+  tooltip: "Market capitalization in billions of dollars",
+  // Exponential scale parameters
+  isExponential: true,
+  exponent: 3, // Power for exponential scaling
+  // Helper functions for exponential scaling
+  toExponential: (linearValue: number) => {
+    const maxValue = 1000;
+    const normalizedValue = linearValue / maxValue;
+    return Math.round(Math.pow(normalizedValue, dteFilterConfig.exponent) * maxValue);
+  },
+  fromExponential: (exponentialValue: number) => {
+    const maxValue = 1000;
+    const normalizedValue = exponentialValue / maxValue;
+    return Math.round(Math.pow(normalizedValue, 1/dteFilterConfig.exponent) * maxValue);
+  }
 };
 
 // Moneyness Range Filter Configuration
