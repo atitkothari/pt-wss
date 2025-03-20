@@ -84,7 +84,19 @@ const formatCell = (value: any, columnKey: string): string|any => {
       return value ? Number(value).toFixed(2) : '-';
       
     case 'marketCap':
-      return value ? `$${Number(value).toFixed(1)}B` : '-';
+      if (!value) return '-';
+      const marketCapValue = Number(value);
+      if (marketCapValue >= 1000000000000) {    
+        return `$${(marketCapValue / 1000000000000).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}T`;
+      } else if (marketCapValue >= 1000000000) {    
+        return `$${(marketCapValue / 1000000000).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}B`;
+      } else if (marketCapValue >= 1000000) {    
+        return `$${(marketCapValue / 1000000).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}M`;
+      } else if (marketCapValue >= 1000) {    
+        return `$${(marketCapValue / 1000).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}K`;
+      } else if (marketCapValue >= 1) {
+        return `$${marketCapValue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+      }
       
     default:
       return String(value);
