@@ -6,12 +6,13 @@ import { Option, OptionType, StrikeFilter } from '../types/option';
 import { parseISO, addDays, format } from 'date-fns';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
-import { yieldFilterConfig, volumeFilterConfig } from '../config/filterConfig';
+import { yieldFilterConfig, volumeFilterConfig, priceFilterConfig } from '../config/filterConfig';
 
 export function useOptionsData(
   symbols: string[] = [],
   minYield: number = 0,
   maxYield: number = 10,
+  minPrice: number = 0,
   maxPrice: number = 1000,
   minVol: number = 0,
   maxVol: number = 10000,
@@ -32,6 +33,7 @@ export function useOptionsData(
     searchTerms: string[] = symbols,
     minYieldVal: number = minYield,
     maxYieldVal: number = maxYield,
+    minPriceVal: number = minPrice,
     maxPriceVal: number = maxPrice,
     minVolVal: number = minVol,
     maxVolVal: number = maxVol,
@@ -71,9 +73,12 @@ export function useOptionsData(
       if (maxYieldVal < yieldFilterConfig.max) {
         filters.push({ operation: 'lt', field: 'yieldPercent', value: maxYieldVal });
       }
-      if (maxPriceVal) {
-        filters.push({ operation: 'lt', field: 'strike', value: maxPriceVal });
+      if (minPriceVal>0 ) {
+        filters.push({ operation: 'gte', field: 'strike', value: minPriceVal });
       }
+      if (maxPriceVal<priceFilterConfig.max) {
+        filters.push({ operation: 'lte', field: 'strike', value: maxPriceVal });
+      }      
       if (minVolVal > 0) {
         filters.push({ operation: 'gt', field: 'volume', value: minVolVal });
       }
