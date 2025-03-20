@@ -94,6 +94,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     maxPrice: priceFilterConfig.defaultMax,
     volumeRange: [volumeFilterConfig.min, volumeFilterConfig.max] as [number, number],
     selectedExpiration: "",
+    minSelectedExpiration: "",
     pageNo: 1,
     peRatio: [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax] as [number, number],
     marketCap: [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax] as [number, number],
