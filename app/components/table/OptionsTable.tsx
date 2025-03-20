@@ -21,7 +21,7 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: "strike", label: "Strike" },
   { key: "premium", label: "Premium" },
   { key: "delta", label: "Delta" },
-  { key: "yieldPercent", label: "Yield %" },
+  { key: "yieldPercent", label: "Premium Yield %" },
   { key: "expiration", label: "Expiration" },
   { key: "annualizedReturn", label: "Ann %" },
   { key: "bidPrice", label: "Bid" },

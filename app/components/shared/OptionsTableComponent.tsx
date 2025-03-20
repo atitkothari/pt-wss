@@ -342,6 +342,12 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       rowsPerPage,
       { field, direction: newDirection },
       strikeFilter !== 'ALL' ? strikeFilter : undefined,
+      deltaFilter,
+      activeFilters.peRatio,
+      activeFilters.marketCap,
+      activeFilters.movingAverageCrossover,
+      activeFilters.sector,
+      activeFilters.moneynessRange
     ).catch(console.error);
   };
 
@@ -480,7 +486,12 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       rowsPerPage,
       { field: columnId as keyof Option, direction: newSortDir },
       strikeFilter !== 'ALL' ? strikeFilter : undefined,
-      deltaFilter
+      deltaFilter,
+      activeFilters.peRatio,
+      activeFilters.marketCap,
+      activeFilters.movingAverageCrossover,
+      activeFilters.sector,
+      activeFilters.moneynessRange
     ).catch(console.error);
   }, [sortColumn, sortDirection, router, searchParams, activeFilters, currentPage, rowsPerPage, strikeFilter, deltaFilter, fetchData]);
 
@@ -531,7 +542,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           />
           <RangeSlider
             id="input_screener_yield_range"
-            label="Yield %"
+            label="Premium Yield %"
             minValue={yieldRange[0]}
             maxValue={yieldRange[1]}
             value={yieldRange}
