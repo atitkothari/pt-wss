@@ -39,7 +39,11 @@ export function RangeSlider({
   min = 0,
   max = 100,
   tooltip,
-  formatValue = (val) => val.toString(),
+  formatValue = (val) => {
+    if (Math.abs(val - min) < Number.EPSILON) return `< ${val}`;
+    if (Math.abs(val - max) < Number.EPSILON) return `> ${val}`;
+    return val.toString();
+  },
   className,
   isExponential = false,
   toExponential = (val) => val,
@@ -63,7 +67,14 @@ export function RangeSlider({
     }
     
     setLocalValue(typedValue);
-    onChange(typedValue);
+    
+    // Handle edge cases for min/max bounds with comparison operators
+    const finalValue: [number, number] = [
+      Math.abs(typedValue[0] - min) < Number.EPSILON ? min : typedValue[0],
+      Math.abs(typedValue[1] - max) < Number.EPSILON ? max : typedValue[1]
+    ];
+    
+    onChange(finalValue);
   };
   
   // Convert exponential values back to linear for slider position
@@ -90,7 +101,7 @@ export function RangeSlider({
           )}
         </div>
         <div className="text-xs text-gray-500">
-          Current: {formatValue(localValue[0])} to {formatValue(localValue[1])}
+          {formatValue(localValue[0])} to {formatValue(localValue[1])}
         </div>
       </div>
       
@@ -105,8 +116,8 @@ export function RangeSlider({
           className="mb-4"
         />
         <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>{formatValue(min)}</span>
-          <span>{formatValue(max)}</span>
+          <span>{`< ${min}`}</span>
+          <span>{`> ${max}`}</span>
         </div>
       </div>
     </div>

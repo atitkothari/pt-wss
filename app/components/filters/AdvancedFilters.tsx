@@ -81,7 +81,7 @@ export function AdvancedFilters({
             {/* Add Strike Price filter before P/E Ratio */}
             <RangeSlider
               id="input_screener_strike_price"
-              label="Strike Price"
+              label="Strike Price ($)"
               value={strikePrice}
               minValue={strikePrice[0]}
               maxValue={strikePrice[1]}
@@ -110,7 +110,7 @@ export function AdvancedFilters({
             
             <RangeSlider
               id="input_screener_market_cap"
-              label="Market Cap (B)"
+              label="Market Cap ($B)"
               value={marketCap}
               minValue={marketCap[0]}
               maxValue={marketCap[1]}
@@ -119,7 +119,7 @@ export function AdvancedFilters({
               max={marketCapFilterConfig.max}
               step={marketCapFilterConfig.step}
               tooltip={marketCapFilterConfig.tooltip}
-              formatValue={(val) => `$${val}B`}
+              formatValue={(val) => `${val}B`}
               className="col-span-1"
             />
             
@@ -134,19 +134,20 @@ export function AdvancedFilters({
               max={deltaFilterConfig.max}
               step={deltaFilterConfig.step}
               tooltip={deltaFilterConfig.tooltip}
+              formatValue={(val) => val.toFixed(2)}
               className="col-span-1"
             />
             
             <SingleValueSlider
               id="input_screener_min_volume"
-              label="Volume"
+              label="Min Volume"
               value={minVol}
               onChange={onMinVolChange}
               min={volumeFilterConfig.min}
               max={volumeFilterConfig.max}
               step={volumeFilterConfig.step}
               tooltip={volumeFilterConfig.tooltip}
-              formatValue={(val) => val.toString()}
+              formatValue={(val) => val.toLocaleString()}
               className="col-span-1"
             />            
             <div className="relative">

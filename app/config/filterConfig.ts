@@ -70,7 +70,7 @@ export const dteFilterConfig = {
 
 // P/E Ratio Filter Configuration
 export const peRatioFilterConfig = {
-  min: 0,
+  min: 1,
   max: 100,
   defaultMin: 0,
   defaultMax: 100,

@@ -32,7 +32,11 @@ export function SingleValueSlider({
   min = 0,
   max = 100,
   tooltip,
-  formatValue = (val) => val.toString(),
+  formatValue = (val) => {
+    if (Math.abs(val - min) < Number.EPSILON) return `< ${val}`;
+    if (Math.abs(val - max) < Number.EPSILON) return `> ${val}`;
+    return val.toString();
+  },
   className
 }: SingleValueSliderProps) {
   const [localValue, setLocalValue] = useState<number>(value);
@@ -67,7 +71,7 @@ export function SingleValueSlider({
           )}
         </div>
         <div className="text-xs text-gray-500">
-          Current: {formatValue(localValue)}
+          {formatValue(localValue)}
         </div>
       </div>
       
@@ -82,8 +86,8 @@ export function SingleValueSlider({
           className="mb-4"
         />
         <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>{formatValue(min)}</span>
-          <span>{formatValue(max)}</span>
+          <span>{`< ${min}`}</span>
+          <span>{`> ${max}`}</span>
         </div>
       </div>
     </div>
