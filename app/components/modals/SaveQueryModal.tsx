@@ -99,13 +99,27 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
       }
     );
 
-    // Replace strikeFilter with moneynessRange
+    // Add moneynessRange filter
     if (query.moneynessRange) {
       filterData.push({
         operation: "strikeFilter",
         field: query.option,
         //value: [query.moneynessRange[0] / 100, query.moneynessRange[1] / 100]
         value: query.moneynessRange[0]/100
+      });
+    }
+    
+    // Add strikePrice filter
+    if (query.strikePrice) {
+      filterData.push({
+        operation: "gte",
+        field: "strike",
+        value: query.strikePrice[0]
+      });
+      filterData.push({
+        operation: "lte",
+        field: "strike",
+        value: query.strikePrice[1]
       });
     }
     
@@ -213,11 +227,11 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
     const displayItems = [
       `Option Type: ${query.option === 'put' ? 'Put' : 'Call'}`,
       `Symbol: ${query.searchTerm || 'Any'}`,
-      `Max Strike: ${query.maxPrice ? `$${query.maxPrice}` : 'No limit'}`,
+      `Strike Price: ${query.strikePrice ? `$${query.strikePrice[0]} to $${query.strikePrice[1]}` : 'Any'}`,
       `Min Yield: ${query.minYield ? `${query.minYield}%` : '0%'}`,
-      `Min Volume: ${query.minVol || '0'}`,
+      `Min Volume: ${query.volumeRange ? query.volumeRange[0] : '0'}`,
       `Expiration: ${query.selectedExpiration || 'Any'}`,
-      `Strike Filter: ${query.strikeFilter || 'ALL'}`,
+      `Strike Filter %: ${query.moneynessRange ? `${query.moneynessRange[0]}% to ${query.moneynessRange[1]}%` : 'Any'}`,
       `Delta Range: ${query.deltaFilter ? `${query.deltaFilter[0]} to ${query.deltaFilter[1]}` : '-1 to 1'}`
     ];
     
@@ -232,6 +246,10 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
     
     if (query.sector && query.sector !== 'All Sectors') {
       displayItems.push(`Sector: ${query.sector}`);
+    }
+    
+    if (query.movingAverageCrossover && query.movingAverageCrossover !== 'Any') {
+      displayItems.push(`Moving Average: ${query.movingAverageCrossover}`);
     }
     
     return displayItems;

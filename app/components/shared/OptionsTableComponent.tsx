@@ -409,6 +409,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     searchTerm,
     yieldRange,
     maxPrice,
+    minPrice,
     volumeRange,
     selectedExpiration,
     moneynessRange,
@@ -417,7 +418,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     marketCap,
     movingAverageCrossover,
     sector,
-    option
+    option,
+    strikePrice: [minPrice, maxPrice]
   });
 
   const [dte, setDte] = useState(Number(searchParams.get(getParamKey('dte'))) || 30);
