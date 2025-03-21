@@ -405,6 +405,42 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       localStorage.setItem(`${option}_moneynessRange`, JSON.stringify(moneynessRange));
     }
   }, [moneynessRange, option]);
+  
+  // Handle browser back/forward navigation
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Store current scroll position in session storage when URL changes
+      const handleBeforeUnload = () => {
+        sessionStorage.setItem('scrollPosition', window.scrollY.toString());
+      };
+      
+      // Restore scroll position on popstate (browser back/forward)
+      const handlePopState = () => {
+        const savedPosition = sessionStorage.getItem('scrollPosition');
+        if (savedPosition) {
+          setTimeout(() => {
+            window.scrollTo(0, parseInt(savedPosition, 10));
+          }, 0);
+        }
+      };
+      
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      window.addEventListener('popstate', handlePopState);
+      
+      // Restore scroll position on initial load
+      const savedPosition = sessionStorage.getItem('scrollPosition');
+      if (savedPosition) {
+        setTimeout(() => {
+          window.scrollTo(0, parseInt(savedPosition, 10));
+        }, 0);
+      }
+      
+      return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+        window.removeEventListener('popstate', handlePopState);
+      };
+    }
+  }, []);
 
   const [selectedExpiration, setSelectedExpiration] = useState(searchParams.get(getParamKey('expiration')) || "");
   const [minSelectedExpiration, setMinSelectedExpiration] = useState(searchParams.get(getParamKey('min_expiration')) || "");
@@ -478,7 +514,15 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       }
     });
 
-    router.push(`?${params.toString()}`);
+    // Save current scroll position before URL update
+    const scrollPosition = window.scrollY;
+    
+    // Update URL without full page refresh
+    const url = `?${params.toString()}`;
+    window.history.pushState({}, '', url);
+    
+    // Restore scroll position
+    window.scrollTo(0, scrollPosition);
   };
 
   const [isFromCache, setIsFromCache] = useState(false);
@@ -795,7 +839,15 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     params.set('sortBy', columnId);
     params.set('sortDir', newSortDir);
     
-    router.push(`?${params.toString()}`);
+    // Save current scroll position before URL update
+    const scrollPosition = window.scrollY;
+    
+    // Update URL without full page refresh
+    const url = `?${params.toString()}`;
+    window.history.pushState({}, '', url);
+    
+    // Restore scroll position
+    window.scrollTo(0, scrollPosition);
 
     // Fetch new data with updated sort configuration
     fetchData(

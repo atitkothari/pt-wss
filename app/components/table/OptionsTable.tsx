@@ -114,21 +114,42 @@ export function OptionsTable({ data, onSort }: OptionsTableProps) {
   const sortColumn = searchParams.get('sortBy');
   const sortDirection = searchParams.get('sortDir');
 
-  const [visibleColumns, setVisibleColumns] = useState<string[]>(
-    DEFAULT_COLUMNS.map(col => col.key)
-  );
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(() => {
+    // Try to get saved columns from localStorage
+    if (typeof window !== 'undefined') {
+      const savedColumns = localStorage.getItem('visibleColumns');
+      if (savedColumns) {
+        try {
+          return JSON.parse(savedColumns);
+        } catch (e) {
+          console.error('Error parsing localStorage value for visibleColumns:', e);
+        }
+      }
+    }
+    // Fall back to default columns
+    return DEFAULT_COLUMNS.map(col => col.key);
+  });
 
   const handleColumnToggle = (columnKey: string) => {
     setVisibleColumns(current => {
+      let newColumns;
       if (current.includes(columnKey)) {
         if (current.length === 1) return current;
-        return current.filter(key => key !== columnKey);
+        newColumns = current.filter(key => key !== columnKey);
+      } else {
+        newColumns = [...current, columnKey].sort(
+          (a, b) => 
+            DEFAULT_COLUMNS.findIndex(col => col.key === a) - 
+            DEFAULT_COLUMNS.findIndex(col => col.key === b)
+        );
       }
-      return [...current, columnKey].sort(
-        (a, b) => 
-          DEFAULT_COLUMNS.findIndex(col => col.key === a) - 
-          DEFAULT_COLUMNS.findIndex(col => col.key === b)
-      );
+      
+      // Save to localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('visibleColumns', JSON.stringify(newColumns));
+      }
+      
+      return newColumns;
     });
   };
 
