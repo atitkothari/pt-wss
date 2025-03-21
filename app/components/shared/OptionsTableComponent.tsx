@@ -61,25 +61,350 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
   const getParamKey = (key: string) => `${option}_${key}`;
   
-  const [searchTerm, setSearchTerm] = useState(searchParams.get(getParamKey('search')) || "");
-  const [selectedStocks, setSelectedStocks] = useState<string[]>(() => {
-    const searchParam = searchParams.get(getParamKey('search'));
-    return searchParam ? searchParam.split(',') : [];
+  // Helper function to get value from URL params, localStorage, or default value
+  const getInitialValue = <T,>(paramKey: string, localStorageKey: string, defaultValue: T): T => {
+    // First priority: URL parameters
+    const urlParam = searchParams.get(paramKey);
+    if (urlParam !== null) {
+      // For arrays, split by comma and convert to numbers if needed
+      if (Array.isArray(defaultValue) && typeof defaultValue[0] === 'number') {
+        return urlParam.split(',').map(Number) as unknown as T;
+      }
+      // For single values
+      return (typeof defaultValue === 'number' ? Number(urlParam) : urlParam) as unknown as T;
+    }
+    
+    // Second priority: localStorage (only if in browser)
+    if (typeof window !== 'undefined') {
+      const storedValue = localStorage.getItem(localStorageKey);
+      if (storedValue !== null) {
+        try {
+          return JSON.parse(storedValue) as T;
+        } catch (e) {
+          console.error(`Error parsing localStorage value for ${localStorageKey}:`, e);
+        }
+      }
+    }
+    
+    // Third priority: default value
+    return defaultValue;
+  };
+
+  const [searchTerm, setSearchTerm] = useState(() => {
+    const paramKey = getParamKey('search');
+    const localStorageKey = `${option}_searchTerm`;
+    return getInitialValue<string>(paramKey, localStorageKey, "");
   });
-  const [yieldRange, setYieldRange] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_yield'))) || yieldFilterConfig.min, Number(searchParams.get(getParamKey('max_yield'))) || yieldFilterConfig.max]);
-  const [minPrice, setMinPrice] = useState(Number(searchParams.get(getParamKey('minPrice'))) || priceFilterConfig.defaultMin);
-  const [maxPrice, setMaxPrice] = useState(Number(searchParams.get(getParamKey('maxPrice'))) || priceFilterConfig.defaultMax);
-  const [volumeRange, setVolumeRange] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_vol'))) || volumeFilterConfig.min, Number(searchParams.get(getParamKey('max_vol'))) || volumeFilterConfig.max]);
-  const [deltaFilter, setDeltaFilter] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_delta'))) || deltaFilterConfig.defaultMin, Number(searchParams.get(getParamKey('max_delta'))) || deltaFilterConfig.defaultMax]);
-  const [minDte, setMinDte] = useState(Number(searchParams.get(getParamKey('min_dte'))) || dteFilterConfig.defaultMin);
-  const [maxDte, setMaxDte] = useState(Number(searchParams.get(getParamKey('max_dte'))) || dteFilterConfig.defaultMax);
+  
+  const [selectedStocks, setSelectedStocks] = useState<string[]>(() => {
+    const paramKey = getParamKey('search');
+    const localStorageKey = `${option}_selectedStocks`;
+    const searchParam = searchParams.get(paramKey);
+    if (searchParam) {
+      return searchParam.split(',');
+    }
+    if (typeof window !== 'undefined') {
+      const storedValue = localStorage.getItem(localStorageKey);
+      if (storedValue) {
+        try {
+          return JSON.parse(storedValue);
+        } catch (e) {
+          console.error(`Error parsing localStorage value for ${localStorageKey}:`, e);
+        }
+      }
+    }
+    return [];
+  });
+  
+  const [yieldRange, setYieldRange] = useState<[number, number]>(() => {
+    const minYieldParam = getParamKey('min_yield');
+    const maxYieldParam = getParamKey('max_yield');
+    const localStorageKey = `${option}_yieldRange`;
+    
+    // Check URL params first
+    const minFromUrl = searchParams.get(minYieldParam);
+    const maxFromUrl = searchParams.get(maxYieldParam);
+    if (minFromUrl !== null && maxFromUrl !== null) {
+      return [Number(minFromUrl), Number(maxFromUrl)];
+    }
+    
+    // Then check localStorage
+    if (typeof window !== 'undefined') {
+      const storedValue = localStorage.getItem(localStorageKey);
+      if (storedValue) {
+        try {
+          return JSON.parse(storedValue) as [number, number];
+        } catch (e) {
+          console.error(`Error parsing localStorage value for ${localStorageKey}:`, e);
+        }
+      }
+    }
+    
+    // Default values
+    return [yieldFilterConfig.min, yieldFilterConfig.max];
+  });
+  
+  const [minPrice, setMinPrice] = useState(() => {
+    const paramKey = getParamKey('minPrice');
+    const localStorageKey = `${option}_minPrice`;
+    return getInitialValue<number>(paramKey, localStorageKey, priceFilterConfig.defaultMin);
+  });
+  
+  const [maxPrice, setMaxPrice] = useState(() => {
+    const paramKey = getParamKey('maxPrice');
+    const localStorageKey = `${option}_maxPrice`;
+    return getInitialValue<number>(paramKey, localStorageKey, priceFilterConfig.defaultMax);
+  });
+  
+  const [volumeRange, setVolumeRange] = useState<[number, number]>(() => {
+    const minVolParam = getParamKey('min_vol');
+    const maxVolParam = getParamKey('max_vol');
+    const localStorageKey = `${option}_volumeRange`;
+    
+    // Check URL params first
+    const minFromUrl = searchParams.get(minVolParam);
+    const maxFromUrl = searchParams.get(maxVolParam);
+    if (minFromUrl !== null && maxFromUrl !== null) {
+      return [Number(minFromUrl), Number(maxFromUrl)];
+    }
+    
+    // Then check localStorage
+    if (typeof window !== 'undefined') {
+      const storedValue = localStorage.getItem(localStorageKey);
+      if (storedValue) {
+        try {
+          return JSON.parse(storedValue) as [number, number];
+        } catch (e) {
+          console.error(`Error parsing localStorage value for ${localStorageKey}:`, e);
+        }
+      }
+    }
+    
+    // Default values
+    return [volumeFilterConfig.min, volumeFilterConfig.max];
+  });
+  
+  const [deltaFilter, setDeltaFilter] = useState<[number, number]>(() => {
+    const minDeltaParam = getParamKey('min_delta');
+    const maxDeltaParam = getParamKey('max_delta');
+    const localStorageKey = `${option}_deltaFilter`;
+    
+    // Check URL params first
+    const minFromUrl = searchParams.get(minDeltaParam);
+    const maxFromUrl = searchParams.get(maxDeltaParam);
+    if (minFromUrl !== null && maxFromUrl !== null) {
+      return [Number(minFromUrl), Number(maxFromUrl)];
+    }
+    
+    // Then check localStorage
+    if (typeof window !== 'undefined') {
+      const storedValue = localStorage.getItem(localStorageKey);
+      if (storedValue) {
+        try {
+          return JSON.parse(storedValue) as [number, number];
+        } catch (e) {
+          console.error(`Error parsing localStorage value for ${localStorageKey}:`, e);
+        }
+      }
+    }
+    
+    // Default values
+    return [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax];
+  });
+  
+  const [minDte, setMinDte] = useState(() => {
+    const paramKey = getParamKey('min_dte');
+    const localStorageKey = `${option}_minDte`;
+    return getInitialValue<number>(paramKey, localStorageKey, dteFilterConfig.defaultMin);
+  });
+  
+  const [maxDte, setMaxDte] = useState(() => {
+    const paramKey = getParamKey('max_dte');
+    const localStorageKey = `${option}_maxDte`;
+    return getInitialValue<number>(paramKey, localStorageKey, dteFilterConfig.defaultMax);
+  });
   
   // Advanced filters
-  const [peRatio, setPeRatio] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_pe'))) || peRatioFilterConfig.defaultMin, Number(searchParams.get(getParamKey('max_pe'))) || peRatioFilterConfig.defaultMax]);
-  const [marketCap, setMarketCap] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_market_cap'))) || marketCapFilterConfig.defaultMin, Number(searchParams.get(getParamKey('max_market_cap'))) || marketCapFilterConfig.defaultMax]);
-  const [movingAverageCrossover, setMovingAverageCrossover] = useState(searchParams.get(getParamKey('ma_crossover')) || movingAverageCrossoverOptions[0]);
-  const [sector, setSector] = useState(searchParams.get(getParamKey('sector')) || sectorOptions[0]);
-  const [moneynessRange, setMoneynessRange] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_moneyness'))) || moneynessFilterConfig.defaultMin, Number(searchParams.get(getParamKey('max_moneyness'))) || moneynessFilterConfig.defaultMax]);
+  const [peRatio, setPeRatio] = useState<[number, number]>(() => {
+    const minPeParam = getParamKey('min_pe');
+    const maxPeParam = getParamKey('max_pe');
+    const localStorageKey = `${option}_peRatio`;
+    
+    // Check URL params first
+    const minFromUrl = searchParams.get(minPeParam);
+    const maxFromUrl = searchParams.get(maxPeParam);
+    if (minFromUrl !== null && maxFromUrl !== null) {
+      return [Number(minFromUrl), Number(maxFromUrl)];
+    }
+    
+    // Then check localStorage
+    if (typeof window !== 'undefined') {
+      const storedValue = localStorage.getItem(localStorageKey);
+      if (storedValue) {
+        try {
+          return JSON.parse(storedValue) as [number, number];
+        } catch (e) {
+          console.error(`Error parsing localStorage value for ${localStorageKey}:`, e);
+        }
+      }
+    }
+    
+    // Default values
+    return [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax];
+  });
+  
+  const [marketCap, setMarketCap] = useState<[number, number]>(() => {
+    const minMarketCapParam = getParamKey('min_market_cap');
+    const maxMarketCapParam = getParamKey('max_market_cap');
+    const localStorageKey = `${option}_marketCap`;
+    
+    // Check URL params first
+    const minFromUrl = searchParams.get(minMarketCapParam);
+    const maxFromUrl = searchParams.get(maxMarketCapParam);
+    if (minFromUrl !== null && maxFromUrl !== null) {
+      return [Number(minFromUrl), Number(maxFromUrl)];
+    }
+    
+    // Then check localStorage
+    if (typeof window !== 'undefined') {
+      const storedValue = localStorage.getItem(localStorageKey);
+      if (storedValue) {
+        try {
+          return JSON.parse(storedValue) as [number, number];
+        } catch (e) {
+          console.error(`Error parsing localStorage value for ${localStorageKey}:`, e);
+        }
+      }
+    }
+    
+    // Default values
+    return [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax];
+  });
+  
+  const [movingAverageCrossover, setMovingAverageCrossover] = useState(() => {
+    const paramKey = getParamKey('ma_crossover');
+    const localStorageKey = `${option}_movingAverageCrossover`;
+    return getInitialValue<string>(paramKey, localStorageKey, movingAverageCrossoverOptions[0]);
+  });
+  
+  const [sector, setSector] = useState(() => {
+    const paramKey = getParamKey('sector');
+    const localStorageKey = `${option}_sector`;
+    return getInitialValue<string>(paramKey, localStorageKey, sectorOptions[0]);
+  });
+  
+  const [moneynessRange, setMoneynessRange] = useState<[number, number]>(() => {
+    const minMoneynessParam = getParamKey('min_moneyness');
+    const maxMoneynessParam = getParamKey('max_moneyness');
+    const localStorageKey = `${option}_moneynessRange`;
+    
+    // Check URL params first
+    const minFromUrl = searchParams.get(minMoneynessParam);
+    const maxFromUrl = searchParams.get(maxMoneynessParam);
+    if (minFromUrl !== null && maxFromUrl !== null) {
+      return [Number(minFromUrl), Number(maxFromUrl)];
+    }
+    
+    // Then check localStorage
+    if (typeof window !== 'undefined') {
+      const storedValue = localStorage.getItem(localStorageKey);
+      if (storedValue) {
+        try {
+          return JSON.parse(storedValue) as [number, number];
+        } catch (e) {
+          console.error(`Error parsing localStorage value for ${localStorageKey}:`, e);
+        }
+      }
+    }
+    
+    // Default values
+    return [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax];
+  });
+  
+  // Save filter values to localStorage whenever they change
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`${option}_searchTerm`, JSON.stringify(searchTerm));
+    }
+  }, [searchTerm, option]);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`${option}_selectedStocks`, JSON.stringify(selectedStocks));
+    }
+  }, [selectedStocks, option]);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`${option}_yieldRange`, JSON.stringify(yieldRange));
+    }
+  }, [yieldRange, option]);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`${option}_minPrice`, JSON.stringify(minPrice));
+    }
+  }, [minPrice, option]);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`${option}_maxPrice`, JSON.stringify(maxPrice));
+    }
+  }, [maxPrice, option]);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`${option}_volumeRange`, JSON.stringify(volumeRange));
+    }
+  }, [volumeRange, option]);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`${option}_deltaFilter`, JSON.stringify(deltaFilter));
+    }
+  }, [deltaFilter, option]);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`${option}_minDte`, JSON.stringify(minDte));
+    }
+  }, [minDte, option]);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`${option}_maxDte`, JSON.stringify(maxDte));
+    }
+  }, [maxDte, option]);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`${option}_peRatio`, JSON.stringify(peRatio));
+    }
+  }, [peRatio, option]);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`${option}_marketCap`, JSON.stringify(marketCap));
+    }
+  }, [marketCap, option]);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`${option}_movingAverageCrossover`, JSON.stringify(movingAverageCrossover));
+    }
+  }, [movingAverageCrossover, option]);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`${option}_sector`, JSON.stringify(sector));
+    }
+  }, [sector, option]);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`${option}_moneynessRange`, JSON.stringify(moneynessRange));
+    }
+  }, [moneynessRange, option]);
 
   const [selectedExpiration, setSelectedExpiration] = useState(searchParams.get(getParamKey('expiration')) || "");
   const [minSelectedExpiration, setMinSelectedExpiration] = useState(searchParams.get(getParamKey('min_expiration')) || "");
