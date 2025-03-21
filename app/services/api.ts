@@ -4,7 +4,7 @@ import { StrikeFilter as StrikeFilterType } from '../types/option';
 interface Filter {
   operation: string;
   field: string;
-  value: string | number;
+  value: string | number | number[];
 }
 
 interface SortConfig {
@@ -41,6 +41,8 @@ export async function fetchOptionsData(
     });
   }
 
+  // Note: The strikeFilter is kept for backward compatibility
+  // but most filtering will now be done through the moneynessRange filter
   if (strikeFilter) {
     if (strikeFilter === 'THREE_PERCENT') {
       body.filters.push({

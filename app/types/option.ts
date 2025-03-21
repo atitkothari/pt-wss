@@ -15,6 +15,10 @@ export interface Option {
   delta?: number;  // Make it optional since some options might not have delta
   annualizedReturn?: number;
   lastUpdatedDate: string;
+  peRatio?: number; // Price-to-Earnings ratio
+  marketCap?: number; // Market capitalization in billions
+  sector?: string; // Company sector
+  movingAverageCrossover?: string; // Moving average crossover status
 }
 
 export type OptionType = 'call' | 'put';

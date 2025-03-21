@@ -6,16 +6,21 @@ import { Option, OptionType, StrikeFilter } from '../types/option';
 import { parseISO, addDays, format } from 'date-fns';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
+import { yieldFilterConfig, volumeFilterConfig, priceFilterConfig } from '../config/filterConfig';
 
 export function useOptionsData(
-  symbol: string = '',
+  symbols: string[] = [],
   minYield: number = 0,
+  maxYield: number = 10,
+  minPrice: number = 0,
   maxPrice: number = 1000,
   minVol: number = 0,
+  maxVol: number = 10000,
   expiration: string = '',
   option: OptionType = 'call',
   minDelta: number = -1,
-  maxDelta: number = 1
+  maxDelta: number = 1,
+  minExpiration: string = ''
 ) {
   const [data, setData] = useState<Option[]>([]);
   const [loading, setLoading] = useState(false);
@@ -25,16 +30,25 @@ export function useOptionsData(
   const { userId } = useAuth(); // Get userId from auth context
 
   const fetchData = async (
-    searchTerm: string = symbol,
+    searchTerms: string[] = symbols,
     minYieldVal: number = minYield,
+    maxYieldVal: number = maxYield,
+    minPriceVal: number = minPrice,
     maxPriceVal: number = maxPrice,
     minVolVal: number = minVol,
+    maxVolVal: number = maxVol,
     selectedExpiration: string = expiration,
     pageNo: number = 1,
     pageSize: number = 50,
     sortConfig?: { field: keyof Option; direction: 'asc' | 'desc' | null },
     strikeFilter?: StrikeFilter,
-    deltaRange?: [number, number]
+    deltaRange?: [number, number],
+    peRatio?: [number, number],
+    marketCap?: [number, number],
+    movingAverageCrossover?: string,
+    sector?: string,
+    moneynessRange?: [number, number],
+    minSelectedExpiration: string = minExpiration
   ) => {
     setLoading(true);
     try {
@@ -42,29 +56,90 @@ export function useOptionsData(
       if(option) {
         filters.push({ operation: 'eq', field: 'type', value: `"${option}"` });
       }
-      if (searchTerm) {
-        filters.push({ operation: 'eq', field: 'symbol', value: `"${searchTerm}"` });
+      if (searchTerms && searchTerms.length > 0) {
+        if (searchTerms.length === 1) {
+          filters.push({ operation: 'eq', field: 'symbol', value: `"${searchTerms[0]}"` });
+        } else {
+          filters.push({ 
+            operation: 'in', 
+            field: 'symbol', 
+            value: `${searchTerms.join(',')}`
+          });
+        }
       }
       if (minYieldVal > 0) {
         filters.push({ operation: 'gt', field: 'yieldPercent', value: minYieldVal });
       }
-      if (maxPriceVal) {
-        filters.push({ operation: 'lt', field: 'strike', value: maxPriceVal });
+      if (maxYieldVal < yieldFilterConfig.max) {
+        filters.push({ operation: 'lt', field: 'yieldPercent', value: maxYieldVal });
       }
+      if (minPriceVal>0 ) {
+        filters.push({ operation: 'gte', field: 'strike', value: minPriceVal });
+      }
+      if (maxPriceVal<priceFilterConfig.max) {
+        filters.push({ operation: 'lte', field: 'strike', value: maxPriceVal });
+      }      
       if (minVolVal > 0) {
         filters.push({ operation: 'gt', field: 'volume', value: minVolVal });
+      }
+      if (maxVolVal < volumeFilterConfig.max) {
+        filters.push({ operation: 'lt', field: 'volume', value: maxVolVal });
       }
       
       if(selectedExpiration === "") {
         filters.push({ operation: 'eq', field: 'expiration', value: `"${format(new Date(), 'yyyy-MM-dd')}"` });
-      } else if (selectedExpiration) {            
-        filters.push({ operation: 'gte', field: 'expiration', value: `"${format(new Date(), 'yyyy-MM-dd')}"` });
+      } else if (selectedExpiration) {
+        // If minSelectedExpiration is provided, use it as the lower bound
+        // Otherwise, use today's date as the lower bound
+        const lowerBoundDate = minSelectedExpiration ? minSelectedExpiration : format(new Date(), 'yyyy-MM-dd');
+        filters.push({ operation: 'gte', field: 'expiration', value: `"${lowerBoundDate}"` });
         filters.push({ operation: 'lte', field: 'expiration', value: `"${selectedExpiration}"` });      
       }
 
       if (deltaRange) {
         filters.push({ operation: 'gte', field: 'delta', value: deltaRange[0] });
         filters.push({ operation: 'lte', field: 'delta', value: deltaRange[1] });
+      }
+      
+      // Add moneyness range filters
+      if (moneynessRange) {
+        filters.push({ operation: 'strikeFilter', field: option, 
+          value: moneynessRange[0]/100//[moneynessRange[0] / 100, moneynessRange[1] / 100] 
+        });
+      }
+      
+      // Add PE Ratio filters
+      if (peRatio && peRatio[0] > 0) {
+        filters.push({ operation: 'gte', field: 'peRatio', value: peRatio[0] });
+      }
+      if (peRatio && peRatio[1] < 100) {
+        filters.push({ operation: 'lte', field: 'peRatio', value: peRatio[1] });
+      }
+      
+      // Add Market Cap filters (in billions)
+      if (marketCap && marketCap[0] > 0) {
+        filters.push({ operation: 'gte', field: 'marketCap', value: marketCap[0] * 1000000000 });
+      }
+      if (marketCap && marketCap[1] < 1000) {
+        filters.push({ operation: 'lte', field: 'marketCap', value: marketCap[1] * 1000000000});
+      }
+      
+      // Add Moving Average Crossover filter
+      if (movingAverageCrossover && movingAverageCrossover !== 'Any') {
+        filters.push({ 
+          operation: 'eq', 
+          field: 'movingAverageCrossover', 
+          value: `"${movingAverageCrossover}"` 
+        });
+      }
+      
+      // Add Sector filter
+      if (sector && sector !== 'All Sectors') {
+        filters.push({ 
+          operation: 'eq', 
+          field: 'sector', 
+          value: `"${sector}"` 
+        });
       }
 
       // Get sort params from URL if not provided in sortConfig
@@ -75,7 +150,7 @@ export function useOptionsData(
         field: sortBy,
         direction: sortDir || 'asc'
       } : undefined;
-
+      console.log(strikeFilter)
       const result = await fetchOptionsData(
         filters, 
         pageNo, 

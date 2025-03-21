@@ -44,6 +44,12 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <meta name="google-adsense-account" content="ca-pub-8741511572242021" />
+        <link
+  rel="icon"
+  href="/icon?<generated>"
+  type="image/<generated>"
+  sizes="<generated>"
+/>
       </head>
       <body className={inter.className}>
         {/* Google Tag Manager (noscript) */}

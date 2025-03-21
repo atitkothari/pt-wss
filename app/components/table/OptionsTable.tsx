@@ -21,13 +21,16 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: "strike", label: "Strike" },
   { key: "premium", label: "Premium" },
   { key: "delta", label: "Delta" },
-  { key: "yieldPercent", label: "Yield %" },
+  { key: "yieldPercent", label: "Premium Yield %" },
   { key: "expiration", label: "Expiration" },
   { key: "annualizedReturn", label: "Ann %" },
   { key: "bidPrice", label: "Bid" },
   { key: "askPrice", label: "Ask" },
   { key: "volume", label: "Volume" },
   { key: "openInterest", label: "Open Interest" },
+  { key: "peRatio", label: "P/E Ratio" },
+  { key: "marketCap", label: "Market Cap" },
+  { key: "sector", label: "Sector" },
   { key: "earningsDate", label: "Earnings" },
   { key: "impliedVolatility", label: "IV %" },
 ];
@@ -77,9 +80,27 @@ const formatCell = (value: any, columnKey: string): string|any => {
       let link = "https://screenwich.com/stock-details/"+value      
       return <a href={link} target="_blank">{String(value)}</a>
     
+    case 'peRatio':
+      return value ? Number(value).toFixed(2) : '-';
+      
+    case 'marketCap':
+      if (!value) return '-';
+      const marketCapValue = Number(value);
+      if (marketCapValue >= 1000000000000) {    
+        return `$${(marketCapValue / 1000000000000).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}T`;
+      } else if (marketCapValue >= 1000000000) {    
+        return `$${(marketCapValue / 1000000000).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}B`;
+      } else if (marketCapValue >= 1000000) {    
+        return `$${(marketCapValue / 1000000).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}M`;
+      } else if (marketCapValue >= 1000) {    
+        return `$${(marketCapValue / 1000).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}K`;
+      } else if (marketCapValue >= 1) {
+        return `$${marketCapValue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+      }
+      
     default:
       return String(value);
-  }
+  };
 };
 
 interface OptionsTableProps {

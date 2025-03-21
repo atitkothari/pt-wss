@@ -2,6 +2,10 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { FilterInput } from "../filters/FilterInput";
+import { AdvancedFilters } from "../filters/AdvancedFilters";
+import { RangeSlider } from "../filters/RangeSlider";
+import { SingleValueSlider } from "../filters/SingleValueSlider";
+import { MultiStockSelect } from "../filters/MultiStockSelect";
 import { useOptionsData } from "../../hooks/useOptionsData";
 import { LoadingSpinner } from "../LoadingSpinner";
 import { Option, OptionType, StrikeFilter } from "../../types/option";
@@ -14,6 +18,26 @@ import { useSymbols } from '../../hooks/useSymbols';
 import { SaveQueryModal } from "../modals/SaveQueryModal";
 import { BlurredTable } from "../auth/BlurredTable";
 import { useAuth } from "@/app/context/AuthContext";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  yieldFilterConfig,
+  priceFilterConfig,
+  volumeFilterConfig,
+  deltaFilterConfig,
+  dteFilterConfig,
+  peRatioFilterConfig,
+  marketCapFilterConfig,
+  moneynessFilterConfig,
+  movingAverageCrossoverOptions,
+  sectorOptions,
+  defaultVisibleColumns as configDefaultVisibleColumns
+} from "@/app/config/filterConfig";
 
 interface OptionsTableComponentProps {
   option: OptionType;
@@ -27,19 +51,8 @@ function getNextFriday(date: Date): Date {
   return nextFriday;
 }
 
-const DEFAULT_VISIBLE_COLUMNS = [
-  'symbol',
-  'stockPrice',
-  'strike',
-  'premium',
-  'delta',
-  'yieldPercent',
-  'expiration',
-  'volume',
-  'openInterest',
-  'earningsDate',
-  'impliedVolatility'
-];
+// Using the centralized default visible columns from filterConfig
+const DEFAULT_VISIBLE_COLUMNS = configDefaultVisibleColumns;
 
 export function OptionsTableComponent({ option }: OptionsTableComponentProps) {  
   const searchParams = useSearchParams();
@@ -49,12 +62,27 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const getParamKey = (key: string) => `${option}_${key}`;
   
   const [searchTerm, setSearchTerm] = useState(searchParams.get(getParamKey('search')) || "");
-  const [minYield, setMinYield] = useState(Number(searchParams.get(getParamKey('minYield'))) || 0);
-  const [maxPrice, setMaxPrice] = useState(Number(searchParams.get(getParamKey('maxPrice'))) || 1000);
-  const [minVol, setMinVol] = useState(Number(searchParams.get(getParamKey('minVol'))) || 0);
-  const [deltaFilter, setDeltaFilter] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_delta'))) || -1, Number(searchParams.get(getParamKey('max_delta'))) || 1]);
+  const [selectedStocks, setSelectedStocks] = useState<string[]>(() => {
+    const searchParam = searchParams.get(getParamKey('search'));
+    return searchParam ? searchParam.split(',') : [];
+  });
+  const [yieldRange, setYieldRange] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_yield'))) || yieldFilterConfig.min, Number(searchParams.get(getParamKey('max_yield'))) || yieldFilterConfig.max]);
+  const [minPrice, setMinPrice] = useState(Number(searchParams.get(getParamKey('minPrice'))) || priceFilterConfig.defaultMin);
+  const [maxPrice, setMaxPrice] = useState(Number(searchParams.get(getParamKey('maxPrice'))) || priceFilterConfig.defaultMax);
+  const [volumeRange, setVolumeRange] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_vol'))) || volumeFilterConfig.min, Number(searchParams.get(getParamKey('max_vol'))) || volumeFilterConfig.max]);
+  const [deltaFilter, setDeltaFilter] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_delta'))) || deltaFilterConfig.defaultMin, Number(searchParams.get(getParamKey('max_delta'))) || deltaFilterConfig.defaultMax]);
+  const [minDte, setMinDte] = useState(Number(searchParams.get(getParamKey('min_dte'))) || dteFilterConfig.defaultMin);
+  const [maxDte, setMaxDte] = useState(Number(searchParams.get(getParamKey('max_dte'))) || dteFilterConfig.defaultMax);
+  
+  // Advanced filters
+  const [peRatio, setPeRatio] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_pe'))) || peRatioFilterConfig.defaultMin, Number(searchParams.get(getParamKey('max_pe'))) || peRatioFilterConfig.defaultMax]);
+  const [marketCap, setMarketCap] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_market_cap'))) || marketCapFilterConfig.defaultMin, Number(searchParams.get(getParamKey('max_market_cap'))) || marketCapFilterConfig.defaultMax]);
+  const [movingAverageCrossover, setMovingAverageCrossover] = useState(searchParams.get(getParamKey('ma_crossover')) || movingAverageCrossoverOptions[0]);
+  const [sector, setSector] = useState(searchParams.get(getParamKey('sector')) || sectorOptions[0]);
+  const [moneynessRange, setMoneynessRange] = useState<[number, number]>([Number(searchParams.get(getParamKey('min_moneyness'))) || moneynessFilterConfig.defaultMin, Number(searchParams.get(getParamKey('max_moneyness'))) || moneynessFilterConfig.defaultMax]);
 
   const [selectedExpiration, setSelectedExpiration] = useState(searchParams.get(getParamKey('expiration')) || "");
+  const [minSelectedExpiration, setMinSelectedExpiration] = useState(searchParams.get(getParamKey('min_expiration')) || "");
   const [sortConfig, setSortConfig] = useState<{ field: keyof Option; direction: 'asc' | 'desc' | null }>({ 
     field: "symbol", 
     direction: null 
@@ -62,28 +90,56 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   
   const [activeFilters, setActiveFilters] = useState({
     searchTerm: "",
-    minYield: 0,
-    maxPrice: 1000,
-    minVol: 0,
+    yieldRange: [yieldFilterConfig.min, yieldFilterConfig.max] as [number, number],
+    maxPrice: priceFilterConfig.defaultMax,
+    minPrice: priceFilterConfig.defaultMin,
+    volumeRange: [volumeFilterConfig.min, volumeFilterConfig.max] as [number, number],
     selectedExpiration: "",
-    pageNo: 1
+    minSelectedExpiration: "",
+    pageNo: 1,
+    peRatio: [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax] as [number, number],
+    marketCap: [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax] as [number, number],
+    movingAverageCrossover: movingAverageCrossoverOptions[0],
+    sector: sectorOptions[0],
+    moneynessRange: [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax] as [number, number]
   });
 
   const [hasSearched, setHasSearched] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [strikeFilter, setStrikeFilter] = useState<StrikeFilter>(
-    (searchParams.get(getParamKey('strikeFilter')) as StrikeFilter) || 'ONE_OUT'
+    (searchParams.get(getParamKey('strikeFilter')) as StrikeFilter)
   );
   const rowsPerPage = 50;
 
   const { data, loading, error, totalCount, fetchData } = useOptionsData(
-    activeFilters.searchTerm,
-    activeFilters.minYield,
+    activeFilters.searchTerm.split(","),
+    activeFilters.yieldRange[0],
+    activeFilters.yieldRange[1],
+    activeFilters.minPrice,
     activeFilters.maxPrice,
-    activeFilters.minVol,
+    activeFilters.volumeRange[0],
+    activeFilters.volumeRange[1],
     activeFilters.selectedExpiration,
-    option
+    option,
+    deltaFilterConfig.defaultMin,
+    deltaFilterConfig.defaultMax,
+    activeFilters.minSelectedExpiration
   );
+
+  // Calculate expiration dates based on minDte and maxDte whenever they change
+  useEffect(() => {
+    const today = new Date();
+    
+    // Calculate min expiration date based on minDte
+    const minDate = addDays(today, minDte);
+    const minFormattedDate = format(minDate, 'yyyy-MM-dd');
+    setMinSelectedExpiration(minFormattedDate);
+    
+    // Calculate max expiration date based on maxDte
+    const maxDate = addDays(today, maxDte);
+    const maxFormattedDate = format(maxDate, 'yyyy-MM-dd');
+    setSelectedExpiration(maxFormattedDate);
+  }, [minDte, maxDte]);
 
   const updateURL = (filters: Record<string, string | number>) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -101,6 +157,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   };
 
   const [isFromCache, setIsFromCache] = useState(false);
+  const [filtersChanged, setFiltersChanged] = useState(false);
 
   const [searchCount, setSearchCount] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -112,6 +169,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const handleSearch = () => {
     setHasSearched(true);
     setIsFromCache(false);
+    setFiltersChanged(false); // Reset the filters changed flag when search is performed
     
     const newCount = searchCount + 1;
     setSearchCount(newCount);
@@ -123,46 +181,138 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     // }
 
     setActiveFilters({
-      searchTerm,
-      minYield,
+      searchTerm: selectedStocks.join(','),
+      yieldRange,
+      minPrice,
       maxPrice,
-      minVol,
+      volumeRange,
       selectedExpiration,
-      pageNo: 1
+      minSelectedExpiration,
+      pageNo: 1,
+      peRatio,
+      marketCap,
+      movingAverageCrossover,
+      sector,
+      moneynessRange
     });
 
     updateURL({
-      search: searchTerm,
-      minYield,
+      search: selectedStocks.join(','),
+      min_yield: yieldRange[0],
+      max_yield: yieldRange[1],
       maxPrice,
-      minVol,
+      min_vol: volumeRange[0],
+      max_vol: volumeRange[1],
       expiration: selectedExpiration,
-      strikeFilter,
+      min_expiration: minSelectedExpiration,
+      min_dte: minDte,
+      max_dte: maxDte,
+      min_moneyness: moneynessRange[0],
+      max_moneyness: moneynessRange[1],
       min_delta: deltaFilter[0],
-      max_delta: deltaFilter[1]
+      max_delta: deltaFilter[1],
+      min_pe: peRatio[0],
+      max_pe: peRatio[1],
+      min_market_cap: marketCap[0],
+      max_market_cap: marketCap[1],
+      ma_crossover: movingAverageCrossover,
+      sector: sector
     });
 
     fetchData(
-      searchTerm, 
-      minYield, 
+      selectedStocks, 
+      yieldRange[0], 
+      yieldRange[1],
+      minPrice, 
       maxPrice, 
-      minVol, 
+      volumeRange[0],
+      volumeRange[1], 
       selectedExpiration,
       1,
       rowsPerPage,
       sortConfig.direction ? sortConfig : undefined,
-      strikeFilter !== 'ALL' ? strikeFilter : undefined,
-      deltaFilter
+      undefined,
+      deltaFilter,
+      peRatio,
+      marketCap,
+      movingAverageCrossover,
+      sector,
+      moneynessRange,
+      minSelectedExpiration
     ).catch(console.error);
     setCurrentPage(1);
   };
 
   useEffect(() => {
+    // Only perform search on initial load if URL has parameters and we haven't already loaded from cache
     if (Array.from(searchParams.entries()).length > 0 && !isFromCache) {
-      handleSearch();
+      // Set isFromCache first to prevent multiple API calls
       setIsFromCache(true);
+      // Use a small timeout to prevent immediate API call on page load
+      const timer = setTimeout(() => {
+        handleSearch();
+      }, 100);
+      return () => clearTimeout(timer);
     }
   }, []);
+  
+  // Track filter changes
+  useEffect(() => {
+    // Only track changes after initial load and if we've already searched once
+    if (isFromCache && hasSearched) {
+      // Check if current filter values differ from active filters
+      const currentFilters = {
+        searchTerm: selectedStocks.join(','),
+        yieldRange,
+        maxPrice,
+        volumeRange,
+        selectedExpiration,
+        deltaFilter,
+        peRatio,
+        marketCap,
+        movingAverageCrossover,
+        sector,
+        moneynessRange
+      };
+      
+      // Compare current filters with active filters
+      const hasChanged = 
+        currentFilters.searchTerm !== activeFilters.searchTerm ||
+        currentFilters.yieldRange[0] !== activeFilters.yieldRange[0] ||
+        currentFilters.yieldRange[1] !== activeFilters.yieldRange[1] ||
+        currentFilters.maxPrice !== activeFilters.maxPrice ||
+        currentFilters.volumeRange[0] !== activeFilters.volumeRange[0] ||
+        currentFilters.volumeRange[1] !== activeFilters.volumeRange[1] ||
+        currentFilters.selectedExpiration !== activeFilters.selectedExpiration ||
+        currentFilters.deltaFilter[0] !== deltaFilter[0] ||
+        currentFilters.deltaFilter[1] !== deltaFilter[1] ||
+        currentFilters.peRatio[0] !== activeFilters.peRatio[0] ||
+        currentFilters.peRatio[1] !== activeFilters.peRatio[1] ||
+        currentFilters.marketCap[0] !== activeFilters.marketCap[0] ||
+        currentFilters.marketCap[1] !== activeFilters.marketCap[1] ||
+        currentFilters.movingAverageCrossover !== activeFilters.movingAverageCrossover ||
+        currentFilters.sector !== activeFilters.sector ||
+        currentFilters.moneynessRange[0] !== activeFilters.moneynessRange[0] ||
+        currentFilters.moneynessRange[1] !== activeFilters.moneynessRange[1];
+      
+      setFiltersChanged(hasChanged);
+    }
+  }, [
+    selectedStocks, 
+    yieldRange, 
+    maxPrice, 
+    volumeRange, 
+    selectedExpiration, 
+    deltaFilter,
+    peRatio,
+    marketCap,
+    movingAverageCrossover,
+    sector,
+    moneynessRange,
+    hasSearched,
+    isFromCache,
+    activeFilters
+  ]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -180,15 +330,24 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     
     // Fetch sorted data from server
     fetchData(
-      activeFilters.searchTerm,
-      activeFilters.minYield,
+      activeFilters.searchTerm.split(","),
+      activeFilters.yieldRange[0],
+      activeFilters.yieldRange[1],
+      activeFilters.minPrice, 
       activeFilters.maxPrice,
-      activeFilters.minVol,
+      activeFilters.volumeRange[0],
+      activeFilters.volumeRange[1],
       activeFilters.selectedExpiration,
       currentPage,
       rowsPerPage,
       { field, direction: newDirection },
       strikeFilter !== 'ALL' ? strikeFilter : undefined,
+      deltaFilter,
+      activeFilters.peRatio,
+      activeFilters.marketCap,
+      activeFilters.movingAverageCrossover,
+      activeFilters.sector,
+      activeFilters.moneynessRange
     ).catch(console.error);
   };
 
@@ -211,18 +370,22 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
   const handleSymbolSelect = (symbol: string) => {
     setHasSearched(true);
+    const newSelectedStocks = [...selectedStocks, symbol];
+    setSelectedStocks(newSelectedStocks);
     setSearchTerm(symbol);
     setActiveFilters(prev => ({
       ...prev,
-      searchTerm: symbol,
+      searchTerm: newSelectedStocks.join(','),
       pageNo: 1
     }));
 
     updateURL({
-      search: symbol,
-      minYield,
+      search: newSelectedStocks.join(','),
+      min_yield: yieldRange[0],
+      max_yield: yieldRange[1],
       maxPrice,
-      minVol,
+      min_vol: volumeRange[0],
+      max_vol: volumeRange[1],
       expiration: selectedExpiration,
       strikeFilter,
       min_delta: deltaFilter[0],
@@ -230,10 +393,13 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     });
 
     fetchData(
-      symbol,
-      minYield,
+      newSelectedStocks,
+      yieldRange[0],
+      yieldRange[1],
+      minPrice, 
       maxPrice,
-      minVol,
+      volumeRange[0],
+      volumeRange[1],
       selectedExpiration,
       1,
       rowsPerPage,
@@ -247,13 +413,19 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
   const getCurrentQuery = () => ({
     searchTerm,
-    minYield,
+    yieldRange,
     maxPrice,
-    minVol,
+    minPrice,
+    volumeRange,
     selectedExpiration,
-    strikeFilter,
+    moneynessRange,
     deltaFilter,
-    option
+    peRatio,
+    marketCap,
+    movingAverageCrossover,
+    sector,
+    option,
+    strikePrice: [minPrice, maxPrice]
   });
 
   const [dte, setDte] = useState(Number(searchParams.get(getParamKey('dte'))) || 30);
@@ -302,16 +474,24 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
     // Fetch new data with updated sort configuration
     fetchData(
-      activeFilters.searchTerm,
-      activeFilters.minYield,
+      activeFilters.searchTerm.split(","),
+      activeFilters.yieldRange[0],
+      activeFilters.yieldRange[1],
+      activeFilters.minPrice,
       activeFilters.maxPrice,
-      activeFilters.minVol,
+      activeFilters.volumeRange[0],
+      activeFilters.volumeRange[1],
       activeFilters.selectedExpiration,
       currentPage,
       rowsPerPage,
       { field: columnId as keyof Option, direction: newSortDir },
       strikeFilter !== 'ALL' ? strikeFilter : undefined,
-      deltaFilter
+      deltaFilter,
+      activeFilters.peRatio,
+      activeFilters.marketCap,
+      activeFilters.movingAverageCrossover,
+      activeFilters.sector,
+      activeFilters.moneynessRange
     ).catch(console.error);
   }, [sortColumn, sortDirection, router, searchParams, activeFilters, currentPage, rowsPerPage, strikeFilter, deltaFilter, fetchData]);
 
@@ -342,109 +522,99 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       <div className="space-y-2 mb-2">
         {/* All Rows - 2 columns on mobile, 4 on large screens */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-          <FilterInput
+          <MultiStockSelect
             id="input_screener_symbol"
             label="Search Symbol"
-            value={searchTerm}
-            onChange={async (value) => {
-              setSearchTerm(value);
-              // if (value) {
-              //   try {
-              //     await fetch(`https://api.wheelstrategyoptions.com/wheelstrat/searchAnalytics`, {
-              //       method: 'POST',
-              //       headers: {
-              //         'Content-Type': 'application/json'
-              //       },
-              //       body: JSON.stringify({ symbol: value,                       
-              //         userId: userId,
-              //         type: option.toString()
-              //         })
-              //     });
-              //   } catch (analyticsError) {
-              //     console.error('Failed to track search analytics:', analyticsError);
-              //   }
-              // }
+            selectedStocks={selectedStocks}
+            onChange={(stocks) => {
+              setSelectedStocks(stocks);
+              if (stocks.length === 1) {
+                setSearchTerm(stocks[0]);
+              } else {
+                setSearchTerm(stocks.join(','));
+              }
             }}
-            placeholder="Enter symbol..."
+            placeholder="Enter symbols..."
             onKeyPress={handleKeyPress}
             suggestions={symbols}
             showSuggestions={true}
-            onSelect={(selectedSymbol: string) => handleSymbolSelect(selectedSymbol)}
+            tooltip="Enter stock symbols (e.g., AAPL, MSFT) to filter options"
           />
-          <FilterInput
-            id="input_screener_min_yield"
-            label="Min Yield %"
-            value={minYield}
-            onChange={setMinYield}
-            placeholder="Min yield..."
-            type="number"
-            onKeyPress={handleKeyPress}
+          <RangeSlider
+            id="input_screener_yield_range"
+            label="Premium Yield %"
+            minValue={yieldRange[0]}
+            maxValue={yieldRange[1]}
+            value={yieldRange}
+            onChange={(value) => {
+              setYieldRange(value);
+            }}
+            min={yieldFilterConfig.min}
+            max={yieldFilterConfig.max}
+            step={yieldFilterConfig.step}
+            tooltip={yieldFilterConfig.tooltip}
+            formatValue={(val) => `${val}%`}
           />
-          <FilterInput
-            id="input_screener_max_price"
-            label="Max Strike Price"
-            value={maxPrice}
-            onChange={setMaxPrice}
-            placeholder="Max strike price..."
-            type="number"
-            onKeyPress={handleKeyPress}
+          <RangeSlider
+            id="input_screener_moneyness_range"
+            label="Strike Filter %"
+            minValue={moneynessRange[0]}
+            maxValue={moneynessRange[1]}
+            value={moneynessRange}
+            onChange={(value) => {
+              setMoneynessRange(value);
+            }}
+            min={moneynessFilterConfig.min}
+            max={moneynessFilterConfig.max}
+            step={moneynessFilterConfig.step}
+            tooltip={moneynessFilterConfig.tooltip}
+            formatValue={(val) => `${val}%`}
           />
-          <FilterInput
+          <RangeSlider
             id="input_screener_expiration"
             label="Days to Expiration"
-            value={dte}
-            onChange={setDte}
-            placeholder="Days to expiration..."
-            type="number"
-            min="0"
-            max="1000"
-            onKeyPress={handleKeyPress}
+            minValue={minDte}
+            maxValue={maxDte}
+            value={[minDte, maxDte]}
+            onChange={(value) => {
+              setMinDte(value[0]);
+              setMaxDte(value[1]);
+              // The useEffect will update selectedExpiration based on maxDte
+            }}
+            min={dteFilterConfig.min}
+            max={dteFilterConfig.max}
+            step={dteFilterConfig.step}
+            tooltip={dteFilterConfig.tooltip}
+            formatValue={(val) => `${val} days`}
+            isExponential={dteFilterConfig.isExponential}
+            toExponential={dteFilterConfig.toExponential}
+            fromExponential={dteFilterConfig.fromExponential}
           />
-          <FilterInput
-            id="input_screener_min_delta"
-            label="Min Delta"
-            value={deltaFilter[0]}
-            onChange={(value) => setDeltaFilter([value, deltaFilter[1]])}
-            placeholder="Min delta..."
-            type="number"
-            step="0.1"
-            min="-1"
-            max="1"
-            onKeyPress={handleKeyPress}
-          />
-          <FilterInput
-            id="input_screener_max_delta"
-            label="Max Delta"
-            value={deltaFilter[1]}
-            onChange={(value) => setDeltaFilter([deltaFilter[0], value])}
-            placeholder="Max delta..."
-            type="number"
-            step="0.1"
-            min="-1"
-            max="1"
-            onKeyPress={handleKeyPress}
-          />
-          <div>
-            <label className="block text-sm font-medium mb-1">Strike Filter</label>
-            <select
-              id="input_screener_strike_filter"
-              className="w-full px-3 py-2 border rounded-md"
-              value={strikeFilter}
-              onChange={(e) => setStrikeFilter(e.target.value as StrikeFilter)}
-            >
-              <option value="ALL">All Strikes</option>
-              <option value="ONE_OUT">One Strike Out</option>
-              <option value="THREE_PERCENT">&gt; 3% Out</option>
-            </select>
-          </div>
-          <FilterInput
-            id="input_screener_min_volume"
-            label="Min Volume"
-            value={minVol}
-            onChange={setMinVol}
-            placeholder="Min vol..."
-            type="number"
-            onKeyPress={handleKeyPress}
+        </div>
+        
+        {/* Advanced Filters */}
+        <div className="mt-4">
+          <AdvancedFilters
+            peRatio={peRatio}
+            onPeRatioChange={setPeRatio}
+            marketCap={marketCap}
+            onMarketCapChange={setMarketCap}
+            movingAverageCrossover={movingAverageCrossover}
+            onMovingAverageCrossoverChange={setMovingAverageCrossover}
+            sector={sector}
+            onSectorChange={setSector}
+            deltaFilter={deltaFilter}
+            onDeltaFilterChange={setDeltaFilter}
+            volumeRange={volumeRange}
+            onVolumeRangeChange={setVolumeRange}
+            handleKeyPress={handleKeyPress}
+            strikePrice={[minPrice, maxPrice]}
+            onStrikePriceChange={(value) => {
+              setMinPrice(value[0]);
+              setMaxPrice(value[1]);
+            }}
+            autoSearch={false}
+            onSearch={handleSearch}
           />
         </div>
 
@@ -463,19 +633,21 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           <Button 
             id="btn_screener_search"
             onClick={handleSearch}
-            className="w-full sm:w-auto"
+            className={`w-full sm:w-auto ${filtersChanged ? 'bg-amber-500 hover:bg-amber-600' : ''}`}
           >
             <Search className="h-4 w-4 mr-2" />
-            Search
+            {filtersChanged ? 'Search (Updated Filters)' : 'Search'}
           </Button>
         </div>
       </div>
 
       {/* Results Section */}
       {!hasSearched && !activeFilters.searchTerm && 
-       activeFilters.minYield === 0 && 
+       activeFilters.yieldRange[0] === yieldFilterConfig.min && 
+       activeFilters.yieldRange[1] === yieldFilterConfig.max && 
        activeFilters.maxPrice === 1000 && 
-       activeFilters.minVol === 0 && 
+       activeFilters.volumeRange[0] === volumeFilterConfig.min && 
+       activeFilters.volumeRange[1] === volumeFilterConfig.max && 
        !activeFilters.selectedExpiration && 
        strikeFilter === 'ONE_OUT' ? (
         <div className="text-center py-8 text-gray-600">
@@ -507,10 +679,13 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                   setCurrentPage(prevPage);
                   setActiveFilters(prev => ({ ...prev, pageNo: prevPage }));
                   fetchData(
-                    activeFilters.searchTerm,
-                    activeFilters.minYield,
+                    activeFilters.searchTerm.split(","),
+                    activeFilters.yieldRange[0],
+                    activeFilters.yieldRange[1],
+                    activeFilters.minPrice,
                     activeFilters.maxPrice,
-                    activeFilters.minVol,
+                    activeFilters.volumeRange[0],
+                    activeFilters.volumeRange[1],
                     activeFilters.selectedExpiration,
                     prevPage,
                     rowsPerPage,
@@ -531,10 +706,13 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                   setCurrentPage(nextPage);
                   setActiveFilters(prev => ({ ...prev, pageNo: nextPage }));
                   fetchData(
-                    activeFilters.searchTerm,
-                    activeFilters.minYield,
+                    activeFilters.searchTerm.split(","),
+                    activeFilters.yieldRange[0],
+                    activeFilters.yieldRange[1],
+                    activeFilters.minPrice,
                     activeFilters.maxPrice,
-                    activeFilters.minVol,
+                    activeFilters.volumeRange[0],
+                    activeFilters.volumeRange[1],
                     activeFilters.selectedExpiration,
                     nextPage,
                     rowsPerPage,
