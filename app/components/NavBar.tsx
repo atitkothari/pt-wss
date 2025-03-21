@@ -15,6 +15,7 @@ export function NavBar() {
     { name: 'Options Screener', href: '/options' },
     { name: 'Covered Call Calculator', href: '/covered-call-calculator' },
     { name: 'Blog', href: 'https://wheelstrategyoptions.com/blog/', external: true },
+    { name: 'API', href: 'https://forms.gle/FRLem4M35jQV3W7Z6', external: true },
     // { name: 'Provide Feedback', href: 'mailto:theproducttank@gmail.com?subject=Feedback about Wheel Strategy Screener', external: true },
   ];
 
@@ -45,6 +46,9 @@ export function NavBar() {
                   key={item.name}
                   href={item.href}
                   className="text-white hover:text-gray-300"
+                  id={item.name === 'API' ? 'api_btn' : undefined}
+                  target={item.external ? "_blank" : undefined}
+                  rel={item.external ? "noopener noreferrer" : undefined}
                 >
                   {item.name}
                 </a>
@@ -102,6 +106,9 @@ export function NavBar() {
                     href={item.href}
                     className="text-white hover:text-gray-300"
                     onClick={() => setIsMenuOpen(false)}
+                    id={item.name === 'API' ? 'api_btn' : undefined}
+                    target={item.external ? "_blank" : undefined}
+                    rel={item.external ? "noopener noreferrer" : undefined}
                   >
                     {item.name}
                   </a>
