@@ -135,6 +135,16 @@ export const sectorOptions = [
   "Utilities"
 ];
 
+// Market Cap Categories
+export const marketCapCategories = [
+  "All Market Caps",
+  "Mega Cap (>$200B)",
+  "Large Cap ($10B-$200B)",
+  "Mid Cap ($2B-$10B)",
+  "Small Cap ($300M-$2B)",
+  "Micro Cap (<$300M)"
+];
+
 // Strike Filter Options
 // export const strikeFilterOptions = {
 //   default: 'ONE_OUT',

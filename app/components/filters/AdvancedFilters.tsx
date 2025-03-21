@@ -21,6 +21,7 @@ import {
   deltaFilterConfig,
   peRatioFilterConfig,
   marketCapFilterConfig,
+  marketCapCategories,
   movingAverageCrossoverOptions,
   sectorOptions
 } from "@/app/config/filterConfig";
@@ -181,23 +182,55 @@ export function AdvancedFilters({
               className="col-span-1"
             />
             
-            <RangeSlider
-              id="input_screener_market_cap"
-              label="Market Cap ($B)"
-              value={marketCap}
-              minValue={marketCap[0]}
-              maxValue={marketCap[1]}
-              onChange={onMarketCapChange}
-              min={marketCapFilterConfig.min}
-              max={marketCapFilterConfig.max}
-              step={marketCapFilterConfig.step}
-              tooltip={marketCapFilterConfig.tooltip}
-              isExponential={marketCapFilterConfig.isExponential}
-              toExponential={marketCapFilterConfig.toExponential}
-              fromExponential={marketCapFilterConfig.fromExponential}
-              formatValue={(val) => `${val}B`}
-              className="col-span-1"
-            />
+            <div className="relative col-span-1">
+              <label className="block text-sm font-medium mb-1">Market Cap</label>
+              <Select 
+                value={marketCap.join('-')} 
+                onValueChange={(value) => {
+                  const [min, max] = value.split('-').map(Number);
+                  onMarketCapChange([min, max]);
+                }}
+              >
+                <SelectTrigger id="input_screener_market_cap" className="h-10">
+                  <SelectValue placeholder="Select Market Cap Range" />
+                </SelectTrigger>
+                <SelectContent>
+                  {marketCapCategories.map((category, index) => {
+                    let value;
+                    switch(index) {
+                      case 0: // All Market Caps
+                        value = `${marketCapFilterConfig.defaultMin}-${marketCapFilterConfig.defaultMax}`;
+                        break;
+                      case 1: // Mega Cap (>$200B)
+                        value = `200-${marketCapFilterConfig.defaultMax}`;
+                        break;
+                      case 2: // Large Cap ($10B-$200B)
+                        value = '10-200';
+                        break;
+                      case 3: // Mid Cap ($2B-$10B)
+                        value = '2-10';
+                        break;
+                      case 4: // Small Cap ($300M-$2B)
+                        value = '0.3-2';
+                        break;
+                      case 5: // Micro Cap (<$300M)
+                        value = `${marketCapFilterConfig.defaultMin}-0.3`;
+                        break;
+                      default:
+                        value = `${marketCapFilterConfig.defaultMin}-${marketCapFilterConfig.defaultMax}`;
+                    }
+                    return (
+                      <SelectItem key={category} value={value}>
+                        {category}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+              <div className="text-xs text-gray-500 mt-1">
+                Filter stocks by market capitalization
+              </div>
+            </div>
             
             <RangeSlider
               id="input_screener_delta"
