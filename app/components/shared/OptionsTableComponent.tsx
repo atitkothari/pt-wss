@@ -1067,7 +1067,14 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                     prevPage,
                     rowsPerPage,
                     sortConfig.direction ? sortConfig : undefined,
-                    strikeFilter !== 'ALL' ? strikeFilter : undefined,                    
+                    strikeFilter !== 'ALL' ? strikeFilter : undefined,
+                    deltaFilter,
+                    activeFilters.peRatio,
+                    activeFilters.marketCap,
+                    activeFilters.movingAverageCrossover,
+                    activeFilters.sector,
+                    activeFilters.moneynessRange,
+                    activeFilters.minSelectedExpiration                    
                   ).catch(console.error); 
                 }}
                 disabled={currentPage === 1}
@@ -1094,7 +1101,14 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                     nextPage,
                     rowsPerPage,
                     sortConfig.direction ? sortConfig : undefined,
-                    strikeFilter !== 'ALL' ? strikeFilter : undefined,    
+                    strikeFilter !== 'ALL' ? strikeFilter : undefined,
+                    deltaFilter,
+                    activeFilters.peRatio,
+                    activeFilters.marketCap,
+                    activeFilters.movingAverageCrossover,
+                    activeFilters.sector,
+                    activeFilters.moneynessRange,
+                    activeFilters.minSelectedExpiration    
                   ).catch(console.error);
                 }}
                 disabled={currentPage * rowsPerPage >= totalCount}
