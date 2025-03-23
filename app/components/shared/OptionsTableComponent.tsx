@@ -681,6 +681,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         marketCap,
         movingAverageCrossover,
         sector,
+        impliedVolatility,
         moneynessRange
       };
       
@@ -701,6 +702,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         currentFilters.marketCap[1] !== activeFilters.marketCap[1] ||
         currentFilters.movingAverageCrossover !== activeFilters.movingAverageCrossover ||
         currentFilters.sector !== activeFilters.sector ||
+        currentFilters.impliedVolatility[0]!== activeFilters.impliedVolatility[0] ||
+        currentFilters.impliedVolatility[1]!== activeFilters.impliedVolatility[1] || 
         currentFilters.moneynessRange[0] !== activeFilters.moneynessRange[0] ||
         currentFilters.moneynessRange[1] !== activeFilters.moneynessRange[1];
       
@@ -729,94 +732,6 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     }
   };
 
-  const handleSort = (field: keyof Option) => {            
-    const newDirection = 
-      sortConfig.field === field && sortConfig.direction === 'asc' 
-        ? 'desc' 
-        : 'asc';
-    
-    setSortConfig({ field, direction: newDirection });
-    
-    // Fetch sorted data from server
-    fetchData(
-      activeFilters.searchTerm.split(","),
-      activeFilters.yieldRange[0],
-      activeFilters.yieldRange[1],
-      activeFilters.minPrice, 
-      activeFilters.maxPrice,
-      activeFilters.volumeRange[0],
-      activeFilters.volumeRange[1],
-      activeFilters.selectedExpiration,
-      currentPage,
-      rowsPerPage,
-      { field, direction: newDirection },
-      strikeFilter !== 'ALL' ? strikeFilter : undefined,
-      deltaFilter,
-      activeFilters.peRatio,
-      activeFilters.marketCap,
-      activeFilters.movingAverageCrossover,
-      activeFilters.sector,
-      activeFilters.moneynessRange
-    ).catch(console.error);
-  };
-
-  const getNext4Fridays = (()=>{
-    const nextFridays: Date[] = [];
-    let currentDate = new Date();
-    
-    for (let i = 0; i < 8; i++) {
-      currentDate = getNextFriday(new Date(currentDate));
-      nextFridays.push(new Date(currentDate));
-      currentDate.setDate(currentDate.getDate() + 7);
-    }
-  
-    return nextFridays;
-  })();
-
-  const handleFeedback = () => {
-    window.location.href = "mailto:theproducttank@gmail.com?subject=Feedback about Wheel Strategy Screener";
-  };  
-
-  const handleSymbolSelect = (symbol: string) => {
-    setHasSearched(true);
-    const newSelectedStocks = [...selectedStocks, symbol];
-    setSelectedStocks(newSelectedStocks);
-    setSearchTerm(symbol);
-    setActiveFilters(prev => ({
-      ...prev,
-      searchTerm: newSelectedStocks.join(','),
-      pageNo: 1
-    }));
-
-    updateURL({
-      search: newSelectedStocks.join(','),
-      min_yield: yieldRange[0],
-      max_yield: yieldRange[1],
-      maxPrice,
-      min_vol: volumeRange[0],
-      max_vol: volumeRange[1],
-      expiration: selectedExpiration,
-      strikeFilter,
-      min_delta: deltaFilter[0],
-      max_delta: deltaFilter[1]
-    });
-
-    fetchData(
-      newSelectedStocks,
-      yieldRange[0],
-      yieldRange[1],
-      minPrice, 
-      maxPrice,
-      volumeRange[0],
-      volumeRange[1],
-      selectedExpiration,
-      1,
-      rowsPerPage,
-      sortConfig.direction ? sortConfig : undefined,
-      strikeFilter !== 'ALL' ? strikeFilter : undefined,
-      deltaFilter
-    ).catch(console.error);
-  };
 
   const [showSaveModal, setShowSaveModal] = useState(false);
 
@@ -834,7 +749,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     movingAverageCrossover,
     sector,
     option,
-    strikePrice: [minPrice, maxPrice]
+    strikePrice: [minPrice, maxPrice],
+    impliedVolatility,
   });
 
   const [dte, setDte] = useState(Number(searchParams.get(getParamKey('dte'))) || 30);
@@ -907,8 +823,9 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       activeFilters.peRatio,
       activeFilters.marketCap,
       activeFilters.movingAverageCrossover,
-      activeFilters.sector,
-      activeFilters.moneynessRange
+      activeFilters.sector,      
+      activeFilters.moneynessRange,
+      activeFilters.impliedVolatility,
     ).catch(console.error);
   }, [sortColumn, sortDirection, router, searchParams, activeFilters, currentPage, rowsPerPage, strikeFilter, deltaFilter, fetchData]);
 
