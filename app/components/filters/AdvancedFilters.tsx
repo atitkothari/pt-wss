@@ -177,10 +177,10 @@ export function AdvancedFilters({
   }, [peRatio, marketCap, movingAverageCrossover, sector, deltaFilter, volumeRange, strikePrice, impliedVolatility, moneynessRange, minDte, maxDte]);
 
   return (
-    <div className="w-full border rounded-md p-3 mb-4 transition-all hover:border-gray-400">
+    <div className="w-full border rounded-md p-2 mb-3 transition-all hover:border-gray-400">
       <Button
         variant="ghost"
-        className="w-full flex justify-between items-center p-0 h-auto mb-2"
+        className="w-full flex justify-between items-center p-0 h-auto mb-1"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center gap-2">
@@ -193,8 +193,8 @@ export function AdvancedFilters({
       </Button>
 
       {isExpanded && (
-        <div className="space-y-4 mt-4 animate-in fade-in-50 duration-300">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="space-y-3 mt-2 animate-in fade-in-50 duration-300">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
             {/* Add Strike Price filter before P/E Ratio */}
             <RangeSlider
               id="input_screener_strike_price"
@@ -209,9 +209,9 @@ export function AdvancedFilters({
               tooltip={priceFilterConfig.tooltip}
               formatValue={(val) => `$${val}`}
               className="col-span-1"
-            />            
-                        
-                        <RangeSlider
+            />
+            
+            <RangeSlider
               id="input_screener_moneyness_range"
               label="Strike Filter %"
               minValue={moneynessRange[0]}
@@ -290,8 +290,6 @@ export function AdvancedFilters({
               formatValue={(val) => `${val}%`}
               className="col-span-1"
             />
-            
-            
             
             <RangeSlider
               id="input_screener_pe_ratio"

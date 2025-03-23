@@ -108,7 +108,7 @@ export function RangeSlider({
         </div>
       </div>
       
-      <div className="pt-6 pb-2 px-1">
+      <div className="pt-4 pb-1 px-1">
         <Slider
           id={id}
           value={sliderValue}
@@ -116,9 +116,9 @@ export function RangeSlider({
           max={max}
           step={step}
           onValueChange={handleSliderChange}
-          className="mb-4"
+          className="mb-2"
         />
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
+        <div className="flex justify-between text-xs text-gray-500 mt-0.5">
           <span>{`< ${min}`}</span>
           <span>{`> ${max}`}</span>
         </div>
