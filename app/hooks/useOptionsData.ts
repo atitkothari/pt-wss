@@ -48,6 +48,7 @@ export function useOptionsData(
     movingAverageCrossover?: string,
     sector?: string,
     moneynessRange?: [number, number],
+    impliedVolatilityRange?: [number, number],
     minSelectedExpiration: string = minExpiration
   ) => {
     setLoading(true);
@@ -106,6 +107,16 @@ export function useOptionsData(
         filters.push({ operation: 'strikeFilter', field: option, 
           value: moneynessRange[0]/100//[moneynessRange[0] / 100, moneynessRange[1] / 100] 
         });
+      }
+      
+      // Add implied volatility filters
+      if (impliedVolatilityRange) {
+        if (impliedVolatilityRange[0] > 0) {
+          filters.push({ operation: 'gte', field: 'impliedVolatility', value: impliedVolatilityRange[0] });
+        }
+        if (impliedVolatilityRange[1] < 200) {
+          filters.push({ operation: 'lte', field: 'impliedVolatility', value: impliedVolatilityRange[1] });
+        }
       }
       
       // Add PE Ratio filters

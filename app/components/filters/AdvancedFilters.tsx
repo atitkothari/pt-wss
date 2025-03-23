@@ -23,7 +23,10 @@ import {
   marketCapFilterConfig,
   marketCapCategories,
   movingAverageCrossoverOptions,
-  sectorOptions
+  sectorOptions,
+  impliedVolatilityFilterConfig,
+  moneynessFilterConfig,
+  dteFilterConfig
 } from "@/app/config/filterConfig";
 
 interface AdvancedFiltersProps {
@@ -43,6 +46,16 @@ interface AdvancedFiltersProps {
   // Add strike price filter props
   strikePrice: [number, number];
   onStrikePriceChange: (value: [number, number]) => void;
+  // Add implied volatility filter props
+  impliedVolatility: [number, number];
+  onImpliedVolatilityChange: (value: [number, number]) => void;
+  // Add moneyness range filter props
+  moneynessRange: [number, number];
+  onMoneynessRangeChange: (value: [number, number]) => void;
+  // Add days to expiration filter props
+  minDte: number;
+  maxDte: number;
+  onDteChange: (value: [number, number]) => void;
   // Optional prop to trigger search automatically
   autoSearch?: boolean;
   onSearch?: () => void;
@@ -65,6 +78,16 @@ export function AdvancedFilters({
   // Add strike price filter props
   strikePrice,
   onStrikePriceChange,
+  // Add implied volatility filter props
+  impliedVolatility,
+  onImpliedVolatilityChange,
+  // Add moneyness range filter props
+  moneynessRange,
+  onMoneynessRangeChange,
+  // Add days to expiration filter props
+  minDte,
+  maxDte,
+  onDteChange,
   // Auto search props
   autoSearch = true,
   onSearch
@@ -90,6 +113,10 @@ export function AdvancedFilters({
     deltaFilter,
     volumeRange,
     strikePrice,
+    impliedVolatility,
+    moneynessRange,
+    minDte,
+    maxDte,
     autoSearch,
     debouncedSearch
   ]);
@@ -129,9 +156,25 @@ export function AdvancedFilters({
       strikePrice[0] !== priceFilterConfig.defaultMin || 
       strikePrice[1] !== priceFilterConfig.defaultMax;
     
+    // Check if Implied Volatility has been modified
+    const isImpliedVolatilityModified = 
+      impliedVolatility[0] !== impliedVolatilityFilterConfig.defaultMin || 
+      impliedVolatility[1] !== impliedVolatilityFilterConfig.defaultMax;
+    
+    // Check if Moneyness Range has been modified
+    const isMoneynessRangeModified = 
+      moneynessRange[0] !== moneynessFilterConfig.defaultMin || 
+      moneynessRange[1] !== moneynessFilterConfig.defaultMax;
+    
+    // Check if Days to Expiration has been modified
+    const isDteModified = 
+      minDte !== dteFilterConfig.defaultMin || 
+      maxDte !== dteFilterConfig.defaultMax;
+    
     return isPeRatioModified || isMarketCapModified || isMovingAverageModified || 
-           isSectorModified || isDeltaModified || isVolumeModified || isStrikePriceModified;
-  }, [peRatio, marketCap, movingAverageCrossover, sector, deltaFilter, volumeRange, strikePrice]);
+           isSectorModified || isDeltaModified || isVolumeModified || isStrikePriceModified ||
+           isImpliedVolatilityModified || isMoneynessRangeModified || isDteModified;
+  }, [peRatio, marketCap, movingAverageCrossover, sector, deltaFilter, volumeRange, strikePrice, impliedVolatility, moneynessRange, minDte, maxDte]);
 
   return (
     <div className="w-full border rounded-md p-3 mb-4 transition-all hover:border-gray-400">
@@ -166,7 +209,89 @@ export function AdvancedFilters({
               tooltip={priceFilterConfig.tooltip}
               formatValue={(val) => `$${val}`}
               className="col-span-1"
+            />            
+                        
+                        <RangeSlider
+              id="input_screener_moneyness_range"
+              label="Strike Filter %"
+              minValue={moneynessRange[0]}
+              maxValue={moneynessRange[1]}
+              value={moneynessRange}
+              onChange={onMoneynessRangeChange}
+              min={moneynessFilterConfig.min}
+              max={moneynessFilterConfig.max}
+              step={moneynessFilterConfig.step}
+              tooltip={moneynessFilterConfig.tooltip}
+              formatValue={(val) => `${val}%`}
+              className="col-span-1"
             />
+            
+            <RangeSlider
+              id="input_screener_expiration"
+              label="Days to Expiration"
+              minValue={minDte}
+              maxValue={maxDte}
+              value={[minDte, maxDte]}
+              onChange={(value) => {
+                onDteChange(value);
+              }}
+              min={dteFilterConfig.min}
+              max={dteFilterConfig.max}
+              step={dteFilterConfig.step}
+              tooltip={dteFilterConfig.tooltip}
+              formatValue={(val) => `${val} days`}
+              isExponential={dteFilterConfig.isExponential}
+              toExponential={dteFilterConfig.toExponential}
+              fromExponential={dteFilterConfig.fromExponential}
+              className="col-span-1"
+            />
+            
+            <RangeSlider
+              id="input_screener_delta"
+              label="Delta"
+              value={deltaFilter}
+              minValue={deltaFilter[0]}
+              maxValue={deltaFilter[1]}
+              onChange={onDeltaFilterChange}
+              min={deltaFilterConfig.min}
+              max={deltaFilterConfig.max}
+              step={deltaFilterConfig.step}
+              tooltip={deltaFilterConfig.tooltip}
+              formatValue={(val) => val.toFixed(2)}
+              className="col-span-1"
+            />
+            
+            <RangeSlider
+              id="input_screener_volume_range"
+              label="Volume"
+              value={volumeRange}
+              minValue={volumeRange[0]}
+              maxValue={volumeRange[1]}
+              onChange={onVolumeRangeChange}
+              min={volumeFilterConfig.min}
+              max={volumeFilterConfig.max}
+              step={volumeFilterConfig.step}
+              tooltip={volumeFilterConfig.tooltip}
+              formatValue={(val) => val.toLocaleString()}
+              className="col-span-1"
+            />
+            
+            <RangeSlider
+              id="input_screener_implied_volatility"
+              label="Implied Volatility (%)"
+              value={impliedVolatility}
+              minValue={impliedVolatility[0]}
+              maxValue={impliedVolatility[1]}
+              onChange={onImpliedVolatilityChange}
+              min={impliedVolatilityFilterConfig.min}
+              max={impliedVolatilityFilterConfig.max}
+              step={impliedVolatilityFilterConfig.step}
+              tooltip={impliedVolatilityFilterConfig.tooltip}
+              formatValue={(val) => `${val}%`}
+              className="col-span-1"
+            />
+            
+            
             
             <RangeSlider
               id="input_screener_pe_ratio"
@@ -181,7 +306,6 @@ export function AdvancedFilters({
               tooltip={peRatioFilterConfig.tooltip}
               className="col-span-1"
             />
-            
             <div className="relative col-span-1">
               <label className="block text-sm font-medium mb-1">Market Cap</label>
               <Select 
@@ -231,37 +355,7 @@ export function AdvancedFilters({
                 Filter stocks by market capitalization
               </div>
             </div>
-            
-            <RangeSlider
-              id="input_screener_delta"
-              label="Delta"
-              value={deltaFilter}
-              minValue={deltaFilter[0]}
-              maxValue={deltaFilter[1]}
-              onChange={onDeltaFilterChange}
-              min={deltaFilterConfig.min}
-              max={deltaFilterConfig.max}
-              step={deltaFilterConfig.step}
-              tooltip={deltaFilterConfig.tooltip}
-              formatValue={(val) => val.toFixed(2)}
-              className="col-span-1"
-            />
-            
-            <RangeSlider
-              id="input_screener_volume_range"
-              label="Volume"
-              value={volumeRange}
-              minValue={volumeRange[0]}
-              maxValue={volumeRange[1]}
-              onChange={onVolumeRangeChange}
-              min={volumeFilterConfig.min}
-              max={volumeFilterConfig.max}
-              step={volumeFilterConfig.step}
-              tooltip={volumeFilterConfig.tooltip}
-              formatValue={(val) => val.toLocaleString()}
-              className="col-span-1"
-            />            
-            <div className="relative">
+            <div className="col-span-1">
               <label className="block text-sm font-medium mb-1">Sector</label>
               <Select 
                 value={sector} 

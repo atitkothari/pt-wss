@@ -165,3 +165,13 @@ export const defaultVisibleColumns = [
   'earningsDate',
   'impliedVolatility'
 ];
+
+// Implied Volatility Filter Configuration
+export const impliedVolatilityFilterConfig = {
+  min: 0,
+  max: 200,
+  defaultMin: 0,
+  defaultMax: 200,
+  step: 5,
+  tooltip: "Implied Volatility percentage range for option contracts"
+};

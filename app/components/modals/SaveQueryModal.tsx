@@ -176,6 +176,24 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
         value: `"${query.sector}"` 
       });
     }
+    
+    // Add Implied Volatility filter
+    if (query.impliedVolatility) {
+      if (query.impliedVolatility[0] > 0) {
+        filterData.push({
+          operation: "gte",
+          field: "impliedVolatility",
+          value: query.impliedVolatility[0]
+        });
+      }
+      if (query.impliedVolatility[1] < 200) {
+        filterData.push({
+          operation: "lte",
+          field: "impliedVolatility",
+          value: query.impliedVolatility[1]
+        });
+      }
+    }
 
     return filterData;
   };

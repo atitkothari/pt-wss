@@ -36,7 +36,8 @@ import {
   moneynessFilterConfig,
   movingAverageCrossoverOptions,
   sectorOptions,
-  defaultVisibleColumns as configDefaultVisibleColumns
+  defaultVisibleColumns as configDefaultVisibleColumns,
+  impliedVolatilityFilterConfig
 } from "@/app/config/filterConfig";
 
 interface OptionsTableComponentProps {
@@ -225,6 +226,34 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   });
   
   // Advanced filters
+  const [impliedVolatility, setImpliedVolatility] = useState<[number, number]>(() => {
+    const minIvParam = getParamKey('min_iv');
+    const maxIvParam = getParamKey('max_iv');
+    const localStorageKey = `${option}_impliedVolatility`;
+    
+    // Check URL params first
+    const minFromUrl = searchParams.get(minIvParam);
+    const maxFromUrl = searchParams.get(maxIvParam);
+    if (minFromUrl !== null && maxFromUrl !== null) {
+      return [Number(minFromUrl), Number(maxFromUrl)];
+    }
+    
+    // Then check localStorage
+    if (typeof window !== 'undefined') {
+      const storedValue = localStorage.getItem(localStorageKey);
+      if (storedValue) {
+        try {
+          return JSON.parse(storedValue) as [number, number];
+        } catch (e) {
+          console.error(`Error parsing localStorage value for ${localStorageKey}:`, e);
+        }
+      }
+    }
+    
+    // Default values
+    return [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax];
+  });
+  
   const [peRatio, setPeRatio] = useState<[number, number]>(() => {
     const minPeParam = getParamKey('min_pe');
     const maxPeParam = getParamKey('max_pe');
@@ -406,6 +435,12 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     }
   }, [moneynessRange, option]);
   
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`${option}_impliedVolatility`, JSON.stringify(impliedVolatility));
+    }
+  }, [impliedVolatility, option]);
+  
   // Handle browser back/forward navigation
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -462,7 +497,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     marketCap: [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax] as [number, number],
     movingAverageCrossover: movingAverageCrossoverOptions[0],
     sector: sectorOptions[0],
-    moneynessRange: [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax] as [number, number]
+    moneynessRange: [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax] as [number, number],
+    impliedVolatility: [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax] as [number, number]
   });
 
   const [hasSearched, setHasSearched] = useState(false);
@@ -562,7 +598,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       marketCap,
       movingAverageCrossover,
       sector,
-      moneynessRange
+      moneynessRange,
+      impliedVolatility
     });
 
     updateURL({
@@ -584,6 +621,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       max_pe: peRatio[1],
       min_market_cap: marketCap[0],
       max_market_cap: marketCap[1],
+      min_iv: impliedVolatility[0],
+      max_iv: impliedVolatility[1],
       ma_crossover: movingAverageCrossover,
       sector: sector
     });
@@ -607,6 +646,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       movingAverageCrossover,
       sector,
       moneynessRange,
+      impliedVolatility,
       minSelectedExpiration
     ).catch(console.error);
     setCurrentPage(1);
@@ -898,7 +938,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       {/* Filter Controls */}
       <div className="space-y-2 mb-2">
         {/* All Rows - 2 columns on mobile, 4 on large screens */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 lg:grid-cols-2 gap-2">
           <MultiStockSelect
             id="input_screener_symbol"
             label="Search Symbol"
@@ -932,41 +972,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             tooltip={yieldFilterConfig.tooltip}
             formatValue={(val) => `${val}%`}
           />
-          <RangeSlider
-            id="input_screener_moneyness_range"
-            label="Strike Filter %"
-            minValue={moneynessRange[0]}
-            maxValue={moneynessRange[1]}
-            value={moneynessRange}
-            onChange={(value) => {
-              setMoneynessRange(value);
-            }}
-            min={moneynessFilterConfig.min}
-            max={moneynessFilterConfig.max}
-            step={moneynessFilterConfig.step}
-            tooltip={moneynessFilterConfig.tooltip}
-            formatValue={(val) => `${val}%`}
-          />
-          <RangeSlider
-            id="input_screener_expiration"
-            label="Days to Expiration"
-            minValue={minDte}
-            maxValue={maxDte}
-            value={[minDte, maxDte]}
-            onChange={(value) => {
-              setMinDte(value[0]);
-              setMaxDte(value[1]);
-              // The useEffect will update selectedExpiration based on maxDte
-            }}
-            min={dteFilterConfig.min}
-            max={dteFilterConfig.max}
-            step={dteFilterConfig.step}
-            tooltip={dteFilterConfig.tooltip}
-            formatValue={(val) => `${val} days`}
-            isExponential={dteFilterConfig.isExponential}
-            toExponential={dteFilterConfig.toExponential}
-            fromExponential={dteFilterConfig.fromExponential}
-          />
+
         </div>
         
         {/* Advanced Filters */}
@@ -989,6 +995,16 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             onStrikePriceChange={(value) => {
               setMinPrice(value[0]);
               setMaxPrice(value[1]);
+            }}
+            impliedVolatility={impliedVolatility}
+            onImpliedVolatilityChange={setImpliedVolatility}
+            moneynessRange={moneynessRange}
+            onMoneynessRangeChange={setMoneynessRange}
+            minDte={minDte}
+            maxDte={maxDte}
+            onDteChange={(value) => {
+              setMinDte(value[0]);
+              setMaxDte(value[1]);
             }}
             autoSearch={false}
             onSearch={handleSearch}
@@ -1074,6 +1090,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                     activeFilters.movingAverageCrossover,
                     activeFilters.sector,
                     activeFilters.moneynessRange,
+                    activeFilters.impliedVolatility,
                     activeFilters.minSelectedExpiration                    
                   ).catch(console.error); 
                 }}
@@ -1108,6 +1125,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                     activeFilters.movingAverageCrossover,
                     activeFilters.sector,
                     activeFilters.moneynessRange,
+                    activeFilters.impliedVolatility,
                     activeFilters.minSelectedExpiration    
                   ).catch(console.error);
                 }}
