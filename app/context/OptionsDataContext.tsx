@@ -1,46 +1,29 @@
-"use client";
+'use client';
 
-import { Option, OptionType, StrikeFilter } from '../types/option';
-import { useOptionsData as useOptionsDataContext } from '../context/OptionsDataContext';
-import { parseISO, addDays, format } from 'date-fns';
-import { yieldFilterConfig, volumeFilterConfig, priceFilterConfig } from '../config/filterConfig';
+import { createContext, useContext, useState, ReactNode } from 'react';
 import { fetchOptionsData } from '../services/api';
+import { Option, OptionType, StrikeFilter } from '../types/option';
+import { parseISO, addDays, format } from 'date-fns';
+import { useAuth } from './AuthContext';
+import { yieldFilterConfig, volumeFilterConfig, priceFilterConfig } from '../config/filterConfig';
 import { useSearchParams } from 'next/navigation';
 
-/**
- * This hook is now a wrapper around the OptionsDataContext
- * It maintains the same API for backward compatibility
- * but delegates all data fetching and state management to the context
- */
-export function useOptionsData(
-  symbols: string[] = [],
-  minYield: number = 0,
-  maxYield: number = 10,
-  minPrice: number = 0,
-  maxPrice: number = 1000,
-  minVol: number = 0,
-  maxVol: number = 10000,
-  expiration: string = '',
-  option: OptionType = 'call',
-  minDelta: number = -1,
-  maxDelta: number = 1,
-  minExpiration: string = ''
-) {
-  // Use the context instead of implementing our own state and logic
-  const context = useOptionsDataContext();
-  
-  // Create a wrapper around the context's fetchData method that maintains the same API
-  const fetchData = async (
-    searchTerms: string[] = symbols,
-    minYieldVal: number = minYield,
-    maxYieldVal: number = maxYield,
-    minPriceVal: number = minPrice,
-    maxPriceVal: number = maxPrice,
-    minVolVal: number = minVol,
-    maxVolVal: number = maxVol,
-    selectedExpiration: string = expiration,
-    pageNo: number = 1,
-    pageSize: number = 50,
+interface OptionsDataContextType {
+  data: Option[];
+  loading: boolean;
+  error: string | null;
+  totalCount: number;
+  fetchData: (
+    searchTerms?: string[],
+    minYieldVal?: number,
+    maxYieldVal?: number,
+    minPriceVal?: number,
+    maxPriceVal?: number,
+    minVolVal?: number,
+    maxVolVal?: number,
+    selectedExpiration?: string,
+    pageNo?: number,
+    pageSize?: number,
     sortConfig?: { field: keyof Option; direction: 'asc' | 'desc' | null },
     strikeFilter?: StrikeFilter,
     deltaRange?: [number, number],
@@ -50,55 +33,38 @@ export function useOptionsData(
     sector?: string,
     moneynessRange?: [number, number],
     impliedVolatilityRange?: [number, number],
-    minSelectedExpiration: string = minExpiration
-  ) => {
-    // Call the context's fetchData method with the same parameters
-    return context.fetchData(
-      searchTerms,
-      minYieldVal,
-      maxYieldVal,
-      minPriceVal,
-      maxPriceVal,
-      minVolVal,
-      maxVolVal,
-      selectedExpiration,
-      pageNo,
-      pageSize,
-      sortConfig,
-      strikeFilter,
-      deltaRange,
-      peRatio,
-      marketCap,
-      movingAverageCrossover,
-      sector,
-      moneynessRange,
-      impliedVolatilityRange,
-      minSelectedExpiration,
-      option // Pass the option type to the context
-    );
-  };
-
-  // Return the same API as before, but using the context's state
-  return {
-    data: context.data,
-    loading: context.loading,
-    error: context.error,
-    totalCount: context.totalCount,
-    fetchData
-  };
+    minSelectedExpiration?: string,
+    optionType?: OptionType
+  ) => Promise<void>;
 }
 
-// This is the old implementation, keeping it here for reference but commented out
-/*
-const fetchData = async (
-    searchTerms: string[] = symbols,
-    minYieldVal: number = minYield,
-    maxYieldVal: number = maxYield,
-    minPriceVal: number = minPrice,
-    maxPriceVal: number = maxPrice,
-    minVolVal: number = minVol,
-    maxVolVal: number = maxVol,
-    selectedExpiration: string = expiration,
+const OptionsDataContext = createContext<OptionsDataContextType>({
+  data: [],
+  loading: false,
+  error: null,
+  totalCount: 0,
+  fetchData: async () => {}
+});
+
+export const useOptionsData = () => useContext(OptionsDataContext);
+
+export const OptionsDataProvider = ({ children }: { children: ReactNode }) => {
+  const [data, setData] = useState<Option[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [totalCount, setTotalCount] = useState(0);
+  const { userId } = useAuth(); // Get userId from auth context
+  const searchParams = useSearchParams();
+
+  const fetchData = async (
+    searchTerms: string[] = [],
+    minYieldVal: number = 0,
+    maxYieldVal: number = 10,
+    minPriceVal: number = 0,
+    maxPriceVal: number = 1000,
+    minVolVal: number = 0,
+    maxVolVal: number = 10000,
+    selectedExpiration: string = '',
     pageNo: number = 1,
     pageSize: number = 50,
     sortConfig?: { field: keyof Option; direction: 'asc' | 'desc' | null },
@@ -110,13 +76,14 @@ const fetchData = async (
     sector?: string,
     moneynessRange?: [number, number],
     impliedVolatilityRange?: [number, number],
-    minSelectedExpiration: string = minExpiration
+    minSelectedExpiration: string = '',
+    optionType: OptionType = 'call'
   ) => {
     setLoading(true);
     try {
       const filters: any = [];
-      if(option) {
-        filters.push({ operation: 'eq', field: 'type', value: `"${option}"` });
+      if(optionType) {
+        filters.push({ operation: 'eq', field: 'type', value: `"${optionType}"` });
       }
       if (searchTerms && searchTerms.length > 0) {
         if (searchTerms.length === 1) {
@@ -135,10 +102,10 @@ const fetchData = async (
       if (maxYieldVal < yieldFilterConfig.max) {
         filters.push({ operation: 'lt', field: 'yieldPercent', value: maxYieldVal });
       }
-      if (minPriceVal>0 ) {
+      if (minPriceVal > 0) {
         filters.push({ operation: 'gte', field: 'strike', value: minPriceVal });
       }
-      if (maxPriceVal<priceFilterConfig.max) {
+      if (maxPriceVal < priceFilterConfig.max) {
         filters.push({ operation: 'lte', field: 'strike', value: maxPriceVal });
       }      
       if (minVolVal > 0) {
@@ -165,8 +132,8 @@ const fetchData = async (
       
       // Add moneyness range filters
       if (moneynessRange) {
-        filters.push({ operation: 'strikeFilter', field: option, 
-          value: moneynessRange[0]/100//[moneynessRange[0] / 100, moneynessRange[1] / 100] 
+        filters.push({ operation: 'strikeFilter', field: optionType, 
+          value: moneynessRange[0]/100
         });
       }
       
@@ -222,14 +189,14 @@ const fetchData = async (
         field: sortBy,
         direction: sortDir || 'asc'
       } : undefined;
-      console.log(strikeFilter)
+      
       const result = await fetchOptionsData(
         filters, 
         pageNo, 
         pageSize, 
         finalSortConfig, 
         strikeFilter,
-        option,
+        optionType,
         userId // Pass userId to the API call
       );   
 
@@ -269,4 +236,10 @@ const fetchData = async (
       setLoading(false);
     }
   };
-}*/
+
+  return (
+    <OptionsDataContext.Provider value={{ data, loading, error, totalCount, fetchData }}>
+      {children}
+    </OptionsDataContext.Provider>
+  );
+};

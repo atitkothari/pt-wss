@@ -6,7 +6,7 @@ import { AdvancedFilters } from "../filters/AdvancedFilters";
 import { RangeSlider } from "../filters/RangeSlider";
 import { SingleValueSlider } from "../filters/SingleValueSlider";
 import { MultiStockSelect } from "../filters/MultiStockSelect";
-import { useOptionsData } from "../../hooks/useOptionsData";
+import { useOptionsData } from "../../context/OptionsDataContext";
 import { LoadingSpinner } from "../LoadingSpinner";
 import { Option, OptionType, StrikeFilter } from "../../types/option";
 import { OptionsTable } from "../table/OptionsTable";
@@ -508,20 +508,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   );
   const rowsPerPage = 50;
 
-  const { data, loading, error, totalCount, fetchData } = useOptionsData(
-    activeFilters.searchTerm.split(","),
-    activeFilters.yieldRange[0],
-    activeFilters.yieldRange[1],
-    activeFilters.minPrice,
-    activeFilters.maxPrice,
-    activeFilters.volumeRange[0],
-    activeFilters.volumeRange[1],
-    activeFilters.selectedExpiration,
-    option,
-    deltaFilterConfig.defaultMin,
-    deltaFilterConfig.defaultMax,
-    activeFilters.minSelectedExpiration
-  );
+  const { data, loading, error, totalCount, fetchData } = useOptionsData();
 
   // Calculate expiration dates based on minDte and maxDte whenever they change
   useEffect(() => {

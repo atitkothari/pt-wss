@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google';
 import { Toaster } from "@/components/ui/sonner";
 import { GoogleAnalytics } from './components/GoogleAnalytics';
 import { AuthContextProvider } from './context/AuthContext';
+import { OptionsDataProvider } from './context/OptionsDataContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -63,10 +64,12 @@ export default function RootLayout({
         </noscript>
         <GoogleAnalytics />
         <AuthContextProvider>
-          <main>
-            {children}
-          </main>
-          <Toaster />
+          <OptionsDataProvider>
+            <main>
+              {children}
+            </main>
+            <Toaster />
+          </OptionsDataProvider>
         </AuthContextProvider>
       </body>
     </html>

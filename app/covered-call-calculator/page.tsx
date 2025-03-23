@@ -5,7 +5,7 @@ import { FilterInput } from "../components/filters/FilterInput";
 import { NavBar } from "../components/NavBar";
 import { Footer } from "../components/Footer";
 import { useSymbols } from "../hooks/useSymbols";
-import { fetchOptionsData } from "../services/api";
+import { useOptionsData } from "../context/OptionsDataContext";
 import { format, parseISO, addDays, addMonths, isLastDayOfMonth } from 'date-fns';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
@@ -30,11 +30,12 @@ export default function CoveredCallCalculatorPage() {
   const [calculationShares, setCalculationShares] = useState<number>(100);
   
   const [results, setResults] = useState<CalculatorResult[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
   const [expandedRowIndex, setExpandedRowIndex] = useState<number | null>(null);
   const { symbols, loading: symbolsLoading } = useSymbols();
-  const { user, userId } = useAuth(); // Get userId from auth context
+  const { user } = useAuth();
+  const { loading: contextLoading, error: contextError, fetchData, data } = useOptionsData();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState<boolean>(false);
 
   const calculateIncome = async () => {
@@ -63,15 +64,32 @@ export default function CoveredCallCalculatorPage() {
       const today = new Date();
       const sixMonthsLater = addMonths(today, 6);
       const minVol = 10;
-      const filters = [
-        { operation: 'eq', field: 'symbol', value: `"${inputSymbol}"` },
-        { operation: 'eq', field: 'type', value: '"call"' },
-        { operation: 'gte', field: 'expiration', value: `"${format(today, 'yyyy-MM-dd')}"` },
-        { operation: 'lte', field: 'expiration', value: `"${format(sixMonthsLater, 'yyyy-MM-dd')}"` },
-        { operation: 'gt', field: 'volume', value: minVol },        
-      ];
-
-      const result = await fetchOptionsData(filters, 1, 1000, undefined, 'ONE_OUT', 'call', userId);
+      // Use the context's fetchData method instead of direct API call
+      await fetchData(
+        [inputSymbol], // searchTerms
+        0, // minYieldVal
+        10, // maxYieldVal
+        0, // minPriceVal
+        1000, // maxPriceVal
+        minVol, // minVolVal
+        10000, // maxVolVal
+        format(sixMonthsLater, 'yyyy-MM-dd'), // selectedExpiration
+        1, // pageNo
+        1000, // pageSize
+        undefined, // sortConfig
+        'ONE_OUT', // strikeFilter
+        undefined, // deltaRange
+        undefined, // peRatio
+        undefined, // marketCap
+        undefined, // movingAverageCrossover
+        undefined, // sector
+        undefined, // moneynessRange
+        undefined, // impliedVolatilityRange
+        format(today, 'yyyy-MM-dd'), // minSelectedExpiration
+        'call' // optionType
+      );
+      
+      const result = { options: data };
       
       if (!result.options || result.options.length === 0) {
         setError("No options data found for this symbol");
