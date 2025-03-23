@@ -160,8 +160,28 @@ export const defaultVisibleColumns = [
   'delta',
   'yieldPercent',
   'expiration',
-  'volume',
-  'openInterest',
+  'earningsDate',
+  'impliedVolatility'
+];
+
+// All available columns for reference
+// These columns will be shown when their related filters are changed
+export const allColumns = [
+  'symbol',
+  'stockPrice',
+  'strike',
+  'premium',
+  'delta',
+  'yieldPercent',
+  'expiration',
+  'annualizedReturn', // Ann %
+  'bidPrice', // Bid
+  'askPrice', // Ask
+  'volume', // Volume
+  'openInterest', // Open Interest
+  'peRatio', // P/E Ratio
+  'marketCap', // Market Cap
+  'sector', // Sector
   'earningsDate',
   'impliedVolatility'
 ];

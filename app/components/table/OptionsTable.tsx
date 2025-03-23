@@ -14,6 +14,8 @@ import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format, parseISO } from "date-fns";
 import { useSearchParams } from 'next/navigation';
+  // Import the defaultVisibleColumns from filterConfig
+import { defaultVisibleColumns as configDefaultVisibleColumns } from '@/app/config/filterConfig';
 
 const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: "symbol", label: "Symbol" },
@@ -114,7 +116,7 @@ export function OptionsTable({ data, onSort }: OptionsTableProps) {
   const sortColumn = searchParams.get('sortBy');
   const sortDirection = searchParams.get('sortDir');
 
-  const [visibleColumns, setVisibleColumns] = useState<string[]>(() => {
+const [visibleColumns, setVisibleColumns] = useState<string[]>(() => {
     // Try to get saved columns from localStorage
     if (typeof window !== 'undefined') {
       const savedColumns = localStorage.getItem('visibleColumns');
@@ -126,8 +128,8 @@ export function OptionsTable({ data, onSort }: OptionsTableProps) {
         }
       }
     }
-    // Fall back to default columns
-    return DEFAULT_COLUMNS.map(col => col.key);
+    // Fall back to default visible columns from config
+    return configDefaultVisibleColumns;
   });
 
   const handleColumnToggle = (columnKey: string) => {
