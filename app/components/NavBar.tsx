@@ -14,6 +14,7 @@ export function NavBar() {
     // { name: 'Home', href: '/' },
     { name: 'Options Screener', href: '/options' },
     { name: 'Covered Call Calculator', href: '/covered-call-calculator' },
+    { name: 'Trending', href: '/trending' },
     { name: 'Blog', href: 'https://wheelstrategyoptions.com/blog/', external: true },
     { name: 'API', href: 'https://forms.gle/FRLem4M35jQV3W7Z6', external: true },
     // { name: 'Provide Feedback', href: 'mailto:theproducttank@gmail.com?subject=Feedback about Wheel Strategy Screener', external: true },
