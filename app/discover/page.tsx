@@ -214,7 +214,8 @@ export default function TrendingPage() {
     
     return (
       <div className="bg-white p-6 rounded-lg shadow-sm">
-        <h2 className="text-xl font-bold mb-4">{label}</h2>
+        
+        <h2 className="text-xl font-bold mb-4 underline font-medium"><a href={optionsUrl}>{label} →</a></h2>
         
         <div className="flex justify-between items-center p-2 font-medium">
           <div>Stock</div>
@@ -241,7 +242,7 @@ export default function TrendingPage() {
                     <a 
                       href={`https://screenwich.com/stock-details/${stock.symbol}`}
                       target="_blank"
-                      className="text-blue-600 hover:underline font-medium"
+                      className="font-medium"
                     >
                       {stock.symbol}
                     </a>                    
@@ -252,14 +253,14 @@ export default function TrendingPage() {
             })}
             
             {/* Find More button */}
-            <div className="mt-4 text-center">
+            {/* <div className="mt-4 text-center">
               <a 
                 href={optionsUrl}
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
               >
                 Find More
               </a>
-            </div>
+            </div> */}
           </div>
         ) : (
           <p className="text-gray-500">No data available</p>
@@ -289,7 +290,7 @@ export default function TrendingPage() {
          
           <h2 className="text-xl font-bold">Covered Call</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {renderStockList(highYieldStocks, 'yieldPercent', 'Top 10 Stocks with High Premium Yield (Large Cap)', 'call')}
+          {renderStockList(highYieldStocks, 'yieldPercent', 'Top 10 Stocks with High Premium Yield', 'call')}
             {renderStockList(highIVStocks, 'impliedVolatility', 'Top 10 Stocks with High IV','call')}
             {renderStockList(earningsStocks, 'earningsDate', 'Top 10 Stocks with Earnings This Week','call')}            
           </div>
