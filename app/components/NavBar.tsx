@@ -12,7 +12,8 @@ export function NavBar() {
   
   const navigation = [
     // { name: 'Home', href: '/' },
-    { name: 'Options Screener', href: '/options' },
+    { name: 'Covered Call Screener', href: '/covered-call-screener', id: 'covered_call_screener' },
+    { name: 'Cash Secured Put Screener', href: '/cash-secured-put-screener', id: 'cash_secured_put_screener' },
     { name: 'Discover', href: '/discover' },
     { name: 'Covered Call Calculator', href: '/covered-call-calculator' },
     { name: 'Blog', href: 'https://wheelstrategyoptions.com/blog/', external: true },

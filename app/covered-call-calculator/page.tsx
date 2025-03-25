@@ -385,7 +385,7 @@ export default function CoveredCallCalculatorPage() {
                                     </div>
                                   </div>
                                   <div className="text-center mt-3 sm:mt-2">
-                                    <Link href={`/options?call_search=${inputSymbol}&call_expiration=${result.option.expiration}`} className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors text-xs sm:text-sm py-2">
+                                    <Link href={`/covered-call-screener?call_search=${inputSymbol}&call_expiration=${result.option.expiration}`} className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors text-xs sm:text-sm py-2">
                                       Try our Options Screener
                                       <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 sm:h-4 sm:w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -403,7 +403,7 @@ export default function CoveredCallCalculatorPage() {
                 </div>                                
                 <div>              
                   <p className="mt-2 text-gray-600 mb-4 text-sm">
-                    <Link href={`/options?call_search=${calculationSymbol}&call_expiration=${results[0].option.expiration}`} className="underline font-medium">Try our Options Screener</Link> to find the perfect covered call and cash secured puts opportunities and start generating passive income today!
+                    <Link href={`/covered-call-screener?call_search=${calculationSymbol}&call_expiration=${results[0].option.expiration}`} className="underline font-medium">Try our Options Screener</Link> to find the perfect covered call and cash secured puts opportunities and start generating passive income today!
                   </p>
                   </div>
               </div>
