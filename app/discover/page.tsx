@@ -213,18 +213,17 @@ export default function TrendingPage() {
     }
     
     return (
-      <div className="bg-white p-6 rounded-lg shadow-sm">
+      <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm">
+        <h2 className="text-base sm:text-lg font-bold mb-2 sm:mb-3 underline font-medium"><a href={optionsUrl}>{label} →</a></h2>
         
-        <h2 className="text-xl font-bold mb-4 underline font-medium"><a href={optionsUrl}>{label} →</a></h2>
-        
-        <div className="flex justify-between items-center p-2 font-medium">
+        <div className="flex justify-between items-center p-1.5 sm:p-2 font-medium text-sm">
           <div>Stock</div>
           {valueKey === 'impliedVolatility' && <div>IV</div>}
           {valueKey === 'earningsDate' && <div>Earnings Date</div>}
           {valueKey === 'yieldPercent' && <div>Yield</div>}          
         </div>
         {stocks.length > 0 ? (
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {stocks.map((stock, index) => {
               let value = stock[valueKey];
               let formattedValue = value;
@@ -236,9 +235,9 @@ export default function TrendingPage() {
               }
               
               return (
-                <div key={stock.symbol} className="flex justify-between items-center p-2 hover:bg-gray-50 rounded">
+                <div key={stock.symbol} className="flex justify-between items-center p-1.5 sm:p-2 hover:bg-gray-50 rounded text-sm">
                   <div className="flex items-center">
-                    <span className="text-gray-500 mr-2">{index + 1}.</span>
+                    <span className="text-gray-500 mr-1.5">{index + 1}.</span>
                     <a 
                       href={`https://screenwich.com/stock-details/${stock.symbol}`}
                       target="_blank"
@@ -251,19 +250,20 @@ export default function TrendingPage() {
                 </div>
               );
             })}
-            
+                        
             {/* Find More button */}
-            {/* <div className="mt-4 text-center">
+            <div className="mt-3 text-center">
               <a 
                 href={optionsUrl}
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+                className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
               >
                 Find More
               </a>
-            </div> */}
+            </div>
+
           </div>
         ) : (
-          <p className="text-gray-500">No data available</p>
+          <p className="text-gray-500 text-sm">No data available</p>
         )}
       </div>
     );
@@ -272,32 +272,32 @@ export default function TrendingPage() {
   const renderContent = () => {
     if (authLoading || loading) {
       return (
-        <div className="flex justify-center items-center min-h-[400px]">
+        <div className="flex justify-center items-center min-h-[300px]">
           <LoadingSpinner />
         </div>
       );
     }
 
     return (
-      <div className="space-y-10">
-        <div className="space-y-6">                    
-          <div className="flex item-center gap-2 mb-4">
-            <h1 className="text-2xl font-bold">Trending Stocks</h1>
-            <span className="text-gray-500 text-sm">
+      <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-3 sm:space-y-4">                    
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2 sm:mb-3">
+            <h1 className="text-xl sm:text-2xl font-bold">Discover new ideas! 💡</h1>
+            <span className="text-gray-500 text-xs sm:text-sm">
               These are based on weekly trends. Updated daily.
             </span>
           </div>
          
-          <h2 className="text-xl font-bold">Covered Call</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {renderStockList(highYieldStocks, 'yieldPercent', 'Top 10 Stocks with High Premium Yield', 'call')}
+          <h2 className="text-lg sm:text-xl font-bold">Covered Call</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            {renderStockList(highYieldStocks, 'yieldPercent', 'Top 10 Stocks with High Premium Yield', 'call')}
             {renderStockList(highIVStocks, 'impliedVolatility', 'Top 10 Stocks with High IV','call')}
             {renderStockList(earningsStocks, 'earningsDate', 'Top 10 Stocks with Earnings This Week','call')}            
           </div>
           
-          <h2 className="text-xl font-bold mt-8">Cash Secured Put</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {renderStockList(highYieldPutStocks, 'yieldPercent', 'Top 10 Stocks with High Premium Yield', 'put')}
+          <h2 className="text-lg sm:text-xl font-bold mt-4 sm:mt-6">Cash Secured Put</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            {renderStockList(highYieldPutStocks, 'yieldPercent', 'Top 10 Stocks with High Premium Yield', 'put')}
             {renderStockList(highIVPutStocks, 'impliedVolatility', 'Top 10 Stocks with High IV', 'put')}
             {renderStockList(earningsPutStocks, 'earningsDate', 'Top 10 Stocks with Earnings This Week', 'put')}            
           </div>
@@ -309,7 +309,7 @@ export default function TrendingPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <NavBar />
-      <div className="max-w-screen-2xl mx-auto p-4">
+      <div className="max-w-screen-2xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
         {renderContent()}
         <Footer />
       </div>
