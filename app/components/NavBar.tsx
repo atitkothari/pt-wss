@@ -13,6 +13,7 @@ export function NavBar() {
   const navigation = [
     // { name: 'Home', href: '/' },
     { name: 'Options Screener', href: '/options' },
+    { name: 'Discover', href: '/discover' },
     { name: 'Covered Call Calculator', href: '/covered-call-calculator' },
     { name: 'Blog', href: 'https://wheelstrategyoptions.com/blog/', external: true },
     { name: 'API', href: 'https://forms.gle/FRLem4M35jQV3W7Z6', external: true },

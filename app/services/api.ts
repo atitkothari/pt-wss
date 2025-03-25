@@ -1,6 +1,22 @@
 import { Option, OptionType } from "../types/option";
 import { StrikeFilter as StrikeFilterType } from '../types/option';
 
+interface HighYieldTicker {
+  symbol: string;
+  yieldPercent: number;
+}
+
+interface HighYieldResponse {
+  calls: {
+    tickers: HighYieldTicker[];
+    url: string;
+  };
+  puts: {
+    tickers: HighYieldTicker[];
+    url: string;
+  };
+}
+
 interface Filter {
   operation: string;
   field: string;
@@ -86,4 +102,19 @@ export async function fetchOptionsData(
       delta: opt.delta || null
     }))
   };
+}
+
+export async function fetchTickersWithHighestYield(): Promise<HighYieldResponse> {
+  const response = await fetch(`https://api.wheelstrategyoptions.com/wheelstrat/fetchTickersWithHighestYield`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch highest yield data');
+  }
+
+  return await response.json();
 }
