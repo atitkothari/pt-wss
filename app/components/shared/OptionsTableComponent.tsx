@@ -441,42 +441,6 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     }
   }, [impliedVolatility, option]);
   
-  // Handle browser back/forward navigation
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      // Store current scroll position in session storage when URL changes
-      const handleBeforeUnload = () => {
-        sessionStorage.setItem('scrollPosition', window.scrollY.toString());
-      };
-      
-      // Restore scroll position on popstate (browser back/forward)
-      const handlePopState = () => {
-        const savedPosition = sessionStorage.getItem('scrollPosition');
-        if (savedPosition) {
-          setTimeout(() => {
-            window.scrollTo(0, parseInt(savedPosition, 10));
-          }, 0);
-        }
-      };
-      
-      window.addEventListener('beforeunload', handleBeforeUnload);
-      window.addEventListener('popstate', handlePopState);
-      
-      // Restore scroll position on initial load
-      const savedPosition = sessionStorage.getItem('scrollPosition');
-      if (savedPosition) {
-        setTimeout(() => {
-          window.scrollTo(0, parseInt(savedPosition, 10));
-        }, 0);
-      }
-      
-      return () => {
-        window.removeEventListener('beforeunload', handleBeforeUnload);
-        window.removeEventListener('popstate', handlePopState);
-      };
-    }
-  }, []);
-
   const [selectedExpiration, setSelectedExpiration] = useState(searchParams.get(getParamKey('expiration')) || "");
   const [minSelectedExpiration, setMinSelectedExpiration] = useState(searchParams.get(getParamKey('min_expiration')) || "");
   const [sortConfig, setSortConfig] = useState<{ field: keyof Option; direction: 'asc' | 'desc' | null }>({ 
@@ -549,16 +513,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         params.delete(paramKey);
       }
     });
-
-    // Save current scroll position before URL update
-    const scrollPosition = window.scrollY;
-    
-    // Update URL without full page refresh
-    const url = `?${params.toString()}`;
-    window.history.pushState({}, '', url);
-    
-    // Restore scroll position
-    window.scrollTo(0, scrollPosition);
+    router.push(`?${params.toString()}`);
   };
 
   const [isFromCache, setIsFromCache] = useState(false);
@@ -780,30 +735,22 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const sortDirection = searchParams.get('sortDir') || 'asc';
 
   // Handle sort change
-  const handleSortURL = useCallback((columnId: string) => {
-    const params = new URLSearchParams(searchParams.toString());
+  const handleSortURL = useCallback((columnId: string) => {     
+    const params = new URLSearchParams(searchParams.toString());    
     
     let newSortDir: 'asc' | 'desc';
     if (sortColumn === columnId) {
       // Toggle direction if clicking same column
-      newSortDir = sortDirection === 'asc' ? 'desc' : 'asc';
+      newSortDir = sortDirection === 'asc' ? 'desc' : 'asc';      
     } else {
       // Set new column and default to ascending
-      newSortDir = 'asc';
+      newSortDir = 'asc';      
     }
     
     params.set('sortBy', columnId);
     params.set('sortDir', newSortDir);
-    
-    // Save current scroll position before URL update
-    const scrollPosition = window.scrollY;
-    
-    // Update URL without full page refresh
-    const url = `?${params.toString()}`;
-    window.history.pushState({}, '', url);
-    
-    // Restore scroll position
-    window.scrollTo(0, scrollPosition);
+    router.push(`?${params.toString()}`);
+
 
     // Fetch new data with updated sort configuration
     fetchData(
@@ -827,24 +774,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       activeFilters.moneynessRange,
       activeFilters.impliedVolatility,
     ).catch(console.error);
-  }, [sortColumn, sortDirection, router, searchParams, activeFilters, currentPage, rowsPerPage, strikeFilter, deltaFilter, fetchData]);
-
-  // Sort data based on URL parameters
-  const sortedData = [...data].sort((a, b) => {
-    if (!sortColumn) return 0;
-    
-    const aValue = a[sortColumn as keyof Option];
-    const bValue = b[sortColumn as keyof Option];
-
-    if (typeof aValue === 'number' && typeof bValue === 'number') {
-      return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
-    }
-
-    // Handle string comparison
-    return sortDirection === 'asc' 
-      ? String(aValue).localeCompare(String(bValue))
-      : String(bValue).localeCompare(String(aValue));
-  });
+  }, [sortColumn, sortDirection, router, searchParams, activeFilters, currentPage, rowsPerPage, strikeFilter, deltaFilter, fetchData]);  
 
   if (error) return <div className="text-red-500 p-4">{error}</div>;
 
@@ -972,8 +902,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           </div>
           <BlurredTable hasSearched={hasSearched && !user}>
             <OptionsTable 
-              data={sortedData}
-              sortConfig={sortConfig}
+              data={data}              
               onSort={handleSortURL}
             />
           </BlurredTable>
