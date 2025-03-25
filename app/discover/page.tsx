@@ -8,6 +8,14 @@ import { Option } from "../types/option";
 import { format, parseISO, addDays, isAfter, isBefore, addWeeks } from 'date-fns';
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { useAuth } from "../context/AuthContext";
+import { 
+  yieldFilterConfig, 
+  volumeFilterConfig, 
+  marketCapFilterConfig, 
+  impliedVolatilityFilterConfig, 
+  setDefaultFilterValues,
+  dteFilterConfig
+} from "../config/filterConfig";
 
 interface StockData {
   symbol: string;
@@ -173,7 +181,37 @@ export default function TrendingPage() {
     }
   };
 
-  const renderStockList = (stocks: StockData[], valueKey: keyof StockData, label: string) => {
+  const renderStockList = (stocks: StockData[], valueKey: keyof StockData, label: string, optionType:'call'|'put') => {
+        
+    // Generate the appropriate URL parameters based on the list type
+    let optionsUrl = '/options?';    
+    setDefaultFilterValues(optionType)
+
+    const paramPrefix = optionType === 'call' ? 'call_' : 'put_';
+    
+    const today = new Date();
+    const nextWeek = addWeeks(today, 1);
+    const formattedToday = format(today, 'yyyy-MM-dd');
+    const formattedNextWeek = format(nextWeek, 'yyyy-MM-dd');
+
+    localStorage.setItem(`${optionType}_minDte`, "0");
+    localStorage.setItem(`${optionType}_maxDte`, "7");
+
+    optionsUrl += `${paramPrefix}min_expiration=${formattedToday}&${paramPrefix}max_expiration=${formattedNextWeek}&`;      
+    // Common filters for all lists using default values from filterConfig    
+    optionsUrl += `${paramPrefix}min_vol=100&${paramPrefix}max_vol=1000&`;
+    
+    if (valueKey === 'impliedVolatility') {
+      // For high IV lists, set implied volatility filter using default values
+      optionsUrl += 'sortBy=impliedVolatility&sortDir=desc';
+    } else if (valueKey === 'earningsDate') {
+      // For earnings lists, set date filter to next week        
+      optionsUrl += 'sortBy=expiration&sortDir=desc';
+    } else if (valueKey === 'yieldPercent') {
+      // For yield lists, set minimum yield using default values      
+      optionsUrl += 'sortBy=yieldPercent&sortDir=desc';
+    }
+    
     return (
       <div className="bg-white p-6 rounded-lg shadow-sm">
         <h2 className="text-xl font-bold mb-4">{label}</h2>
@@ -212,6 +250,16 @@ export default function TrendingPage() {
                 </div>
               );
             })}
+            
+            {/* Find More button */}
+            <div className="mt-4 text-center">
+              <a 
+                href={optionsUrl}
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Find More
+              </a>
+            </div>
           </div>
         ) : (
           <p className="text-gray-500">No data available</p>
@@ -241,16 +289,16 @@ export default function TrendingPage() {
          
           <h2 className="text-xl font-bold">Covered Call</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {renderStockList(highYieldStocks, 'yieldPercent', 'Top 10 Stocks with High Premium Yield (Large Cap)')}
-            {renderStockList(highIVStocks, 'impliedVolatility', 'Top 10 Stocks with High IV')}
-            {renderStockList(earningsStocks, 'earningsDate', 'Top 10 Stocks with Earnings This Week')}            
+          {renderStockList(highYieldStocks, 'yieldPercent', 'Top 10 Stocks with High Premium Yield (Large Cap)', 'call')}
+            {renderStockList(highIVStocks, 'impliedVolatility', 'Top 10 Stocks with High IV','call')}
+            {renderStockList(earningsStocks, 'earningsDate', 'Top 10 Stocks with Earnings This Week','call')}            
           </div>
           
           <h2 className="text-xl font-bold mt-8">Cash Secured Put</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {renderStockList(highYieldPutStocks, 'yieldPercent', 'Top 10 Stocks with High Premium Yield')}
-            {renderStockList(highIVPutStocks, 'impliedVolatility', 'Top 10 Stocks with High IV')}
-            {renderStockList(earningsPutStocks, 'earningsDate', 'Top 10 Stocks with Earnings This Week')}            
+          {renderStockList(highYieldPutStocks, 'yieldPercent', 'Top 10 Stocks with High Premium Yield', 'put')}
+            {renderStockList(highIVPutStocks, 'impliedVolatility', 'Top 10 Stocks with High IV', 'put')}
+            {renderStockList(earningsPutStocks, 'earningsDate', 'Top 10 Stocks with Earnings This Week', 'put')}            
           </div>
         </div>
       </div>
