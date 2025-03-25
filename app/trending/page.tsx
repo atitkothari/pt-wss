@@ -8,6 +8,7 @@ import { Option, OptionType } from "../types/option";
 import { format } from 'date-fns';
 import { BarChart2, Calendar, DollarSign } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "../context/AuthContext";
 
 interface StockGroup {
   symbol: string;
@@ -25,24 +26,58 @@ export default function TrendingPage() {
   const [earningsStocks, setEarningsStocks] = useState<StockGroup[]>([]);
   const [highYieldStocks, setHighYieldStocks] = useState<StockGroup[]>([]);
   const [selectedTab, setSelectedTab] = useState<OptionType>('call');
+  const { userId } = useAuth(); // Get userId from auth context
 
   useEffect(() => {
     const fetchTrendingData = async () => {
       setLoading(true);
       try {
-        // Fetch high IV stocks
-        const highIVFilters = [
-          { operation: 'gt', field: 'impliedVolatility', value: 50 },
-          { operation: 'sort', field: 'impliedVolatility', value: 'desc' }
-        ];
-        const highIVResult = await fetchOptionsData(highIVFilters, 1, 100, undefined, undefined, selectedTab);
-        
-        // Fetch stocks with earnings this week
+        // Fetch high IV stocks for the next 14 days
         const today = new Date();
         const nextWeek = new Date(today);
-        nextWeek.setDate(today.getDate() + 7);
+        nextWeek.setDate(today.getDate() + 14);
         
+        const highIVFilters = [
+        { operation: 'gt', field: 'volume', value: 100 },
+          { operation: 'gt', field: 'impliedVolatility', value: 100 },
+          { operation: 'sort', field: 'impliedVolatility', value: 'desc' },
+          { 
+            operation: 'gte', 
+            field: 'expiration', 
+            value: `"${format(today, 'yyyy-MM-dd')}"` 
+          },
+          { 
+            operation: 'lte', 
+            field: 'expiration', 
+            value: `"${format(nextWeek, 'yyyy-MM-dd')}"` 
+          }
+        ];
+        const highIVResult = await fetchOptionsData(highIVFilters, 1, 100, undefined, undefined, selectedTab, userId);
+                
+        
+        // Fetch high premium yield large cap stocks for the next 7 days
+        const highYieldFilters = [
+            { operation: 'gt', field: 'volume', value: 100 },
+        //   { operation: 'gt', field: 'yieldPercent', value: 5 },
+          { operation: 'gte', field: 'marketCap', value: 1000000000 }, // 1B market cap
+          { operation: 'sort', field: 'yieldPercent', value: 'desc' },
+          { 
+            operation: 'gte', 
+            field: 'expiration', 
+            value: `"${format(today, 'yyyy-MM-dd')}"` 
+          },
+          { 
+            operation: 'lte', 
+            field: 'expiration', 
+            value: `"${format(nextWeek, 'yyyy-MM-dd')}"` 
+          }
+        ];
+        const highYieldResult = await fetchOptionsData(highYieldFilters, 1, 100, undefined, undefined, selectedTab, userId);
+
+        // Fetch stocks with earnings this week                
+        nextWeek.setDate(today.getDate() + 7);
         const earningsFilters = [
+            { operation: 'gt', field: 'volume', value: 100 },
           { 
             operation: 'gte', 
             field: 'earningsDate', 
@@ -52,17 +87,19 @@ export default function TrendingPage() {
             operation: 'lte', 
             field: 'earningsDate', 
             value: `"${format(nextWeek, 'yyyy-MM-dd')}"` 
+          },
+          { 
+            operation: 'gte', 
+            field: 'expiration', 
+            value: `"${format(today, 'yyyy-MM-dd')}"` 
+          },
+          { 
+            operation: 'lte', 
+            field: 'expiration', 
+            value: `"${format(nextWeek, 'yyyy-MM-dd')}"` 
           }
         ];
-        const earningsResult = await fetchOptionsData(earningsFilters, 1, 100, undefined, undefined, selectedTab);
-        
-        // Fetch high premium yield large cap stocks
-        const highYieldFilters = [
-          { operation: 'gt', field: 'yieldPercent', value: 5 },
-          { operation: 'gte', field: 'marketCap', value: 10000000000 }, // 10B market cap
-          { operation: 'sort', field: 'yieldPercent', value: 'desc' }
-        ];
-        const highYieldResult = await fetchOptionsData(highYieldFilters, 1, 100, undefined, undefined, selectedTab);
+        const earningsResult = await fetchOptionsData(earningsFilters, 1, 100, undefined, undefined, selectedTab, userId);
 
         // Process and group by stock symbol
         setHighIVStocks(processStockData(highYieldResult.options));
