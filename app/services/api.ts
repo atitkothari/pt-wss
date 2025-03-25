@@ -118,3 +118,34 @@ export async function fetchTickersWithHighestYield(): Promise<HighYieldResponse>
 
   return await response.json();
 }
+
+interface HighIVTicker {
+  symbol: string;
+  impliedVolatility: number;
+}
+
+interface HighIVResponse {
+  calls: {
+    tickers: HighIVTicker[];
+    url: string;
+  };
+  puts: {
+    tickers: HighIVTicker[];
+    url: string;
+  };
+}
+
+export async function fetchTickersWithHighestImpliedVolatility(): Promise<HighIVResponse> {
+  const response = await fetch(`https://api.wheelstrategyoptions.com/wheelstrat/fetchTockersWithHighestImpliedVolatility`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch highest implied volatility data');
+  }
+
+  return await response.json();
+}
