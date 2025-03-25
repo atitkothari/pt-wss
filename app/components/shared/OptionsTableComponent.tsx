@@ -12,7 +12,7 @@ import { Option, OptionType, StrikeFilter } from "../../types/option";
 import { OptionsTable } from "../table/OptionsTable";
 import { format, addDays } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Search, Mail, Save, Coffee } from "lucide-react";
+import { Search, Mail, Save, Coffee, RotateCcw } from "lucide-react";
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSymbols } from '../../hooks/useSymbols';
 import { SaveQueryModal } from "../modals/SaveQueryModal";
@@ -780,6 +780,49 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
   const { user, userId } = useAuth();
 
+  const handleReset = () => {
+    // Reset all filter states to their default values
+    setSelectedStocks([]);
+    setSearchTerm("");
+    setYieldRange([yieldFilterConfig.min, yieldFilterConfig.max]);
+    setMinPrice(priceFilterConfig.defaultMin);
+    setMaxPrice(priceFilterConfig.defaultMax);
+    setVolumeRange([volumeFilterConfig.min, volumeFilterConfig.max]);
+    setDeltaFilter([deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax]);
+    setMinDte(dteFilterConfig.defaultMin);
+    setMaxDte(dteFilterConfig.defaultMax);
+    setImpliedVolatility([impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax]);
+    setPeRatio([peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax]);
+    setMarketCap([marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax]);
+    setMovingAverageCrossover(movingAverageCrossoverOptions[0]);
+    setSector(sectorOptions[0]);
+    setMoneynessRange([moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax]);
+    
+    // Reset active filters
+    setActiveFilters({
+      searchTerm: "",
+      yieldRange: [yieldFilterConfig.min, yieldFilterConfig.max] as [number, number],
+      maxPrice: priceFilterConfig.defaultMax,
+      minPrice: priceFilterConfig.defaultMin,
+      volumeRange: [volumeFilterConfig.min, volumeFilterConfig.max] as [number, number],
+      selectedExpiration: "",
+      minSelectedExpiration: "",
+      pageNo: 1,
+      peRatio: [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax] as [number, number],
+      marketCap: [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax] as [number, number],
+      movingAverageCrossover: movingAverageCrossoverOptions[0],
+      sector: sectorOptions[0],
+      moneynessRange: [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax] as [number, number],
+      impliedVolatility: [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax] as [number, number]
+    });
+    
+    // Reset URL parameters
+    const params = new URLSearchParams();
+    router.push(`?${params.toString()}`);
+    
+    setCurrentPage(1);
+  };
+
   return (
     <div className="w-full">      
       {/* Filter Controls */}
@@ -860,7 +903,15 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row justify-end gap-1">
-          
+          <Button
+            id="btn_screener_reset"
+            variant="outline"
+            onClick={handleReset}
+            className="w-full sm:w-auto"
+          >
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Reset Filters
+          </Button>
           <Button
             id="btn_screener_save"
             variant="outline"

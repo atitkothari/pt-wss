@@ -100,20 +100,6 @@ export function AdvancedFilters({
     [onSearch]
   );
 
-  // Reset all filters to default values
-  const handleReset = () => {
-    onStrikePriceChange([priceFilterConfig.defaultMin, priceFilterConfig.defaultMax]);
-    onMoneynessRangeChange([moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax]);
-    onDteChange([dteFilterConfig.defaultMin, dteFilterConfig.defaultMax]);
-    onDeltaFilterChange([deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax]);
-    onVolumeRangeChange([volumeFilterConfig.min, volumeFilterConfig.max]);
-    onImpliedVolatilityChange([impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax]);
-    onPeRatioChange([peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax]);
-    onMarketCapChange([marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax]);
-    onMovingAverageCrossoverChange(movingAverageCrossoverOptions[0]);
-    onSectorChange(sectorOptions[0]);
-  };
-
   // Trigger search when filters change
   useEffect(() => {
     if (autoSearch && debouncedSearch) {
@@ -188,17 +174,6 @@ export function AdvancedFilters({
           </div>
           {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
         </Button>
-        {hasModifiedFilters && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="ml-2 text-gray-500 hover:text-gray-700"
-            onClick={handleReset}
-          >
-            <RotateCcw size={14} className="mr-1" />
-            <span className="text-xs">Reset</span>
-          </Button>
-        )}
       </div>
 
       {isExpanded && (
