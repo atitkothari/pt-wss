@@ -5,7 +5,7 @@ import { FilterInput } from "./FilterInput";
 import { RangeSlider } from "./RangeSlider";
 import { SingleValueSlider } from "./SingleValueSlider";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, RotateCcw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { debounce } from "@/app/lib/debounce";
 import {
@@ -100,6 +100,20 @@ export function AdvancedFilters({
     [onSearch]
   );
 
+  // Reset all filters to default values
+  const handleReset = () => {
+    onStrikePriceChange([priceFilterConfig.defaultMin, priceFilterConfig.defaultMax]);
+    onMoneynessRangeChange([moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax]);
+    onDteChange([dteFilterConfig.defaultMin, dteFilterConfig.defaultMax]);
+    onDeltaFilterChange([deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax]);
+    onVolumeRangeChange([volumeFilterConfig.min, volumeFilterConfig.max]);
+    onImpliedVolatilityChange([impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax]);
+    onPeRatioChange([peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax]);
+    onMarketCapChange([marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax]);
+    onMovingAverageCrossoverChange(movingAverageCrossoverOptions[0]);
+    onSectorChange(sectorOptions[0]);
+  };
+
   // Trigger search when filters change
   useEffect(() => {
     if (autoSearch && debouncedSearch) {
@@ -121,79 +135,104 @@ export function AdvancedFilters({
     debouncedSearch
   ]);
 
-  // Check if any filter has been modified from default values
+  // Check individual filter modifications
+  const modifiedFilters = useMemo(() => {
+    return {
+      strikePrice: strikePrice[0] !== priceFilterConfig.defaultMin || 
+                   strikePrice[1] !== priceFilterConfig.defaultMax,
+      moneyness: moneynessRange[0] !== moneynessFilterConfig.defaultMin || 
+                 moneynessRange[1] !== moneynessFilterConfig.defaultMax,
+      dte: minDte !== dteFilterConfig.defaultMin || 
+           maxDte !== dteFilterConfig.defaultMax,
+      delta: deltaFilter[0] !== deltaFilterConfig.defaultMin || 
+             deltaFilter[1] !== deltaFilterConfig.defaultMax,
+      volume: volumeRange[0] !== volumeFilterConfig.min || 
+              volumeRange[1] !== volumeFilterConfig.max,
+      iv: impliedVolatility[0] !== impliedVolatilityFilterConfig.defaultMin || 
+          impliedVolatility[1] !== impliedVolatilityFilterConfig.defaultMax,
+      peRatio: peRatio[0] !== peRatioFilterConfig.defaultMin || 
+               peRatio[1] !== peRatioFilterConfig.defaultMax,
+      marketCap: marketCap[0] !== marketCapFilterConfig.defaultMin || 
+                 marketCap[1] !== marketCapFilterConfig.defaultMax,
+      movingAverage: movingAverageCrossover !== movingAverageCrossoverOptions[0],
+      sector: sector !== sectorOptions[0]
+    };
+  }, [
+    strikePrice, moneynessRange, minDte, maxDte, deltaFilter, volumeRange,
+    impliedVolatility, peRatio, marketCap, movingAverageCrossover, sector
+  ]);
+
   const hasModifiedFilters = useMemo(() => {
-    // Check if PE Ratio has been modified
-    const isPeRatioModified = 
-      peRatio[0] !== peRatioFilterConfig.defaultMin || 
-      peRatio[1] !== peRatioFilterConfig.defaultMax;
-    
-    // Check if Market Cap has been modified
-    const isMarketCapModified = 
-      marketCap[0] !== marketCapFilterConfig.defaultMin || 
-      marketCap[1] !== marketCapFilterConfig.defaultMax;
-    
-    // Check if Moving Average Crossover has been modified
-    const isMovingAverageModified = 
-      movingAverageCrossover !== movingAverageCrossoverOptions[0];
-    
-    // Check if Sector has been modified
-    const isSectorModified = 
-      sector !== sectorOptions[0];
-    
-    // Check if Delta Filter has been modified
-    const isDeltaModified = 
-      deltaFilter[0] !== deltaFilterConfig.defaultMin || 
-      deltaFilter[1] !== deltaFilterConfig.defaultMax;
-    
-    // Check if Volume Range has been modified
-    const isVolumeModified = 
-      volumeRange[0] !== volumeFilterConfig.min || 
-      volumeRange[1] !== volumeFilterConfig.max;
-    
-    // Check if Strike Price has been modified
-    const isStrikePriceModified = 
-      strikePrice[0] !== priceFilterConfig.defaultMin || 
-      strikePrice[1] !== priceFilterConfig.defaultMax;
-    
-    // Check if Implied Volatility has been modified
-    const isImpliedVolatilityModified = 
-      impliedVolatility[0] !== impliedVolatilityFilterConfig.defaultMin || 
-      impliedVolatility[1] !== impliedVolatilityFilterConfig.defaultMax;
-    
-    // Check if Moneyness Range has been modified
-    const isMoneynessRangeModified = 
-      moneynessRange[0] !== moneynessFilterConfig.defaultMin || 
-      moneynessRange[1] !== moneynessFilterConfig.defaultMax;
-    
-    // Check if Days to Expiration has been modified
-    const isDteModified = 
-      minDte !== dteFilterConfig.defaultMin || 
-      maxDte !== dteFilterConfig.defaultMax;
-    
-    return isPeRatioModified || isMarketCapModified || isMovingAverageModified || 
-           isSectorModified || isDeltaModified || isVolumeModified || isStrikePriceModified ||
-           isImpliedVolatilityModified || isMoneynessRangeModified || isDteModified;
-  }, [peRatio, marketCap, movingAverageCrossover, sector, deltaFilter, volumeRange, strikePrice, impliedVolatility, moneynessRange, minDte, maxDte]);
+    return Object.values(modifiedFilters).some(modified => modified);
+  }, [modifiedFilters]);
+
+  const getModifiedCount = useMemo(() => {
+    return Object.values(modifiedFilters).filter(modified => modified).length;
+  }, [modifiedFilters]);
 
   return (
     <div className="w-full border rounded-md p-2 mb-3 transition-all hover:border-gray-400">
-      <Button
-        variant="ghost"
-        className="w-full flex justify-between items-center p-0 h-auto mb-1"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        <div className="flex items-center gap-2">
-          <span className="text-lg font-semibold text-primary">Advanced Filters</span>
-          {hasModifiedFilters && !isExpanded && (
-            <Badge variant="secondary" className="bg-blue-500 text-white h-2 w-2 p-0 rounded-full" />
-          )}
-        </div>
-        {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-      </Button>
+      <div className="flex justify-between items-center mb-1">
+        <Button
+          variant="ghost"
+          className="flex-1 flex justify-between items-center p-0 h-auto"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-lg font-semibold text-primary">Advanced Filters</span>
+            {hasModifiedFilters && !isExpanded && (
+              <Badge variant="secondary" className="bg-blue-500 text-white px-2 py-0.5 text-xs">
+                {getModifiedCount} active
+              </Badge>
+            )}
+          </div>
+          {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+        </Button>
+        {hasModifiedFilters && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="ml-2 text-gray-500 hover:text-gray-700"
+            onClick={handleReset}
+          >
+            <RotateCcw size={14} className="mr-1" />
+            <span className="text-xs">Reset</span>
+          </Button>
+        )}
+      </div>
 
       {isExpanded && (
         <div className="space-y-3 mt-2 animate-in fade-in-50 duration-300">
+          {/* Modified Filters Summary */}
+          {hasModifiedFilters && (
+            <div className="flex flex-wrap gap-2 mb-3">
+              {Object.entries(modifiedFilters).map(([key, isModified]) => {
+                if (!isModified) return null;
+                const filterNames: { [key: string]: string } = {
+                  strikePrice: 'Strike Price',
+                  moneyness: 'Strike Filter',
+                  dte: 'Expiration',
+                  delta: 'Delta',
+                  volume: 'Volume',
+                  iv: 'IV',
+                  peRatio: 'P/E',
+                  marketCap: 'Market Cap',
+                  movingAverage: 'MA',
+                  sector: 'Sector'
+                };
+                return (
+                  <Badge 
+                    key={key}
+                    variant="secondary" 
+                    className="bg-blue-100 text-blue-800 text-xs"
+                  >
+                    {filterNames[key]}
+                  </Badge>
+                );
+              })}
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
             {/* Add Strike Price filter before P/E Ratio */}
             <RangeSlider
