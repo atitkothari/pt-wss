@@ -12,7 +12,7 @@ import { Option, OptionType, StrikeFilter } from "../../types/option";
 import { OptionsTable } from "../table/OptionsTable";
 import { format, addDays } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Search, Mail, Save, Coffee, RotateCcw } from "lucide-react";
+import { Search, Mail, Save, Coffee, RotateCcw, BellRing } from "lucide-react";
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSymbols } from '../../hooks/useSymbols';
 import { SaveQueryModal } from "../modals/SaveQueryModal";
@@ -903,23 +903,25 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             <RotateCcw className="h-4 w-4 mr-2" />
             Reset Filters
           </Button>
-          <Button
-            id="btn_screener_save"
-            variant="outline"
-            onClick={() => setShowSaveModal(true)}
-            className="bg-orange-600 text-white hover:text-black w-full sm:w-auto"
-          >
-            <Save className="h-4 w-4 mr-2" />
-            Save & Set Alerts
-          </Button>
-          <Button 
-            id="btn_screener_search"
-            onClick={handleSearch}
-            className={`w-full sm:w-auto ${filtersChanged ? 'bg-amber-500 hover:bg-amber-600' : ''}`}
-          >
-            <Search className="h-4 w-4 mr-2" />
-            {filtersChanged ? 'Search (Updated Filters)' : 'Search'}
-          </Button>
+          <div className="flex w-full sm:w-[70%] gap-1">
+            <Button
+              id="btn_screener_save"
+              variant="outline"
+              onClick={() => setShowSaveModal(true)}
+              className="bg-orange-600 text-white hover:text-black w-[35%]"
+            >
+              <BellRing className="h-4 w-4 mr-2" />
+              Get Alerts
+            </Button>
+            <Button 
+              id="btn_screener_search"
+              onClick={handleSearch}
+              className={`w-[65%] ${filtersChanged ? 'bg-amber-500 hover:bg-amber-600' : ''}`}
+            >
+              <Search className="h-4 w-4 mr-2" />
+              {filtersChanged ? 'Search (Updated Filters)' : 'Search'}
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -938,10 +940,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       ) : loading ? (
         <LoadingSpinner />
       ) : (
-        <div>
-          <div className="text-xs text-gray-600 mb-0.5 md:mb-1">
-            Showing {totalCount} contracts
-          </div>
+        <div>          
           <BlurredTable hasSearched={hasSearched && !user}>
             <OptionsTable 
               data={data}              
