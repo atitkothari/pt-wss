@@ -902,12 +902,12 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             <RotateCcw className="h-4 w-4 mr-2" />
             Reset Filters
           </Button>
-          <div className="flex w-full sm:w-[70%] gap-1">
+          <div className="grid grid-cols-[35%_65%] sm:flex sm:gap-1 w-full sm:w-auto">
             <Button
               id="btn_screener_save"
               variant="outline"
               onClick={() => setShowSaveModal(true)}
-              className="bg-orange-600 text-white hover:text-black w-[35%]"
+              className="bg-orange-600 text-white hover:text-black"
             >
               <BellRing className="h-4 w-4 mr-2" />
               Get Alerts
@@ -915,7 +915,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             <Button 
               id="btn_screener_search"
               onClick={handleSearch}
-              className={`w-[65%] ${filtersChanged ? 'bg-amber-500 hover:bg-amber-600' : ''}`}
+              className={`${filtersChanged ? 'bg-amber-500 hover:bg-amber-600' : ''}`}
             >
               <Search className="h-4 w-4 mr-2" />
               {filtersChanged ? 'Search (Updated Filters)' : 'Search'}
