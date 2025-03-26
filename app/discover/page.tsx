@@ -19,12 +19,16 @@ import {
 
 interface StockData {
   symbol: string;
-//   stockPrice: number;
   impliedVolatility: number;
   earningsDate: string;
   yieldPercent: number;
-//   marketCap?: number;
-//   sector?: string;
+  stockPrice?: number;
+  strike?: number;
+  bidPrice?: number;
+  askPrice?: number;
+  volume?: number;
+  openInterest?: number;
+  delta?: number;
 }
 
 // Add tab type definition
@@ -54,6 +58,8 @@ export default function TrendingPage() {
   // State for tabs
   const [activeCallTab, setActiveCallTab] = useState<'highIV' | 'highYield' | 'earnings'>('highIV');
   const [activePutTab, setActivePutTab] = useState<'highIV' | 'highYield' | 'earnings'>('highIV');
+
+  const [expandedStock, setExpandedStock] = useState<{ symbol: string; type: 'call' | 'put' } | null>(null);
 
   useEffect(() => {
     const fetchTrendingData = async () => {
@@ -228,7 +234,6 @@ export default function TrendingPage() {
     
     return (
       <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm">
-        {/* <h2 className="text-base sm:text-lg font-bold mb-2 sm:mb-3 underline font-medium"><a href={optionsUrl}>{label} →</a></h2> */}        
         <div className="flex justify-between items-center p-1.5 sm:p-2 font-medium text-sm">
           <div>Stock</div>
           {valueKey === 'impliedVolatility' && <div>IV</div>}
@@ -247,19 +252,96 @@ export default function TrendingPage() {
                 formattedValue = formatDate(value as string);
               }
               
+              const isExpanded = expandedStock?.symbol === stock.symbol && expandedStock?.type === optionType;
+              
               return (
-                <div key={stock.symbol} className="flex justify-between items-center p-1.5 sm:p-2 hover:bg-gray-50 rounded text-sm">
-                  <div className="flex items-center">
-                    <span className="text-gray-500 mr-1.5">{index + 1}.</span>
-                    <a 
-                      href={`https://screenwich.com/stock-details/${stock.symbol}`}
-                      target="_blank"
-                      className="font-medium"
-                    >
-                      {stock.symbol}
-                    </a>                    
+                <div key={stock.symbol}>
+                  <div 
+                    className="flex justify-between items-center p-1.5 sm:p-2 hover:bg-gray-50 rounded text-sm cursor-pointer transition-colors duration-150 relative group"
+                    onClick={() => setExpandedStock(isExpanded ? null : { symbol: stock.symbol, type: optionType })}
+                  >
+                    <div className="flex items-center">
+                      <span className="text-gray-500 mr-1.5">{index + 1}.</span>
+                      <span className="font-medium">{stock.symbol}</span>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <div className="font-medium">{formattedValue}</div>
+                      <div className="flex items-center justify-center w-5 h-5 rounded-full bg-orange-500 text-white">
+                        {isExpanded ? (
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                          </svg>
+                        ) : (
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                          </svg>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div className="font-medium">{formattedValue}</div>
+                  
+                  {isExpanded && (
+                    <div className="bg-gray-50 p-3 sm:p-4 border-t">
+                      <div className="bg-white rounded-lg shadow-sm p-3 sm:p-5 border border-gray-200">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 text-sm mb-4">
+                          <div className="bg-blue-50 rounded-lg p-3 sm:p-4">
+                            <p className="font-semibold text-blue-800 mb-2 sm:mb-3 text-center border-b border-blue-100 pb-2 text-sm sm:text-base">Option Details</p>
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-600">Current Price:</span>
+                                <span className="font-medium">${stock.stockPrice || 'N/A'}</span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-600">Strike Price:</span>
+                                <span className="font-medium">${stock.strike || 'N/A'}</span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-600">Bid:</span>
+                                <span className="font-medium">${stock.bidPrice || 'N/A'}</span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-600">Ask:</span>
+                                <span className="font-medium">${stock.askPrice || 'N/A'}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="bg-green-50 rounded-lg p-3 sm:p-4 mt-4 sm:mt-0">
+                            <p className="font-semibold text-green-800 mb-2 sm:mb-3 text-center border-b border-green-100 pb-2 text-sm sm:text-base">Additional Info</p>
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-600">Volume:</span>
+                                <span className="font-medium">{stock.volume || 'N/A'}</span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-600">Open Interest:</span>
+                                <span className="font-medium">{stock.openInterest || 'N/A'}</span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-600">Implied Volatility:</span>
+                                <span className="font-medium">{(stock.impliedVolatility || 0).toFixed(2)}%</span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-600">Delta:</span>
+                                <span className="font-medium">{(stock.delta || 0).toFixed(2)}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-center mt-3 sm:mt-2">
+                          <a 
+                            href={optionsUrl}
+                            className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors text-xs sm:text-sm py-2"
+                          >
+                            Try our Options Screener
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 sm:h-4 sm:w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
