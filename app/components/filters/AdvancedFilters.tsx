@@ -363,9 +363,6 @@ export function AdvancedFilters({
                   })}
                 </SelectContent>
               </Select>
-              <div className="text-xs text-gray-500 mt-1">
-                Filter stocks by market capitalization
-              </div>
             </div>
             <div className="col-span-1">
               <label className="block text-sm font-medium mb-1">Sector</label>
@@ -384,9 +381,6 @@ export function AdvancedFilters({
                   ))}
                 </SelectContent>
               </Select>
-              <div className="text-xs text-gray-500 mt-1">
-                Filter stocks by industry sector
-              </div>
             </div>
           </div>
         </div>
