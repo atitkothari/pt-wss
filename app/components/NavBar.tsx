@@ -130,7 +130,7 @@ export function NavBar() {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="absolute top-[72px] left-0 right-0 bg-gray-900 border-b border-gray-700 p-4 md:hidden z-50">
+          <div className="absolute top-[64px] left-0 right-0 bg-gray-900 border-b border-gray-700 p-4 md:hidden z-50">
             <div className="flex flex-col space-y-4">
               {/* Screeners Section */}
               <div className="border-b border-gray-700 pb-4">
