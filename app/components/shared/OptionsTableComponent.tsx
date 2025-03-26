@@ -462,7 +462,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     movingAverageCrossover: movingAverageCrossoverOptions[0],
     sector: sectorOptions[0],
     moneynessRange: [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax] as [number, number],
-    impliedVolatility: [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax] as [number, number]
+    impliedVolatility: [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax] as [number, number],
+    deltaFilter: [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax] as [number, number]
   });
 
   const [hasSearched, setHasSearched] = useState(false);
@@ -554,7 +555,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       movingAverageCrossover,
       sector,
       moneynessRange,
-      impliedVolatility
+      impliedVolatility,
+      deltaFilter
     });
 
     updateURL({
@@ -622,51 +624,38 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   
   // Track filter changes
   useEffect(() => {
+    // console.log(hasSearched)
     // Only track changes after initial load and if we've already searched once
-    if (isFromCache && hasSearched) {
-      // Check if current filter values differ from active filters
-      const currentFilters = {
-        searchTerm: selectedStocks.join(','),
-        yieldRange,
-        maxPrice,
-        volumeRange,
-        selectedExpiration,
-        deltaFilter,
-        peRatio,
-        marketCap,
-        movingAverageCrossover,
-        sector,
-        impliedVolatility,
-        moneynessRange
-      };
-      
-      // Compare current filters with active filters
+    // if (isFromCache && hasSearched) {
+      // Compare current filter values with the last search values
       const hasChanged = 
-        currentFilters.searchTerm !== activeFilters.searchTerm ||
-        currentFilters.yieldRange[0] !== activeFilters.yieldRange[0] ||
-        currentFilters.yieldRange[1] !== activeFilters.yieldRange[1] ||
-        currentFilters.maxPrice !== activeFilters.maxPrice ||
-        currentFilters.volumeRange[0] !== activeFilters.volumeRange[0] ||
-        currentFilters.volumeRange[1] !== activeFilters.volumeRange[1] ||
-        currentFilters.selectedExpiration !== activeFilters.selectedExpiration ||
-        currentFilters.deltaFilter[0] !== deltaFilter[0] ||
-        currentFilters.deltaFilter[1] !== deltaFilter[1] ||
-        currentFilters.peRatio[0] !== activeFilters.peRatio[0] ||
-        currentFilters.peRatio[1] !== activeFilters.peRatio[1] ||
-        currentFilters.marketCap[0] !== activeFilters.marketCap[0] ||
-        currentFilters.marketCap[1] !== activeFilters.marketCap[1] ||
-        currentFilters.movingAverageCrossover !== activeFilters.movingAverageCrossover ||
-        currentFilters.sector !== activeFilters.sector ||
-        currentFilters.impliedVolatility[0]!== activeFilters.impliedVolatility[0] ||
-        currentFilters.impliedVolatility[1]!== activeFilters.impliedVolatility[1] || 
-        currentFilters.moneynessRange[0] !== activeFilters.moneynessRange[0] ||
-        currentFilters.moneynessRange[1] !== activeFilters.moneynessRange[1];
+        selectedStocks.join(',') !== activeFilters.searchTerm ||
+        yieldRange[0] !== activeFilters.yieldRange[0] ||
+        yieldRange[1] !== activeFilters.yieldRange[1] ||
+        minPrice !== activeFilters.minPrice ||
+        maxPrice !== activeFilters.maxPrice ||
+        volumeRange[0] !== activeFilters.volumeRange[0] ||
+        volumeRange[1] !== activeFilters.volumeRange[1] ||
+        selectedExpiration !== activeFilters.selectedExpiration ||
+        deltaFilter[0] !== activeFilters.deltaFilter[0] ||
+        deltaFilter[1] !== activeFilters.deltaFilter[1] ||
+        peRatio[0] !== activeFilters.peRatio[0] ||
+        peRatio[1] !== activeFilters.peRatio[1] ||
+        marketCap[0] !== activeFilters.marketCap[0] ||
+        marketCap[1] !== activeFilters.marketCap[1] ||
+        movingAverageCrossover !== activeFilters.movingAverageCrossover ||
+        sector !== activeFilters.sector ||
+        impliedVolatility[0] !== activeFilters.impliedVolatility[0] ||
+        impliedVolatility[1] !== activeFilters.impliedVolatility[1] || 
+        moneynessRange[0] !== activeFilters.moneynessRange[0] ||
+        moneynessRange[1] !== activeFilters.moneynessRange[1];
       
       setFiltersChanged(hasChanged);
-    }
+    // }
   }, [
     selectedStocks, 
     yieldRange, 
+    minPrice,
     maxPrice, 
     volumeRange, 
     selectedExpiration, 
@@ -676,9 +665,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     movingAverageCrossover,
     sector,
     moneynessRange,
+    impliedVolatility,
     hasSearched,
     isFromCache,
-    activeFilters
+    activeFilters // We still need this to compare against the last search values
   ]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -813,7 +803,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       movingAverageCrossover: movingAverageCrossoverOptions[0],
       sector: sectorOptions[0],
       moneynessRange: [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax] as [number, number],
-      impliedVolatility: [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax] as [number, number]
+      impliedVolatility: [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax] as [number, number],
+      deltaFilter: [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax] as [number, number]
     });
     
     // Reset URL parameters
