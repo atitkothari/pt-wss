@@ -234,11 +234,17 @@ export default function TrendingPage() {
     
     return (
       <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm">
-        <div className="flex justify-between items-center p-1.5 sm:p-2 font-medium text-sm">
-          <div>Stock</div>
-          {valueKey === 'impliedVolatility' && <div>IV</div>}
-          {valueKey === 'earningsDate' && <div>Earnings Date</div>}
-          {valueKey === 'yieldPercent' && <div>Yield</div>}          
+        <div className="flex justify-between items-center p-1.5 sm:p-2 font-medium text-sm border-b border-gray-100">
+          <div className="flex items-center space-x-2">
+            <span className="text-gray-500">#</span>
+            <span>Stock</span>
+          </div>
+          <div className="flex items-center space-x-4">
+            {valueKey === 'impliedVolatility' && <div className="w-20 text-right">IV</div>}
+            {valueKey === 'earningsDate' && <div className="w-32 text-right">Earnings Date</div>}
+            {valueKey === 'yieldPercent' && <div className="w-20 text-right">Yield</div>}
+            <div className="w-8"></div>
+          </div>
         </div>
         {stocks.length > 0 ? (
           <div className="space-y-1.5">
@@ -255,18 +261,26 @@ export default function TrendingPage() {
               const isExpanded = expandedStock?.symbol === stock.symbol && expandedStock?.type === optionType;
               
               return (
-                <div key={stock.symbol}>
+                <div key={stock.symbol} className="border-b border-gray-50 last:border-0">
                   <div 
                     className="flex justify-between items-center p-1.5 sm:p-2 hover:bg-gray-50 rounded text-sm cursor-pointer transition-colors duration-150 relative group"
                     onClick={() => setExpandedStock(isExpanded ? null : { symbol: stock.symbol, type: optionType })}
                   >
                     <div className="flex items-center">
-                      <span className="text-gray-500 mr-1.5">{index + 1}.</span>
+                      <span className="text-gray-500 w-6">{index + 1}.</span>
                       <span className="font-medium">{stock.symbol}</span>
                     </div>
                     <div className="flex items-center space-x-4">
-                      <div className="font-medium">{formattedValue}</div>
-                      <div className="flex items-center justify-center w-5 h-5 rounded-full bg-orange-500 text-white">
+                      {valueKey === 'impliedVolatility' && (
+                        <div className="w-20 text-right font-medium">{formattedValue}</div>
+                      )}
+                      {valueKey === 'earningsDate' && (
+                        <div className="w-32 text-right font-medium">{formattedValue}</div>
+                      )}
+                      {valueKey === 'yieldPercent' && (
+                        <div className="w-20 text-right font-medium">{formattedValue}</div>
+                      )}
+                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-orange-500 text-white">
                         {isExpanded ? (
                           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -282,56 +296,56 @@ export default function TrendingPage() {
                   </div>
                   
                   {isExpanded && (
-                    <div className="bg-gray-50 p-3 sm:p-4 border-t">
-                      <div className="bg-white rounded-lg shadow-sm p-3 sm:p-5 border border-gray-200">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 text-sm mb-4">
-                          <div className="bg-blue-50 rounded-lg p-3 sm:p-4">
-                            <p className="font-semibold text-blue-800 mb-2 sm:mb-3 text-center border-b border-blue-100 pb-2 text-sm sm:text-base">Option Details</p>
-                            <div className="space-y-2">
+                    <div className="bg-gray-50 p-2 sm:p-3">
+                      <div className="bg-white rounded-lg shadow-sm p-3 sm:p-4 border border-gray-200">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
+                          <div className="bg-blue-50 rounded-lg p-2 sm:p-3">
+                            <p className="font-semibold text-blue-800 mb-2 text-center border-b border-blue-100 pb-1.5 text-xs sm:text-sm">Option Details</p>
+                            <div className="space-y-1.5">
                               <div className="flex justify-between items-center">
-                                <span className="text-gray-600">Current Price:</span>
-                                <span className="font-medium">${stock.stockPrice || 'N/A'}</span>
+                                <span className="text-gray-600 text-xs sm:text-sm">Current Price:</span>
+                                <span className="font-medium text-xs sm:text-sm">${stock.stockPrice || 'N/A'}</span>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className="text-gray-600">Strike Price:</span>
-                                <span className="font-medium">${stock.strike || 'N/A'}</span>
+                                <span className="text-gray-600 text-xs sm:text-sm">Strike Price:</span>
+                                <span className="font-medium text-xs sm:text-sm">${stock.strike || 'N/A'}</span>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className="text-gray-600">Bid:</span>
-                                <span className="font-medium">${stock.bidPrice || 'N/A'}</span>
+                                <span className="text-gray-600 text-xs sm:text-sm">Bid:</span>
+                                <span className="font-medium text-xs sm:text-sm">${stock.bidPrice || 'N/A'}</span>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className="text-gray-600">Ask:</span>
-                                <span className="font-medium">${stock.askPrice || 'N/A'}</span>
+                                <span className="text-gray-600 text-xs sm:text-sm">Ask:</span>
+                                <span className="font-medium text-xs sm:text-sm">${stock.askPrice || 'N/A'}</span>
                               </div>
                             </div>
                           </div>
-                          <div className="bg-green-50 rounded-lg p-3 sm:p-4 mt-4 sm:mt-0">
-                            <p className="font-semibold text-green-800 mb-2 sm:mb-3 text-center border-b border-green-100 pb-2 text-sm sm:text-base">Additional Info</p>
-                            <div className="space-y-2">
+                          <div className="bg-green-50 rounded-lg p-2 sm:p-3">
+                            <p className="font-semibold text-green-800 mb-2 text-center border-b border-green-100 pb-1.5 text-xs sm:text-sm">Additional Info</p>
+                            <div className="space-y-1.5">
                               <div className="flex justify-between items-center">
-                                <span className="text-gray-600">Volume:</span>
-                                <span className="font-medium">{stock.volume || 'N/A'}</span>
+                                <span className="text-gray-600 text-xs sm:text-sm">Volume:</span>
+                                <span className="font-medium text-xs sm:text-sm">{stock.volume || 'N/A'}</span>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className="text-gray-600">Open Interest:</span>
-                                <span className="font-medium">{stock.openInterest || 'N/A'}</span>
+                                <span className="text-gray-600 text-xs sm:text-sm">Open Interest:</span>
+                                <span className="font-medium text-xs sm:text-sm">{stock.openInterest || 'N/A'}</span>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className="text-gray-600">Implied Volatility:</span>
-                                <span className="font-medium">{(stock.impliedVolatility || 0).toFixed(2)}%</span>
+                                <span className="text-gray-600 text-xs sm:text-sm">Implied Volatility:</span>
+                                <span className="font-medium text-xs sm:text-sm">{(stock.impliedVolatility || 0).toFixed(2)}%</span>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className="text-gray-600">Delta:</span>
-                                <span className="font-medium">{(stock.delta || 0).toFixed(2)}</span>
+                                <span className="text-gray-600 text-xs sm:text-sm">Delta:</span>
+                                <span className="font-medium text-xs sm:text-sm">{(stock.delta || 0).toFixed(2)}</span>
                               </div>
                             </div>
                           </div>
                         </div>
-                        <div className="text-center mt-3 sm:mt-2">
+                        <div className="text-center mt-2">
                           <a 
                             href={optionsUrl}
-                            className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors text-xs sm:text-sm py-2"
+                            className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors text-xs sm:text-sm py-1.5"
                           >
                             Try our Options Screener
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 sm:h-4 sm:w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -413,49 +427,58 @@ export default function TrendingPage() {
             </span>
           </div>
 
-          {/* Covered Call Section */}
-          <div className="space-y-4 bg-white rounded-lg shadow-sm p-4 sm:p-6">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900">Covered Call</h2>
-            
-            {/* Category Tabs for Covered Call */}
-            <div className="mb-6">
-              {renderTabs(activeCallTab, setActiveCallTab, 'call')}
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+            {/* Covered Call Section */}
+            <div className="space-y-4 bg-white rounded-lg shadow-sm p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900">Covered Call</h2>
+                <span className="text-sm text-gray-500">Weekly Opportunities</span>
+              </div>
+              
+              {/* Category Tabs for Covered Call */}
+              <div className="mb-6">
+                {renderTabs(activeCallTab, setActiveCallTab, 'call')}
+              </div>
+
+              {/* Content based on active tab for Covered Call */}
+              <div className="w-full">
+                {activeCallTab === 'highIV' && (
+                  renderStockList(highIVStocks, 'impliedVolatility', 'Top Stocks with High IV', 'call')
+                )}
+                {activeCallTab === 'highYield' && (
+                  renderStockList(highYieldStocks, 'yieldPercent', 'Top Stocks with High Premium Yield', 'call')
+                )}
+                {activeCallTab === 'earnings' && (
+                  renderStockList(earningsStocks, 'earningsDate', 'Top Stocks with Earnings This Week', 'call')
+                )}
+              </div>
             </div>
 
-            {/* Content based on active tab for Covered Call */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-              {activeCallTab === 'highIV' && (
-                renderStockList(highIVStocks, 'impliedVolatility', 'Top Stocks with High IV', 'call')
-              )}
-              {activeCallTab === 'highYield' && (
-                renderStockList(highYieldStocks, 'yieldPercent', 'Top Stocks with High Premium Yield', 'call')
-              )}
-              {activeCallTab === 'earnings' && (
-                renderStockList(earningsStocks, 'earningsDate', 'Top Stocks with Earnings This Week', 'call')
-              )}
-            </div>
-          </div>
+            {/* Cash Secured Put Section */}
+            <div className="space-y-4 bg-white rounded-lg shadow-sm p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900">Cash Secured Put</h2>
+                <span className="text-sm text-gray-500">Weekly Opportunities</span>
+              </div>
+              
+              {/* Category Tabs for Cash Secured Put */}
+              <div className="mb-6">
+                {renderTabs(activePutTab, setActivePutTab, 'put')}
+              </div>
 
-          {/* Cash Secured Put Section */}
-          <div className="space-y-4 bg-white rounded-lg shadow-sm p-4 sm:p-6">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900">Cash Secured Put</h2>
-            
-            {/* Category Tabs for Cash Secured Put */}
-            <div className="mb-6">
-              {renderTabs(activePutTab, setActivePutTab, 'put')}
-            </div>
-
-            {/* Content based on active tab for Cash Secured Put */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-              {activePutTab === 'highIV' && (
-                renderStockList(highIVPutStocks, 'impliedVolatility', 'Top Stocks with High IV', 'put')
-              )}
-              {activePutTab === 'highYield' && (
-                renderStockList(highYieldPutStocks, 'yieldPercent', 'Top Stocks with High Premium Yield', 'put')
-              )}
-              {activePutTab === 'earnings' && (
-                renderStockList(earningsPutStocks, 'earningsDate', 'Top Stocks with Earnings This Week', 'put')
-              )}
+              {/* Content based on active tab for Cash Secured Put */}
+              <div className="w-full">
+                {activePutTab === 'highIV' && (
+                  renderStockList(highIVPutStocks, 'impliedVolatility', 'Top Stocks with High IV', 'put')
+                )}
+                {activePutTab === 'highYield' && (
+                  renderStockList(highYieldPutStocks, 'yieldPercent', 'Top Stocks with High Premium Yield', 'put')
+                )}
+                {activePutTab === 'earnings' && (
+                  renderStockList(earningsPutStocks, 'earningsDate', 'Top Stocks with Earnings This Week', 'put')
+                )}
+              </div>
             </div>
           </div>
         </div>
