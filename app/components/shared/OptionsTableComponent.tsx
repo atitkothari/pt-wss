@@ -819,7 +819,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       {/* Filter Controls */}
       <div className="space-y-2 mb-2">
         {/* All Rows - 2 columns on mobile, 4 on large screens */}
-        <div className="grid grid-cols-2 lg:grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
           <MultiStockSelect
             id="input_screener_symbol"
             label="Search Symbol"
@@ -853,7 +853,6 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             tooltip={yieldFilterConfig.tooltip}
             formatValue={(val) => `${val}%`}
           />
-
         </div>
         
         {/* Advanced Filters */}
