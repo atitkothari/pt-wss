@@ -27,6 +27,16 @@ interface StockData {
 //   sector?: string;
 }
 
+// Add tab type definition
+type TabType = 'highIV' | 'highYield' | 'earnings';
+
+// Add tab configuration
+const tabConfig: Record<TabType, { label: string; icon: string }> = {
+  highIV: { label: 'High IV', icon: '📈' },
+  highYield: { label: 'High Yield', icon: '💰' },
+  earnings: { label: 'Earnings This Week', icon: '📅' }
+};
+
 export default function TrendingPage() {
   // Covered Call stocks
   const [highIVStocks, setHighIVStocks] = useState<StockData[]>([]);
@@ -40,6 +50,10 @@ export default function TrendingPage() {
   
   const [loading, setLoading] = useState(true);
   const { loading: authLoading } = useAuth();
+
+  // State for tabs
+  const [activeCallTab, setActiveCallTab] = useState<'highIV' | 'highYield' | 'earnings'>('highIV');
+  const [activePutTab, setActivePutTab] = useState<'highIV' | 'highYield' | 'earnings'>('highIV');
 
   useEffect(() => {
     const fetchTrendingData = async () => {
@@ -125,7 +139,7 @@ export default function TrendingPage() {
         };
 
         // Get high IV data for covered calls from the new endpoint
-        const highIVData = processHighIVData(highIVResponse.calls.tickers).slice(0, 10);
+        const highIVData = processHighIVData(highIVResponse.calls.tickers).slice(0, 5);
 
         const earningsData = processStockData(earningsResult.options)
           .sort((a, b) => {
@@ -133,13 +147,13 @@ export default function TrendingPage() {
             const dateB = b.earningsDate ? new Date(b.earningsDate) : new Date();
             return dateA.getTime() - dateB.getTime();
           })
-          .slice(0, 10);
+          .slice(0, 5);
 
         // Get high yield data from the new endpoint
-        const highYieldData = processHighYieldData(highYieldResponse.calls.tickers);
+        const highYieldData = processHighYieldData(highYieldResponse.calls.tickers).slice(0,5);
           
         // Get high IV data for cash secured puts from the new endpoint
-        const highIVPutData = processHighIVData(highIVResponse.puts.tickers).slice(0, 10);
+        const highIVPutData = processHighIVData(highIVResponse.puts.tickers).slice(0, 5);
 
         const earningsPutData = processStockData(earningsPutResult.options)
           .sort((a, b) => {
@@ -147,10 +161,10 @@ export default function TrendingPage() {
             const dateB = b.earningsDate ? new Date(b.earningsDate) : new Date();
             return dateA.getTime() - dateB.getTime();
           })
-          .slice(0, 10);
+          .slice(0, 5);
 
         // Get high yield put data from the new endpoint
-        const highYieldPutData = processHighYieldData(highYieldResponse.puts.tickers);
+        const highYieldPutData = processHighYieldData(highYieldResponse.puts.tickers).slice(0,5);
 
         // Set state for covered calls
         setHighIVStocks(highIVData);
@@ -214,8 +228,7 @@ export default function TrendingPage() {
     
     return (
       <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm">
-        <h2 className="text-base sm:text-lg font-bold mb-2 sm:mb-3 underline font-medium"><a href={optionsUrl}>{label} →</a></h2>
-        
+        {/* <h2 className="text-base sm:text-lg font-bold mb-2 sm:mb-3 underline font-medium"><a href={optionsUrl}>{label} →</a></h2> */}        
         <div className="flex justify-between items-center p-1.5 sm:p-2 font-medium text-sm">
           <div>Stock</div>
           {valueKey === 'impliedVolatility' && <div>IV</div>}
@@ -269,6 +282,36 @@ export default function TrendingPage() {
     );
   };
 
+  const renderTabs = (activeTab: TabType, setActiveTab: (tab: TabType) => void, section: 'call' | 'put') => {
+    return (
+      <div className="relative">
+        <div className="flex space-x-1 border-b border-gray-200">
+          {(Object.keys(tabConfig) as TabType[]).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`
+                relative px-4 py-2 text-sm font-medium transition-all duration-200
+                ${activeTab === tab
+                  ? 'text-primary'
+                  : 'text-gray-500 hover:text-gray-700'
+                }
+              `}
+            >
+              <div className="flex items-center space-x-2">
+                <span>{tabConfig[tab].icon}</span>
+                <span>{tabConfig[tab].label}</span>
+              </div>
+              {activeTab === tab && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary transform transition-transform duration-200" />
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   const renderContent = () => {
     if (authLoading || loading) {
       return (
@@ -279,7 +322,7 @@ export default function TrendingPage() {
     }
 
     return (
-      <div className="space-y-4 sm:space-y-6">
+      <div className="space-y-8 sm:space-y-12">
         <div className="space-y-3 sm:space-y-4">                    
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2 sm:mb-3">
             <h1 className="text-xl sm:text-2xl font-bold">Discover new ideas! 💡</h1>
@@ -287,19 +330,51 @@ export default function TrendingPage() {
               These are based on weekly trends. Updated daily.
             </span>
           </div>
-         
-          <h2 className="text-lg sm:text-xl font-bold">Covered Call</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {renderStockList(highYieldStocks, 'yieldPercent', 'Top 10 Stocks with High Premium Yield', 'call')}
-            {renderStockList(highIVStocks, 'impliedVolatility', 'Top 10 Stocks with High IV','call')}
-            {renderStockList(earningsStocks, 'earningsDate', 'Top 10 Stocks with Earnings This Week','call')}            
+
+          {/* Covered Call Section */}
+          <div className="space-y-4 bg-white rounded-lg shadow-sm p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">Covered Call</h2>
+            
+            {/* Category Tabs for Covered Call */}
+            <div className="mb-6">
+              {renderTabs(activeCallTab, setActiveCallTab, 'call')}
+            </div>
+
+            {/* Content based on active tab for Covered Call */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              {activeCallTab === 'highIV' && (
+                renderStockList(highIVStocks, 'impliedVolatility', 'Top Stocks with High IV', 'call')
+              )}
+              {activeCallTab === 'highYield' && (
+                renderStockList(highYieldStocks, 'yieldPercent', 'Top Stocks with High Premium Yield', 'call')
+              )}
+              {activeCallTab === 'earnings' && (
+                renderStockList(earningsStocks, 'earningsDate', 'Top Stocks with Earnings This Week', 'call')
+              )}
+            </div>
           </div>
-          
-          <h2 className="text-lg sm:text-xl font-bold mt-4 sm:mt-6">Cash Secured Put</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {renderStockList(highYieldPutStocks, 'yieldPercent', 'Top 10 Stocks with High Premium Yield', 'put')}
-            {renderStockList(highIVPutStocks, 'impliedVolatility', 'Top 10 Stocks with High IV', 'put')}
-            {renderStockList(earningsPutStocks, 'earningsDate', 'Top 10 Stocks with Earnings This Week', 'put')}            
+
+          {/* Cash Secured Put Section */}
+          <div className="space-y-4 bg-white rounded-lg shadow-sm p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">Cash Secured Put</h2>
+            
+            {/* Category Tabs for Cash Secured Put */}
+            <div className="mb-6">
+              {renderTabs(activePutTab, setActivePutTab, 'put')}
+            </div>
+
+            {/* Content based on active tab for Cash Secured Put */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              {activePutTab === 'highIV' && (
+                renderStockList(highIVPutStocks, 'impliedVolatility', 'Top Stocks with High IV', 'put')
+              )}
+              {activePutTab === 'highYield' && (
+                renderStockList(highYieldPutStocks, 'yieldPercent', 'Top Stocks with High Premium Yield', 'put')
+              )}
+              {activePutTab === 'earnings' && (
+                renderStockList(earningsPutStocks, 'earningsDate', 'Top Stocks with Earnings This Week', 'put')
+              )}
+            </div>
           </div>
         </div>
       </div>
