@@ -198,7 +198,7 @@ export function AdvancedFilters({
                 return (
                   <Badge 
                     key={key}
-                    variant="secondary" 
+                    variant="outline" 
                     className="bg-blue-100 text-blue-800 text-xs"
                   >
                     {filterNames[key]}
