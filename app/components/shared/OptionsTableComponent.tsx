@@ -610,13 +610,41 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   };
 
   useEffect(() => {
-    // Only perform search on initial load if URL has parameters and we haven't already loaded from cache
-    if (Array.from(searchParams.entries()).length > 0 && !isFromCache) {
+    // Auto fetch data on initial load regardless of URL parameters
+    if (!isFromCache) {
       // Set isFromCache first to prevent multiple API calls
       setIsFromCache(true);
       // Use a small timeout to prevent immediate API call on page load
       const timer = setTimeout(() => {
-        handleSearch();
+        // If URL has parameters, use those for search
+        if (Array.from(searchParams.entries()).length > 0) {
+          handleSearch();
+        } else {
+          // Otherwise, fetch with default values
+          fetchData(
+            selectedStocks, 
+            yieldRange[0], 
+            yieldRange[1],
+            minPrice, 
+            maxPrice, 
+            volumeRange[0],
+            volumeRange[1], 
+            selectedExpiration,
+            1,
+            rowsPerPage,
+            sortConfig.direction ? sortConfig : undefined,
+            undefined,
+            deltaFilter,
+            peRatio,
+            marketCap,
+            movingAverageCrossover,
+            sector,
+            moneynessRange,
+            impliedVolatility,
+            minSelectedExpiration
+          ).catch(console.error);
+          setHasSearched(true);
+        }
       }, 100);
       return () => clearTimeout(timer);
     }
