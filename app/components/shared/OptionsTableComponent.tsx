@@ -716,7 +716,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     return oldestDate.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',      
+      timeZoneName: 'short'
     });
   };
 
