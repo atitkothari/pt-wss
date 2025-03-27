@@ -527,6 +527,51 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     return 0;
   });
 
+  // Track filter changes
+  useEffect(() => {
+    // Compare current filter values with the last search values
+    const hasChanged = 
+      selectedStocks.join(',') !== activeFilters.searchTerm ||
+      yieldRange[0] !== activeFilters.yieldRange[0] ||
+      yieldRange[1] !== activeFilters.yieldRange[1] ||
+      minPrice !== activeFilters.minPrice ||
+      maxPrice !== activeFilters.maxPrice ||
+      volumeRange[0] !== activeFilters.volumeRange[0] ||
+      volumeRange[1] !== activeFilters.volumeRange[1] ||
+      selectedExpiration !== activeFilters.selectedExpiration ||
+      deltaFilter[0] !== activeFilters.deltaFilter[0] ||
+      deltaFilter[1] !== activeFilters.deltaFilter[1] ||
+      peRatio[0] !== activeFilters.peRatio[0] ||
+      peRatio[1] !== activeFilters.peRatio[1] ||
+      marketCap[0] !== activeFilters.marketCap[0] ||
+      marketCap[1] !== activeFilters.marketCap[1] ||
+      movingAverageCrossover !== activeFilters.movingAverageCrossover ||
+      sector !== activeFilters.sector ||
+      impliedVolatility[0] !== activeFilters.impliedVolatility[0] ||
+      impliedVolatility[1] !== activeFilters.impliedVolatility[1] || 
+      moneynessRange[0] !== activeFilters.moneynessRange[0] ||
+      moneynessRange[1] !== activeFilters.moneynessRange[1];
+    
+    if (hasChanged) {
+      setFiltersChanged(true);
+    }
+  }, [
+    selectedStocks, 
+    yieldRange, 
+    minPrice,
+    maxPrice, 
+    volumeRange, 
+    selectedExpiration, 
+    deltaFilter,
+    peRatio,
+    marketCap,
+    movingAverageCrossover,
+    sector,
+    moneynessRange,
+    impliedVolatility,
+    activeFilters
+  ]);
+
   const handleSearch = () => {
     setHasSearched(true);
     setIsFromCache(false);
@@ -535,11 +580,6 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     const newCount = searchCount + 1;
     setSearchCount(newCount);
     localStorage.setItem('searchCount', newCount.toString());
-    
-    // if (newCount >= 3) {
-    //   setShowSaveModal(true);
-    //   setSearchCount(0)
-    // }
 
     setActiveFilters({
       searchTerm: selectedStocks.join(','),
@@ -650,55 +690,6 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     }
   }, []);
   
-  // Track filter changes
-  useEffect(() => {
-    // console.log(hasSearched)
-    // Only track changes after initial load and if we've already searched once
-    // if (isFromCache && hasSearched) {
-      // Compare current filter values with the last search values
-      const hasChanged = 
-        selectedStocks.join(',') !== activeFilters.searchTerm ||
-        yieldRange[0] !== activeFilters.yieldRange[0] ||
-        yieldRange[1] !== activeFilters.yieldRange[1] ||
-        minPrice !== activeFilters.minPrice ||
-        maxPrice !== activeFilters.maxPrice ||
-        volumeRange[0] !== activeFilters.volumeRange[0] ||
-        volumeRange[1] !== activeFilters.volumeRange[1] ||
-        selectedExpiration !== activeFilters.selectedExpiration ||
-        deltaFilter[0] !== activeFilters.deltaFilter[0] ||
-        deltaFilter[1] !== activeFilters.deltaFilter[1] ||
-        peRatio[0] !== activeFilters.peRatio[0] ||
-        peRatio[1] !== activeFilters.peRatio[1] ||
-        marketCap[0] !== activeFilters.marketCap[0] ||
-        marketCap[1] !== activeFilters.marketCap[1] ||
-        movingAverageCrossover !== activeFilters.movingAverageCrossover ||
-        sector !== activeFilters.sector ||
-        impliedVolatility[0] !== activeFilters.impliedVolatility[0] ||
-        impliedVolatility[1] !== activeFilters.impliedVolatility[1] || 
-        moneynessRange[0] !== activeFilters.moneynessRange[0] ||
-        moneynessRange[1] !== activeFilters.moneynessRange[1];
-      
-      setFiltersChanged(hasChanged);
-    // }
-  }, [
-    selectedStocks, 
-    yieldRange, 
-    minPrice,
-    maxPrice, 
-    volumeRange, 
-    selectedExpiration, 
-    deltaFilter,
-    peRatio,
-    marketCap,
-    movingAverageCrossover,
-    sector,
-    moneynessRange,
-    impliedVolatility,
-    hasSearched,
-    isFromCache,
-    activeFilters // We still need this to compare against the last search values
-  ]);
-
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSearch();
@@ -966,6 +957,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
        strikeFilter === 'ONE_OUT' ? (
         <div className="text-center py-8 text-gray-600">
           Run a search to view results
+        </div>
+      ) : filtersChanged ? (
+        <div className="text-center py-8 text-gray-600">
+          Filters have been updated. Click the Search button to view updated results.
         </div>
       ) : loading ? (
         <LoadingSpinner />
