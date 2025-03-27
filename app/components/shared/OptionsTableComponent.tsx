@@ -44,12 +44,19 @@ interface OptionsTableComponentProps {
   option: OptionType;
 }
 
-function getNextFriday(date: Date): Date {
-  const dayOfWeek = date.getDay();
-  const daysUntilFriday = (5 - dayOfWeek + 7) % 7;
-  const nextFriday = new Date(date);
-  nextFriday.setDate(date.getDate() + daysUntilFriday);
-  return nextFriday;
+
+function convertUtcToEst(utcDate: string): Date {
+  // Parse the UTC date string into a Date object
+  const utcDateObj = new Date(utcDate);
+
+  // Get the UTC offset for Eastern Time Zone (Daylight Saving Time: UTC-4)
+  const estOffset = -4 * 60 * 60 * 1000; // Offset in milliseconds (-4 hours)
+
+  // Adjust the UTC date by adding the offset (in milliseconds)
+  const estDateObj = new Date(utcDateObj.getTime() + estOffset);
+
+  // Return the adjusted Date object
+  return estDateObj;
 }
 
 // Using the centralized default visible columns from filterConfig
@@ -729,7 +736,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const getOldestUpdateDate = () => {
     if (!data || data.length === 0) return null;
     
-    const dates = data.map(item => new Date(item.lastUpdatedDate));
+    const dates = data.map(item => convertUtcToEst(item.lastUpdatedDate));
     const oldestDate = new Date(Math.min(...dates.map(date => date.getTime())));
     
     return oldestDate.toLocaleDateString('en-US', {
