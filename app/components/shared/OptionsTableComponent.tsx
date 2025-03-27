@@ -441,7 +441,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     }
   }, [impliedVolatility, option]);
   
-  const [selectedExpiration, setSelectedExpiration] = useState(searchParams.get(getParamKey('expiration')) || "");
+  const [selectedExpiration, setSelectedExpiration] = useState(searchParams.get(getParamKey('max_expiration')) || "");
   const [minSelectedExpiration, setMinSelectedExpiration] = useState(searchParams.get(getParamKey('min_expiration')) || "");
   const [sortConfig, setSortConfig] = useState<{ field: keyof Option; direction: 'asc' | 'desc' | null }>({ 
     field: "symbol", 
