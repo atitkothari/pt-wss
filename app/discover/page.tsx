@@ -17,6 +17,7 @@ import {
   setDefaultFilterValues,
   dteFilterConfig
 } from "../config/filterConfig";
+import { sendAnalyticsEvent, AnalyticsEvents } from '../utils/analytics';
 
 interface StockData {
   symbol: string;
@@ -62,6 +63,38 @@ export default function TrendingPage() {
   const [activePutTab, setActivePutTab] = useState<'highIV' | 'highYield' | 'earnings'>('highIV');
 
   const [expandedStock, setExpandedStock] = useState<{ symbol: string; type: 'call' | 'put' } | null>(null);
+
+  // Track tab changes
+  const handleCallTabChange = (tab: 'highIV' | 'highYield' | 'earnings') => {
+    setActiveCallTab(tab);
+    sendAnalyticsEvent({
+      event_name: AnalyticsEvents.DISCOVER_TAB_CHANGE,
+      event_category: 'Discover',
+      event_label: 'Covered Call',
+      tab_name: tab
+    });
+  };
+
+  const handlePutTabChange = (tab: 'highIV' | 'highYield' | 'earnings') => {
+    setActivePutTab(tab);
+    sendAnalyticsEvent({
+      event_name: AnalyticsEvents.DISCOVER_TAB_CHANGE,
+      event_category: 'Discover',
+      event_label: 'Cash Secured Put',
+      tab_name: tab
+    });
+  };
+
+  // Track stock expansion
+  const handleStockExpand = (symbol: string, type: 'call' | 'put') => {
+    setExpandedStock({ symbol, type });
+    sendAnalyticsEvent({
+      event_name: AnalyticsEvents.STOCK_DETAIL_VIEW,
+      event_category: 'Discover',
+      event_label: type === 'call' ? 'Covered Call' : 'Cash Secured Put',
+      symbol: symbol
+    });
+  };
 
   useEffect(() => {
     const fetchTrendingData = async () => {
@@ -280,7 +313,7 @@ export default function TrendingPage() {
                 <div key={stock.symbol} className="border-b border-gray-50 last:border-0">
                   <div 
                     className="flex justify-between items-center p-1.5 sm:p-2 hover:bg-gray-50 rounded text-sm cursor-pointer transition-colors duration-150 relative group"
-                    onClick={() => setExpandedStock(isExpanded ? null : { symbol: stock.symbol, type: optionType })}
+                    onClick={() => handleStockExpand(stock.symbol, optionType)}
                   >
                     <div className="flex items-center">
                       <span className="text-gray-500 w-6">{index + 1}.</span>
@@ -454,7 +487,7 @@ export default function TrendingPage() {
               
               {/* Category Tabs for Covered Call */}
               <div className="mb-6">
-                {renderTabs(activeCallTab, setActiveCallTab, 'call')}
+                {renderTabs(activeCallTab, handleCallTabChange, 'call')}
               </div>
 
               {/* Content based on active tab for Covered Call */}
@@ -516,7 +549,7 @@ export default function TrendingPage() {
               
               {/* Category Tabs for Cash Secured Put */}
               <div className="mb-6">
-                {renderTabs(activePutTab, setActivePutTab, 'put')}
+                {renderTabs(activePutTab, handlePutTabChange, 'put')}
               </div>
 
               {/* Content based on active tab for Cash Secured Put */}

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
+import { sendAnalyticsEvent, AnalyticsEvents } from '../utils/analytics';
 
 export function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -31,6 +32,16 @@ export function NavBar() {
     setIsMenuOpen(false);
   };
 
+  const handleNavigation = (name: string, href: string, external: boolean = false) => {
+    sendAnalyticsEvent({
+      event_name: AnalyticsEvents.PAGE_VIEW,
+      event_category: 'Navigation',
+      event_label: name,
+      page_path: href,
+      is_external: external
+    });
+  };
+
   return (
     <nav className="bg-gradient-to-b from-gray-900 to-gray-800 w-full border-b border-gray-700 p-4 z-40 relative">
       <div className="max-w-screen-2xl mx-auto flex justify-between items-center">
@@ -48,26 +59,28 @@ export function NavBar() {
         <div className="hidden md:flex items-center space-x-8">
           <div className="flex space-x-8">
             {/* Screeners Dropdown */}
-            <div className="relative">
+            <div className="relative group">
               <button
+                className="flex items-center text-gray-700 hover:text-gray-900"
                 onClick={() => setIsScreenersOpen(!isScreenersOpen)}
-                className="text-white hover:text-gray-300 flex items-center"
               >
                 Screeners
                 <ChevronDown className="ml-1 h-4 w-4" />
               </button>
               {isScreenersOpen && (
-                <div className="absolute top-full left-0 mt-2 w-64 bg-gray-800 rounded-md shadow-lg py-1">
-                  {navigation.screeners.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
-                      onClick={() => setIsScreenersOpen(false)}
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
+                <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                  <div className="py-1">
+                    {navigation.screeners.map((item) => (
+                      <Link
+                        key={item.id}
+                        href={item.href}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => handleNavigation(item.name, item.href)}
+                      >
+                        {item.name}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -77,7 +90,8 @@ export function NavBar() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-white hover:text-gray-300"
+                className="text-gray-700 hover:text-gray-900"
+                onClick={() => handleNavigation(item.name, item.href)}
               >
                 {item.name}
               </Link>
@@ -88,10 +102,10 @@ export function NavBar() {
               <a
                 key={item.name}
                 href={item.href}
-                className="text-white hover:text-gray-300"
-                id={item.name === 'API' ? 'api_btn' : undefined}
-                target={item.external ? "_blank" : undefined}
-                rel={item.external ? "noopener noreferrer" : undefined}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-700 hover:text-gray-900"
+                onClick={() => handleNavigation(item.name, item.href, true)}
               >
                 {item.name}
               </a>
