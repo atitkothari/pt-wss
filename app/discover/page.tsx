@@ -8,6 +8,7 @@ import { Option } from "../types/option";
 import { format, parseISO, addDays, isAfter, isBefore, addWeeks } from 'date-fns';
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { useAuth } from "../context/AuthContext";
+import { Button } from "@/components/ui/button";
 import { 
   yieldFilterConfig, 
   volumeFilterConfig, 
@@ -53,7 +54,7 @@ export default function TrendingPage() {
   const [highYieldPutStocks, setHighYieldPutStocks] = useState<StockData[]>([]);
   
   const [loading, setLoading] = useState(true);
-  const { loading: authLoading } = useAuth();
+  const { user, loading: authLoading, signInWithGoogle } = useAuth();
 
   // State for tabs
   const [activeCallTab, setActiveCallTab] = useState<'highIV' | 'highYield' | 'earnings'>('highIV');
@@ -442,15 +443,51 @@ export default function TrendingPage() {
               </div>
 
               {/* Content based on active tab for Covered Call */}
-              <div className="w-full">
+              <div className="w-full relative">
                 {activeCallTab === 'highIV' && (
                   renderStockList(highIVStocks, 'impliedVolatility', 'Top Stocks with High IV', 'call')
                 )}
                 {activeCallTab === 'highYield' && (
-                  renderStockList(highYieldStocks, 'yieldPercent', 'Top Stocks with High Premium Yield', 'call')
+                  <>
+                    {user ? (
+                      renderStockList(highYieldStocks, 'yieldPercent', 'Top Stocks with High Premium Yield', 'call')
+                    ) : (
+                      <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm min-h-[300px] relative">
+                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/95 via-gray-900/60 to-transparent flex flex-col items-center justify-center p-6 text-center">
+                          <h2 className="text-xl font-bold text-white mb-2">Sign in to view High Yield data</h2>
+                          <p className="text-gray-200 max-w-md mb-4">Get full access to premium yield data by signing in with your Google account.</p>
+                          <Button
+                            onClick={signInWithGoogle}
+                            size="lg"
+                            className="bg-white hover:bg-gray-100 text-gray-900 border-0"
+                          >
+                            Sign in with Google for FREE
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
                 {activeCallTab === 'earnings' && (
-                  renderStockList(earningsStocks, 'earningsDate', 'Top Stocks with Earnings This Week', 'call')
+                  <>
+                    {user ? (
+                      renderStockList(earningsStocks, 'earningsDate', 'Top Stocks with Earnings This Week', 'call')
+                    ) : (
+                      <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm min-h-[300px] relative">
+                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/95 via-gray-900/60 to-transparent flex flex-col items-center justify-center p-6 text-center">
+                          <h2 className="text-xl font-bold text-white mb-2">Sign in to view Earnings data</h2>
+                          <p className="text-gray-200 max-w-md mb-4">Get full access to earnings data by signing in with your Google account.</p>
+                          <Button
+                            onClick={signInWithGoogle}
+                            size="lg"
+                            className="bg-white hover:bg-gray-100 text-gray-900 border-0"
+                          >
+                            Sign in with Google for FREE
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -468,15 +505,51 @@ export default function TrendingPage() {
               </div>
 
               {/* Content based on active tab for Cash Secured Put */}
-              <div className="w-full">
+              <div className="w-full relative">
                 {activePutTab === 'highIV' && (
                   renderStockList(highIVPutStocks, 'impliedVolatility', 'Top Stocks with High IV', 'put')
                 )}
                 {activePutTab === 'highYield' && (
-                  renderStockList(highYieldPutStocks, 'yieldPercent', 'Top Stocks with High Premium Yield', 'put')
+                  <>
+                    {user ? (
+                      renderStockList(highYieldPutStocks, 'yieldPercent', 'Top Stocks with High Premium Yield', 'put')
+                    ) : (
+                      <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm min-h-[300px] relative">
+                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/95 via-gray-900/60 to-transparent flex flex-col items-center justify-center p-6 text-center">
+                          <h2 className="text-xl font-bold text-white mb-2">Sign in to view High Yield data</h2>
+                          <p className="text-gray-200 max-w-md mb-4">Get full access to premium yield data by signing in with your Google account.</p>
+                          <Button
+                            onClick={signInWithGoogle}
+                            size="lg"
+                            className="bg-white hover:bg-gray-100 text-gray-900 border-0"
+                          >
+                            Sign in with Google for FREE
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
                 {activePutTab === 'earnings' && (
-                  renderStockList(earningsPutStocks, 'earningsDate', 'Top Stocks with Earnings This Week', 'put')
+                  <>
+                    {user ? (
+                      renderStockList(earningsPutStocks, 'earningsDate', 'Top Stocks with Earnings This Week', 'put')
+                    ) : (
+                      <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm min-h-[300px] relative">
+                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/95 via-gray-900/60 to-transparent flex flex-col items-center justify-center p-6 text-center">
+                          <h2 className="text-xl font-bold text-white mb-2">Sign in to view Earnings data</h2>
+                          <p className="text-gray-200 max-w-md mb-4">Get full access to earnings data by signing in with your Google account.</p>
+                          <Button
+                            onClick={signInWithGoogle}
+                            size="lg"
+                            className="bg-white hover:bg-gray-100 text-gray-900 border-0"
+                          >
+                            Sign in with Google for FREE
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
