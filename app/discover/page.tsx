@@ -30,6 +30,7 @@ interface StockData {
   volume?: number;
   openInterest?: number;
   delta?: number;
+  expiration?: string;
 }
 
 // Add tab type definition
@@ -126,22 +127,36 @@ export default function TrendingPage() {
         };
 
         // Process high yield stocks from the new endpoint
-        const processHighYieldData = (tickers: { symbol: string; yieldPercent: number }[]): StockData[] => {
+        const processHighYieldData = (tickers: any[]): StockData[] => {
           return tickers.map(ticker => ({
             symbol: ticker.symbol,
-            impliedVolatility: 0, // We don't have this data from the endpoint
-            earningsDate: '', // We don't have this data from the endpoint
-            yieldPercent: ticker.yieldPercent
+            impliedVolatility: ticker.impliedVolatility || 0,
+            earningsDate: ticker.earningsDate || '',
+            yieldPercent: ticker.yieldPercent,
+            askPrice: ticker.askprice,
+            bidPrice: ticker.bidprice,
+            delta: ticker.delta,
+            strike: ticker.strike,
+            volume: ticker.volume,
+            openInterest: ticker.openinterest,
+            expiration: ticker.expiration
           }));
         };
         
         // Process high IV stocks from the new endpoint
-        const processHighIVData = (tickers: { symbol: string; impliedVolatility: number }[]): StockData[] => {
+        const processHighIVData = (tickers: any[]): StockData[] => {
           return tickers.map(ticker => ({
             symbol: ticker.symbol,
             impliedVolatility: ticker.impliedVolatility,
-            earningsDate: '', // We don't have this data from the endpoint
-            yieldPercent: 0 // We don't have this data from the endpoint
+            earningsDate: ticker.earningsDate || '',
+            yieldPercent: ticker.yieldPercent || 0,
+            askPrice: ticker.askprice,
+            bidPrice: ticker.bidprice,
+            delta: ticker.delta,
+            strike: ticker.strike,
+            volume: ticker.volume,
+            openInterest: ticker.openinterest,
+            expiration: ticker.expiration
           }));
         };
 
@@ -345,7 +360,7 @@ export default function TrendingPage() {
                         </div>
                         <div className="text-center mt-2">
                           <a 
-                            href={optionsUrl}
+                            href={optionsUrl+`&${paramPrefix}search=${stock.symbol}`}
                             className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors text-xs sm:text-sm py-1.5"
                           >
                             Try our Options Screener

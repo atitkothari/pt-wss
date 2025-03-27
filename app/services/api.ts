@@ -4,6 +4,13 @@ import { StrikeFilter as StrikeFilterType } from '../types/option';
 interface HighYieldTicker {
   symbol: string;
   yieldPercent: number;
+  askprice?: number;
+  bidprice?: number;
+  delta?: number;
+  expiration?: string;
+  strike?: number;
+  volume?: number;
+  openinterest?: number;
 }
 
 interface HighYieldResponse {
@@ -122,6 +129,14 @@ export async function fetchTickersWithHighestYield(): Promise<HighYieldResponse>
 interface HighIVTicker {
   symbol: string;
   impliedVolatility: number;
+  askprice?: number;
+  bidprice?: number;
+  delta?: number;
+  expiration?: string;
+  strike?: number;
+  volume?: number;
+  openinterest?: number;
+  yieldPercent?: number;
 }
 
 interface HighIVResponse {
