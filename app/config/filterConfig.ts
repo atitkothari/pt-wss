@@ -48,8 +48,8 @@ export const dteFilterConfig = {
   min: 0,
   max: 365,
   defaultMin: 0,
-  defaultMax: 30,
-  default: 30, // For single value DTE selector
+  defaultMax: 365,
+  default: 365, // For single value DTE selector
   step: 1,
   tooltip: "Number of days until option expiration",
   // Exponential scale parameters
