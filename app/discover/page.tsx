@@ -87,6 +87,13 @@ export default function TrendingPage() {
 
   // Track stock expansion
   const handleStockExpand = (symbol: string, type: 'call' | 'put') => {
+    // If clicking on the same stock, collapse it
+    if (expandedStock?.symbol === symbol && expandedStock?.type === type) {
+      setExpandedStock(null);
+      return;
+    }
+    
+    // Otherwise expand the new stock
     setExpandedStock({ symbol, type });
     sendAnalyticsEvent({
       event_name: AnalyticsEvents.STOCK_DETAIL_VIEW,
