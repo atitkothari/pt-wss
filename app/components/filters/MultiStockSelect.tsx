@@ -167,6 +167,7 @@ export function MultiStockSelect({
               setIsFocused(true);
             }}
             onKeyDown={handleKeyDown}
+            style={{ fontSize: '16px' }}
           />
         </div>
         
