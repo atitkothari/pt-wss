@@ -40,6 +40,7 @@ export function SingleValueSlider({
   className
 }: SingleValueSliderProps) {
   const [localValue, setLocalValue] = useState<number>(value);
+  const [isTooltipOpen, setIsTooltipOpen] = useState(false);
   
   // Update local state when props change
   useEffect(() => {
@@ -57,18 +58,30 @@ export function SingleValueSlider({
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-1">
           <label htmlFor={id} className="block text-sm font-medium">{label}</label>
-          {/* {tooltip && (
-            <TooltipProvider>
-              <Tooltip>
+          {tooltip && (
+            <TooltipProvider delayDuration={0}>
+              <Tooltip open={isTooltipOpen} onOpenChange={setIsTooltipOpen}>
                 <TooltipTrigger asChild>
-                  <Info size={14} className="text-gray-400 cursor-help" />
+                  <Info 
+                    size={14} 
+                    className="text-gray-400 cursor-help touch-manipulation" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsTooltipOpen(!isTooltipOpen);
+                    }}
+                  />
                 </TooltipTrigger>
-                <TooltipContent>
+                <TooltipContent 
+                  side="top" 
+                  className="max-w-[300px] z-[9999] bg-white text-gray-900 border border-gray-200 shadow-lg"
+                  sideOffset={5}
+                  align="start"
+                >
                   <p className="text-xs">{tooltip}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-          )} */}
+          )}
         </div>
         <div className="text-xs text-gray-500">
           {formatValue(localValue)}

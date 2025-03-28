@@ -1,6 +1,29 @@
 import { Option, OptionType } from "../types/option";
 import { StrikeFilter as StrikeFilterType } from '../types/option';
 
+interface HighYieldTicker {
+  symbol: string;
+  yieldPercent: number;
+  askprice?: number;
+  bidprice?: number;
+  delta?: number;
+  expiration?: string;
+  strike?: number;
+  volume?: number;
+  openinterest?: number;
+}
+
+interface HighYieldResponse {
+  calls: {
+    tickers: HighYieldTicker[];
+    url: string;
+  };
+  puts: {
+    tickers: HighYieldTicker[];
+    url: string;
+  };
+}
+
 interface Filter {
   operation: string;
   field: string;
@@ -86,4 +109,99 @@ export async function fetchOptionsData(
       delta: opt.delta || null
     }))
   };
+}
+
+export async function fetchTickersWithHighestYield(): Promise<HighYieldResponse> {
+  const response = await fetch(`https://api.wheelstrategyoptions.com/wheelstrat/fetchTickersWithHighestYield`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch highest yield data');
+  }
+
+  return await response.json();
+}
+
+interface HighIVTicker {
+  symbol: string;
+  impliedVolatility: number;
+  askprice?: number;
+  bidprice?: number;
+  delta?: number;
+  expiration?: string;
+  strike?: number;
+  volume?: number;
+  openinterest?: number;
+  yieldPercent?: number;
+}
+
+interface HighIVResponse {
+  calls: {
+    tickers: HighIVTicker[];
+    url: string;
+  };
+  puts: {
+    tickers: HighIVTicker[];
+    url: string;
+  };
+}
+
+export async function fetchTickersWithHighestImpliedVolatility(): Promise<HighIVResponse> {
+  const response = await fetch(`https://api.wheelstrategyoptions.com/wheelstrat/fetchTockersWithHighestImpliedVolatility`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch highest implied volatility data');
+  }
+
+  return await response.json();
+}
+
+interface NextEarningsTicker {
+  symbol: string;
+  earningsDate: string;
+  impliedVolatility: number;
+  askprice?: number;
+  bidprice?: number;
+  delta?: number;
+  expiration?: string;
+  strike?: number;
+  volume?: number;
+  openinterest?: number;
+  yieldPercent?: number;
+  stockPrice?: number;
+}
+
+interface NextEarningsResponse {
+  calls: {
+    tickers: NextEarningsTicker[];
+    url: string;
+  };
+  puts: {
+    tickers: NextEarningsTicker[];
+    url: string;
+  };
+}
+
+export async function fetchTickersWithNextEarnings(): Promise<NextEarningsResponse> {
+  const response = await fetch(`https://api.wheelstrategyoptions.com/wheelstrat/fetchTickersWithNextEarnings`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch next earnings data');
+  }
+
+  return await response.json();
 }

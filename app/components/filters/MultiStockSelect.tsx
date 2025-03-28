@@ -40,6 +40,7 @@ export function MultiStockSelect({
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [isFocused, setIsFocused] = useState(false);
+  const [isTooltipOpen, setIsTooltipOpen] = useState(false);
   
   const filteredSuggestions = suggestions
     .filter(symbol => 
@@ -100,18 +101,30 @@ export function MultiStockSelect({
     <div className={`flex-1 relative ${className || ''}`}>
       <div className="flex items-center gap-1 mb-1">
         <label htmlFor={id} className="block text-sm font-medium">{label}</label>
-        {/* {tooltip && (
-          <TooltipProvider>
-            <Tooltip>
+        {tooltip && (
+          <TooltipProvider delayDuration={0}>
+            <Tooltip open={isTooltipOpen} onOpenChange={setIsTooltipOpen}>
               <TooltipTrigger asChild>
-                <Info size={14} className="text-gray-400 cursor-help" />
+                <Info 
+                  size={14} 
+                  className="text-gray-400 cursor-help touch-manipulation" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsTooltipOpen(!isTooltipOpen);
+                  }}
+                />
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent 
+                side="top" 
+                className="max-w-[300px] z-[9999] bg-white text-gray-900 border border-gray-200 shadow-lg"
+                sideOffset={5}
+                align="start"
+              >
                 <p className="text-xs">{tooltip}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-        )} */}
+        )}
       </div>
       
       <div className="relative">
@@ -154,6 +167,7 @@ export function MultiStockSelect({
               setIsFocused(true);
             }}
             onKeyDown={handleKeyDown}
+            style={{ fontSize: '16px' }}
           />
         </div>
         

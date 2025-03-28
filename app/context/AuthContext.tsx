@@ -11,6 +11,7 @@ import {
 import { auth } from '../config/firebase';
 import { toast } from "sonner";
 import { subscribeToGhost } from '../services/queryService';
+import { sendAnalyticsEvent, AnalyticsEvents } from '../utils/analytics';
 
 interface AuthContextType {
   user: User | null;  
@@ -82,16 +83,12 @@ export const AuthContextProvider = ({
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       
-      // Subscribe to Ghost mailing list
-      // if (result.user.email) {
-      //   console.log('Email:', result.user)
-      //   try {
-      //     await subscribeToGhost(result.user.email, result.user.displayName??"")
-      //   } catch (subscribeError) {
-      //     console.error('Error subscribing to newsletter:', subscribeError);
-      //     // Don't throw error to prevent blocking sign-in
-      //   }
-      // }
+      // Track sign in event
+      sendAnalyticsEvent({
+        event_name: AnalyticsEvents.SIGN_IN,
+        event_category: 'Auth',
+        method: 'Google'
+      });
       
       toast.success('Successfully signed in!');
     } catch (error) {
@@ -99,6 +96,13 @@ export const AuthContextProvider = ({
       const errorMessage = error instanceof Error ? error.message : 'Failed to sign in with Google';
       setError(errorMessage);
       toast.error(errorMessage);
+      
+      // Track error event
+      sendAnalyticsEvent({
+        event_name: AnalyticsEvents.ERROR,
+        event_category: 'Auth',
+        error_message: errorMessage
+      });
     } finally {
       setLoading(false);
     }
@@ -109,12 +113,26 @@ export const AuthContextProvider = ({
       setLoading(true);
       setError(null);
       await signOut(auth);
+      
+      // Track sign out event
+      sendAnalyticsEvent({
+        event_name: AnalyticsEvents.SIGN_OUT,
+        event_category: 'Auth'
+      });
+      
       toast.success('Successfully signed out!');
     } catch (error) {
       console.error('Error signing out:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to sign out';
       setError(errorMessage);
       toast.error(errorMessage);
+      
+      // Track error event
+      sendAnalyticsEvent({
+        event_name: AnalyticsEvents.ERROR,
+        event_category: 'Auth',
+        error_message: errorMessage
+      });
     } finally {
       setLoading(false);
     }

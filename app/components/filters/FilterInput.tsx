@@ -103,18 +103,18 @@ export function FilterInput({
     <div className={`flex-1 relative ${className || ''}`}>
       <div className="flex items-center gap-1 mb-1">
         <label htmlFor={id} className="block text-sm font-medium">{label}</label>
-        {/* {tooltip && (
+        {tooltip && (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Info size={14} className="text-gray-400 cursor-help" />
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent side="top" className="max-w-[300px]">
                 <p className="text-xs">{tooltip}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-        )} */}
+        )}
       </div>
       <div className="relative">
         <Input

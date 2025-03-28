@@ -48,8 +48,8 @@ export const dteFilterConfig = {
   min: 0,
   max: 365,
   defaultMin: 0,
-  defaultMax: 30,
-  default: 30, // For single value DTE selector
+  defaultMax: 365,
+  default: 365, // For single value DTE selector
   step: 1,
   tooltip: "Number of days until option expiration",
   // Exponential scale parameters
@@ -195,3 +195,55 @@ export const impliedVolatilityFilterConfig = {
   step: 5,
   tooltip: "Implied Volatility percentage range for option contracts"
 };
+
+/**
+ * Sets all filter values to their defaults in local storage for a specific option type
+ * @param optionType - The type of option ('call' or 'put')
+ */
+export const setDefaultFilterValues = (optionType: 'call' | 'put') => {
+  // Yield filter
+  localStorage.setItem(`${optionType}_yieldRange`, JSON.stringify([yieldFilterConfig.min, yieldFilterConfig.max]));
+
+  // Price filter
+  localStorage.setItem(`${optionType}_minPrice`, JSON.stringify(priceFilterConfig.defaultMin));
+  localStorage.setItem(`${optionType}_maxPrice`, JSON.stringify(priceFilterConfig.defaultMax));
+
+  // Volume filter
+  localStorage.setItem(`${optionType}_volumeRange`, JSON.stringify([volumeFilterConfig.min, volumeFilterConfig.max]));
+
+  // Delta filter
+  localStorage.setItem(`${optionType}_deltaFilter`, JSON.stringify([deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax]));
+
+  // DTE filter
+  localStorage.setItem(`${optionType}_minDte`, JSON.stringify(dteFilterConfig.defaultMin));
+  localStorage.setItem(`${optionType}_maxDte`, JSON.stringify(dteFilterConfig.defaultMax));
+
+  // P/E Ratio filter
+  localStorage.setItem(`${optionType}_peRatio`, JSON.stringify([peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax]));
+
+  // Market Cap filter
+  localStorage.setItem(`${optionType}_marketCap`, JSON.stringify([marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax]));
+
+  // Moneyness filter
+  localStorage.setItem(`${optionType}_moneynessRange`, JSON.stringify([moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax]));
+
+  // Moving Average Crossover
+  localStorage.setItem(`${optionType}_movingAverageCrossover`, JSON.stringify(movingAverageCrossoverOptions[0]));
+
+  // Sector
+  localStorage.setItem(`${optionType}_sector`, JSON.stringify(sectorOptions[0]));
+
+  // Market Cap Category
+  localStorage.setItem(`${optionType}_marketCapCategory`, JSON.stringify(marketCapCategories[0]));
+
+  // Implied Volatility filter
+  localStorage.setItem(`${optionType}_impliedVolatility`, JSON.stringify([impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax]));
+
+  // Visible columns
+  localStorage.setItem(`${optionType}_visibleColumns`, JSON.stringify(defaultVisibleColumns));
+
+  // Reset search symbol
+  localStorage.setItem(`${optionType}_searchTerm`, JSON.stringify(''));
+  localStorage.setItem(`${optionType}_selectedStocks`, JSON.stringify([]));
+};
+

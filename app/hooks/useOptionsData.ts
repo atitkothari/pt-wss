@@ -88,7 +88,7 @@ export function useOptionsData(
       }
       
       if(selectedExpiration === "") {
-        filters.push({ operation: 'eq', field: 'expiration', value: `"${format(new Date(), 'yyyy-MM-dd')}"` });
+        filters.push({ operation: 'gte', field: 'expiration', value: `"${format(new Date(), 'yyyy-MM-dd')}"` });
       } else if (selectedExpiration) {
         // If minSelectedExpiration is provided, use it as the lower bound
         // Otherwise, use today's date as the lower bound
