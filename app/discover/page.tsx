@@ -477,7 +477,7 @@ export default function TrendingPage() {
       <div className="space-y-8 sm:space-y-12">
         <div className="space-y-3 sm:space-y-4">                    
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2 sm:mb-3">
-            <h1 className="text-xl sm:text-2xl font-bold">Discover new ideas! ��</h1>
+            <h1 className="text-xl sm:text-2xl font-bold">Discover new ideas!</h1>
             <span className="text-gray-500 text-xs sm:text-sm">
               These are based on weekly trends. Updated daily.
             </span>
