@@ -179,7 +179,8 @@ export default function TrendingPage() {
             strike: ticker.strike,
             volume: ticker.volume,
             openInterest: ticker.openinterest,
-            expiration: ticker.expiration
+            expiration: ticker.expiration,
+            stockPrice: ticker.stockPrice
           }));
         };
         
@@ -196,7 +197,8 @@ export default function TrendingPage() {
             strike: ticker.strike,
             volume: ticker.volume,
             openInterest: ticker.openinterest,
-            expiration: ticker.expiration
+            expiration: ticker.expiration,
+            stockPrice: ticker.stockPrice
           }));
         };
 
@@ -258,7 +260,7 @@ export default function TrendingPage() {
   };
 
   const renderStockList = (stocks: StockData[], valueKey: keyof StockData, label: string, optionType:'call'|'put') => {
-        
+        console.log(stocks);
     // Generate the appropriate URL parameters based on the list type
     let optionsUrl = optionType === 'call' ? '/covered-call-screener?' : '/cash-secured-put-screener?';    
     setDefaultFilterValues(optionType)
