@@ -938,7 +938,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
               onClick={() => setShowSaveModal(true)}
               className="bg-orange-600 text-white hover:text-black"
             >
-              <BellRing className="h-4 w-4 mr-2" />
+              <BellRing className="h-5 w-5 min-h-[15px] min-w-[15px] mr-2" />
               Get Alerts
             </Button>
             <Button 
@@ -946,139 +946,145 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
               onClick={handleSearch}
               className={`${filtersChanged ? 'bg-amber-500 hover:bg-amber-600' : ''}`}
             >
-              <Search className="h-4 w-4 mr-2" />
+              <Search className="h-5 w-5 min-h-[15px] min-w-[15px] mr-2" />
               {filtersChanged ? 'Search (Updated Filters)' : 'Search'}
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Results Section */}
-      {!hasSearched && !activeFilters.searchTerm && 
-       activeFilters.yieldRange[0] === yieldFilterConfig.min && 
-       activeFilters.yieldRange[1] === yieldFilterConfig.max && 
-       activeFilters.maxPrice === 1000 && 
-       activeFilters.volumeRange[0] === volumeFilterConfig.min && 
-       activeFilters.volumeRange[1] === volumeFilterConfig.max && 
-       !activeFilters.selectedExpiration && 
-       strikeFilter === 'ONE_OUT' ? (
-        <div className="text-center py-8 text-gray-600">
-          Run a search to view results
-        </div>
-      ) : filtersChanged ? (
-        <div className="text-center py-8 text-gray-600">
-          Filters have been updated. Click the Search button to view updated results.
-        </div>
-      ) : loading ? (
-        <LoadingSpinner />
-      ) : (
-        <div>          
-          <BlurredTable hasSearched={hasSearched && !user}>
-            <OptionsTable 
-              data={data}              
-              onSort={handleSortURL}
-            />
-          </BlurredTable>
-          {/* Pagination Controls */}
-          <div className="flex justify-between items-center mt-0.5 md:mt-1 px-0.5 md:px-1 text-xs">
-            <div className="text-gray-600">
-              Showing {((currentPage - 1) * rowsPerPage) + 1} to {Math.min(currentPage * rowsPerPage, totalCount)} of {totalCount} results
+      {/* Results Section - Fixed height container */}
+      <div className="min-h-[600px] relative">
+        {!hasSearched && !activeFilters.searchTerm && 
+         activeFilters.yieldRange[0] === yieldFilterConfig.min && 
+         activeFilters.yieldRange[1] === yieldFilterConfig.max && 
+         activeFilters.maxPrice === 1000 && 
+         activeFilters.volumeRange[0] === volumeFilterConfig.min && 
+         activeFilters.volumeRange[1] === volumeFilterConfig.max && 
+         !activeFilters.selectedExpiration && 
+         strikeFilter === 'ONE_OUT' ? (
+          <div className="absolute inset-0 flex items-center justify-center text-gray-600">
+            Run a search to view results
+          </div>
+        ) : filtersChanged ? (
+          <div className="absolute inset-0 flex justify-center text-gray-600">
+            Filters have been updated. Click the Search button to view updated results.
+          </div>
+        ) : loading ? (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <LoadingSpinner />
+          </div>
+        ) : (
+          <div className="h-full flex flex-col">          
+            <div className="flex-grow">
+              <BlurredTable hasSearched={hasSearched && !user}>
+                <OptionsTable 
+                  data={data}              
+                  onSort={handleSortURL}
+                />
+              </BlurredTable>
             </div>
-            <div className="flex gap-1">
-              <Button 
-                onClick={() => {
-                  const prevPage = Math.max(1, currentPage - 1);
-                  setCurrentPage(prevPage);
-                  setActiveFilters(prev => ({ ...prev, pageNo: prevPage }));
-                  fetchData(
-                    activeFilters.searchTerm.split(","),
-                    activeFilters.yieldRange[0],
-                    activeFilters.yieldRange[1],
-                    activeFilters.minPrice,
-                    activeFilters.maxPrice,
-                    activeFilters.volumeRange[0],
-                    activeFilters.volumeRange[1],
-                    activeFilters.selectedExpiration,
-                    prevPage,
-                    rowsPerPage,
-                    sortConfig.direction ? sortConfig : undefined,
-                    strikeFilter !== 'ALL' ? strikeFilter : undefined,
-                    deltaFilter,
-                    activeFilters.peRatio,
-                    activeFilters.marketCap,
-                    activeFilters.movingAverageCrossover,
-                    activeFilters.sector,
-                    activeFilters.moneynessRange,
-                    activeFilters.impliedVolatility,
-                    activeFilters.minSelectedExpiration                    
-                  ).catch(console.error); 
-                }}
-                disabled={currentPage === 1}
-                variant="outline"
-                size="sm"
-                className="px-1.5 py-0.5 text-xs"
-              >
-                Previous
-              </Button>
+            {/* Pagination Controls */}
+            <div className="flex justify-between items-center mt-0.5 md:mt-1 px-0.5 md:px-1 text-xs">
+              <div className="text-gray-600">
+                Showing {((currentPage - 1) * rowsPerPage) + 1} to {Math.min(currentPage * rowsPerPage, totalCount)} of {totalCount} results
+              </div>
+              <div className="flex gap-1">
+                <Button 
+                  onClick={() => {
+                    const prevPage = Math.max(1, currentPage - 1);
+                    setCurrentPage(prevPage);
+                    setActiveFilters(prev => ({ ...prev, pageNo: prevPage }));
+                    fetchData(
+                      activeFilters.searchTerm.split(","),
+                      activeFilters.yieldRange[0],
+                      activeFilters.yieldRange[1],
+                      activeFilters.minPrice,
+                      activeFilters.maxPrice,
+                      activeFilters.volumeRange[0],
+                      activeFilters.volumeRange[1],
+                      activeFilters.selectedExpiration,
+                      prevPage,
+                      rowsPerPage,
+                      sortConfig.direction ? sortConfig : undefined,
+                      strikeFilter !== 'ALL' ? strikeFilter : undefined,
+                      deltaFilter,
+                      activeFilters.peRatio,
+                      activeFilters.marketCap,
+                      activeFilters.movingAverageCrossover,
+                      activeFilters.sector,
+                      activeFilters.moneynessRange,
+                      activeFilters.impliedVolatility,
+                      activeFilters.minSelectedExpiration                    
+                    ).catch(console.error); 
+                  }}
+                  disabled={currentPage === 1}
+                  variant="outline"
+                  size="sm"
+                  className="px-1.5 py-0.5 text-xs"
+                >
+                  Previous
+                </Button>
+                <Button
+                  onClick={() => {
+                    const nextPage = currentPage + 1;
+                    setCurrentPage(nextPage);
+                    setActiveFilters(prev => ({ ...prev, pageNo: nextPage }));
+                    fetchData(
+                      activeFilters.searchTerm.split(","),
+                      activeFilters.yieldRange[0],
+                      activeFilters.yieldRange[1],
+                      activeFilters.minPrice,
+                      activeFilters.maxPrice,
+                      activeFilters.volumeRange[0],
+                      activeFilters.volumeRange[1],
+                      activeFilters.selectedExpiration,
+                      nextPage,
+                      rowsPerPage,
+                      sortConfig.direction ? sortConfig : undefined,
+                      strikeFilter !== 'ALL' ? strikeFilter : undefined,
+                      deltaFilter,
+                      activeFilters.peRatio,
+                      activeFilters.marketCap,
+                      activeFilters.movingAverageCrossover,
+                      activeFilters.sector,
+                      activeFilters.moneynessRange,
+                      activeFilters.impliedVolatility,
+                      activeFilters.minSelectedExpiration    
+                    ).catch(console.error);
+                  }}
+                  disabled={currentPage * rowsPerPage >= totalCount}
+                  variant="outline"
+                  size="sm"
+                  className="px-1.5 py-0.5 text-xs"
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+            
+            {/* Add footnote */}
+            <div className="mt-6 flex justify-between items-center text-sm text-gray-500">
+              <div className="text-xs text-gray-500 mt-2">
+                {loading ? (
+                  <span>Loading update information...</span>
+                ) : (
+                  <span>* Data last updated on {getOldestUpdateDate()}</span>
+                )}
+              </div>
               <Button
-                onClick={() => {
-                  const nextPage = currentPage + 1;
-                  setCurrentPage(nextPage);
-                  setActiveFilters(prev => ({ ...prev, pageNo: nextPage }));
-                  fetchData(
-                    activeFilters.searchTerm.split(","),
-                    activeFilters.yieldRange[0],
-                    activeFilters.yieldRange[1],
-                    activeFilters.minPrice,
-                    activeFilters.maxPrice,
-                    activeFilters.volumeRange[0],
-                    activeFilters.volumeRange[1],
-                    activeFilters.selectedExpiration,
-                    nextPage,
-                    rowsPerPage,
-                    sortConfig.direction ? sortConfig : undefined,
-                    strikeFilter !== 'ALL' ? strikeFilter : undefined,
-                    deltaFilter,
-                    activeFilters.peRatio,
-                    activeFilters.marketCap,
-                    activeFilters.movingAverageCrossover,
-                    activeFilters.sector,
-                    activeFilters.moneynessRange,
-                    activeFilters.impliedVolatility,
-                    activeFilters.minSelectedExpiration    
-                  ).catch(console.error);
-                }}
-                disabled={currentPage * rowsPerPage >= totalCount}
+                id="btn_buy_coffee_bottom"
                 variant="outline"
                 size="sm"
-                className="px-1.5 py-0.5 text-xs"
+                onClick={() => window.open('https://buymeacoffee.com/wheelstrategyoptions', '_blank')}
+                className="text-gray-500 hover:text-gray-700"
               >
-                Next
+                Support
               </Button>
             </div>
           </div>
-          
-          {/* Add footnote */}
-          <div className="mt-6 flex justify-between items-center text-sm text-gray-500">
-          <div className="text-xs text-gray-500 mt-2">
-        {loading ? (
-          <span>Loading update information...</span>
-        ) : (
-          <span>* Data last updated on {getOldestUpdateDate()}</span>
         )}
       </div>
-            <Button
-              id="btn_buy_coffee_bottom"
-              variant="outline"
-              size="sm"
-              onClick={() => window.open('https://buymeacoffee.com/wheelstrategyoptions', '_blank')}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              Support
-            </Button>
-          </div>
-        </div>
-      )}
       <SaveQueryModal
         isOpen={showSaveModal}
         onClose={() => setShowSaveModal(false)}
