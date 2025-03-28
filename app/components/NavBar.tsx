@@ -45,7 +45,7 @@ export function NavBar() {
   return (
     <nav className="bg-gradient-to-b from-gray-900 to-gray-800 w-full border-b border-gray-700 p-4 z-40 relative">
       <div className="max-w-screen-2xl mx-auto flex justify-between items-center">
-        <a href="/" className="flex items-center">
+        <a href="/" className="flex items-center hover:opacity-90 transition-opacity">
           <img src="/logo.png" className="h-8 md:h-12 mr-2 md:mr-3" alt="Wheel Strategy Options Logo" />
           <span className="self-center text-lg md:text-2xl font-semibold whitespace-nowrap text-white hidden sm:inline">
             Wheel Strategy Options
@@ -61,20 +61,20 @@ export function NavBar() {
             {/* Screeners Dropdown */}
             <div className="relative group">
               <button
-                className="flex items-center text-gray-700 hover:text-gray-900"
+                className="flex items-center text-gray-300 hover:text-white transition-colors"
                 onClick={() => setIsScreenersOpen(!isScreenersOpen)}
               >
                 Screeners
                 <ChevronDown className="ml-1 h-4 w-4" />
               </button>
               {isScreenersOpen && (
-                <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transform transition-all duration-200 ease-in-out">
                   <div className="py-1">
                     {navigation.screeners.map((item) => (
                       <Link
                         key={item.id}
                         href={item.href}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                         onClick={() => handleNavigation(item.name, item.href)}
                       >
                         {item.name}
@@ -90,7 +90,7 @@ export function NavBar() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-gray-700 hover:text-gray-900"
+                className="text-gray-300 hover:text-white transition-colors"
                 onClick={() => handleNavigation(item.name, item.href)}
               >
                 {item.name}
@@ -104,7 +104,7 @@ export function NavBar() {
                 href={item.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-700 hover:text-gray-900"
+                className="text-gray-300 hover:text-white transition-colors"
                 onClick={() => handleNavigation(item.name, item.href, true)}
               >
                 {item.name}
@@ -117,7 +117,7 @@ export function NavBar() {
               <Button
                 onClick={handleLogout}
                 variant="outline"
-                className="bg-white/10 text-white hover:bg-white/20 border-white/20"
+                className="bg-white/10 text-white hover:bg-white/20 border-white/20 transition-colors"
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 Sign Out
@@ -126,7 +126,7 @@ export function NavBar() {
               <Button
                 onClick={signInWithGoogle}
                 variant="outline"
-                className="bg-white/10 text-white hover:bg-white/20 border-white/20"
+                className="bg-white/10 text-white hover:bg-white/20 border-white/20 transition-colors"
               >
                 Sign In
               </Button>
@@ -137,23 +137,23 @@ export function NavBar() {
         {/* Mobile Menu Button */}
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="md:hidden text-white"
+          className="md:hidden text-white hover:text-gray-300 transition-colors"
         >
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="absolute top-[64px] left-0 right-0 bg-gray-900 border-b border-gray-700 p-4 md:hidden z-50">
+          <div className="absolute top-[64px] left-0 right-0 bg-gray-900 border-b border-gray-700 p-4 md:hidden z-50 animate-in slide-in-from-top duration-200">
             <div className="flex flex-col space-y-4">
               {/* Screeners Section */}
               <div className="border-b border-gray-700 pb-4">
-                <h3 className="text-gray-400 text-sm font-medium mb-2">Screeners</h3>
+                <h3 className="text-gray-400 text-sm font-medium mb-2 uppercase tracking-wider">Screeners</h3>
                 {navigation.screeners.map((item) => (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className="block text-white hover:text-gray-300 py-2"
+                    className="block text-gray-300 hover:text-white py-2 transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {item.name}
@@ -163,12 +163,12 @@ export function NavBar() {
 
               {/* Tools Section */}
               <div className="border-b border-gray-700 pb-4">
-                <h3 className="text-gray-400 text-sm font-medium mb-2">Tools</h3>
+                <h3 className="text-gray-400 text-sm font-medium mb-2 uppercase tracking-wider">Tools</h3>
                 {navigation.tools.map((item) => (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className="block text-white hover:text-gray-300 py-2"
+                    className="block text-gray-300 hover:text-white py-2 transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {item.name}
@@ -178,12 +178,12 @@ export function NavBar() {
 
               {/* Resources Section */}
               <div className="pb-4">
-                <h3 className="text-gray-400 text-sm font-medium mb-2">Resources</h3>
+                <h3 className="text-gray-400 text-sm font-medium mb-2 uppercase tracking-wider">Resources</h3>
                 {navigation.resources.map((item) => (
                   <a
                     key={item.name}
                     href={item.href}
-                    className="block text-white hover:text-gray-300 py-2"
+                    className="block text-gray-300 hover:text-white py-2 transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                     id={item.name === 'API' ? 'api_btn' : undefined}
                     target={item.external ? "_blank" : undefined}
@@ -198,7 +198,7 @@ export function NavBar() {
                 <Button
                   variant="outline"
                   onClick={handleLogout}
-                  className="bg-white/10 text-white hover:bg-white/20 border-white/20 w-full"
+                  className="bg-white/10 text-white hover:bg-white/20 border-white/20 w-full transition-colors"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
                   <span>Log out</span>
@@ -207,7 +207,7 @@ export function NavBar() {
                 <Button
                   onClick={signInWithGoogle}
                   variant="outline"
-                  className="bg-white/10 text-white hover:bg-white/20 border-white/20 w-full"
+                  className="bg-white/10 text-white hover:bg-white/20 border-white/20 w-full transition-colors"
                 >
                   <User className="h-4 w-4 mr-2" />
                   <span>Sign In</span>
