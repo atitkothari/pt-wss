@@ -60,7 +60,7 @@ export default function CashSecuredPutScreenerPage() {
               </Link>
             </div>
             <p className="text-gray-600 text-sm">
-              New to selling options? See how much income you can generate on stocks you already hold using our <a id={'options_subheading_covered_call_calculator'} href="/covered-call-calculator" className="text-blue-600 hover:text-blue-800 underline">covered call calculator</a>.
+              New to selling options? Discover trending opportunities and learn about different strategies using our <a id={'options_subheading_discover'} href="/discover" className="text-blue-600 hover:text-blue-800 underline">discover page</a>.
             </p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow-sm relative">
