@@ -164,3 +164,44 @@ export async function fetchTickersWithHighestImpliedVolatility(): Promise<HighIV
 
   return await response.json();
 }
+
+interface NextEarningsTicker {
+  symbol: string;
+  earningsDate: string;
+  impliedVolatility: number;
+  askprice?: number;
+  bidprice?: number;
+  delta?: number;
+  expiration?: string;
+  strike?: number;
+  volume?: number;
+  openinterest?: number;
+  yieldPercent?: number;
+  stockPrice?: number;
+}
+
+interface NextEarningsResponse {
+  calls: {
+    tickers: NextEarningsTicker[];
+    url: string;
+  };
+  puts: {
+    tickers: NextEarningsTicker[];
+    url: string;
+  };
+}
+
+export async function fetchTickersWithNextEarnings(): Promise<NextEarningsResponse> {
+  const response = await fetch(`https://api.wheelstrategyoptions.com/wheelstrat/fetchTickersWithNextEarnings`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch next earnings data');
+  }
+
+  return await response.json();
+}

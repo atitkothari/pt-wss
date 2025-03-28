@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { NavBar } from "../components/NavBar";
 import { Footer } from "../components/Footer";
-import { fetchOptionsData, fetchTickersWithHighestYield, fetchTickersWithHighestImpliedVolatility } from "../services/api";
+import { fetchOptionsData, fetchTickersWithHighestYield, fetchTickersWithHighestImpliedVolatility, fetchTickersWithNextEarnings } from "../services/api";
 import { Option } from "../types/option";
 import { format, parseISO, addDays, isAfter, isBefore, addWeeks } from 'date-fns';
 import { LoadingSpinner } from "../components/LoadingSpinner";
@@ -110,40 +110,8 @@ export default function TrendingPage() {
         // Fetch stocks with highest implied volatility for covered calls
         const highIVResponse = await fetchTickersWithHighestImpliedVolatility();
         
-        // Fetch stocks with earnings this week for covered calls
-        const today = new Date();
-        const nextWeek = addWeeks(today, 1);
-        const formattedToday = format(today, 'yyyy-MM-dd');
-        const formattedNextWeek = format(nextWeek, 'yyyy-MM-dd');
-
-        const earningsResult = await fetchOptionsData(
-          [
-            { operation: 'sort', field: 'marketCap', value: 'desc' },
-            { operation: 'gte', field: 'marketCap', value: '100000000' },
-            { operation: 'gte', field: 'volume', value: '1000' },
-            { operation: 'eq', field: 'type', value: '"call"' },
-            { operation: 'gte', field: 'earningsDate', value: `"${formattedToday}"` },
-            { operation: 'lte', field: 'earningsDate', value: `"${formattedNextWeek}"` }
-          ],
-          1,
-          1000
-        );
-
-        // High IV stocks for cash secured puts are already fetched with highIVResponse
-
-        // Fetch stocks with earnings this week for cash secured puts
-        const earningsPutResult = await fetchOptionsData(
-          [
-            { operation: 'sort', field: 'marketCap', value: 'desc' },
-            { operation: 'gte', field: 'marketCap', value: '100000000' },
-            { operation: 'gte', field: 'volume', value: '1000' },
-            { operation: 'eq', field: 'type', value: '"put"' },
-            { operation: 'gte', field: 'earningsDate', value: `"${formattedToday}"` },
-            { operation: 'lte', field: 'earningsDate', value: `"${formattedNextWeek}"` }
-          ],
-          1,
-          100
-        );
+        // Fetch stocks with earnings this week using the new endpoint
+        const earningsResponse = await fetchTickersWithNextEarnings();
         
         // Fetch highest yielding stocks for both calls and puts using the new endpoint
         const highYieldResponse = await fetchTickersWithHighestYield();
@@ -180,7 +148,7 @@ export default function TrendingPage() {
             volume: ticker.volume,
             openInterest: ticker.openinterest,
             expiration: ticker.expiration,
-            stockPrice: ticker.stockPrice
+            stockPrice: ticker.stockPrice.toFixed(2)
           }));
         };
         
@@ -198,14 +166,33 @@ export default function TrendingPage() {
             volume: ticker.volume,
             openInterest: ticker.openinterest,
             expiration: ticker.expiration,
-            stockPrice: ticker.stockPrice
+            stockPrice: ticker.stockPrice.toFixed(2)
+          }));
+        };
+
+        // Process earnings data from the new endpoint
+        const processEarningsData = (tickers: any[]): StockData[] => {
+          return tickers.map(ticker => ({
+            symbol: ticker.symbol,
+            impliedVolatility: ticker.impliedVolatility || 0,
+            earningsDate: ticker.expiration,
+            yieldPercent: ticker.yieldPercent || 0,
+            askPrice: ticker.askprice,
+            bidPrice: ticker.bidprice,
+            delta: ticker.delta,
+            strike: ticker.strike,
+            volume: ticker.volume,
+            openInterest: ticker.openinterest,
+            expiration: ticker.expiration,
+            stockPrice: ticker.stockPrice.toFixed(2)
           }));
         };
 
         // Get high IV data for covered calls from the new endpoint
         const highIVData = processHighIVData(highIVResponse.calls.tickers).slice(0, 5);
 
-        const earningsData = processStockData(earningsResult.options)
+        // Get earnings data from the new endpoint
+        const earningsData = processEarningsData(earningsResponse.calls.tickers)
           .sort((a, b) => {
             const dateA = a.earningsDate ? new Date(a.earningsDate) : new Date();
             const dateB = b.earningsDate ? new Date(b.earningsDate) : new Date();
@@ -219,7 +206,8 @@ export default function TrendingPage() {
         // Get high IV data for cash secured puts from the new endpoint
         const highIVPutData = processHighIVData(highIVResponse.puts.tickers).slice(0, 5);
 
-        const earningsPutData = processStockData(earningsPutResult.options)
+        // Get earnings put data from the new endpoint
+        const earningsPutData = processEarningsData(earningsResponse.puts.tickers)
           .sort((a, b) => {
             const dateA = a.earningsDate ? new Date(a.earningsDate) : new Date();
             const dateB = b.earningsDate ? new Date(b.earningsDate) : new Date();
@@ -252,8 +240,9 @@ export default function TrendingPage() {
   const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A';
     try {
-      const date = parseISO(dateString);
-      return format(date, 'MMM d, yyyy');
+      // Handle the specific format "Fri, 04 Apr 2025 00:00:00 GMT"
+      const date = new Date(dateString);
+      return format(date, 'MMM d, EEEE');
     } catch {
       return dateString;
     }
