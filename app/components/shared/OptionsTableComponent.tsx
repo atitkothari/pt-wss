@@ -894,6 +894,15 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     <div className="w-full">      
       {/* Filter Controls */}
       <div className="space-y-2 mb-2">
+        {/* Preset Manager - Full Width */}
+        <div className="w-full">
+          <PresetManager
+            optionType={option}
+            currentFilters={activeFilters}
+            onPresetSelect={handlePresetSelect}
+          />
+        </div>
+
         {/* All Rows - 2 columns on mobile, 4 on large screens */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
           <MultiStockSelect
@@ -978,21 +987,14 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             <RotateCcw className="h-4 w-4 mr-2" />
             Reset Filters
           </Button>
-          <div className="grid grid-cols-[35%_65%] sm:flex sm:gap-1 w-full sm:w-auto">
-            <PresetManager
-              optionType={option}
-              currentFilters={activeFilters}
-              onPresetSelect={handlePresetSelect}
-            />
-            <Button 
-              id="btn_screener_search"
-              onClick={handleSearch}
-              className={`${filtersChanged ? 'bg-amber-500 hover:bg-amber-600' : ''}`}
-            >
-              <Search className="h-5 w-5 min-h-[15px] min-w-[15px] mr-2" />
-              {filtersChanged ? 'Search (Updated Filters)' : 'Search'}
-            </Button>
-          </div>
+          <Button 
+            id="btn_screener_search"
+            onClick={handleSearch}
+            className={`${filtersChanged ? 'bg-amber-500 hover:bg-amber-600' : ''}`}
+          >
+            <Search className="h-5 w-5 min-h-[15px] min-w-[15px] mr-2" />
+            {filtersChanged ? 'Search (Updated Filters)' : 'Search'}
+          </Button>
         </div>
       </div>
 

@@ -20,8 +20,9 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Preset, predefinedPresets } from '@/app/config/filterConfig';
-import { Save, Trash2, Edit2 } from 'lucide-react';
+import { Save, Settings, Trash2, Edit2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 interface PresetManagerProps {
   optionType: 'call' | 'put';
@@ -30,6 +31,7 @@ interface PresetManagerProps {
 }
 
 export function PresetManager({ optionType, currentFilters, onPresetSelect }: PresetManagerProps) {
+  const router = useRouter();
   const [presets, setPresets] = useState<Preset[]>([]);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [newPresetName, setNewPresetName] = useState('');
@@ -53,6 +55,7 @@ export function PresetManager({ optionType, currentFilters, onPresetSelect }: Pr
       id: Date.now().toString(),
       name: newPresetName.trim(),
       emailEnabled,
+      optionType,
       filters: currentFilters
     };
 
@@ -64,89 +67,57 @@ export function PresetManager({ optionType, currentFilters, onPresetSelect }: Pr
     toast.success('Preset saved successfully!');
   };
 
-  const handleDeletePreset = (presetId: string) => {
-    const updatedPresets = presets.filter(p => p.id !== presetId);
-    setPresets(updatedPresets);
-    localStorage.setItem(`${optionType}_presets`, JSON.stringify(updatedPresets));
-    toast.success('Preset deleted successfully!');
-  };
-
-  const handleEditPreset = (preset: Preset) => {
-    setNewPresetName(preset.name);
-    setEmailEnabled(preset.emailEnabled);
-    setShowSaveModal(true);
-    handleDeletePreset(preset.id);
-  };
-
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-2">
-        <Select onValueChange={(value) => {
-          const selectedPreset = [...presets, ...predefinedPresets].find(p => p.id === value);
-          if (selectedPreset) {
-            onPresetSelect(selectedPreset);
-          }
-        }}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Select a preset" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="predefined-header" disabled>Predefined Presets</SelectItem>
-            {predefinedPresets.map(preset => (
-              <SelectItem key={preset.id} value={preset.id}>
-                {preset.name}
-              </SelectItem>
-            ))}
-            {presets.length > 0 && (
-              <>
-                <SelectItem value="custom-header" disabled>Custom Presets</SelectItem>
-                {presets.map(preset => (
-                  <SelectItem key={preset.id} value={preset.id}>
-                    {preset.name}
-                  </SelectItem>
-                ))}
-              </>
-            )}
-          </SelectContent>
-        </Select>
-
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setShowSaveModal(true)}
-          className="bg-orange-600 text-white hover:text-black"
-        >
-          <Save className="h-4 w-4 mr-2" />
-          Save Preset
-        </Button>
-      </div>
-
-      {presets.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {presets.map(preset => (
-            <div
-              key={preset.id}
-              className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-md"
-            >
-              <span className="text-sm">{preset.name}</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleEditPreset(preset)}
-              >
-                <Edit2 className="h-3 w-3" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleDeletePreset(preset.id)}
-              >
-                <Trash2 className="h-3 w-3" />
-              </Button>
-            </div>
+    <div className="flex items-center gap-2">
+      <Select onValueChange={(value) => {
+        if (value === 'manage-presets') {
+          router.push('/presets');
+          return;
+        }
+        const selectedPreset = [...presets, ...predefinedPresets].find(p => p.id === value);
+        if (selectedPreset) {
+          onPresetSelect(selectedPreset);
+        }
+      }}>
+        <SelectTrigger className="w-[300px]">
+          <SelectValue placeholder="Select a preset" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="predefined-header" disabled>Predefined Presets</SelectItem>
+          {predefinedPresets.map(preset => (
+            <SelectItem key={preset.id} value={preset.id}>
+              {preset.name}
+            </SelectItem>
           ))}
-        </div>
-      )}
+          {presets.length > 0 && (
+            <>
+              <SelectItem value="custom-header" disabled>Custom Presets</SelectItem>
+              {presets.map(preset => (
+                <SelectItem key={preset.id} value={preset.id}>
+                  {preset.name}
+                </SelectItem>
+              ))}
+              <SelectItem value="manage-header" disabled>Manage Presets</SelectItem>
+              <SelectItem value="manage-presets" className="text-orange-600">
+                <div className="flex items-center gap-2">
+                  <Settings className="h-4 w-4" />
+                  Manage Presets
+                </div>
+              </SelectItem>
+            </>
+          )}
+        </SelectContent>
+      </Select>
+
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => setShowSaveModal(true)}
+        className="bg-orange-600 text-white hover:text-black"
+      >
+        <Save className="h-4 w-4 mr-2" />
+        Save Preset
+      </Button>
 
       <Dialog open={showSaveModal} onOpenChange={setShowSaveModal}>
         <DialogContent>

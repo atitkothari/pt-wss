@@ -252,7 +252,8 @@ export interface Preset {
   id: string;
   name: string;
   emailEnabled: boolean;
-  filters: {
+  optionType: 'call' | 'put';
+  filters?: {
     yieldRange: [number, number];
     priceRange: [number, number];
     volumeRange: [number, number];
@@ -275,6 +276,7 @@ export const predefinedPresets: Preset[] = [
     id: 'high-yield',
     name: 'High Yield',
     emailEnabled: true,
+    optionType: 'call',
     filters: {
       yieldRange: [5, 10],
       priceRange: [0, 2000],
@@ -295,6 +297,7 @@ export const predefinedPresets: Preset[] = [
     id: 'high-iv',
     name: 'High IV',
     emailEnabled: true,
+    optionType: 'call',
     filters: {
       yieldRange: [0, 10],
       priceRange: [0, 2000],
@@ -315,6 +318,7 @@ export const predefinedPresets: Preset[] = [
     id: 'earnings-this-week',
     name: 'Earnings This Week',
     emailEnabled: true,
+    optionType: 'call',
     filters: {
       yieldRange: [0, 10],
       priceRange: [0, 2000],
@@ -335,6 +339,7 @@ export const predefinedPresets: Preset[] = [
     id: 'high-volume',
     name: 'High Volume',
     emailEnabled: true,
+    optionType: 'call',
     filters: {
       yieldRange: [0, 10],
       priceRange: [0, 2000],
