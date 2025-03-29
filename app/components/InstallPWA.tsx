@@ -17,7 +17,14 @@ export default function InstallPWA() {
 
   useEffect(() => {
     // Check if the app is already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    console.log('Is app already installed (standalone mode)?', isStandalone);
+    
+    // Check if browser supports PWA installation
+    const isPWAInstallable = 'beforeinstallprompt' in window;
+    console.log('Does browser support PWA installation?', isPWAInstallable);
+    
+    if (isStandalone) {
       return;
     }
 
@@ -32,12 +39,17 @@ export default function InstallPWA() {
     };
 
     window.addEventListener('beforeinstallprompt', handler);
+    console.log('Added beforeinstallprompt event listener');
 
     // Check if the prompt was already fired
     if (window.deferredPrompt) {
+      console.log('Found existing deferredPrompt');
       setDeferredPrompt(window.deferredPrompt);
       setShowInstallPrompt(true);
     }
+
+    // Log if we're in a secure context (required for PWA)
+    console.log('Is secure context?', window.isSecureContext);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handler);
