@@ -4,12 +4,25 @@ import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 
+// Extend the Window interface to include deferredPrompt
+declare global {
+  interface Window {
+    deferredPrompt?: any;
+  }
+}
+
 export default function InstallPWA() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
 
   useEffect(() => {
+    // Check if the app is already installed
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      return;
+    }
+
     const handler = (e: Event) => {
+      console.log('beforeinstallprompt event fired');
       // Prevent Chrome 67 and earlier from automatically showing the prompt
       e.preventDefault();
       // Stash the event so it can be triggered later
@@ -20,6 +33,12 @@ export default function InstallPWA() {
 
     window.addEventListener('beforeinstallprompt', handler);
 
+    // Check if the prompt was already fired
+    if (window.deferredPrompt) {
+      setDeferredPrompt(window.deferredPrompt);
+      setShowInstallPrompt(true);
+    }
+
     return () => {
       window.removeEventListener('beforeinstallprompt', handler);
     };
@@ -28,14 +47,19 @@ export default function InstallPWA() {
   const handleInstallClick = async () => {
     if (!deferredPrompt) return;
     
-    // Show the install prompt
-    deferredPrompt.prompt();
-    // Wait for the user to respond to the prompt
-    const { outcome } = await deferredPrompt.userChoice;
-    // Clear the deferredPrompt variable
-    setDeferredPrompt(null);
-    // Hide the install prompt
-    setShowInstallPrompt(false);
+    try {
+      // Show the install prompt
+      deferredPrompt.prompt();
+      // Wait for the user to respond to the prompt
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`User response to the install prompt: ${outcome}`);
+      // Clear the deferredPrompt variable
+      setDeferredPrompt(null);
+      // Hide the install prompt
+      setShowInstallPrompt(false);
+    } catch (error) {
+      console.error('Error installing PWA:', error);
+    }
   };
 
   if (!showInstallPrompt) return null;
