@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google';
 import { Toaster } from "@/components/ui/sonner";
 import { GoogleAnalytics } from './components/GoogleAnalytics';
 import { AuthContextProvider } from './context/AuthContext';
+import InstallPWA from './components/InstallPWA';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -38,7 +39,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'WSS App',
+    title: 'Wheel Strategy Options',
   },
   viewport: {
     width: 'device-width',
@@ -86,6 +87,7 @@ export default function RootLayout({
             {children}
           </main>
           <Toaster />
+          <InstallPWA />
         </AuthContextProvider>
       </body>
     </html>
