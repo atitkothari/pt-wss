@@ -847,6 +847,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
   const handlePresetSelect = (preset: Preset) => {
     const { filters } = preset;
+    if (!filters) return;
     
     // Update individual filter states
     if (filters.yieldRange) setYieldRange(filters.yieldRange);

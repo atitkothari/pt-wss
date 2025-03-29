@@ -10,6 +10,19 @@ import { Save, Trash2, Edit2, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { 
+  yieldFilterConfig,
+  priceFilterConfig,
+  volumeFilterConfig,
+  deltaFilterConfig,
+  peRatioFilterConfig,
+  marketCapFilterConfig,
+  movingAverageCrossoverOptions,
+  sectorOptions,
+  impliedVolatilityFilterConfig,
+  moneynessFilterConfig,
+  dteFilterConfig
+} from '@/app/config/filterConfig';
 
 export default function PresetsPage() {
   const router = useRouter();
@@ -33,52 +46,35 @@ export default function PresetsPage() {
   }, []);
 
   const handleSavePreset = () => {
-    if (!newPresetName.trim()) {
-      toast.error('Please enter a name for your preset');
-      return;
-    }
+    if (!newPresetName.trim()) return;
 
-    if (editingPreset) {
-      // Update existing preset
-      const updatedPresets = presets.map(p => 
-        p.id === editingPreset.id 
-          ? { ...p, name: newPresetName.trim(), emailEnabled }
-          : p
-      );
-      setPresets(updatedPresets);
-      
-      // Update localStorage
-      const callPresets = updatedPresets.filter(p => p.optionType === 'call');
-      const putPresets = updatedPresets.filter(p => p.optionType === 'put');
-      localStorage.setItem('call_presets', JSON.stringify(callPresets));
-      localStorage.setItem('put_presets', JSON.stringify(putPresets));
-      
-      toast.success('Preset updated successfully!');
-    } else {
-      // Create new preset
-      const newPreset: Preset = {
-        id: Date.now().toString(),
-        name: newPresetName.trim(),
-        emailEnabled,
-        filters: {} // This will be set when saving from the screener
-      };
-      
-      const updatedPresets = [...presets, newPreset];
-      setPresets(updatedPresets);
-      
-      // Update localStorage
-      const callPresets = updatedPresets.filter(p => p.optionType === 'call');
-      const putPresets = updatedPresets.filter(p => p.optionType === 'put');
-      localStorage.setItem('call_presets', JSON.stringify(callPresets));
-      localStorage.setItem('put_presets', JSON.stringify(putPresets));
-      
-      toast.success('Preset saved successfully!');
-    }
-
+    const newPreset: Preset = {
+      id: Date.now().toString(),
+      name: newPresetName.trim(),
+      emailEnabled,
+      optionType: 'call',
+      filters: {
+        yieldRange: [yieldFilterConfig.min, yieldFilterConfig.max],
+        priceRange: [priceFilterConfig.defaultMin, priceFilterConfig.defaultMax],
+        volumeRange: [volumeFilterConfig.min, volumeFilterConfig.max],
+        deltaFilter: [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax],
+        peRatio: [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax],
+        marketCap: [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax],
+        movingAverageCrossover: movingAverageCrossoverOptions[0],
+        sector: sectorOptions[0],
+        impliedVolatility: [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax],
+        moneynessRange: [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax],
+        minDte: dteFilterConfig.defaultMin,
+        maxDte: dteFilterConfig.defaultMax,
+        strikeFilter: 'ALL'
+      }
+    };
+    
+    const updatedPresets = [...presets, newPreset];
+    setPresets(updatedPresets);
+    localStorage.setItem('presets', JSON.stringify(updatedPresets));
     setShowSaveModal(false);
     setNewPresetName('');
-    setEmailEnabled(true);
-    setEditingPreset(null);
   };
 
   const handleDeletePreset = (presetId: string) => {
