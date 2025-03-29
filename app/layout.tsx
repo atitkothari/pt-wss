@@ -33,6 +33,19 @@ export const metadata: Metadata = {
   other: {
     'google-adsense-account': 'ca-pub-8741511572242021',
   },
+  manifest: '/manifest.json',
+  themeColor: '#000000',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'WSS App',
+  },
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
 };
 
 export default function RootLayout({
@@ -45,12 +58,17 @@ export default function RootLayout({
       <head>
         <meta name="google-adsense-account" content="ca-pub-8741511572242021" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        <meta name="theme-color" content="#000000" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="WSS App" />
+        <link rel="manifest" href="/manifest.json" />
         <link
-  rel="icon"
-  href="/icon?<generated>"
-  type="image/<generated>"
-  sizes="<generated>"
-/>
+          rel="icon"
+          href="/icon?<generated>"
+          type="image/<generated>"
+          sizes="<generated>"
+        />
       </head>
       <body className={inter.className}>
         {/* Google Tag Manager (noscript) */}

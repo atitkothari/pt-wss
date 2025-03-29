@@ -18,6 +18,15 @@ const nextConfig = {
       }
     ]
   },
+  // Add PWA support
+  async rewrites() {
+    return [
+      {
+        source: '/manifest.json',
+        destination: '/manifest.json',
+      },
+    ]
+  },
 };
 
 module.exports = nextConfig;
