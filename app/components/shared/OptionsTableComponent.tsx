@@ -39,6 +39,8 @@ import {
   defaultVisibleColumns as configDefaultVisibleColumns,
   impliedVolatilityFilterConfig
 } from "@/app/config/filterConfig";
+import { PresetManager } from "../presets/PresetManager";
+import { Preset } from "@/app/config/filterConfig";
 
 interface OptionsTableComponentProps {
   option: OptionType;
@@ -843,6 +845,51 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     setCurrentPage(1);
   };
 
+  const handlePresetSelect = (preset: Preset) => {
+    const { filters } = preset;
+    
+    // Update individual filter states
+    if (filters.yieldRange) setYieldRange(filters.yieldRange);
+    if (filters.priceRange) {
+      setMinPrice(filters.priceRange[0]);
+      setMaxPrice(filters.priceRange[1]);
+    }
+    if (filters.volumeRange) setVolumeRange(filters.volumeRange);
+    if (filters.deltaFilter) setDeltaFilter(filters.deltaFilter);
+    if (filters.peRatio) setPeRatio(filters.peRatio);
+    if (filters.marketCap) setMarketCap(filters.marketCap);
+    if (filters.movingAverageCrossover) setMovingAverageCrossover(filters.movingAverageCrossover);
+    if (filters.sector) setSector(filters.sector);
+    if (filters.impliedVolatility) setImpliedVolatility(filters.impliedVolatility);
+    if (filters.moneynessRange) setMoneynessRange(filters.moneynessRange);
+    if (filters.minDte) setMinDte(filters.minDte);
+    if (filters.maxDte) setMaxDte(filters.maxDte);
+    if (filters.strikeFilter) setStrikeFilter(filters.strikeFilter as StrikeFilter);
+
+    // Update active filters
+    setActiveFilters(prev => ({
+      ...prev,
+      ...(filters.yieldRange && { yieldRange: filters.yieldRange }),
+      ...(filters.priceRange && {
+        minPrice: filters.priceRange[0],
+        maxPrice: filters.priceRange[1]
+      }),
+      ...(filters.volumeRange && { volumeRange: filters.volumeRange }),
+      ...(filters.deltaFilter && { deltaFilter: filters.deltaFilter }),
+      ...(filters.peRatio && { peRatio: filters.peRatio }),
+      ...(filters.marketCap && { marketCap: filters.marketCap }),
+      ...(filters.movingAverageCrossover && { movingAverageCrossover: filters.movingAverageCrossover }),
+      ...(filters.sector && { sector: filters.sector }),
+      ...(filters.impliedVolatility && { impliedVolatility: filters.impliedVolatility }),
+      ...(filters.moneynessRange && { moneynessRange: filters.moneynessRange }),
+      ...(filters.minDte && { minSelectedExpiration: filters.minDte.toString() }),
+      ...(filters.maxDte && { maxSelectedExpiration: filters.maxDte.toString() }),
+      ...(filters.strikeFilter && { strikeFilter: filters.strikeFilter as StrikeFilter })
+    }));
+
+    setFiltersChanged(true);
+  };
+
   return (
     <div className="w-full">      
       {/* Filter Controls */}
@@ -932,15 +979,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             Reset Filters
           </Button>
           <div className="grid grid-cols-[35%_65%] sm:flex sm:gap-1 w-full sm:w-auto">
-            <Button
-              id="btn_screener_save"
-              variant="outline"
-              onClick={() => setShowSaveModal(true)}
-              className="bg-orange-600 text-white hover:text-black"
-            >
-              <BellRing className="h-5 w-5 min-h-[15px] min-w-[15px] mr-2" />
-              Get Alerts
-            </Button>
+            <PresetManager
+              optionType={option}
+              currentFilters={activeFilters}
+              onPresetSelect={handlePresetSelect}
+            />
             <Button 
               id="btn_screener_search"
               onClick={handleSearch}

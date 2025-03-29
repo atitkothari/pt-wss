@@ -247,3 +247,109 @@ export const setDefaultFilterValues = (optionType: 'call' | 'put') => {
   localStorage.setItem(`${optionType}_selectedStocks`, JSON.stringify([]));
 };
 
+// Preset Types
+export interface Preset {
+  id: string;
+  name: string;
+  emailEnabled: boolean;
+  filters: {
+    yieldRange: [number, number];
+    priceRange: [number, number];
+    volumeRange: [number, number];
+    deltaFilter: [number, number];
+    peRatio: [number, number];
+    marketCap: [number, number];
+    movingAverageCrossover: string;
+    sector: string;
+    impliedVolatility: [number, number];
+    moneynessRange: [number, number];
+    minDte: number;
+    maxDte: number;
+    strikeFilter: string;
+  };
+}
+
+// Predefined Presets
+export const predefinedPresets: Preset[] = [
+  {
+    id: 'high-yield',
+    name: 'High Yield',
+    emailEnabled: true,
+    filters: {
+      yieldRange: [5, 10],
+      priceRange: [0, 2000],
+      volumeRange: [100, 1000],
+      deltaFilter: [-1, 1],
+      peRatio: [0, 100],
+      marketCap: [0, 1000],
+      movingAverageCrossover: 'Any',
+      sector: 'All Sectors',
+      impliedVolatility: [0, 200],
+      moneynessRange: [-15, 15],
+      minDte: 0,
+      maxDte: 365,
+      strikeFilter: 'ONE_OUT'
+    }
+  },
+  {
+    id: 'high-iv',
+    name: 'High IV',
+    emailEnabled: true,
+    filters: {
+      yieldRange: [0, 10],
+      priceRange: [0, 2000],
+      volumeRange: [100, 1000],
+      deltaFilter: [-1, 1],
+      peRatio: [0, 100],
+      marketCap: [0, 1000],
+      movingAverageCrossover: 'Any',
+      sector: 'All Sectors',
+      impliedVolatility: [50, 200],
+      moneynessRange: [-15, 15],
+      minDte: 0,
+      maxDte: 365,
+      strikeFilter: 'ONE_OUT'
+    }
+  },
+  {
+    id: 'earnings-this-week',
+    name: 'Earnings This Week',
+    emailEnabled: true,
+    filters: {
+      yieldRange: [0, 10],
+      priceRange: [0, 2000],
+      volumeRange: [100, 1000],
+      deltaFilter: [-1, 1],
+      peRatio: [0, 100],
+      marketCap: [0, 1000],
+      movingAverageCrossover: 'Any',
+      sector: 'All Sectors',
+      impliedVolatility: [0, 200],
+      moneynessRange: [-15, 15],
+      minDte: 0,
+      maxDte: 7,
+      strikeFilter: 'ONE_OUT'
+    }
+  },
+  {
+    id: 'high-volume',
+    name: 'High Volume',
+    emailEnabled: true,
+    filters: {
+      yieldRange: [0, 10],
+      priceRange: [0, 2000],
+      volumeRange: [500, 1000],
+      deltaFilter: [-1, 1],
+      peRatio: [0, 100],
+      marketCap: [0, 1000],
+      movingAverageCrossover: 'Any',
+      sector: 'All Sectors',
+      impliedVolatility: [0, 200],
+      moneynessRange: [-15, 15],
+      minDte: 0,
+      maxDte: 365,
+      strikeFilter: 'ONE_OUT'
+    }
+  }
+];
+
