@@ -494,7 +494,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     option,
     deltaFilterConfig.defaultMin,
     deltaFilterConfig.defaultMax,
-    activeFilters.minSelectedExpiration
+    activeFilters.minSelectedExpiration,
+    option === 'call' ? 'covered_call_screener' : 'cash_secured_put_screener'
   );
 
   // Calculate expiration dates based on minDte and maxDte whenever they change

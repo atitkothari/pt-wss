@@ -2,7 +2,7 @@
   "name": "Wheel Strategy Options",
   "short_name": "Wheel Strategy Options",
   "description": "Screen for high-yield options trades and selling opportunities using our advanced options screener",
-  "start_url": "/covered-call-options?utm_source=pwa",
+  "start_url": "/covered-call-screener?utm_source=pwa",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",

@@ -71,7 +71,7 @@ export default function CoveredCallCalculatorPage() {
         { operation: 'gt', field: 'volume', value: minVol },        
       ];
 
-      const result = await fetchOptionsData(filters, 1, 1000, undefined, 'ONE_OUT', 'call', userId);
+      const result = await fetchOptionsData(filters, 1, 1000, undefined, 'ONE_OUT', 'call', userId, 'covered_call_calculator');
       
       if (!result.options || result.options.length === 0) {
         setError("No options data found for this symbol");

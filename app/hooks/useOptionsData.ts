@@ -20,7 +20,8 @@ export function useOptionsData(
   option: OptionType = 'call',
   minDelta: number = -1,
   maxDelta: number = 1,
-  minExpiration: string = ''
+  minExpiration: string = '',
+  pageName: string = ''
 ) {
   const [data, setData] = useState<Option[]>([]);
   const [loading, setLoading] = useState(false);
@@ -168,7 +169,8 @@ export function useOptionsData(
         finalSortConfig, 
         strikeFilter,
         option,
-        userId // Pass userId to the API call
+        userId, // Pass userId to the API call
+        pageName
       );   
 
       const updatedResult = result.options.map((option: any) => {

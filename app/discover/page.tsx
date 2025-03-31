@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { NavBar } from "../components/NavBar";
 import { Footer } from "../components/Footer";
-import { fetchOptionsData, fetchTickersWithHighestYield, fetchTickersWithHighestImpliedVolatility, fetchTickersWithNextEarnings } from "../services/api";
+import { fetchTickersWithHighestYield, fetchTickersWithHighestImpliedVolatility, fetchTickersWithNextEarnings } from "../services/api";
 import { Option } from "../types/option";
 import { format, parseISO, addDays, isAfter, isBefore, addWeeks } from 'date-fns';
 import { LoadingSpinner } from "../components/LoadingSpinner";
