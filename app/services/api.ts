@@ -41,14 +41,16 @@ export async function fetchOptionsData(
   pageSize: number = 50,
   sortConfig?: SortConfig,
   strikeFilter?: StrikeFilterType,
-  optionType: OptionType = 'call',
-  userId?: string | null
+  optionType: OptionType = 'call',  
+  userId?: string | null,  
+  pageName?: string,
 ) {
   const body: any = {
     filters,
     paging: true,
     pageNo,
-    pageSize
+    pageSize,
+    pageName
   };
 
   // Add userId to the request body if available
