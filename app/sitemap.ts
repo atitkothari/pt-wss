@@ -2,12 +2,15 @@ import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://wheelstrategyoptions.com'
+  
+  // Static dates for static content
+  const staticDate = new Date('2024-03-31') // Using a recent static date
 
   return [
     {
       url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
+      lastModified: staticDate,
+      changeFrequency: 'weekly',
       priority: 1,
     },
     {
@@ -42,8 +45,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${baseUrl}/blog`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
+      lastModified: staticDate,
+      changeFrequency: 'weekly',
       priority: 0.5,
     },
   ]
