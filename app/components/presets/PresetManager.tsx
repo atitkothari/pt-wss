@@ -91,17 +91,16 @@ export function PresetManager({ optionType, currentFilters, onPresetSelect }: Pr
           ))}
           {presets.length > 0 && (
             <>
-              <SelectItem value="custom-header" disabled>Custom Presets</SelectItem>
+              <SelectItem value="custom-header" disabled>Custom Screener</SelectItem>
               {presets.map(preset => (
                 <SelectItem key={preset.id} value={preset.id}>
                   {preset.name}
                 </SelectItem>
-              ))}
-              <SelectItem value="manage-header" disabled>Manage Presets</SelectItem>
+              ))}              
               <SelectItem value="manage-presets" className="text-orange-600">
                 <div className="flex items-center gap-2">
                   <Settings className="h-4 w-4" />
-                  Manage Presets
+                  Manage Saved Screener
                 </div>
               </SelectItem>
             </>
@@ -116,7 +115,7 @@ export function PresetManager({ optionType, currentFilters, onPresetSelect }: Pr
         className="bg-orange-600 text-white hover:text-black"
       >
         <Save className="h-4 w-4 mr-2" />
-        Save Preset
+        Save Screener
       </Button>
 
       <Dialog open={showSaveModal} onOpenChange={setShowSaveModal}>

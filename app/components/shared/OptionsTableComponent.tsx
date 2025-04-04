@@ -26,6 +26,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   yieldFilterConfig,
   priceFilterConfig,
   volumeFilterConfig,
@@ -68,6 +76,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { symbols } = useSymbols();
+  const [showResetConfirmation, setShowResetConfirmation] = useState(false);
 
   const getParamKey = (key: string) => `${option}_${key}`;
   
@@ -844,6 +853,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     router.push(`?${params.toString()}`);
     
     setCurrentPage(1);
+    setShowResetConfirmation(false);
+  };
+
+  const handleResetClick = () => {
+    setShowResetConfirmation(true);
   };
 
   const handlePresetSelect = (preset: Preset) => {
@@ -983,7 +997,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           <Button
             id="btn_screener_reset"
             variant="outline"
-            onClick={handleReset}
+            onClick={handleResetClick}
             className="w-full sm:w-auto"
           >
             <RotateCcw className="h-4 w-4 mr-2" />
@@ -1137,6 +1151,26 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         onClose={() => setShowSaveModal(false)}
         currentQuery={getCurrentQuery()}
       />
+
+      {/* Reset Confirmation Dialog */}
+      <Dialog open={showResetConfirmation} onOpenChange={setShowResetConfirmation}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reset Filters</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to reset all filters to their default values? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowResetConfirmation(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleReset}>
+              Reset Filters
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

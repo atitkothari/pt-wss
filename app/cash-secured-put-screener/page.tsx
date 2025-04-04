@@ -58,10 +58,7 @@ export default function CashSecuredPutScreenerPage() {
               >
                 Switch to Covered Call Screener →
               </Link>
-            </div>
-            <p className="text-gray-600 text-sm">
-              New to selling options? Discover trending opportunities and learn about different strategies using our <a id={'options_subheading_discover'} href="/discover" className="text-blue-600 hover:text-blue-800 underline">discover page</a>.
-            </p>
+            </div>            
           </div>
           <div className="bg-white p-4 rounded-lg shadow-sm relative">
             <OptionsTableComponent option="put" />
