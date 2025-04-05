@@ -49,7 +49,7 @@ export const defaultScreeners: SavedScreener[] = [
     name: 'High Volume',
     optionType: 'call',
     filters: {
-      volumeRange: [1000, 1000000],
+      volumeRange: [100, 1000000],
       minPrice: 5,
       maxPrice: 1000
     },
@@ -105,7 +105,7 @@ export const defaultScreeners: SavedScreener[] = [
     name: 'High Volume',
     optionType: 'put',
     filters: {
-      volumeRange: [1000, 1000000],
+      volumeRange: [100, 1000000],
       minPrice: 5,
       maxPrice: 1000
     },
