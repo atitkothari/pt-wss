@@ -25,6 +25,7 @@ export function NavBar() {
     resources: [
       { name: 'Blog', href: 'https://wheelstrategyoptions.com/blog/', external: true },
       { name: 'API', href: 'https://forms.gle/FRLem4M35jQV3W7Z6', external: true },
+      { name: 'Pricing', href: '/pricing', external: false },
     ],
   };
 
