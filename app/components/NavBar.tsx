@@ -16,6 +16,7 @@ export function NavBar() {
     screeners: [
       { name: 'Covered Call Screener', href: '/covered-call-screener', id: 'covered_call_screener' },
       { name: 'Cash Secured Put Screener', href: '/cash-secured-put-screener', id: 'cash_secured_put_screener' },
+      { name: 'Saved Screeners', href: '/saved-screeners', id: 'saved_screeners' },
     ],
     tools: [
       { name: 'Discover', href: '/discover' },

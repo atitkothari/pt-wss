@@ -12,7 +12,7 @@ import { Option, OptionType, StrikeFilter } from "../../types/option";
 import { OptionsTable } from "../table/OptionsTable";
 import { format, addDays } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Search, Mail, Save, Coffee, RotateCcw, BellRing } from "lucide-react";
+import { Search, Mail, Save, Coffee, RotateCcw, BellRing, FolderOpen } from "lucide-react";
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSymbols } from '../../hooks/useSymbols';
 import { SaveQueryModal } from "../modals/SaveQueryModal";
@@ -39,6 +39,9 @@ import {
   defaultVisibleColumns as configDefaultVisibleColumns,
   impliedVolatilityFilterConfig
 } from "@/app/config/filterConfig";
+import { SaveScreenerModal } from "../modals/SaveScreenerModal";
+import { LoadScreenerModal } from "../modals/LoadScreenerModal";
+import { SavedScreener } from "@/app/types/screener";
 
 interface OptionsTableComponentProps {
   option: OptionType;
@@ -465,8 +468,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     minSelectedExpiration: "",
     pageNo: 1,
     peRatio: [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax] as [number, number],
-    marketCap: [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax] as [number, number],
-    movingAverageCrossover: movingAverageCrossoverOptions[0],
+    marketCap: [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax] as [number, number],    
     sector: sectorOptions[0],
     moneynessRange: [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax] as [number, number],
     impliedVolatility: [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax] as [number, number],
@@ -552,8 +554,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       peRatio[0] !== activeFilters.peRatio[0] ||
       peRatio[1] !== activeFilters.peRatio[1] ||
       marketCap[0] !== activeFilters.marketCap[0] ||
-      marketCap[1] !== activeFilters.marketCap[1] ||
-      movingAverageCrossover !== activeFilters.movingAverageCrossover ||
+      marketCap[1] !== activeFilters.marketCap[1] ||      
       sector !== activeFilters.sector ||
       impliedVolatility[0] !== activeFilters.impliedVolatility[0] ||
       impliedVolatility[1] !== activeFilters.impliedVolatility[1] || 
@@ -599,8 +600,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       minSelectedExpiration,
       pageNo: 1,
       peRatio,
-      marketCap,
-      movingAverageCrossover,
+      marketCap,      
       sector,
       moneynessRange,
       impliedVolatility,
@@ -627,8 +627,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       min_market_cap: marketCap[0],
       max_market_cap: marketCap[1],
       min_iv: impliedVolatility[0],
-      max_iv: impliedVolatility[1],
-      ma_crossover: movingAverageCrossover,
+      max_iv: impliedVolatility[1],      
       sector: sector
     });
 
@@ -647,8 +646,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       undefined,
       deltaFilter,
       peRatio,
-      marketCap,
-      movingAverageCrossover,
+      marketCap,      
       sector,
       moneynessRange,
       impliedVolatility,
@@ -684,8 +682,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             undefined,
             deltaFilter,
             peRatio,
-            marketCap,
-            movingAverageCrossover,
+            marketCap,            
             sector,
             moneynessRange,
             impliedVolatility,
@@ -788,15 +785,12 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       strikeFilter !== 'ALL' ? strikeFilter : undefined,
       deltaFilter,
       activeFilters.peRatio,
-      activeFilters.marketCap,
-      activeFilters.movingAverageCrossover,
+      activeFilters.marketCap,      
       activeFilters.sector,      
       activeFilters.moneynessRange,
       activeFilters.impliedVolatility,
     ).catch(console.error);
   }, [sortColumn, sortDirection, router, searchParams, activeFilters, currentPage, rowsPerPage, strikeFilter, deltaFilter, fetchData]);  
-
-  if (error) return <div className="text-red-500 p-4">{error}</div>;
 
   const { user, userId } = useAuth();
 
@@ -829,8 +823,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       minSelectedExpiration: "",
       pageNo: 1,
       peRatio: [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax] as [number, number],
-      marketCap: [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax] as [number, number],
-      movingAverageCrossover: movingAverageCrossoverOptions[0],
+      marketCap: [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax] as [number, number],      
       sector: sectorOptions[0],
       moneynessRange: [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax] as [number, number],
       impliedVolatility: [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax] as [number, number],
@@ -843,6 +836,102 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     
     setCurrentPage(1);
   };
+
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const [isLoadModalOpen, setIsLoadModalOpen] = useState(false);
+
+  const handleSaveScreener = (screener: SavedScreener) => {
+    if (typeof window === 'undefined') return;
+    
+    const savedScreeners = localStorage.getItem('savedScreeners');
+    const screeners = savedScreeners ? JSON.parse(savedScreeners) : [];
+    screeners.push(screener);
+    localStorage.setItem('savedScreeners', JSON.stringify(screeners));
+  };
+
+  const handleLoadScreener = (screener: SavedScreener) => {
+    // Create a single URLSearchParams object
+    const params = new URLSearchParams();
+
+    // Batch all state updates
+    const updates = {
+      searchTerm: screener.filters.searchTerm || "",
+      selectedStocks: screener.filters.selectedStocks || [],
+      yieldRange: screener.filters.yieldRange || [yieldFilterConfig.min, yieldFilterConfig.max],
+      minPrice: screener.filters.minPrice || priceFilterConfig.defaultMin,
+      maxPrice: screener.filters.maxPrice || priceFilterConfig.defaultMax,
+      volumeRange: screener.filters.volumeRange || [volumeFilterConfig.min, volumeFilterConfig.max],
+      deltaFilter: screener.filters.deltaFilter || [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax],
+      minDte: screener.filters.minDte || dteFilterConfig.defaultMin,
+      maxDte: screener.filters.maxDte || dteFilterConfig.defaultMax,
+      impliedVolatility: screener.filters.impliedVolatility || [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax],
+      peRatio: screener.filters.peRatio || [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax],
+      marketCap: screener.filters.marketCap || [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax],
+      moneynessRange: screener.filters.moneynessRange || [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax],
+      sector: Array.isArray(screener.filters.sector) ? screener.filters.sector[0] : (screener.filters.sector || sectorOptions[0])
+    };
+
+    // Update URL parameters
+    if (updates.searchTerm) params.append(getParamKey('search'), updates.searchTerm);
+    if (updates.selectedStocks.length) params.append(getParamKey('search'), updates.selectedStocks.join(','));
+    if (updates.yieldRange) {
+      params.append(getParamKey('min_yield'), updates.yieldRange[0].toString());
+      params.append(getParamKey('max_yield'), updates.yieldRange[1].toString());
+    }
+    if (updates.minPrice) params.append(getParamKey('minPrice'), updates.minPrice.toString());
+    if (updates.maxPrice) params.append(getParamKey('maxPrice'), updates.maxPrice.toString());
+    if (updates.volumeRange) {
+      params.append(getParamKey('min_vol'), updates.volumeRange[0].toString());
+      params.append(getParamKey('max_vol'), updates.volumeRange[1].toString());
+    }
+    if (updates.deltaFilter) {
+      params.append(getParamKey('min_delta'), updates.deltaFilter[0].toString());
+      params.append(getParamKey('max_delta'), updates.deltaFilter[1].toString());
+    }
+    if (updates.minDte) params.append(getParamKey('min_dte'), updates.minDte.toString());
+    if (updates.maxDte) params.append(getParamKey('max_dte'), updates.maxDte.toString());
+    if (updates.impliedVolatility) {
+      params.append(getParamKey('min_iv'), updates.impliedVolatility[0].toString());
+      params.append(getParamKey('max_iv'), updates.impliedVolatility[1].toString());
+    }
+    if (updates.peRatio) {
+      params.append(getParamKey('min_pe'), updates.peRatio[0].toString());
+      params.append(getParamKey('max_pe'), updates.peRatio[1].toString());
+    }
+    if (updates.marketCap) {
+      params.append(getParamKey('min_market_cap'), updates.marketCap[0].toString());
+      params.append(getParamKey('max_market_cap'), updates.marketCap[1].toString());
+    }
+    if (updates.moneynessRange) {
+      params.append(getParamKey('min_moneyness'), updates.moneynessRange[0].toString());
+      params.append(getParamKey('max_moneyness'), updates.moneynessRange[1].toString());
+    }
+    if (updates.sector) {
+      params.append(getParamKey('sector'), updates.sector);
+    }
+
+    // Update all state variables at once
+    setSearchTerm(updates.searchTerm);
+    setSelectedStocks(updates.selectedStocks);
+    setYieldRange(updates.yieldRange);
+    setMinPrice(updates.minPrice);
+    setMaxPrice(updates.maxPrice);
+    setVolumeRange(updates.volumeRange);
+    setDeltaFilter(updates.deltaFilter);
+    setMinDte(updates.minDte);
+    setMaxDte(updates.maxDte);
+    setImpliedVolatility(updates.impliedVolatility);
+    setPeRatio(updates.peRatio);
+    setMarketCap(updates.marketCap);
+    setMoneynessRange(updates.moneynessRange);
+    setSector(updates.sector);
+
+    // Update URL parameters last
+    router.push(`?${params.toString()}`);
+  };
+
+  // Move error check here, after all hooks are declared
+  if (error) return <div className="text-red-500 p-4">{error}</div>;
 
   return (
     <div className="w-full">      
@@ -936,11 +1025,20 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             <Button
               id="btn_screener_save"
               variant="outline"
-              onClick={() => setShowSaveModal(true)}
+              onClick={() => setIsSaveModalOpen(true)}
               className="bg-orange-600 text-white hover:text-black"
             >
-              <BellRing className="h-5 w-5 min-h-[15px] min-w-[15px] mr-2" />
-              Get Alerts
+              <Save className="h-5 w-5 min-h-[15px] min-w-[15px] mr-2" />
+              Save Screener
+            </Button>
+            <Button
+              id="btn_screener_load"
+              variant="outline"
+              onClick={() => setIsLoadModalOpen(true)}
+              className="bg-blue-600 text-white hover:text-black"
+            >
+              <FolderOpen className="h-5 w-5 min-h-[15px] min-w-[15px] mr-2" />
+              Load Screener
             </Button>
             <Button 
               id="btn_screener_search"
@@ -1011,8 +1109,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                       strikeFilter !== 'ALL' ? strikeFilter : undefined,
                       deltaFilter,
                       activeFilters.peRatio,
-                      activeFilters.marketCap,
-                      activeFilters.movingAverageCrossover,
+                      activeFilters.marketCap,                      
                       activeFilters.sector,
                       activeFilters.moneynessRange,
                       activeFilters.impliedVolatility,
@@ -1046,8 +1143,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                       strikeFilter !== 'ALL' ? strikeFilter : undefined,
                       deltaFilter,
                       activeFilters.peRatio,
-                      activeFilters.marketCap,
-                      activeFilters.movingAverageCrossover,
+                      activeFilters.marketCap,                      
                       activeFilters.sector,
                       activeFilters.moneynessRange,
                       activeFilters.impliedVolatility,
@@ -1090,6 +1186,34 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         isOpen={showSaveModal}
         onClose={() => setShowSaveModal(false)}
         currentQuery={getCurrentQuery()}
+      />
+      <SaveScreenerModal
+        isOpen={isSaveModalOpen}
+        onClose={() => setIsSaveModalOpen(false)}
+        onSave={handleSaveScreener}
+        optionType={option}
+        filters={{
+          searchTerm,
+          selectedStocks,
+          yieldRange,
+          minPrice,
+          maxPrice,
+          volumeRange,
+          deltaFilter,
+          minDte,
+          maxDte,
+          impliedVolatility,
+          peRatio,
+          marketCap,
+          moneynessRange,          
+          sector
+        }}
+      />
+      <LoadScreenerModal
+        isOpen={isLoadModalOpen}
+        onClose={() => setIsLoadModalOpen(false)}
+        onLoad={handleLoadScreener}
+        optionType={option}
       />
     </div>
   );

@@ -1,0 +1,32 @@
+export type EmailFrequency = 'daily' | 'weekly' | 'monthly';
+
+export interface SavedScreener {
+  id: string;
+  name: string;
+  optionType: 'call' | 'put';
+  filters: {
+    searchTerm?: string;
+    selectedStocks?: string[];
+    yieldRange?: [number, number];
+    minPrice?: number;
+    maxPrice?: number;
+    volumeRange?: [number, number];
+    deltaFilter?: [number, number];
+    minDte?: number;
+    maxDte?: number;
+    impliedVolatility?: [number, number];
+    peRatio?: [number, number];
+    marketCap?: [number, number];
+    moneynessRange?: [number, number];
+    movingAverageCrossover?: string[];
+    sector?: string[];
+  };
+  emailNotifications?: {
+    enabled: boolean;
+    email: string;
+    frequency: EmailFrequency;
+  };
+  createdAt: string;
+  updatedAt: string;
+  isDefault?: boolean;
+} 
