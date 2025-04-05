@@ -9,7 +9,7 @@ import { MultiStockSelect } from "../filters/MultiStockSelect";
 import { useOptionsData } from "../../hooks/useOptionsData";
 import { LoadingSpinner } from "../LoadingSpinner";
 import { Option, OptionType, StrikeFilter } from "../../types/option";
-import { OptionsTable } from "../table/OptionsTable";
+import { DEFAULT_COLUMNS, OptionsTable } from "../table/OptionsTable";
 import { format, addDays } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Search, Mail, Save, Coffee, RotateCcw, BellRing, FolderOpen } from "lucide-react";
@@ -43,6 +43,7 @@ import { SaveScreenerModal } from "../modals/SaveScreenerModal";
 import { LoadScreenerModal } from "../modals/LoadScreenerModal";
 import { SavedScreener } from "@/app/types/screener";
 import { defaultScreeners } from '@/app/config/defaultScreeners';
+import { ColumnCustomizer } from "../table/ColumnCustomizer";
 
 interface OptionsTableComponentProps {
   option: OptionType;
@@ -702,6 +703,45 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     }
   };
 
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(() => {
+    // Try to get saved columns from localStorage
+    if (typeof window !== 'undefined') {
+      const savedColumns = localStorage.getItem('visibleColumns');
+      if (savedColumns) {
+        try {
+          return JSON.parse(savedColumns);
+        } catch (e) {
+          console.error('Error parsing localStorage value for visibleColumns:', e);
+        }
+      }
+    }
+    // Fall back to default visible columns from config
+    return configDefaultVisibleColumns;
+  });
+
+  const handleColumnToggle = (columnKey: string) => {
+    setVisibleColumns(current => {
+      let newColumns;
+      if (current.includes(columnKey)) {
+        if (current.length === 1) return current;
+        newColumns = current.filter(key => key !== columnKey);
+      } else {
+        newColumns = [...current, columnKey].sort(
+          (a, b) => 
+            DEFAULT_COLUMNS.findIndex(col => col.key === a) - 
+            DEFAULT_COLUMNS.findIndex(col => col.key === b)
+        );
+      }
+      
+      // Save to localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('visibleColumns', JSON.stringify(newColumns));
+      }
+      
+      return newColumns;
+    });
+  };
+
 
   const [showSaveModal, setShowSaveModal] = useState(false);
 
@@ -945,6 +985,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   // Move error check here, after all hooks are declared
   if (error) return <div className="text-red-500 p-4">{error}</div>;
 
+  const [showColumnSelector, setShowColumnSelector] = useState(false);
+
   return (
     <div className="w-full">      
       {/* Filter Controls */}
@@ -1020,39 +1062,28 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
         {/* All Rows - 2 columns on mobile, 4 on large screens */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
-          <MultiStockSelect
-            id="input_screener_symbol"
-            label="Search Symbol"
-            selectedStocks={selectedStocks}
-            onChange={(stocks) => {
-              setSelectedStocks(stocks);
-              if (stocks.length === 1) {
-                setSearchTerm(stocks[0]);
-              } else {
-                setSearchTerm(stocks.join(','));
-              }
-            }}
-            placeholder="Enter symbols..."
-            onKeyPress={handleKeyPress}
-            suggestions={symbols}
-            showSuggestions={true}
-            tooltip="Enter stock symbols (e.g., AAPL, MSFT) to filter options"
-          />
-          <RangeSlider
-            id="input_screener_yield_range"
-            label="Premium Yield %"
-            minValue={yieldRange[0]}
-            maxValue={yieldRange[1]}
-            value={yieldRange}
-            onChange={(value) => {
-              setYieldRange(value);
-            }}
-            min={yieldFilterConfig.min}
-            max={yieldFilterConfig.max}
-            step={yieldFilterConfig.step}
-            tooltip={yieldFilterConfig.tooltip}
-            formatValue={(val) => `${val}%`}
-          />
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <MultiStockSelect
+                id="input_screener_symbol"
+                label="Search Symbol"
+                selectedStocks={selectedStocks}
+                onChange={(stocks) => {
+                  setSelectedStocks(stocks);
+                  if (stocks.length === 1) {
+                    setSearchTerm(stocks[0]);
+                  } else {
+                    setSearchTerm(stocks.join(','));
+                  }
+                }}
+                placeholder="Enter symbols..."
+                onKeyPress={handleKeyPress}
+                suggestions={symbols}
+                showSuggestions={true}
+                tooltip="Enter stock symbols (e.g., AAPL, MSFT) to filter options"
+              />
+            </div>
+          </div>
         </div>
         
         {/* Advanced Filters */}
@@ -1072,9 +1103,9 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             onVolumeRangeChange={setVolumeRange}
             handleKeyPress={handleKeyPress}
             strikePrice={[minPrice, maxPrice]}
-            onStrikePriceChange={(value) => {
-              setMinPrice(value[0]);
-              setMaxPrice(value[1]);
+            onStrikePriceChange={([min, max]) => {
+              setMinPrice(min);
+              setMaxPrice(max);
             }}
             impliedVolatility={impliedVolatility}
             onImpliedVolatilityChange={setImpliedVolatility}
@@ -1082,26 +1113,33 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             onMoneynessRangeChange={setMoneynessRange}
             minDte={minDte}
             maxDte={maxDte}
-            onDteChange={(value) => {
-              setMinDte(value[0]);
-              setMaxDte(value[1]);
+            onDteChange={([min, max]) => {
+              setMinDte(min);
+              setMaxDte(max);
             }}
+            yieldRange={yieldRange}
+            onYieldRangeChange={setYieldRange}
             autoSearch={false}
             onSearch={handleSearch}
           />
         </div>
 
         {/* Buttons */}
-        <div className="flex flex-col sm:flex-row justify-end gap-1">
+        <div className="flex items-center gap-2">
           <Button
-            id="btn_screener_reset"
             variant="outline"
+            size="sm"
             onClick={handleReset}
-            className="w-full sm:w-auto"
+            className="flex items-center gap-2"
           >
-            <RotateCcw className="h-4 w-4 mr-2" />
+            <RotateCcw className="h-4 w-4" />
             Reset Filters
           </Button>
+          <ColumnCustomizer
+          columns={DEFAULT_COLUMNS}
+          visibleColumns={visibleColumns}
+          onColumnToggle={handleColumnToggle}
+        />
         </div>
       </div>
 
@@ -1133,6 +1171,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                 <OptionsTable 
                   data={data}              
                   onSort={handleSortURL}
+                  visibleColumns={visibleColumns}
                 />
               </BlurredTable>
             </div>
@@ -1236,23 +1275,23 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         )}
       </div>
 
-      {/* Sticky Save Button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-md p-4 z-50">
-        <div className="max-w-screen-2xl mx-auto flex justify-end gap-2">
+      {/* Sticky Save and Search buttons */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 z-50">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Button
+            variant="outline"
             onClick={() => setIsSaveModalOpen(true)}
-            className="bg-orange-600 text-white hover:text-black"
+            className="flex items-center gap-2"
           >
-            <Save className="h-5 w-5 min-h-[15px] min-w-[15px] mr-2" />
+            <Save className="h-4 w-4" />
             Save Screener
           </Button>
-          <Button 
-            id="btn_screener_search"
+          <Button
             onClick={handleSearch}
-            className={`${filtersChanged ? 'bg-amber-500 hover:bg-amber-600' : ''}`}
+            className="flex items-center gap-2"
           >
-            <Search className="h-5 w-5 min-h-[15px] min-w-[15px] mr-2" />
-            {filtersChanged ? 'Search (Updated Filters)' : 'Search'}
+            <Search className="h-4 w-4" />
+            Search
           </Button>
         </div>
       </div>
