@@ -942,6 +942,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         <div className="mb-4">
           <Select
             onValueChange={(value) => {
+              if (value === "manage") {
+                window.location.href = '/saved-screeners';
+                return;
+              }
               if (value === "default") return;
               const savedScreeners = localStorage.getItem('savedScreeners');
               const allScreeners = [...defaultScreeners, ...(savedScreeners ? JSON.parse(savedScreeners) : [])];
@@ -989,6 +993,16 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                   </>
                 );
               })()}
+
+              {/* Manage Saved Screeners Option */}
+              <div className="px-2 py-1.5 text-sm font-semibold text-gray-500 border-t">
+                <SelectItem 
+                  value="manage" 
+                  className="text-blue-600 hover:text-blue-800 cursor-pointer"
+                >
+                  Manage Saved Screeners
+                </SelectItem>
+              </div>
             </SelectContent>
           </Select>
         </div>
