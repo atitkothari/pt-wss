@@ -1102,30 +1102,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             <RotateCcw className="h-4 w-4 mr-2" />
             Reset Filters
           </Button>
-          <div className="grid grid-cols-[35%_65%] sm:flex sm:gap-1 w-full sm:w-auto">
-            <Button
-              id="btn_screener_save"
-              variant="outline"
-              onClick={() => setIsSaveModalOpen(true)}
-              className="bg-orange-600 text-white hover:text-black"
-            >
-              <Save className="h-5 w-5 min-h-[15px] min-w-[15px] mr-2" />
-              Save Screener
-            </Button>
-            <Button 
-              id="btn_screener_search"
-              onClick={handleSearch}
-              className={`${filtersChanged ? 'bg-amber-500 hover:bg-amber-600' : ''}`}
-            >
-              <Search className="h-5 w-5 min-h-[15px] min-w-[15px] mr-2" />
-              {filtersChanged ? 'Search (Updated Filters)' : 'Search'}
-            </Button>
-          </div>
         </div>
       </div>
 
       {/* Results Section - Fixed height container */}
-      <div className="min-h-[600px] relative">
+      <div className="relative flex-1 min-h-[400px] bg-white rounded-lg shadow-sm overflow-hidden">
         {!hasSearched && !activeFilters.searchTerm && 
          activeFilters.yieldRange[0] === yieldFilterConfig.min && 
          activeFilters.yieldRange[1] === yieldFilterConfig.max && 
@@ -1254,32 +1235,61 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           </div>
         )}
       </div>
+
+      {/* Sticky Save Button */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-md p-4 z-50">
+        <div className="max-w-screen-2xl mx-auto flex justify-end gap-2">
+          <Button
+            onClick={() => setIsSaveModalOpen(true)}
+            className="bg-orange-600 text-white hover:text-black"
+          >
+            <Save className="h-5 w-5 min-h-[15px] min-w-[15px] mr-2" />
+            Save Screener
+          </Button>
+          <Button 
+            id="btn_screener_search"
+            onClick={handleSearch}
+            className={`${filtersChanged ? 'bg-amber-500 hover:bg-amber-600' : ''}`}
+          >
+            <Search className="h-5 w-5 min-h-[15px] min-w-[15px] mr-2" />
+            {filtersChanged ? 'Search (Updated Filters)' : 'Search'}
+          </Button>
+        </div>
+      </div>
+
+      {/* Add padding to the bottom to account for the sticky button */}
+      <div className="h-20" />
+
+      {/* Save Screener Modal */}
+      {isSaveModalOpen && (
+        <SaveScreenerModal
+          isOpen={isSaveModalOpen}
+          onClose={() => setIsSaveModalOpen(false)}
+          onSave={handleSaveScreener}
+          optionType={option}
+          filters={{
+            searchTerm,
+            selectedStocks,
+            yieldRange,
+            minPrice,
+            maxPrice,
+            volumeRange,
+            deltaFilter,
+            minDte,
+            maxDte,
+            impliedVolatility,
+            peRatio,
+            marketCap,
+            movingAverageCrossover,
+            sector,
+            moneynessRange
+          }}
+        />
+      )}
       <SaveQueryModal
         isOpen={showSaveModal}
         onClose={() => setShowSaveModal(false)}
         currentQuery={getCurrentQuery()}
-      />
-      <SaveScreenerModal
-        isOpen={isSaveModalOpen}
-        onClose={() => setIsSaveModalOpen(false)}
-        onSave={handleSaveScreener}
-        optionType={option}
-        filters={{
-          searchTerm,
-          selectedStocks,
-          yieldRange,
-          minPrice,
-          maxPrice,
-          volumeRange,
-          deltaFilter,
-          minDte,
-          maxDte,
-          impliedVolatility,
-          peRatio,
-          marketCap,
-          moneynessRange,          
-          sector
-        }}
       />
       <LoadScreenerModal
         isOpen={isLoadModalOpen}
