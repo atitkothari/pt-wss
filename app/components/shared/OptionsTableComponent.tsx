@@ -1074,7 +1074,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         </div>
 
         {/* All Rows - 2 columns on mobile, 4 on large screens */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-2">
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <MultiStockSelect
