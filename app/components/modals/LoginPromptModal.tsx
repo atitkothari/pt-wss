@@ -1,0 +1,47 @@
+"use client";
+
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/app/context/AuthContext";
+
+interface LoginPromptModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export function LoginPromptModal({ isOpen, onClose }: LoginPromptModalProps) {
+  const { signInWithGoogle } = useAuth();
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Sign in Required</DialogTitle>
+          <DialogDescription>
+            Please sign in with your Google account to save screeners and access premium features.
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="flex flex-col items-center gap-6 py-6">
+          <div className="text-center space-y-2">
+            <p className="text-sm text-gray-600">
+              Sign in to access these features:
+            </p>
+            <ul className="text-sm text-gray-600 list-disc list-inside">
+              <li>Save your screeners</li>
+              <li>Receive email alerts for new matches</li>
+              <li>See all option contracts</li>
+            </ul>
+          </div>
+          
+          <Button
+            onClick={signInWithGoogle}
+            className="w-full"
+          >
+            Sign in with Google
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+} 

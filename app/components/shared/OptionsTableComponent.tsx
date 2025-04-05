@@ -41,6 +41,7 @@ import {
 } from "@/app/config/filterConfig";
 import { SaveScreenerModal } from "../modals/SaveScreenerModal";
 import { LoadScreenerModal } from "../modals/LoadScreenerModal";
+import { LoginPromptModal } from "../modals/LoginPromptModal";
 import { SavedScreener } from "@/app/types/screener";
 import { defaultScreeners } from '@/app/config/defaultScreeners';
 import { ColumnCustomizer } from "../table/ColumnCustomizer";
@@ -880,6 +881,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [isLoadModalOpen, setIsLoadModalOpen] = useState(false);
+  const [isLoginPromptOpen, setIsLoginPromptOpen] = useState(false);
 
   const handleSaveScreener = (screener: SavedScreener) => {
     if (typeof window === 'undefined') return;
@@ -980,6 +982,15 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
     // Update URL parameters last
     router.push(`?${params.toString()}`);
+  };
+
+  // Update the Save Screener button click handlers
+  const handleSaveScreenerClick = () => {
+    if (!user) {
+      setIsLoginPromptOpen(true);
+      return;
+    }
+    setIsSaveModalOpen(true);
   };
 
   // Move error check here, after all hooks are declared
@@ -1125,21 +1136,61 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         </div>
 
         {/* Buttons */}
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleReset}
-            className="flex items-center gap-2"
-          >
-            <RotateCcw className="h-4 w-4" />
-            Reset Filters
-          </Button>
-          <ColumnCustomizer
-          columns={DEFAULT_COLUMNS}
-          visibleColumns={visibleColumns}
-          onColumnToggle={handleColumnToggle}
-        />
+        <div className="flex flex-col gap-2">
+          {/* Desktop buttons */}
+          <div className="hidden md:flex items-center justify-between gap-2 w-full">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={handleSaveScreenerClick}
+                className="flex items-center gap-2"
+              >
+                <Save className="h-4 w-4" />
+                Save Screener
+              </Button>
+              <Button
+                onClick={handleSearch}
+                className="flex items-center gap-2"
+              >
+                <Search className="h-4 w-4" />
+                Search
+              </Button>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleReset}
+                className="flex items-center gap-2"
+              >
+                <RotateCcw className="h-4 w-4" />
+                Reset Filters
+              </Button>
+              <ColumnCustomizer
+                columns={DEFAULT_COLUMNS}
+                visibleColumns={visibleColumns}
+                onColumnToggle={handleColumnToggle}
+              />
+            </div>
+          </div>
+          
+          {/* Mobile buttons */}
+          <div className="md:hidden flex items-center justify-end gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleReset}
+              className="flex items-center gap-2"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Reset Filters
+            </Button>
+            <ColumnCustomizer
+              columns={DEFAULT_COLUMNS}
+              visibleColumns={visibleColumns}
+              onColumnToggle={handleColumnToggle}
+            />
+          </div>
         </div>
       </div>
 
@@ -1275,12 +1326,12 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         )}
       </div>
 
-      {/* Sticky Save and Search buttons */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 z-50">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
+      {/* Mobile Sticky Save and Search buttons */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 z-50">
+        <div className="flex justify-between items-center">
           <Button
             variant="outline"
-            onClick={() => setIsSaveModalOpen(true)}
+            onClick={handleSaveScreenerClick}
             className="flex items-center gap-2"
           >
             <Save className="h-4 w-4" />
@@ -1296,8 +1347,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         </div>
       </div>
 
-      {/* Add padding to the bottom to account for the sticky button */}
-      <div className="h-20" />
+      {/* Add padding to the bottom to account for the sticky button on mobile only */}
+      <div className="h-20 md:h-0" />
 
       {/* Save Screener Modal */}
       {isSaveModalOpen && (
@@ -1335,6 +1386,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         onClose={() => setIsLoadModalOpen(false)}
         onLoad={handleLoadScreener}
         optionType={option}
+      />
+      <LoginPromptModal
+        isOpen={isLoginPromptOpen}
+        onClose={() => setIsLoginPromptOpen(false)}
       />
     </div>
   );
