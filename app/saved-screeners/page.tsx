@@ -41,13 +41,13 @@ export default function SavedScreenersPage() {
     if (savedScreeners) {
       try {
         const parsedScreeners = JSON.parse(savedScreeners);
-        setScreeners([...defaultScreeners, ...parsedScreeners]);
+        setScreeners(parsedScreeners);
       } catch (e) {
         console.error('Error parsing saved screeners:', e);
-        setScreeners(defaultScreeners);
+        setScreeners([]);
       }
     } else {
-      setScreeners(defaultScreeners);
+      setScreeners([]);
     }
     setLoading(false);
   };
@@ -117,88 +117,185 @@ export default function SavedScreenersPage() {
         <div className="mb-4">
           <h1 className="text-2xl font-bold">Saved Screeners</h1>
         </div>
-        <div className="bg-white rounded-lg shadow-sm">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead>Email Notifications</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {screeners.map((screener) => (
-                <TableRow key={screener.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      {screener.isDefault && <Star className="h-4 w-4 text-yellow-500" />}
-                      {screener.name}
-                    </div>
-                  </TableCell>
-                  <TableCell className="capitalize">{screener.optionType}</TableCell>
-                  <TableCell>{format(new Date(screener.createdAt), 'MMM d, yyyy')}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleToggleEmailNotifications(screener.id)}
-                      >
-                        {screener.emailNotifications?.enabled ? (
-                          <Bell className="h-4 w-4 text-green-600" />
-                        ) : (
-                          <BellOff className="h-4 w-4 text-gray-400" />
-                        )}
-                      </Button>
-                      {screener.emailNotifications?.enabled && (
-                        <Select
-                          value={screener.emailNotifications.frequency}
-                          onValueChange={(value: EmailFrequency) =>
-                            handleUpdateFrequency(screener.id, value)
-                          }
-                        >
-                          <SelectTrigger className="w-[120px]">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="daily">Daily</SelectItem>
-                            <SelectItem value="weekly">Weekly</SelectItem>
-                            <SelectItem value="monthly">Monthly</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => {
-                          // TODO: Implement edit functionality
-                          console.log('Edit screener:', screener.id);
-                        }}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      {!screener.isDefault && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(screener.id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-red-600" />
-                        </Button>
-                      )}
-                    </div>
-                  </TableCell>
+
+        {/* Covered Call Screeners Section */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">Covered Call Screeners</h2>
+          <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[40%]">Name</TableHead>
+                  <TableHead className="hidden sm:table-cell">Created</TableHead>
+                  <TableHead className="w-[30%]">Notifications</TableHead>
+                  <TableHead className="w-[30%]">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {screeners
+                  .filter(screener => screener.optionType === 'call')
+                  .map((screener) => (
+                    <TableRow key={screener.id}>
+                      <TableCell className="font-medium">
+                        {screener.name}
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        {format(new Date(screener.createdAt), 'MMM d, yyyy')}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleToggleEmailNotifications(screener.id)}
+                            className="h-8 w-8"
+                          >
+                            {screener.emailNotifications?.enabled ? (
+                              <Bell className="h-4 w-4 text-green-600" />
+                            ) : (
+                              <BellOff className="h-4 w-4 text-gray-400" />
+                            )}
+                          </Button>
+                          {screener.emailNotifications?.enabled && (
+                            <Select
+                              value={screener.emailNotifications.frequency}
+                              onValueChange={(value: EmailFrequency) =>
+                                handleUpdateFrequency(screener.id, value)
+                              }
+                            >
+                              <SelectTrigger className="h-8 w-[100px]">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="daily">Daily</SelectItem>
+                                <SelectItem value="weekly">Weekly</SelectItem>
+                                <SelectItem value="monthly">Monthly</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              // TODO: Implement edit functionality
+                              console.log('Edit screener:', screener.id);
+                            }}
+                            className="h-8 w-8"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          {!screener.isDefault && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDelete(screener.id)}
+                              className="h-8 w-8"
+                            >
+                              <Trash2 className="h-4 w-4 text-red-600" />
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </div>
         </div>
+
+        {/* Cash Secured Put Screeners Section */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">Cash Secured Put Screeners</h2>
+          <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[40%]">Name</TableHead>
+                  <TableHead className="hidden sm:table-cell">Created</TableHead>
+                  <TableHead className="w-[30%]">Notifications</TableHead>
+                  <TableHead className="w-[30%]">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {screeners
+                  .filter(screener => screener.optionType === 'put')
+                  .map((screener) => (
+                    <TableRow key={screener.id}>
+                      <TableCell className="font-medium">
+                        {screener.name}
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        {format(new Date(screener.createdAt), 'MMM d, yyyy')}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleToggleEmailNotifications(screener.id)}
+                            className="h-8 w-8"
+                          >
+                            {screener.emailNotifications?.enabled ? (
+                              <Bell className="h-4 w-4 text-green-600" />
+                            ) : (
+                              <BellOff className="h-4 w-4 text-gray-400" />
+                            )}
+                          </Button>
+                          {screener.emailNotifications?.enabled && (
+                            <Select
+                              value={screener.emailNotifications.frequency}
+                              onValueChange={(value: EmailFrequency) =>
+                                handleUpdateFrequency(screener.id, value)
+                              }
+                            >
+                              <SelectTrigger className="h-8 w-[100px]">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="daily">Daily</SelectItem>
+                                <SelectItem value="weekly">Weekly</SelectItem>
+                                <SelectItem value="monthly">Monthly</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              // TODO: Implement edit functionality
+                              console.log('Edit screener:', screener.id);
+                            }}
+                            className="h-8 w-8"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          {!screener.isDefault && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDelete(screener.id)}
+                              className="h-8 w-8"
+                            >
+                              <Trash2 className="h-4 w-4 text-red-600" />
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+
         <Footer />
       </div>
     </div>
