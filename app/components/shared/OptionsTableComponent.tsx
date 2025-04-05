@@ -937,6 +937,43 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     <div className="w-full">      
       {/* Filter Controls */}
       <div className="space-y-2 mb-2">
+        {/* Screener Dropdown */}
+        <div className="mb-4">
+          <Select
+            onValueChange={(value) => {
+              if (value === "default") return;
+              const savedScreeners = localStorage.getItem('savedScreeners');
+              if (savedScreeners) {
+                const screeners = JSON.parse(savedScreeners);
+                const selectedScreener = screeners.find((s: SavedScreener) => s.id === value);
+                if (selectedScreener) {
+                  handleLoadScreener(selectedScreener);
+                }
+              }
+            }}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select a saved screener" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="default">Select a saved screener</SelectItem>
+              {(() => {
+                if (typeof window === 'undefined') return null;
+                const savedScreeners = localStorage.getItem('savedScreeners');
+                if (!savedScreeners) return null;
+                const screeners = JSON.parse(savedScreeners);
+                return screeners
+                  .filter((s: SavedScreener) => s.optionType === option)
+                  .map((screener: SavedScreener) => (
+                    <SelectItem key={screener.id} value={screener.id}>
+                      {screener.name}
+                    </SelectItem>
+                  ));
+              })()}
+            </SelectContent>
+          </Select>
+        </div>
+
         {/* All Rows - 2 columns on mobile, 4 on large screens */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
           <MultiStockSelect
@@ -1030,15 +1067,6 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             >
               <Save className="h-5 w-5 min-h-[15px] min-w-[15px] mr-2" />
               Save Screener
-            </Button>
-            <Button
-              id="btn_screener_load"
-              variant="outline"
-              onClick={() => setIsLoadModalOpen(true)}
-              className="bg-blue-600 text-white hover:text-black"
-            >
-              <FolderOpen className="h-5 w-5 min-h-[15px] min-w-[15px] mr-2" />
-              Load Screener
             </Button>
             <Button 
               id="btn_screener_search"
