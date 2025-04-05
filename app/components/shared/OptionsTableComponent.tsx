@@ -42,6 +42,7 @@ import {
 import { SaveScreenerModal } from "../modals/SaveScreenerModal";
 import { LoadScreenerModal } from "../modals/LoadScreenerModal";
 import { SavedScreener } from "@/app/types/screener";
+import { defaultScreeners } from '@/app/config/defaultScreeners';
 
 interface OptionsTableComponentProps {
   option: OptionType;
@@ -943,12 +944,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             onValueChange={(value) => {
               if (value === "default") return;
               const savedScreeners = localStorage.getItem('savedScreeners');
-              if (savedScreeners) {
-                const screeners = JSON.parse(savedScreeners);
-                const selectedScreener = screeners.find((s: SavedScreener) => s.id === value);
-                if (selectedScreener) {
-                  handleLoadScreener(selectedScreener);
-                }
+              const allScreeners = [...defaultScreeners, ...(savedScreeners ? JSON.parse(savedScreeners) : [])];
+              const selectedScreener = allScreeners.find((s: SavedScreener) => s.id === value);
+              if (selectedScreener) {
+                handleLoadScreener(selectedScreener);
               }
             }}
           >
@@ -956,19 +955,39 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
               <SelectValue placeholder="Select a saved screener" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="default">Select a saved screener</SelectItem>
+              {/* Predefined Screeners Section */}
+              <div className="px-2 py-1.5 text-sm font-semibold text-gray-500">
+                Predefined Screeners
+              </div>
+              {(() => {
+                if (typeof window === 'undefined') return null;
+                const predefinedScreeners = defaultScreeners.filter((s: SavedScreener) => s.optionType === option);
+                return predefinedScreeners.map((screener: SavedScreener) => (
+                  <SelectItem key={screener.id} value={screener.id}>
+                    {screener.name}
+                  </SelectItem>
+                ));
+              })()}
+
+              {/* Custom Screeners Section */}
               {(() => {
                 if (typeof window === 'undefined') return null;
                 const savedScreeners = localStorage.getItem('savedScreeners');
                 if (!savedScreeners) return null;
-                const screeners = JSON.parse(savedScreeners);
-                return screeners
-                  .filter((s: SavedScreener) => s.optionType === option)
-                  .map((screener: SavedScreener) => (
-                    <SelectItem key={screener.id} value={screener.id}>
-                      {screener.name}
-                    </SelectItem>
-                  ));
+                const customScreeners = JSON.parse(savedScreeners).filter((s: SavedScreener) => s.optionType === option);
+                if (customScreeners.length === 0) return null;
+                return (
+                  <>
+                    <div className="px-2 py-1.5 text-sm font-semibold text-gray-500">
+                      Custom Screeners
+                    </div>
+                    {customScreeners.map((screener: SavedScreener) => (
+                      <SelectItem key={screener.id} value={screener.id}>
+                        {screener.name}
+                      </SelectItem>
+                    ))}
+                  </>
+                );
               })()}
             </SelectContent>
           </Select>
