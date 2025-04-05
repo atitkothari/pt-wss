@@ -1037,8 +1037,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                 ));
               })()}
 
-              {/* Custom Screeners Section */}
-              {(() => {
+              {/* Custom Screeners Section - Only show if user is logged in */}
+              {user && (() => {
                 if (typeof window === 'undefined') return null;
                 const savedScreeners = localStorage.getItem('savedScreeners');
                 if (!savedScreeners) return null;
@@ -1058,15 +1058,17 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                 );
               })()}
 
-              {/* Manage Saved Screeners Option */}
-              <div className="px-2 py-1.5 text-sm font-semibold text-gray-500 border-t">
-                <SelectItem 
-                  value="manage" 
-                  className="text-blue-600 hover:text-blue-800 cursor-pointer"
-                >
-                  Manage Saved Screeners
-                </SelectItem>
-              </div>
+              {/* Manage Saved Screeners Option - Only show if user is logged in */}
+              {user && (
+                <div className="px-2 py-1.5 text-sm font-semibold text-gray-500 border-t">
+                  <SelectItem 
+                    value="manage" 
+                    className="text-blue-600 hover:text-blue-800 cursor-pointer"
+                  >
+                    Manage Saved Screeners
+                  </SelectItem>
+                </div>
+              )}
             </SelectContent>
           </Select>
         </div>
