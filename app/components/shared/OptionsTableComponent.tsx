@@ -846,7 +846,18 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     
     const savedScreeners = localStorage.getItem('savedScreeners');
     const screeners = savedScreeners ? JSON.parse(savedScreeners) : [];
-    screeners.push(screener);
+    
+    // Check if a screener with the same ID exists
+    const existingIndex = screeners.findIndex((s: SavedScreener) => s.id === screener.id);
+    
+    if (existingIndex >= 0) {
+      // Update existing screener
+      screeners[existingIndex] = screener;
+    } else {
+      // Add new screener
+      screeners.push(screener);
+    }
+    
     localStorage.setItem('savedScreeners', JSON.stringify(screeners));
   };
 
