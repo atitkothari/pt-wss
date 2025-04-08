@@ -44,6 +44,7 @@ export default function SavedScreenersPage() {
       const savedScreeners = localStorage.getItem('savedScreeners');
       if (savedScreeners) {
         const parsedScreeners = JSON.parse(savedScreeners);
+        console.log(parsedScreeners)
         // Validate that parsedScreeners is an array
         if (!Array.isArray(parsedScreeners)) {
           console.error('Saved screeners is not an array');
