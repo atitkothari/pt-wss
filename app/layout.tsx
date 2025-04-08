@@ -11,7 +11,7 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: {
     default: 'Wheel Strategy Options - Options Selling Screener',
-    template: '%s | Wheel Strategy Options - Options Selling'
+    template: '%s | Options Selling'
   },
   description: 'Screen for high-yield options trades and selling opportunities using our advanced options screener. Find the best covered calls and cash-secured puts for the wheel strategy.',
   keywords: ['options trading', 'wheel strategy', 'covered calls', 'cash secured puts', 'options screener', 'selling options', 'options selling'],
