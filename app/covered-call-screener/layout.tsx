@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Covered Call Screener | Wheel Strategy Options',
+  title: 'Covered Call Screener',
   description: 'Screen for covered call opportunities with our advanced options screener. Find high-yield covered calls that match your investment strategy.',
 };
 
