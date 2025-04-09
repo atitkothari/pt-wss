@@ -36,7 +36,7 @@ export function LoadScreenerModal({
     }
   }, []);
 
-  const filteredScreeners = screeners.filter(screener => screener.optionType === optionType);
+  const filteredScreeners = screeners.filter(screener => screener.filters.optionType === optionType);
 
   const handleLoad = (screener: SavedScreener) => {
     onLoad(screener);

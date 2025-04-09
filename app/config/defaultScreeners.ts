@@ -5,8 +5,8 @@ export const defaultScreeners: SavedScreener[] = [
   {
     id: 'high-iv-call',
     name: 'High IV',
-    optionType: 'call',
     filters: {
+      optionType: 'call',
       impliedVolatility: [50, 200],
       volumeRange: [100, 1000000],
       minPrice: 5,
@@ -19,8 +19,8 @@ export const defaultScreeners: SavedScreener[] = [
   {
     id: 'high-yield-call',
     name: 'High Yield',
-    optionType: 'call',
     filters: {
+      optionType: 'call',
       yieldRange: [2, 100],
       volumeRange: [100, 1000000],
       minPrice: 5,
@@ -33,8 +33,8 @@ export const defaultScreeners: SavedScreener[] = [
   {
     id: 'earnings-next-week-call',
     name: 'Earnings Next Week',
-    optionType: 'call',
     filters: {
+      optionType: 'call',
       minDte: 1,
       maxDte: 7,
       impliedVolatility: [30, 200],
@@ -47,8 +47,8 @@ export const defaultScreeners: SavedScreener[] = [
   {
     id: 'high-volume-call',
     name: 'High Volume',
-    optionType: 'call',
     filters: {
+      optionType: 'call',
       volumeRange: [100, 1000000],
       minPrice: 5,
       maxPrice: 1000
@@ -61,8 +61,8 @@ export const defaultScreeners: SavedScreener[] = [
   {
     id: 'high-iv-put',
     name: 'High IV',
-    optionType: 'put',
     filters: {
+      optionType: 'put',
       impliedVolatility: [50, 200],
       volumeRange: [100, 1000000],
       minPrice: 5,
@@ -75,8 +75,8 @@ export const defaultScreeners: SavedScreener[] = [
   {
     id: 'high-yield-put',
     name: 'High Yield',
-    optionType: 'put',
     filters: {
+      optionType: 'put',
       yieldRange: [2, 100],
       volumeRange: [100, 1000000],
       minPrice: 5,
@@ -89,8 +89,8 @@ export const defaultScreeners: SavedScreener[] = [
   {
     id: 'earnings-next-week-put',
     name: 'Earnings Next Week',
-    optionType: 'put',
     filters: {
+      optionType: 'put',
       minDte: 1,
       maxDte: 7,
       impliedVolatility: [30, 200],
@@ -103,8 +103,8 @@ export const defaultScreeners: SavedScreener[] = [
   {
     id: 'high-volume-put',
     name: 'High Volume',
-    optionType: 'put',
     filters: {
+      optionType: 'put',
       volumeRange: [100, 1000000],
       minPrice: 5,
       maxPrice: 1000

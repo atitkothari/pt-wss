@@ -59,7 +59,7 @@ export function SaveScreenerModal({
     if (savedScreeners) {
       try {
         const parsedScreeners = JSON.parse(savedScreeners);
-        setExistingScreeners(parsedScreeners.filter((s: SavedScreener) => s.optionType === optionType));
+        setExistingScreeners(parsedScreeners.filter((s: SavedScreener) => s.filters.optionType === optionType));
       } catch (e) {
         console.error('Error parsing saved screeners:', e);
       }
@@ -88,8 +88,10 @@ export function SaveScreenerModal({
     const newScreener: SavedScreener = {
       id: selectedScreenerToOverwrite?.id || uuidv4(),
       name: selectedScreenerToOverwrite?.name || name.trim(),
-      optionType,
-      filters,
+      filters: {
+        ...filters,
+        optionType
+      },
       createdAt: selectedScreenerToOverwrite?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       ...(emailNotifications && {

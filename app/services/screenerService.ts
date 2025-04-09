@@ -11,7 +11,7 @@ interface SaveFilterPayload {
   email_id: string;
   frequency: string;
   filter_name: string;
-  filters: Filter[];
+  filters: string;
   is_alerting: boolean;
 }
 
@@ -34,15 +34,11 @@ export const screenerService = {
         email_id: payload.email_id,
         frequency: payload.frequency,
         filter_name: payload.filter_name,
-        filters: payload.filters.map(filter => ({
-          field: filter.field,
-          operation: filter.operation,
-          value: filter.value
-        })),
+        filters: payload.filters,
         is_alerting: payload.is_alerting
       };
       console.log(formattedPayload)
-      const response = await axios.post(`${API_BASE_URL}/wheelstrat/saveFilter`, formattedPayload);
+      const response = await axios.post(`${API_BASE_URL}/wheelstrat/saveFilter`, payload);
       return response.data;
     } catch (error) {
       console.error('Error saving filter:', error);

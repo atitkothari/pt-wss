@@ -3,8 +3,8 @@ export type EmailFrequency = 'daily' | 'weekly' | 'monthly';
 export interface SavedScreener {
   id: string;
   name: string;
-  optionType: 'call' | 'put';
   filters: {
+    optionType: 'call' | 'put';
     searchTerm?: string;
     selectedStocks?: string[];
     yieldRange?: [number, number];

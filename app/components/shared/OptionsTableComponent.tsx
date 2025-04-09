@@ -42,9 +42,25 @@ import {
 import { SaveScreenerModal } from "../modals/SaveScreenerModal";
 import { LoadScreenerModal } from "../modals/LoadScreenerModal";
 import { LoginPromptModal } from "../modals/LoginPromptModal";
-import { SavedScreener } from "@/app/types/screener";
+import { SavedScreener, EmailFrequency } from "@/app/types/screener";
 import { defaultScreeners } from '@/app/config/defaultScreeners';
 import { ColumnCustomizer } from "../table/ColumnCustomizer";
+import { screenerService } from "@/app/services/screenerService";
+
+interface Filter {
+  field: string;
+  operation: string;
+  value: string | number;
+}
+
+interface SaveFilterPayload {
+  user_id: string;
+  email_id: string;
+  frequency: EmailFrequency;
+  filter_name: string;
+  filters: Filter[];
+  is_alerting: boolean;
+}
 
 interface OptionsTableComponentProps {
   option: OptionType;
@@ -886,102 +902,53 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const handleSaveScreener = (screener: SavedScreener) => {
     if (typeof window === 'undefined') return;
     
-    const savedScreeners = localStorage.getItem('savedScreeners');
-    const screeners = savedScreeners ? JSON.parse(savedScreeners) : [];
-    
-    // Check if a screener with the same ID exists
-    const existingIndex = screeners.findIndex((s: SavedScreener) => s.id === screener.id);
-    
-    if (existingIndex >= 0) {
-      // Update existing screener
-      screeners[existingIndex] = screener;
-    } else {
-      // Add new screener
-      screeners.push(screener);
-    }
-    
-    localStorage.setItem('savedScreeners', JSON.stringify(screeners));
+    // Convert SavedScreener to SaveFilterPayload
+    const payload = {
+      user_id: userId || '',
+      email_id: screener.emailNotifications?.email||'',
+      frequency: screener.emailNotifications?.frequency??'daily' as const,
+      filter_name: screener.name,
+      filters: JSON.stringify(screener.filters),
+      is_alerting: screener.emailNotifications?.enabled??false
+    };
+
+    screenerService.saveFilter(payload);
   };
 
   const handleLoadScreener = (screener: SavedScreener) => {
-    // Create a single URLSearchParams object
-    const params = new URLSearchParams();
-
-    // Batch all state updates
-    const updates = {
-      searchTerm: screener.filters.searchTerm || "",
-      selectedStocks: screener.filters.selectedStocks || [],
+    // Update filters based on the loaded screener
+    setActiveFilters({
+      searchTerm: screener.filters.searchTerm || '',
       yieldRange: screener.filters.yieldRange || [yieldFilterConfig.min, yieldFilterConfig.max],
-      minPrice: screener.filters.minPrice || priceFilterConfig.defaultMin,
       maxPrice: screener.filters.maxPrice || priceFilterConfig.defaultMax,
+      minPrice: screener.filters.minPrice || priceFilterConfig.defaultMin,
       volumeRange: screener.filters.volumeRange || [volumeFilterConfig.min, volumeFilterConfig.max],
-      deltaFilter: screener.filters.deltaFilter || [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax],
-      minDte: screener.filters.minDte || dteFilterConfig.defaultMin,
-      maxDte: screener.filters.maxDte || dteFilterConfig.defaultMax,
-      impliedVolatility: screener.filters.impliedVolatility || [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax],
+      selectedExpiration: "",
+      minSelectedExpiration: "",
+      pageNo: 1,
       peRatio: screener.filters.peRatio || [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax],
       marketCap: screener.filters.marketCap || [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax],
+      sector: Array.isArray(screener.filters.sector) ? screener.filters.sector[0] : (screener.filters.sector || sectorOptions[0]),
       moneynessRange: screener.filters.moneynessRange || [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax],
-      sector: Array.isArray(screener.filters.sector) ? screener.filters.sector[0] : (screener.filters.sector || sectorOptions[0])
-    };
+      impliedVolatility: screener.filters.impliedVolatility || [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax],
+      deltaFilter: screener.filters.deltaFilter || [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax]
+    });
 
-    // Update URL parameters
-    if (updates.searchTerm) params.append(getParamKey('search'), updates.searchTerm);
-    if (updates.selectedStocks.length) params.append(getParamKey('search'), updates.selectedStocks.join(','));
-    if (updates.yieldRange) {
-      params.append(getParamKey('min_yield'), updates.yieldRange[0].toString());
-      params.append(getParamKey('max_yield'), updates.yieldRange[1].toString());
-    }
-    if (updates.minPrice) params.append(getParamKey('minPrice'), updates.minPrice.toString());
-    if (updates.maxPrice) params.append(getParamKey('maxPrice'), updates.maxPrice.toString());
-    if (updates.volumeRange) {
-      params.append(getParamKey('min_vol'), updates.volumeRange[0].toString());
-      params.append(getParamKey('max_vol'), updates.volumeRange[1].toString());
-    }
-    if (updates.deltaFilter) {
-      params.append(getParamKey('min_delta'), updates.deltaFilter[0].toString());
-      params.append(getParamKey('max_delta'), updates.deltaFilter[1].toString());
-    }
-    if (updates.minDte) params.append(getParamKey('min_dte'), updates.minDte.toString());
-    if (updates.maxDte) params.append(getParamKey('max_dte'), updates.maxDte.toString());
-    if (updates.impliedVolatility) {
-      params.append(getParamKey('min_iv'), updates.impliedVolatility[0].toString());
-      params.append(getParamKey('max_iv'), updates.impliedVolatility[1].toString());
-    }
-    if (updates.peRatio) {
-      params.append(getParamKey('min_pe'), updates.peRatio[0].toString());
-      params.append(getParamKey('max_pe'), updates.peRatio[1].toString());
-    }
-    if (updates.marketCap) {
-      params.append(getParamKey('min_market_cap'), updates.marketCap[0].toString());
-      params.append(getParamKey('max_market_cap'), updates.marketCap[1].toString());
-    }
-    if (updates.moneynessRange) {
-      params.append(getParamKey('min_moneyness'), updates.moneynessRange[0].toString());
-      params.append(getParamKey('max_moneyness'), updates.moneynessRange[1].toString());
-    }
-    if (updates.sector) {
-      params.append(getParamKey('sector'), updates.sector);
-    }
-
-    // Update all state variables at once
-    setSearchTerm(updates.searchTerm);
-    setSelectedStocks(updates.selectedStocks);
-    setYieldRange(updates.yieldRange);
-    setMinPrice(updates.minPrice);
-    setMaxPrice(updates.maxPrice);
-    setVolumeRange(updates.volumeRange);
-    setDeltaFilter(updates.deltaFilter);
-    setMinDte(updates.minDte);
-    setMaxDte(updates.maxDte);
-    setImpliedVolatility(updates.impliedVolatility);
-    setPeRatio(updates.peRatio);
-    setMarketCap(updates.marketCap);
-    setMoneynessRange(updates.moneynessRange);
-    setSector(updates.sector);
-
-    // Update URL parameters last
-    router.push(`?${params.toString()}`);
+    // Update individual states
+    setSearchTerm(screener.filters.searchTerm || '');
+    setSelectedStocks(screener.filters.selectedStocks || []);
+    setYieldRange(screener.filters.yieldRange || [yieldFilterConfig.min, yieldFilterConfig.max]);
+    setMinPrice(screener.filters.minPrice || priceFilterConfig.defaultMin);
+    setMaxPrice(screener.filters.maxPrice || priceFilterConfig.defaultMax);
+    setVolumeRange(screener.filters.volumeRange || [volumeFilterConfig.min, volumeFilterConfig.max]);
+    setDeltaFilter(screener.filters.deltaFilter || [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax]);
+    setMinDte(screener.filters.minDte || dteFilterConfig.defaultMin);
+    setMaxDte(screener.filters.maxDte || dteFilterConfig.defaultMax);
+    setImpliedVolatility(screener.filters.impliedVolatility || [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax]);
+    setPeRatio(screener.filters.peRatio || [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax]);
+    setMarketCap(screener.filters.marketCap || [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax]);
+    setMoneynessRange(screener.filters.moneynessRange || [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax]);
+    setSector(Array.isArray(screener.filters.sector) ? screener.filters.sector[0] : (screener.filters.sector || sectorOptions[0]));
   };
 
   // Update the Save Screener button click handlers
@@ -1029,7 +996,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
               </div>
               {(() => {
                 if (typeof window === 'undefined') return null;
-                const predefinedScreeners = defaultScreeners.filter((s: SavedScreener) => s.optionType === option);
+                const predefinedScreeners = defaultScreeners.filter((s: SavedScreener) => s.filters.optionType === option);
                 return predefinedScreeners.map((screener: SavedScreener) => (
                   <SelectItem key={screener.id} value={screener.id}>
                     {screener.name}
@@ -1042,7 +1009,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                 if (typeof window === 'undefined') return null;
                 const savedScreeners = localStorage.getItem('savedScreeners');
                 if (!savedScreeners) return null;
-                const customScreeners = JSON.parse(savedScreeners).filter((s: SavedScreener) => s.optionType === option);
+                const customScreeners = JSON.parse(savedScreeners).filter((s: SavedScreener) => s.filters.optionType === option);
                 if (customScreeners.length === 0) return null;
                 return (
                   <>

@@ -25,9 +25,11 @@ import {
 import { format } from 'date-fns';
 import { defaultScreeners } from '../config/defaultScreeners';
 import { EditScreenerModal } from '../components/modals/EditScreenerModal';
+import { screenerService } from '../services/screenerService';
+import { auth } from '../config/firebase';
 
 export default function SavedScreenersPage() {
-  const { user, signInWithGoogle } = useAuth();
+  const { user, signInWithGoogle, userId } = useAuth();
   const [screeners, setScreeners] = useState<SavedScreener[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingScreener, setEditingScreener] = useState<SavedScreener | null>(null);
@@ -35,40 +37,38 @@ export default function SavedScreenersPage() {
 
   useEffect(() => {
     loadSavedScreeners();
-  }, []);
+  }, [userId]);
 
-  const loadSavedScreeners = () => {
+
+  const loadSavedScreeners = async () => {
     if (typeof window === 'undefined') return;
     
     try {
-      const savedScreeners = localStorage.getItem('savedScreeners');
-      if (savedScreeners) {
-        const parsedScreeners = JSON.parse(savedScreeners);
-        console.log(parsedScreeners)
-        // Validate that parsedScreeners is an array
-        if (!Array.isArray(parsedScreeners)) {
-          console.error('Saved screeners is not an array');
-          localStorage.removeItem('savedScreeners');
-          setScreeners([]);
-        } else {
-          // Filter out any invalid screeners
-          const validScreeners = parsedScreeners.filter(screener => 
-            screener && 
-            typeof screener === 'object' && 
-            typeof screener.id === 'string' &&
-            typeof screener.name === 'string' &&
-            typeof screener.optionType === 'string' &&
-            typeof screener.createdAt === 'string'
-          );
-          setScreeners(validScreeners);
-        }
-      } else {
-        setScreeners([]);
-      }
+      const fetchScreener = await screenerService.fetchFilter({user_id: userId??''})
+      
+      // Convert API response to SavedScreener format
+      const convertedScreeners = fetchScreener.map((screener: any) => {
+        const parsedFilters = JSON.parse(screener.filter);
+        return {
+          id: screener.id.toString(),
+          name: screener.filter_name,
+          filters: {
+            ...parsedFilters,
+            optionType: parsedFilters.optionType || 'call' // Default to call if not specified
+          },
+          createdAt: screener.created_date,
+          updatedAt: screener.last_updated_date,
+          emailNotifications: screener.is_alerting ? {
+            enabled: true,
+            email: user?.email || '',
+            frequency: 'daily' as EmailFrequency
+          } : undefined
+        };
+      });
+
+      setScreeners(convertedScreeners);
     } catch (e) {
       console.error('Error loading saved screeners:', e);
-      // If there's an error, clear the invalid data
-      localStorage.removeItem('savedScreeners');
       setScreeners([]);
     } finally {
       setLoading(false);
@@ -284,7 +284,7 @@ export default function SavedScreenersPage() {
               </TableHeader>
               <TableBody>
                 {screeners
-                  .filter(screener => screener.optionType === 'call')
+                  .filter(screener => screener.filters.optionType === 'call')
                   .map((screener) => (
                     <>
                       <TableRow 
@@ -406,7 +406,7 @@ export default function SavedScreenersPage() {
               </TableHeader>
               <TableBody>
                 {screeners
-                  .filter(screener => screener.optionType === 'put')
+                  .filter(screener => screener.filters.optionType === 'put')
                   .map((screener) => (
                     <>
                       <TableRow 
