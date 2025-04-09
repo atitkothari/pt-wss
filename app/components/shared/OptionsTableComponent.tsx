@@ -88,6 +88,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { symbols } = useSymbols();
+  const { user, userId } = useAuth();
+  const [savedScreeners, setSavedScreeners] = useState<SavedScreener[]>([]);
 
   const getParamKey = (key: string) => `${option}_${key}`;
   
@@ -850,8 +852,6 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     ).catch(console.error);
   }, [sortColumn, sortDirection, router, searchParams, activeFilters, currentPage, rowsPerPage, strikeFilter, deltaFilter, fetchData]);  
 
-  const { user, userId } = useAuth();
-
   const handleReset = () => {
     // Reset all filter states to their default values
     setSelectedStocks([]);
@@ -965,6 +965,43 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
   const [showColumnSelector, setShowColumnSelector] = useState(false);
 
+  useEffect(() => {
+    const loadSavedScreeners = async () => {
+      if (!userId) return;
+      
+      try {
+        const fetchScreener = await screenerService.fetchFilter({user_id: userId});
+        
+        // Convert API response to SavedScreener format
+        const convertedScreeners = fetchScreener.map((screener: any) => {
+          const parsedFilters = JSON.parse(screener.filter);
+          return {
+            id: screener.id.toString(),
+            name: screener.filter_name,
+            filters: {
+              ...parsedFilters,
+              optionType: parsedFilters.optionType || 'call' // Default to call if not specified
+            },
+            createdAt: screener.created_date,
+            updatedAt: screener.last_updated_date,
+            emailNotifications: screener.is_alerting ? {
+              enabled: true,
+              email: user?.email || '',
+              frequency: 'daily' as EmailFrequency
+            } : undefined
+          };
+        });
+
+        setSavedScreeners(convertedScreeners);
+      } catch (e) {
+        console.error('Error loading saved screeners:', e);
+        setSavedScreeners([]);
+      }
+    };
+
+    loadSavedScreeners();
+  }, [userId, user?.email]);
+
   return (
     <div className="w-full">      
       {/* Filter Controls */}
@@ -978,8 +1015,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                 return;
               }
               if (value === "default") return;
-              const savedScreeners = localStorage.getItem('savedScreeners');
-              const allScreeners = [...defaultScreeners, ...(savedScreeners ? JSON.parse(savedScreeners) : [])];
+              const allScreeners = [...defaultScreeners, ...savedScreeners];
               const selectedScreener = allScreeners.find((s: SavedScreener) => s.id === value);
               if (selectedScreener) {
                 handleLoadScreener(selectedScreener);
@@ -1007,9 +1043,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
               {/* Custom Screeners Section - Only show if user is logged in */}
               {user && (() => {
                 if (typeof window === 'undefined') return null;
-                const savedScreeners = localStorage.getItem('savedScreeners');
-                if (!savedScreeners) return null;
-                const customScreeners = JSON.parse(savedScreeners).filter((s: SavedScreener) => s.filters.optionType === option);
+                const customScreeners = savedScreeners.filter((s: SavedScreener) => s.filters.optionType === option);
                 if (customScreeners.length === 0) return null;
                 return (
                   <>

@@ -63,7 +63,7 @@ export const screenerService = {
       if (params.user_id) queryParams.append('user_id', params.user_id);
 
       const response = await axios.get(`${API_BASE_URL}/wheelstrat/fetchFilter?${queryParams.toString()}`);
-      return response.data;
+      return response.data.filter((r: { is_deleted: any; }) => !r.is_deleted);
     } catch (error) {
       console.error('Error fetching filter:', error);
       throw error;
@@ -72,7 +72,7 @@ export const screenerService = {
 
   deleteFilter: async (filter_id: string) => {
     try {
-      const response = await axios.delete(`${API_BASE_URL}/wheelstrat/deleteFilter?filter_id=${filter_id}`);
+      const response = await axios.get(`${API_BASE_URL}/wheelstrat/deleteFilter?filter_id=${filter_id}`);
       return response.data;
     } catch (error) {
       console.error('Error deleting filter:', error);

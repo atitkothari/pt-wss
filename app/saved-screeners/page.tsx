@@ -22,6 +22,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { format } from 'date-fns';
 import { defaultScreeners } from '../config/defaultScreeners';
 import { EditScreenerModal } from '../components/modals/EditScreenerModal';
@@ -34,6 +44,7 @@ export default function SavedScreenersPage() {
   const [loading, setLoading] = useState(true);
   const [editingScreener, setEditingScreener] = useState<SavedScreener | null>(null);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [screenerToDelete, setScreenerToDelete] = useState<SavedScreener | null>(null);
 
   useEffect(() => {
     loadSavedScreeners();
@@ -75,49 +86,96 @@ export default function SavedScreenersPage() {
     }
   };
 
-  const handleDelete = (id: string) => {
-    const updatedScreeners = screeners.filter(screener => 
-      screener.id !== id && !screener.isDefault
-    );
-    localStorage.setItem('savedScreeners', JSON.stringify(updatedScreeners.filter(s => !s.isDefault)));
-    setScreeners(updatedScreeners);
+  const handleDelete = async (id: string) => {
+    try {
+      // Find the screener to delete
+      const screenerToDelete = screeners.find(s => s.id === id);
+      if (!screenerToDelete) return;
+
+      // Delete from backend
+      await screenerService.deleteFilter(id);
+
+      // Update local state
+      const updatedScreeners = screeners.filter(screener => screener.id !== id);
+      setScreeners(updatedScreeners);
+    } catch (e) {
+      console.error('Error deleting screener:', e);
+    }
   };
 
-  const handleToggleEmailNotifications = (id: string) => {
-    const updatedScreeners = screeners.map(screener => {
-      if (screener.id === id) {
-        return {
-          ...screener,
-          emailNotifications: screener.emailNotifications?.enabled
-            ? undefined
-            : {
-                enabled: true,
-                email: user?.email || '',
-                frequency: 'daily' as EmailFrequency
-              }
-        };
-      }
-      return screener;
-    });
-    localStorage.setItem('savedScreeners', JSON.stringify(updatedScreeners.filter(s => !s.isDefault)));
-    setScreeners(updatedScreeners);
+  const handleToggleEmailNotifications = async (id: string) => {
+    try {
+      // Find the screener to update
+      const screenerToUpdate = screeners.find(s => s.id === id);
+      if (!screenerToUpdate) return;
+
+      // Determine if we're enabling or disabling notifications
+      const isEnabling = !screenerToUpdate.emailNotifications?.enabled;
+      const newFrequency = isEnabling ? 'daily' as EmailFrequency : screenerToUpdate.emailNotifications?.frequency;
+
+      // Update the screener in the backend
+      await screenerService.updateFilter({
+        filter_id: id,
+        filter_name: screenerToUpdate.name,
+        is_alerting: isEnabling,
+        frequency: newFrequency || 'daily',
+        filters: JSON.parse(JSON.stringify(screenerToUpdate.filters))
+      });
+
+      // Update the local state
+      const updatedScreeners = screeners.map(screener => {
+        if (screener.id === id) {
+          return {
+            ...screener,
+            emailNotifications: isEnabling
+              ? {
+                  enabled: true,
+                  email: user?.email || '',
+                  frequency: newFrequency || 'daily'
+                }
+              : undefined
+          };
+        }
+        return screener;
+      });
+      setScreeners(updatedScreeners);
+    } catch (e) {
+      console.error('Error toggling email notifications:', e);
+    }
   };
 
-  const handleUpdateFrequency = (id: string, frequency: EmailFrequency) => {
-    const updatedScreeners = screeners.map(screener => {
-      if (screener.id === id && screener.emailNotifications) {
-        return {
-          ...screener,
-          emailNotifications: {
-            ...screener.emailNotifications,
-            frequency
-          }
-        };
-      }
-      return screener;
-    });
-    localStorage.setItem('savedScreeners', JSON.stringify(updatedScreeners.filter(s => !s.isDefault)));
-    setScreeners(updatedScreeners);
+  const handleUpdateFrequency = async (id: string, frequency: EmailFrequency) => {
+    try {
+      // Find the screener to update
+      const screenerToUpdate = screeners.find(s => s.id === id);
+      if (!screenerToUpdate) return;
+
+      // Update the screener in the backend
+      await screenerService.updateFilter({
+        filter_id: id,
+        filter_name: screenerToUpdate.name,
+        is_alerting: true,
+        frequency,
+        filters: JSON.parse(JSON.stringify(screenerToUpdate.filters))
+      });
+
+      // Update the local state
+      const updatedScreeners = screeners.map(screener => {
+        if (screener.id === id && screener.emailNotifications) {
+          return {
+            ...screener,
+            emailNotifications: {
+              ...screener.emailNotifications,
+              frequency
+            }
+          };
+        }
+        return screener;
+      });
+      setScreeners(updatedScreeners);
+    } catch (e) {
+      console.error('Error updating screener frequency:', e);
+    }
   };
 
   const handleEditScreener = (screener: SavedScreener) => {
@@ -363,7 +421,7 @@ export default function SavedScreenersPage() {
                                 size="icon"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleDelete(screener.id);
+                                  setScreenerToDelete(screener);
                                 }}
                                 className="h-8 w-8"
                               >
@@ -485,7 +543,7 @@ export default function SavedScreenersPage() {
                                 size="icon"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleDelete(screener.id);
+                                  setScreenerToDelete(screener);
                                 }}
                                 className="h-8 w-8"
                               >
@@ -511,6 +569,29 @@ export default function SavedScreenersPage() {
             </Table>
           </div>
         </div>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={!!screenerToDelete} onOpenChange={() => setScreenerToDelete(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Screener</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete the screener "{screenerToDelete?.name}"? This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => {
+                if (screenerToDelete) {
+                  handleDelete(screenerToDelete.id);
+                  setScreenerToDelete(null);
+                }
+              }}>
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         {/* Edit Screener Modal */}
         {editingScreener && (
