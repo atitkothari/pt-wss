@@ -128,7 +128,7 @@ export function SaveScreenerModal({
           )}
 
           {/* Existing Screeners Dropdown */}
-          {existingScreeners.length > 0 && (
+          {/* {existingScreeners.length > 0 && (
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -168,7 +168,7 @@ export function SaveScreenerModal({
                 </Select>
               )}
             </div>
-          )}
+          )} */}
 
           <div className="flex items-center space-x-2">
             <Checkbox
@@ -213,9 +213,9 @@ export function SaveScreenerModal({
         {!isOverwriting && (
           <Dialog open={showOverwriteWarning} onOpenChange={setShowOverwriteWarning}>
             <DialogContent>
-              <DialogHeader>
+              {/* <DialogHeader>
                 <DialogTitle>Overwrite Existing Screener?</DialogTitle>
-              </DialogHeader>
+              </DialogHeader> */}
               <div className="py-4">
                 <p className="text-sm text-gray-600">
                   A screener with the name "{selectedScreenerToOverwrite?.name}" already exists. Do you want to overwrite it?
