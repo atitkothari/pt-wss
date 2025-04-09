@@ -90,7 +90,10 @@ export default function SavedScreenersPage() {
     try {
       // Find the screener to delete
       const screenerToDelete = screeners.find(s => s.id === id);
-      if (!screenerToDelete) return;
+      if (!screenerToDelete) {
+        console.error('Screener not found');
+        return;
+      }
 
       // Delete from backend
       await screenerService.deleteFilter(id);
@@ -98,8 +101,14 @@ export default function SavedScreenersPage() {
       // Update local state
       const updatedScreeners = screeners.filter(screener => screener.id !== id);
       setScreeners(updatedScreeners);
-    } catch (e) {
-      console.error('Error deleting screener:', e);
+
+      // Show success message
+      // You might want to add a toast notification here
+      console.log('Screener deleted successfully');
+    } catch (error) {
+      console.error('Error deleting screener:', error);
+      // You might want to add a toast notification here to show the error to the user
+      alert('Failed to delete screener. Please try again.');
     }
   };
 

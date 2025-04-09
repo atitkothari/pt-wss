@@ -899,20 +899,54 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const [isLoadModalOpen, setIsLoadModalOpen] = useState(false);
   const [isLoginPromptOpen, setIsLoginPromptOpen] = useState(false);
 
-  const handleSaveScreener = (screener: SavedScreener) => {
+  const handleSaveScreener = async (screener: SavedScreener) => {
     if (typeof window === 'undefined') return;
     
-    // Convert SavedScreener to SaveFilterPayload
-    const payload = {
-      user_id: userId || '',
-      email_id: screener.emailNotifications?.email||'',
-      frequency: screener.emailNotifications?.frequency??'daily' as const,
-      filter_name: screener.name,
-      filters: JSON.stringify(screener.filters),
-      is_alerting: screener.emailNotifications?.enabled??false
-    };
+    try {
+      // Convert SavedScreener to SaveFilterPayload
+      const payload = {
+        user_id: userId || '',
+        email_id: screener.emailNotifications?.email || '',
+        frequency: screener.emailNotifications?.frequency??'daily' as const,
+        filter_name: screener.name,
+        filters: JSON.stringify(screener.filters),
+        is_alerting: screener.emailNotifications?.enabled??false
+      };
 
-    screenerService.saveFilter(payload);
+      // Save to backend
+      await screenerService.saveFilter(payload);
+      
+      // Fetch updated list of screeners
+      const fetchScreener = await screenerService.fetchFilter({user_id: userId||''});
+      
+      // Convert API response to SavedScreener format
+      const convertedScreeners = fetchScreener.map((screener: any) => {
+        const parsedFilters = JSON.parse(screener.filter);
+        return {
+          id: screener.id.toString(),
+          name: screener.filter_name,
+          filters: {
+            ...parsedFilters,
+            optionType: parsedFilters.optionType || 'call' // Default to call if not specified
+          },
+          createdAt: screener.created_date,
+          updatedAt: screener.last_updated_date,
+          emailNotifications: screener.is_alerting ? {
+            enabled: true,
+            email: user?.email ?? '',
+            frequency: screener.frequency || 'daily' as EmailFrequency
+          } : undefined
+        };
+      });
+
+      // Update local state with the fresh data
+      setSavedScreeners(convertedScreeners);
+
+      // Close the modal
+      setIsSaveModalOpen(false);
+    } catch (e) {
+      console.error('Error saving screener:', e);
+    }
   };
 
   const handleLoadScreener = (screener: SavedScreener) => {
@@ -986,7 +1020,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             updatedAt: screener.last_updated_date,
             emailNotifications: screener.is_alerting ? {
               enabled: true,
-              email: user?.email || '',
+              email: user?.email ?? '',
               frequency: 'daily' as EmailFrequency
             } : undefined
           };

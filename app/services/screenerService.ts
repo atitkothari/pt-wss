@@ -72,10 +72,19 @@ export const screenerService = {
 
   deleteFilter: async (filter_id: string) => {
     try {
+      console.log('Attempting to delete filter with ID:', filter_id);
       const response = await axios.get(`${API_BASE_URL}/wheelstrat/deleteFilter?filter_id=${filter_id}`);
+      console.log('Delete filter response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error deleting filter:', error);
+      if (axios.isAxiosError(error)) {
+        console.error('Error details:', {
+          status: error.response?.status,
+          data: error.response?.data,
+          message: error.message
+        });
+      }
       throw error;
     }
   },
