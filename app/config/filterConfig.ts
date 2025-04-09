@@ -39,7 +39,7 @@ export const deltaFilterConfig = {
   max: 1,
   defaultMin: -1,
   defaultMax: 1,
-  step: 0.1,
+  step: 0.05,
   tooltip: "Delta value (-1 to 1). Delta measures the rate of change of option price with respect to the underlying asset's price."
 };
 
