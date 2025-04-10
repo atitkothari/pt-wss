@@ -351,245 +351,273 @@ export default function SavedScreenersPage() {
         {/* Covered Call Screeners Section */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-4">Covered Call Screeners</h2>
-          <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[5%]"></TableHead>
-                  <TableHead className="w-[35%]">Name</TableHead>
-                  <TableHead className="w-[30%]">Notifications</TableHead>
-                  <TableHead className="w-[30%]">Actions</TableHead>
-                  <TableHead className="hidden sm:table-cell">Created</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {screeners
-                  .filter(screener => screener.filters.optionType === 'call')
-                  .map((screener) => (
-                    <>
-                      <TableRow 
-                        key={screener.id}
-                        className="cursor-pointer hover:bg-gray-50"
-                        onClick={() => toggleRow(screener.id)}
-                      >
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                          >
-                            {expandedRows.has(screener.id) ? (
-                              <ChevronDown className="h-4 w-4" />
-                            ) : (
-                              <ChevronRight className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {screener.name}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
+          {screeners.filter(screener => screener.filters.optionType === 'call').length === 0 ? (
+            <div className="flex flex-col items-center justify-center min-h-[200px] text-center bg-white rounded-lg shadow-sm p-8">
+              <p className="text-gray-600 mb-6 max-w-md">
+                No covered call screeners yet. Create your first covered call screener to find options opportunities.
+              </p>
+              <Button
+                onClick={() => window.location.href = '/covered-call-screener'}
+                className="bg-primary hover:bg-primary/90"
+              >
+                Create Covered Call Screener
+              </Button>
+            </div>
+          ) : (
+            <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[5%]"></TableHead>
+                    <TableHead className="w-[35%]">Name</TableHead>
+                    <TableHead className="w-[30%]">Notifications</TableHead>
+                    <TableHead className="w-[30%]">Actions</TableHead>
+                    <TableHead className="hidden sm:table-cell">Created</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {screeners
+                    .filter(screener => screener.filters.optionType === 'call')
+                    .map((screener) => (
+                      <>
+                        <TableRow 
+                          key={screener.id}
+                          className="cursor-pointer hover:bg-gray-50"
+                          onClick={() => toggleRow(screener.id)}
+                        >
+                          <TableCell>
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleToggleEmailNotifications(screener.id);
-                              }}
                               className="h-8 w-8"
                             >
-                              {screener.emailNotifications?.enabled ? (
-                                <Bell className="h-4 w-4 text-green-600" />
+                              {expandedRows.has(screener.id) ? (
+                                <ChevronDown className="h-4 w-4" />
                               ) : (
-                                <BellOff className="h-4 w-4 text-gray-400" />
+                                <ChevronRight className="h-4 w-4" />
                               )}
                             </Button>
-                            {screener.emailNotifications?.enabled && (
-                              <Select
-                                value={screener.emailNotifications.frequency}
-                                onValueChange={(value: EmailFrequency) =>
-                                  handleUpdateFrequency(screener.id, value)
-                                }
-                              >
-                                <SelectTrigger className="h-8 w-[100px]" onClick={(e) => e.stopPropagation()}>
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="daily">Daily</SelectItem>
-                                  <SelectItem value="weekly">Weekly</SelectItem>
-                                  <SelectItem value="monthly">Monthly</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEditScreener(screener);
-                              }}
-                              className="h-8 w-8"
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            {!screener.isDefault && (
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {screener.name}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
                               <Button
                                 variant="ghost"
                                 size="icon"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  setScreenerToDelete(screener);
+                                  handleToggleEmailNotifications(screener.id);
                                 }}
                                 className="h-8 w-8"
                               >
-                                <Trash2 className="h-4 w-4 text-red-600" />
+                                {screener.emailNotifications?.enabled ? (
+                                  <Bell className="h-4 w-4 text-green-600" />
+                                ) : (
+                                  <BellOff className="h-4 w-4 text-gray-400" />
+                                )}
                               </Button>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell className="hidden sm:table-cell">
-                          {format(new Date(screener.createdAt), 'MMM d, yyyy')}
-                        </TableCell>
-                      </TableRow>
-                      {expandedRows.has(screener.id) && (
-                        <TableRow>
-                          <td colSpan={5} className="p-0">
-                            {renderFilterDetails(screener)}
-                          </td>
+                              {screener.emailNotifications?.enabled && (
+                                <Select
+                                  value={screener.emailNotifications.frequency}
+                                  onValueChange={(value: EmailFrequency) =>
+                                    handleUpdateFrequency(screener.id, value)
+                                  }
+                                >
+                                  <SelectTrigger className="h-8 w-[100px]" onClick={(e) => e.stopPropagation()}>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="daily">Daily</SelectItem>
+                                    <SelectItem value="weekly">Weekly</SelectItem>
+                                    <SelectItem value="monthly">Monthly</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEditScreener(screener);
+                                }}
+                                className="h-8 w-8"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              {!screener.isDefault && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setScreenerToDelete(screener);
+                                  }}
+                                  className="h-8 w-8"
+                                >
+                                  <Trash2 className="h-4 w-4 text-red-600" />
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="hidden sm:table-cell">
+                            {format(new Date(screener.createdAt), 'MMM d, yyyy')}
+                          </TableCell>
                         </TableRow>
-                      )}
-                    </>
-                  ))}
-              </TableBody>
-            </Table>
-          </div>
+                        {expandedRows.has(screener.id) && (
+                          <TableRow>
+                            <td colSpan={5} className="p-0">
+                              {renderFilterDetails(screener)}
+                            </td>
+                          </TableRow>
+                        )}
+                      </>
+                    ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </div>
 
         {/* Cash Secured Put Screeners Section */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-4">Cash Secured Put Screeners</h2>
-          <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[5%]"></TableHead>
-                  <TableHead className="w-[35%]">Name</TableHead>
-                  <TableHead className="w-[30%]">Notifications</TableHead>
-                  <TableHead className="w-[30%]">Actions</TableHead>
-                  <TableHead className="hidden sm:table-cell">Created</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {screeners
-                  .filter(screener => screener.filters.optionType === 'put')
-                  .map((screener) => (
-                    <>
-                      <TableRow 
-                        key={screener.id}
-                        className="cursor-pointer hover:bg-gray-50"
-                        onClick={() => toggleRow(screener.id)}
-                      >
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                          >
-                            {expandedRows.has(screener.id) ? (
-                              <ChevronDown className="h-4 w-4" />
-                            ) : (
-                              <ChevronRight className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {screener.name}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
+          {screeners.filter(screener => screener.filters.optionType === 'put').length === 0 ? (
+            <div className="flex flex-col items-center justify-center min-h-[200px] text-center bg-white rounded-lg shadow-sm p-8">
+              <p className="text-gray-600 mb-6 max-w-md">
+                No cash secured put screeners yet. Create your first put screener to find options opportunities.
+              </p>
+              <Button
+                onClick={() => window.location.href = '/cash-secured-put-screener'}
+                className="bg-primary hover:bg-primary/90"
+              >
+                Create Put Screener
+              </Button>
+            </div>
+          ) : (
+            <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[5%]"></TableHead>
+                    <TableHead className="w-[35%]">Name</TableHead>
+                    <TableHead className="w-[30%]">Notifications</TableHead>
+                    <TableHead className="w-[30%]">Actions</TableHead>
+                    <TableHead className="hidden sm:table-cell">Created</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {screeners
+                    .filter(screener => screener.filters.optionType === 'put')
+                    .map((screener) => (
+                      <>
+                        <TableRow 
+                          key={screener.id}
+                          className="cursor-pointer hover:bg-gray-50"
+                          onClick={() => toggleRow(screener.id)}
+                        >
+                          <TableCell>
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleToggleEmailNotifications(screener.id);
-                              }}
                               className="h-8 w-8"
                             >
-                              {screener.emailNotifications?.enabled ? (
-                                <Bell className="h-4 w-4 text-green-600" />
+                              {expandedRows.has(screener.id) ? (
+                                <ChevronDown className="h-4 w-4" />
                               ) : (
-                                <BellOff className="h-4 w-4 text-gray-400" />
+                                <ChevronRight className="h-4 w-4" />
                               )}
                             </Button>
-                            {screener.emailNotifications?.enabled && (
-                              <Select
-                                value={screener.emailNotifications.frequency}
-                                onValueChange={(value: EmailFrequency) =>
-                                  handleUpdateFrequency(screener.id, value)
-                                }
-                              >
-                                <SelectTrigger className="h-8 w-[100px]" onClick={(e) => e.stopPropagation()}>
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="daily">Daily</SelectItem>
-                                  <SelectItem value="weekly">Weekly</SelectItem>
-                                  <SelectItem value="monthly">Monthly</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEditScreener(screener);
-                              }}
-                              className="h-8 w-8"
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            {!screener.isDefault && (
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {screener.name}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
                               <Button
                                 variant="ghost"
                                 size="icon"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  setScreenerToDelete(screener);
+                                  handleToggleEmailNotifications(screener.id);
                                 }}
                                 className="h-8 w-8"
                               >
-                                <Trash2 className="h-4 w-4 text-red-600" />
+                                {screener.emailNotifications?.enabled ? (
+                                  <Bell className="h-4 w-4 text-green-600" />
+                                ) : (
+                                  <BellOff className="h-4 w-4 text-gray-400" />
+                                )}
                               </Button>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell className="hidden sm:table-cell">
-                          {format(new Date(screener.createdAt), 'MMM d, yyyy')}
-                        </TableCell>
-                      </TableRow>
-                      {expandedRows.has(screener.id) && (
-                        <TableRow>
-                          <td colSpan={5} className="p-0">
-                            {renderFilterDetails(screener)}
-                          </td>
+                              {screener.emailNotifications?.enabled && (
+                                <Select
+                                  value={screener.emailNotifications.frequency}
+                                  onValueChange={(value: EmailFrequency) =>
+                                    handleUpdateFrequency(screener.id, value)
+                                  }
+                                >
+                                  <SelectTrigger className="h-8 w-[100px]" onClick={(e) => e.stopPropagation()}>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="daily">Daily</SelectItem>
+                                    <SelectItem value="weekly">Weekly</SelectItem>
+                                    <SelectItem value="monthly">Monthly</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEditScreener(screener);
+                                }}
+                                className="h-8 w-8"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              {!screener.isDefault && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setScreenerToDelete(screener);
+                                  }}
+                                  className="h-8 w-8"
+                                >
+                                  <Trash2 className="h-4 w-4 text-red-600" />
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="hidden sm:table-cell">
+                            {format(new Date(screener.createdAt), 'MMM d, yyyy')}
+                          </TableCell>
                         </TableRow>
-                      )}
-                    </>
-                  ))}
-              </TableBody>
-            </Table>
-          </div>
+                        {expandedRows.has(screener.id) && (
+                          <TableRow>
+                            <td colSpan={5} className="p-0">
+                              {renderFilterDetails(screener)}
+                            </td>
+                          </TableRow>
+                        )}
+                      </>
+                    ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </div>
 
         {/* Delete Confirmation Dialog */}
