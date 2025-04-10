@@ -55,11 +55,15 @@ export default function SavedScreenersPage() {
     if (typeof window === 'undefined') return;
     
     try {
-      const fetchScreener = await screenerService.fetchFilter({user_id: userId??''})
+      let fetchScreener = await screenerService.fetchFilter({user_id: userId??''});
+      const sortedScreeners = fetchScreener.sort((a: { filter_name: string }, b: { filter_name: string }) => 
+        a.filter_name.localeCompare(b.filter_name)
+      );
       
       // Convert API response to SavedScreener format
-      const convertedScreeners = fetchScreener.map((screener: any) => {
-        const parsedFilters = JSON.parse(screener.filter);
+      const convertedScreeners = sortedScreeners.map((screener: any, index:any) => {                
+        const parsedFilters = JSON.parse(screener.filter);        
+        
         return {
           id: screener.id.toString(),
           name: screener.filter_name,
@@ -72,7 +76,7 @@ export default function SavedScreenersPage() {
           emailNotifications: screener.is_alerting ? {
             enabled: true,
             email: user?.email || '',
-            frequency: 'daily' as EmailFrequency
+            frequency: screener.frequency as EmailFrequency
           } : undefined
         };
       });
@@ -128,7 +132,8 @@ export default function SavedScreenersPage() {
         filter_name: screenerToUpdate.name,
         is_alerting: isEnabling,
         frequency: newFrequency || 'daily',
-        filters: JSON.parse(JSON.stringify(screenerToUpdate.filters))
+        email_id:user?.email||''
+        // filters: JSON.parse(JSON.stringify(screenerToUpdate.filters))
       });
 
       // Update the local state
@@ -165,7 +170,8 @@ export default function SavedScreenersPage() {
         filter_name: screenerToUpdate.name,
         is_alerting: true,
         frequency,
-        filters: JSON.parse(JSON.stringify(screenerToUpdate.filters))
+        email_id:user?.email||''
+        // filters: JSON.parse(JSON.stringify(screenerToUpdate.filters))
       });
 
       // Update the local state
@@ -191,11 +197,18 @@ export default function SavedScreenersPage() {
     setEditingScreener(screener);
   };
 
-  const handleSaveEdit = (updatedScreener: SavedScreener) => {
+  const handleSaveEdit = async (updatedScreener: SavedScreener) => {
     const updatedScreeners = screeners.map(screener => 
       screener.id === updatedScreener.id ? updatedScreener : screener
     );
     localStorage.setItem('savedScreeners', JSON.stringify(updatedScreeners));
+    await screenerService.updateFilter({
+      filter_id: updatedScreener.id,
+      filter_name: updatedScreener.name,
+      is_alerting: updatedScreener.emailNotifications?.enabled||false,
+      frequency: updatedScreener.emailNotifications?.frequency||'daily',      
+      email_id:user?.email||''
+    })
     setScreeners(updatedScreeners);
   };
 
@@ -223,47 +236,47 @@ export default function SavedScreenersPage() {
           )}
           {filters.minPrice !== undefined && filters.maxPrice !== undefined && (
             <div className="text-sm">
-              <span className="font-medium">Price Range:</span> ${filters.minPrice} - ${filters.maxPrice}
+              <span className="font-medium">Price Range:</span> ${filters.minPrice} to ${filters.maxPrice}
             </div>
           )}
           {filters.volumeRange && (
             <div className="text-sm">
-              <span className="font-medium">Volume Range:</span> {filters.volumeRange[0]} - {filters.volumeRange[1]}
+              <span className="font-medium">Volume Range:</span> {filters.volumeRange[0]} to {filters.volumeRange[1]}
             </div>
           )}
           {filters.yieldRange && (
             <div className="text-sm">
-              <span className="font-medium">Yield Range:</span> {filters.yieldRange[0]}% - {filters.yieldRange[1]}%
+              <span className="font-medium">Yield Range:</span> {filters.yieldRange[0]}% to {filters.yieldRange[1]}%
             </div>
           )}
           {filters.deltaFilter && (
             <div className="text-sm">
-              <span className="font-medium">Delta Range:</span> {filters.deltaFilter[0]} - {filters.deltaFilter[1]}
+              <span className="font-medium">Delta Range:</span> {filters.deltaFilter[0]} to {filters.deltaFilter[1]}
             </div>
           )}
           {filters.moneynessRange && (
             <div className="text-sm">
-              <span className="font-medium">Moneyness Range:</span> {filters.moneynessRange[0]}% - {filters.moneynessRange[1]}%
+              <span className="font-medium">Moneyness Range:</span> {filters.moneynessRange[0]}% to {filters.moneynessRange[1]}%
             </div>
           )}
           {filters.minDte !== undefined && filters.maxDte !== undefined && (
             <div className="text-sm">
-              <span className="font-medium">DTE Range:</span> {filters.minDte} - {filters.maxDte} days
+              <span className="font-medium">DTE Range:</span> {filters.minDte} to {filters.maxDte} days
             </div>
           )}
           {filters.impliedVolatility && (
             <div className="text-sm">
-              <span className="font-medium">IV Range:</span> {filters.impliedVolatility[0]}% - {filters.impliedVolatility[1]}%
+              <span className="font-medium">IV Range:</span> {filters.impliedVolatility[0]}% to {filters.impliedVolatility[1]}%
             </div>
           )}
           {filters.peRatio && (
             <div className="text-sm">
-              <span className="font-medium">P/E Range:</span> {filters.peRatio[0]} - {filters.peRatio[1]}
+              <span className="font-medium">P/E Range:</span> {filters.peRatio[0]} to {filters.peRatio[1]}
             </div>
           )}
           {filters.marketCap && (
             <div className="text-sm">
-              <span className="font-medium">Market Cap Range:</span> ${filters.marketCap[0]}B - ${filters.marketCap[1]}B
+              <span className="font-medium">Market Cap Range:</span> ${filters.marketCap[0]}B to ${filters.marketCap[1]}B
             </div>
           )}
           {filters.sector && (

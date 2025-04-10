@@ -16,11 +16,12 @@ interface SaveFilterPayload {
 }
 
 interface UpdateFilterPayload {
-  filter_id: string;
-  filter_name: string;
-  is_alerting: boolean;
-  frequency: string;
-  filters: Filter[];
+  filter_id?: string;
+  filter_name?: string;
+  is_alerting?: boolean;
+  frequency?: string;
+  filters?: Filter[];
+  email_id?: string;
 }
 
 const API_BASE_URL = 'https://api.wheelstrategyoptions.com';
