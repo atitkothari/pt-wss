@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check } from "lucide-react";
+import { Check, Clock } from "lucide-react";
 import { NavBar } from "../components/NavBar";
 import { Footer } from "../components/Footer";
 
@@ -9,23 +9,26 @@ export default function PricingPage() {
     "Advanced Options Screening",
     "Covered Call Screener",
     "Cash-Secured Put Screener",
-    "Real-time Market Data",
+    // "Real-time Market Data",
     "Customizable Filters",
     "Save & Load Screeners",
+    "Advanced Filters(Delta, IV, DTE and more)",
     "Premium Yield Analysis",
-    "Strike Price Optimization",
-    "Expiration Date Selection",
-    "Volume & Liquidity Filters",
-    "Implied Volatility Analysis",
-    "Delta Filtering",
-    "P/E Ratio Screening",
-    "Market Cap Filtering",
-    "Sector-based Filtering",
-    "Moving Average Analysis",
-    "Moneyness Range Filtering",
+    // "Strike Price Optimization",
+    // "Expiration Date Selection",
+    // "Volume & Liquidity Filters",
+    // "Implied Volatility Analysis",
+    // "Delta Filtering",
+    "Fundamental Filters(P/E Ratio, Market Cap and more)",
+    // "P/E Ratio Screening",
+    // "Market Cap Filtering",
+    // "Sector-based Filtering",
+    // "Moving Average Analysis",
+    // "Moneyness Range Filtering",
     "Column Customization",
     "Mobile Responsive Design",
-    "API Access"
+    "API Access (Coming soon)",
+    "Export as CSV and Excel (Coming Soon)"
   ];
 
   return (
@@ -60,7 +63,11 @@ export default function PricingPage() {
               <ul className="space-y-4">
                 {features.map((feature, index) => (
                   <li key={index} className="flex items-center gap-2">
-                    <Check className="h-5 w-5 text-green-500" />
+                    {feature.toLowerCase().includes("coming soon") ? (
+                      <Clock className="h-5 w-5 text-yellow-500" />
+                    ) : (
+                      <Check className="h-5 w-5 text-green-500" />
+                    )}
                     <span className="text-gray-700">{feature}</span>
                   </li>
                 ))}
@@ -86,7 +93,11 @@ export default function PricingPage() {
               <ul className="space-y-4">
                 {features.map((feature, index) => (
                   <li key={index} className="flex items-center gap-2">
-                    <Check className="h-5 w-5 text-green-500" />
+                    {feature.toLowerCase().includes("coming soon") ? (
+                      <Clock className="h-5 w-5 text-yellow-500" />
+                    ) : (
+                      <Check className="h-5 w-5 text-green-500" />
+                    )}
                     <span className="text-gray-700">{feature}</span>
                   </li>
                 ))}
@@ -113,7 +124,11 @@ export default function PricingPage() {
               <ul className="space-y-4">
                 {features.map((feature, index) => (
                   <li key={index} className="flex items-center gap-2">
-                    <Check className="h-5 w-5 text-green-500" />
+                    {feature.toLowerCase().includes("coming soon") ? (
+                      <Clock className="h-5 w-5 text-yellow-500" />
+                    ) : (
+                      <Check className="h-5 w-5 text-green-500" />
+                    )}
                     <span className="text-gray-700">{feature}</span>
                   </li>
                 ))}
