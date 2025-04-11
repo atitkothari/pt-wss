@@ -34,7 +34,7 @@ export function SaveScreenerModal({
 }: SaveScreenerModalProps) {
   const { user } = useAuth();
   const [name, setName] = useState('');
-  const [emailNotifications, setEmailNotifications] = useState(false);
+  const [emailNotifications, setEmailNotifications] = useState(true);
   const [frequency, setFrequency] = useState<EmailFrequency>('daily');
   const [existingScreeners, setExistingScreeners] = useState<SavedScreener[]>([]);
   const [showOverwriteWarning, setShowOverwriteWarning] = useState(false);
@@ -45,7 +45,7 @@ export function SaveScreenerModal({
   useEffect(() => {
     if (!isOpen) {
       setName('');
-      setEmailNotifications(false);
+      setEmailNotifications(true);
       setFrequency('daily');
       setSelectedScreenerToOverwrite(null);
       setIsOverwriting(false);
@@ -176,7 +176,14 @@ export function SaveScreenerModal({
               checked={emailNotifications}
               onCheckedChange={(checked) => setEmailNotifications(checked as boolean)}
             />
-            <Label htmlFor="emailNotifications">Enable Email Notifications</Label>
+            <div className="flex flex-col">
+              <Label htmlFor="emailNotifications">
+                Receive Results of this Screener via Email
+              </Label>
+              {emailNotifications && user?.email && (
+                <span className="text-sm text-gray-500 mt-1">({user.email})</span>
+              )}
+            </div>
           </div>
           {emailNotifications && (
             <div className="space-y-2">
