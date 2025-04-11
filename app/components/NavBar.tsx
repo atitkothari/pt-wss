@@ -16,6 +16,7 @@ export function NavBar() {
     screeners: [
       { name: 'Covered Call Screener', href: '/covered-call-screener', id: 'covered_call_screener' },
       { name: 'Cash Secured Put Screener', href: '/cash-secured-put-screener', id: 'cash_secured_put_screener' },
+      { name: 'Saved Screeners', href: '/saved-screeners', id: 'saved_screeners' },
     ],
     tools: [
       { name: 'Discover', href: '/discover' },
@@ -23,7 +24,8 @@ export function NavBar() {
     ],
     resources: [
       { name: 'Blog', href: 'https://wheelstrategyoptions.com/blog/', external: true },
-      { name: 'API', href: 'https://forms.gle/FRLem4M35jQV3W7Z6', external: true },
+      // { name: 'API', href: 'https://forms.gle/FRLem4M35jQV3W7Z6', external: true },
+      // { name: 'Pricing', href: '/pricing', external: false },
     ],
   };
 

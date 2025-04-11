@@ -45,8 +45,7 @@ export function useOptionsData(
     strikeFilter?: StrikeFilter,
     deltaRange?: [number, number],
     peRatio?: [number, number],
-    marketCap?: [number, number],
-    movingAverageCrossover?: string,
+    marketCap?: [number, number],    
     sector?: string,
     moneynessRange?: [number, number],
     impliedVolatilityRange?: [number, number],
@@ -133,15 +132,6 @@ export function useOptionsData(
       }
       if (marketCap && marketCap[1] < 1000) {
         filters.push({ operation: 'lte', field: 'marketCap', value: marketCap[1] * 1000000000});
-      }
-      
-      // Add Moving Average Crossover filter
-      if (movingAverageCrossover && movingAverageCrossover !== 'Any') {
-        filters.push({ 
-          operation: 'eq', 
-          field: 'movingAverageCrossover', 
-          value: `"${movingAverageCrossover}"` 
-        });
       }
       
       // Add Sector filter

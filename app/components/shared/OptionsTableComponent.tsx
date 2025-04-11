@@ -9,10 +9,10 @@ import { MultiStockSelect } from "../filters/MultiStockSelect";
 import { useOptionsData } from "../../hooks/useOptionsData";
 import { LoadingSpinner } from "../LoadingSpinner";
 import { Option, OptionType, StrikeFilter } from "../../types/option";
-import { OptionsTable } from "../table/OptionsTable";
+import { DEFAULT_COLUMNS, OptionsTable } from "../table/OptionsTable";
 import { format, addDays } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Search, Mail, Save, Coffee, RotateCcw, BellRing } from "lucide-react";
+import { Search, Mail, Save, Coffee, RotateCcw, BellRing, FolderOpen } from "lucide-react";
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSymbols } from '../../hooks/useSymbols';
 import { SaveQueryModal } from "../modals/SaveQueryModal";
@@ -39,6 +39,28 @@ import {
   defaultVisibleColumns as configDefaultVisibleColumns,
   impliedVolatilityFilterConfig
 } from "@/app/config/filterConfig";
+import { SaveScreenerModal } from "../modals/SaveScreenerModal";
+import { LoadScreenerModal } from "../modals/LoadScreenerModal";
+import { LoginPromptModal } from "../modals/LoginPromptModal";
+import { SavedScreener, EmailFrequency } from "@/app/types/screener";
+import { defaultScreeners } from '@/app/config/defaultScreeners';
+import { ColumnCustomizer } from "../table/ColumnCustomizer";
+import { screenerService } from "@/app/services/screenerService";
+
+interface Filter {
+  field: string;
+  operation: string;
+  value: string | number;
+}
+
+interface SaveFilterPayload {
+  user_id: string;
+  email_id: string;
+  frequency: EmailFrequency;
+  filter_name: string;
+  filters: Filter[];
+  is_alerting: boolean;
+}
 
 interface OptionsTableComponentProps {
   option: OptionType;
@@ -66,6 +88,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { symbols } = useSymbols();
+  const { user, userId } = useAuth();
+  const [savedScreeners, setSavedScreeners] = useState<SavedScreener[]>([]);
 
   const getParamKey = (key: string) => `${option}_${key}`;
   
@@ -465,8 +489,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     minSelectedExpiration: "",
     pageNo: 1,
     peRatio: [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax] as [number, number],
-    marketCap: [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax] as [number, number],
-    movingAverageCrossover: movingAverageCrossoverOptions[0],
+    marketCap: [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax] as [number, number],    
     sector: sectorOptions[0],
     moneynessRange: [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax] as [number, number],
     impliedVolatility: [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax] as [number, number],
@@ -552,8 +575,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       peRatio[0] !== activeFilters.peRatio[0] ||
       peRatio[1] !== activeFilters.peRatio[1] ||
       marketCap[0] !== activeFilters.marketCap[0] ||
-      marketCap[1] !== activeFilters.marketCap[1] ||
-      movingAverageCrossover !== activeFilters.movingAverageCrossover ||
+      marketCap[1] !== activeFilters.marketCap[1] ||      
       sector !== activeFilters.sector ||
       impliedVolatility[0] !== activeFilters.impliedVolatility[0] ||
       impliedVolatility[1] !== activeFilters.impliedVolatility[1] || 
@@ -599,8 +621,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       minSelectedExpiration,
       pageNo: 1,
       peRatio,
-      marketCap,
-      movingAverageCrossover,
+      marketCap,      
       sector,
       moneynessRange,
       impliedVolatility,
@@ -627,8 +648,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       min_market_cap: marketCap[0],
       max_market_cap: marketCap[1],
       min_iv: impliedVolatility[0],
-      max_iv: impliedVolatility[1],
-      ma_crossover: movingAverageCrossover,
+      max_iv: impliedVolatility[1],      
       sector: sector
     });
 
@@ -647,8 +667,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       undefined,
       deltaFilter,
       peRatio,
-      marketCap,
-      movingAverageCrossover,
+      marketCap,      
       sector,
       moneynessRange,
       impliedVolatility,
@@ -684,8 +703,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             undefined,
             deltaFilter,
             peRatio,
-            marketCap,
-            movingAverageCrossover,
+            marketCap,            
             sector,
             moneynessRange,
             impliedVolatility,
@@ -702,6 +720,45 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     if (e.key === 'Enter') {
       handleSearch();
     }
+  };
+
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(() => {
+    // Try to get saved columns from localStorage
+    if (typeof window !== 'undefined') {
+      const savedColumns = localStorage.getItem('visibleColumns');
+      if (savedColumns) {
+        try {
+          return JSON.parse(savedColumns);
+        } catch (e) {
+          console.error('Error parsing localStorage value for visibleColumns:', e);
+        }
+      }
+    }
+    // Fall back to default visible columns from config
+    return configDefaultVisibleColumns;
+  });
+
+  const handleColumnToggle = (columnKey: string) => {
+    setVisibleColumns(current => {
+      let newColumns;
+      if (current.includes(columnKey)) {
+        if (current.length === 1) return current;
+        newColumns = current.filter(key => key !== columnKey);
+      } else {
+        newColumns = [...current, columnKey].sort(
+          (a, b) => 
+            DEFAULT_COLUMNS.findIndex(col => col.key === a) - 
+            DEFAULT_COLUMNS.findIndex(col => col.key === b)
+        );
+      }
+      
+      // Save to localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('visibleColumns', JSON.stringify(newColumns));
+      }
+      
+      return newColumns;
+    });
   };
 
 
@@ -788,17 +845,12 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       strikeFilter !== 'ALL' ? strikeFilter : undefined,
       deltaFilter,
       activeFilters.peRatio,
-      activeFilters.marketCap,
-      activeFilters.movingAverageCrossover,
+      activeFilters.marketCap,      
       activeFilters.sector,      
       activeFilters.moneynessRange,
       activeFilters.impliedVolatility,
     ).catch(console.error);
   }, [sortColumn, sortDirection, router, searchParams, activeFilters, currentPage, rowsPerPage, strikeFilter, deltaFilter, fetchData]);  
-
-  if (error) return <div className="text-red-500 p-4">{error}</div>;
-
-  const { user, userId } = useAuth();
 
   const handleReset = () => {
     // Reset all filter states to their default values
@@ -829,8 +881,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       minSelectedExpiration: "",
       pageNo: 1,
       peRatio: [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax] as [number, number],
-      marketCap: [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax] as [number, number],
-      movingAverageCrossover: movingAverageCrossoverOptions[0],
+      marketCap: [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax] as [number, number],      
       sector: sectorOptions[0],
       moneynessRange: [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax] as [number, number],
       impliedVolatility: [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax] as [number, number],
@@ -844,45 +895,243 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     setCurrentPage(1);
   };
 
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const [isLoadModalOpen, setIsLoadModalOpen] = useState(false);
+  const [isLoginPromptOpen, setIsLoginPromptOpen] = useState(false);
+
+  const handleSaveScreener = async (screener: SavedScreener) => {
+    if (typeof window === 'undefined') return;
+    
+    try {
+      // Convert SavedScreener to SaveFilterPayload
+      const payload = {
+        user_id: userId || '',
+        email_id: screener.emailNotifications?.email || '',
+        frequency: screener.emailNotifications?.frequency??'daily' as const,
+        filter_name: screener.name,
+        filters: JSON.stringify(screener.filters),
+        is_alerting: screener.emailNotifications?.enabled??false
+      };
+
+      // Save to backend
+      await screenerService.saveFilter(payload);
+      
+      // Fetch updated list of screeners
+      const fetchScreener = await screenerService.fetchFilter({user_id: userId||''});
+      
+      // Convert API response to SavedScreener format
+      const convertedScreeners = fetchScreener.map((screener: any) => {
+        const parsedFilters = JSON.parse(screener.filter);
+        return {
+          id: screener.id.toString(),
+          name: screener.filter_name,
+          filters: {
+            ...parsedFilters,
+            optionType: parsedFilters.optionType || 'call' // Default to call if not specified
+          },
+          createdAt: screener.created_date,
+          updatedAt: screener.last_updated_date,
+          emailNotifications: screener.is_alerting ? {
+            enabled: true,
+            email: user?.email ?? '',
+            frequency: screener.frequency || 'daily' as EmailFrequency
+          } : undefined
+        };
+      });
+
+      // Update local state with the fresh data
+      setSavedScreeners(convertedScreeners);
+
+      // Close the modal
+      setIsSaveModalOpen(false);
+    } catch (e) {
+      console.error('Error saving screener:', e);
+    }
+  };
+
+  const handleLoadScreener = (screener: SavedScreener) => {
+    // Update filters based on the loaded screener
+    setActiveFilters({
+      searchTerm: screener.filters.searchTerm || '',
+      yieldRange: screener.filters.yieldRange || [yieldFilterConfig.min, yieldFilterConfig.max],
+      maxPrice: screener.filters.maxPrice || priceFilterConfig.defaultMax,
+      minPrice: screener.filters.minPrice || priceFilterConfig.defaultMin,
+      volumeRange: screener.filters.volumeRange || [volumeFilterConfig.min, volumeFilterConfig.max],
+      selectedExpiration: "",
+      minSelectedExpiration: "",
+      pageNo: 1,
+      peRatio: screener.filters.peRatio || [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax],
+      marketCap: screener.filters.marketCap || [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax],
+      sector: Array.isArray(screener.filters.sector) ? screener.filters.sector[0] : (screener.filters.sector || sectorOptions[0]),
+      moneynessRange: screener.filters.moneynessRange || [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax],
+      impliedVolatility: screener.filters.impliedVolatility || [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax],
+      deltaFilter: screener.filters.deltaFilter || [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax]
+    });
+
+    // Update individual states
+    setSearchTerm(screener.filters.searchTerm || '');
+    setSelectedStocks(screener.filters.selectedStocks || []);
+    setYieldRange(screener.filters.yieldRange || [yieldFilterConfig.min, yieldFilterConfig.max]);
+    setMinPrice(screener.filters.minPrice || priceFilterConfig.defaultMin);
+    setMaxPrice(screener.filters.maxPrice || priceFilterConfig.defaultMax);
+    setVolumeRange(screener.filters.volumeRange || [volumeFilterConfig.min, volumeFilterConfig.max]);
+    setDeltaFilter(screener.filters.deltaFilter || [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax]);
+    setMinDte(screener.filters.minDte || dteFilterConfig.defaultMin);
+    setMaxDte(screener.filters.maxDte || dteFilterConfig.defaultMax);
+    setImpliedVolatility(screener.filters.impliedVolatility || [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax]);
+    setPeRatio(screener.filters.peRatio || [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax]);
+    setMarketCap(screener.filters.marketCap || [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax]);
+    setMoneynessRange(screener.filters.moneynessRange || [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax]);
+    setSector(Array.isArray(screener.filters.sector) ? screener.filters.sector[0] : (screener.filters.sector || sectorOptions[0]));
+  };
+
+  // Update the Save Screener button click handlers
+  const handleSaveScreenerClick = () => {
+    if (!user) {
+      setIsLoginPromptOpen(true);
+      return;
+    }
+    setIsSaveModalOpen(true);
+  };
+
+  // Move error check here, after all hooks are declared
+  if (error) return <div className="text-red-500 p-4">{error}</div>;
+
+  const [showColumnSelector, setShowColumnSelector] = useState(false);
+
+  useEffect(() => {
+    const loadSavedScreeners = async () => {
+      if (!userId) return;
+      
+      try {
+        const fetchScreener = await screenerService.fetchFilter({user_id: userId});
+        
+        // Convert API response to SavedScreener format
+        const convertedScreeners = fetchScreener.map((screener: any) => {
+          const parsedFilters = JSON.parse(screener.filter);
+          return {
+            id: screener.id.toString(),
+            name: screener.filter_name,
+            filters: {
+              ...parsedFilters,
+              optionType: parsedFilters.optionType || 'call' // Default to call if not specified
+            },
+            createdAt: screener.created_date,
+            updatedAt: screener.last_updated_date,
+            emailNotifications: screener.is_alerting ? {
+              enabled: true,
+              email: user?.email ?? '',
+              frequency: 'daily' as EmailFrequency
+            } : undefined
+          };
+        });
+
+        setSavedScreeners(convertedScreeners);
+      } catch (e) {
+        console.error('Error loading saved screeners:', e);
+        setSavedScreeners([]);
+      }
+    };
+
+    loadSavedScreeners();
+  }, [userId, user?.email]);
+
   return (
     <div className="w-full">      
       {/* Filter Controls */}
       <div className="space-y-2 mb-2">
-        {/* All Rows - 2 columns on mobile, 4 on large screens */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
-          <MultiStockSelect
-            id="input_screener_symbol"
-            label="Search Symbol"
-            selectedStocks={selectedStocks}
-            onChange={(stocks) => {
-              setSelectedStocks(stocks);
-              if (stocks.length === 1) {
-                setSearchTerm(stocks[0]);
-              } else {
-                setSearchTerm(stocks.join(','));
+        {/* Screener Dropdown */}
+        <div className="mb-4">
+          <Select
+            onValueChange={(value) => {
+              if (value === "manage") {
+                window.location.href = '/saved-screeners';
+                return;
+              }
+              if (value === "default") return;
+              const allScreeners = [...defaultScreeners, ...savedScreeners];
+              const selectedScreener = allScreeners.find((s: SavedScreener) => s.id === value);
+              if (selectedScreener) {
+                handleLoadScreener(selectedScreener);
               }
             }}
-            placeholder="Enter symbols..."
-            onKeyPress={handleKeyPress}
-            suggestions={symbols}
-            showSuggestions={true}
-            tooltip="Enter stock symbols (e.g., AAPL, MSFT) to filter options"
-          />
-          <RangeSlider
-            id="input_screener_yield_range"
-            label="Premium Yield %"
-            minValue={yieldRange[0]}
-            maxValue={yieldRange[1]}
-            value={yieldRange}
-            onChange={(value) => {
-              setYieldRange(value);
-            }}
-            min={yieldFilterConfig.min}
-            max={yieldFilterConfig.max}
-            step={yieldFilterConfig.step}
-            tooltip={yieldFilterConfig.tooltip}
-            formatValue={(val) => `${val}%`}
-          />
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select a saved screener" />
+            </SelectTrigger>
+            <SelectContent>
+              {/* Predefined Screeners Section */}
+              <div className="px-2 py-1.5 text-sm font-semibold text-gray-500">
+                Predefined Screeners
+              </div>
+              {(() => {
+                if (typeof window === 'undefined') return null;
+                const predefinedScreeners = defaultScreeners.filter((s: SavedScreener) => s.filters.optionType === option);
+                return predefinedScreeners.map((screener: SavedScreener) => (
+                  <SelectItem key={screener.id} value={screener.id}>
+                    {screener.name}
+                  </SelectItem>
+                ));
+              })()}
+
+              {/* Custom Screeners Section - Only show if user is logged in */}
+              {user && (() => {
+                if (typeof window === 'undefined') return null;
+                const customScreeners = savedScreeners.filter((s: SavedScreener) => s.filters.optionType === option);
+                if (customScreeners.length === 0) return null;
+                return (
+                  <>
+                    <div className="px-2 py-1.5 text-sm font-semibold text-gray-500">
+                      Custom Screeners
+                    </div>
+                    {customScreeners.map((screener: SavedScreener) => (
+                      <SelectItem key={screener.id} value={screener.id}>
+                        {screener.name}
+                      </SelectItem>
+                    ))}
+                  </>
+                );
+              })()}
+
+              {/* Manage Saved Screeners Option - Only show if user is logged in */}
+              {user && (
+                <div className="px-2 py-1.5 text-sm font-semibold text-gray-500 border-t">
+                  <SelectItem 
+                    value="manage" 
+                    className="text-blue-600 hover:text-blue-800 cursor-pointer"
+                  >
+                    Manage Saved Screeners
+                  </SelectItem>
+                </div>
+              )}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* All Rows - 2 columns on mobile, 4 on large screens */}
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-2">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <MultiStockSelect
+                id="input_screener_symbol"
+                label="Search Symbol"
+                selectedStocks={selectedStocks}
+                onChange={(stocks) => {
+                  setSelectedStocks(stocks);
+                  if (stocks.length === 1) {
+                    setSearchTerm(stocks[0]);
+                  } else {
+                    setSearchTerm(stocks.join(','));
+                  }
+                }}
+                placeholder="Enter symbols..."
+                onKeyPress={handleKeyPress}
+                suggestions={symbols}
+                showSuggestions={true}
+                tooltip="Enter stock symbols (e.g., AAPL, MSFT) to filter options"
+              />
+            </div>
+          </div>
         </div>
         
         {/* Advanced Filters */}
@@ -902,9 +1151,9 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             onVolumeRangeChange={setVolumeRange}
             handleKeyPress={handleKeyPress}
             strikePrice={[minPrice, maxPrice]}
-            onStrikePriceChange={(value) => {
-              setMinPrice(value[0]);
-              setMaxPrice(value[1]);
+            onStrikePriceChange={([min, max]) => {
+              setMinPrice(min);
+              setMaxPrice(max);
             }}
             impliedVolatility={impliedVolatility}
             onImpliedVolatilityChange={setImpliedVolatility}
@@ -912,50 +1161,78 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             onMoneynessRangeChange={setMoneynessRange}
             minDte={minDte}
             maxDte={maxDte}
-            onDteChange={(value) => {
-              setMinDte(value[0]);
-              setMaxDte(value[1]);
+            onDteChange={([min, max]) => {
+              setMinDte(min);
+              setMaxDte(max);
             }}
+            yieldRange={yieldRange}
+            onYieldRangeChange={setYieldRange}
             autoSearch={false}
             onSearch={handleSearch}
           />
         </div>
 
         {/* Buttons */}
-        <div className="flex flex-col sm:flex-row justify-end gap-1">
-          <Button
-            id="btn_screener_reset"
-            variant="outline"
-            onClick={handleReset}
-            className="w-full sm:w-auto"
-          >
-            <RotateCcw className="h-4 w-4 mr-2" />
-            Reset Filters
-          </Button>
-          <div className="grid grid-cols-[35%_65%] sm:flex sm:gap-1 w-full sm:w-auto">
+        <div className="flex flex-col gap-2">
+          {/* Desktop buttons */}
+          <div className="hidden md:flex items-center justify-between gap-2 w-full">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={handleSaveScreenerClick}
+                className="flex items-center gap-2"
+              >
+                <Save className="h-4 w-4" />
+                Save Screener
+              </Button>
+              <Button
+                onClick={handleSearch}
+                className="flex items-center gap-2"
+              >
+                <Search className="h-4 w-4" />
+                Search
+              </Button>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleReset}
+                className="flex items-center gap-2"
+              >
+                <RotateCcw className="h-4 w-4" />
+                Reset Filters
+              </Button>
+              <ColumnCustomizer
+                columns={DEFAULT_COLUMNS}
+                visibleColumns={visibleColumns}
+                onColumnToggle={handleColumnToggle}
+              />
+            </div>
+          </div>
+          
+          {/* Mobile buttons */}
+          <div className="md:hidden flex items-center justify-end gap-2">
             <Button
-              id="btn_screener_save"
               variant="outline"
-              onClick={() => setShowSaveModal(true)}
-              className="bg-orange-600 text-white hover:text-black"
+              size="sm"
+              onClick={handleReset}
+              className="flex items-center gap-2"
             >
-              <BellRing className="h-5 w-5 min-h-[15px] min-w-[15px] mr-2" />
-              Get Alerts
+              <RotateCcw className="h-4 w-4" />
+              Reset Filters
             </Button>
-            <Button 
-              id="btn_screener_search"
-              onClick={handleSearch}
-              className={`${filtersChanged ? 'bg-amber-500 hover:bg-amber-600' : ''}`}
-            >
-              <Search className="h-5 w-5 min-h-[15px] min-w-[15px] mr-2" />
-              {filtersChanged ? 'Search (Updated Filters)' : 'Search'}
-            </Button>
+            <ColumnCustomizer
+              columns={DEFAULT_COLUMNS}
+              visibleColumns={visibleColumns}
+              onColumnToggle={handleColumnToggle}
+            />
           </div>
         </div>
       </div>
 
       {/* Results Section - Fixed height container */}
-      <div className="min-h-[600px] relative">
+      <div className="relative flex-1 min-h-[400px] bg-white rounded-lg shadow-sm overflow-hidden">
         {!hasSearched && !activeFilters.searchTerm && 
          activeFilters.yieldRange[0] === yieldFilterConfig.min && 
          activeFilters.yieldRange[1] === yieldFilterConfig.max && 
@@ -982,6 +1259,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                 <OptionsTable 
                   data={data}              
                   onSort={handleSortURL}
+                  visibleColumns={visibleColumns}
                 />
               </BlurredTable>
             </div>
@@ -1011,8 +1289,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                       strikeFilter !== 'ALL' ? strikeFilter : undefined,
                       deltaFilter,
                       activeFilters.peRatio,
-                      activeFilters.marketCap,
-                      activeFilters.movingAverageCrossover,
+                      activeFilters.marketCap,                      
                       activeFilters.sector,
                       activeFilters.moneynessRange,
                       activeFilters.impliedVolatility,
@@ -1046,8 +1323,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                       strikeFilter !== 'ALL' ? strikeFilter : undefined,
                       deltaFilter,
                       activeFilters.peRatio,
-                      activeFilters.marketCap,
-                      activeFilters.movingAverageCrossover,
+                      activeFilters.marketCap,                      
                       activeFilters.sector,
                       activeFilters.moneynessRange,
                       activeFilters.impliedVolatility,
@@ -1086,10 +1362,71 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           </div>
         )}
       </div>
+
+      {/* Mobile Sticky Save and Search buttons */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 z-50">
+        <div className="flex justify-between items-center">
+          <Button
+            variant="outline"
+            onClick={handleSaveScreenerClick}
+            className="flex items-center gap-2"
+          >
+            <Save className="h-4 w-4" />
+            Save Screener
+          </Button>
+          <Button
+            onClick={handleSearch}
+            className="flex items-center gap-2"
+          >
+            <Search className="h-4 w-4" />
+            Search
+          </Button>
+        </div>
+      </div>
+
+      {/* Add padding to the bottom to account for the sticky button on mobile only */}
+      <div className="h-20 md:h-0" />
+
+      {/* Save Screener Modal */}
+      {isSaveModalOpen && (
+        <SaveScreenerModal
+          isOpen={isSaveModalOpen}
+          onClose={() => setIsSaveModalOpen(false)}
+          onSave={handleSaveScreener}
+          optionType={option}
+          filters={{
+            searchTerm,
+            selectedStocks,
+            yieldRange,
+            minPrice,
+            maxPrice,
+            volumeRange,
+            deltaFilter,
+            minDte,
+            maxDte,
+            impliedVolatility,
+            peRatio,
+            marketCap,
+            movingAverageCrossover,
+            sector,
+            moneynessRange
+          }}
+        />
+      )}
       <SaveQueryModal
         isOpen={showSaveModal}
         onClose={() => setShowSaveModal(false)}
         currentQuery={getCurrentQuery()}
+      />
+      <LoadScreenerModal
+        isOpen={isLoadModalOpen}
+        onClose={() => setIsLoadModalOpen(false)}
+        onLoad={handleLoadScreener}
+        optionType={option}
+      />
+      <LoginPromptModal
+        isOpen={isLoginPromptOpen}
+        onClose={() => setIsLoginPromptOpen(false)}
       />
     </div>
   );

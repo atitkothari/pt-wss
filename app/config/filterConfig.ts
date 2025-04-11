@@ -9,7 +9,8 @@
 export const yieldFilterConfig = {
   min: 0,
   max: 10,
-  default: 0,
+  defaultMin: 0,
+  defaultMax: 10,
   step: .5,
   tooltip: "Minimum percentage yield to filter options"
 };

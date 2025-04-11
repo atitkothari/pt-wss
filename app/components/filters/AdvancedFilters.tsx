@@ -26,7 +26,8 @@ import {
   sectorOptions,
   impliedVolatilityFilterConfig,
   moneynessFilterConfig,
-  dteFilterConfig
+  dteFilterConfig,
+  yieldFilterConfig
 } from "@/app/config/filterConfig";
 
 interface AdvancedFiltersProps {
@@ -56,6 +57,9 @@ interface AdvancedFiltersProps {
   minDte: number;
   maxDte: number;
   onDteChange: (value: [number, number]) => void;
+  // Add yield range filter props
+  yieldRange: [number, number];
+  onYieldRangeChange: (value: [number, number]) => void;
   // Optional prop to trigger search automatically
   autoSearch?: boolean;
   onSearch?: () => void;
@@ -88,6 +92,9 @@ export function AdvancedFilters({
   minDte,
   maxDte,
   onDteChange,
+  // Add yield range filter props
+  yieldRange,
+  onYieldRangeChange,
   // Auto search props
   autoSearch = true,
   onSearch
@@ -141,11 +148,13 @@ export function AdvancedFilters({
       marketCap: marketCap[0] !== marketCapFilterConfig.defaultMin || 
                  marketCap[1] !== marketCapFilterConfig.defaultMax,
       movingAverage: movingAverageCrossover !== movingAverageCrossoverOptions[0],
-      sector: sector !== sectorOptions[0]
+      sector: sector !== sectorOptions[0],
+      yieldRange: yieldRange[0] !== yieldFilterConfig.defaultMin || 
+                  yieldRange[1] !== yieldFilterConfig.defaultMax
     };
   }, [
     strikePrice, moneynessRange, minDte, maxDte, deltaFilter, volumeRange,
-    impliedVolatility, peRatio, marketCap, movingAverageCrossover, sector
+    impliedVolatility, peRatio, marketCap, movingAverageCrossover, sector, yieldRange
   ]);
 
   const hasModifiedFilters = useMemo(() => {
@@ -193,7 +202,8 @@ export function AdvancedFilters({
                   peRatio: 'P/E',
                   marketCap: 'Market Cap',
                   movingAverage: 'MA',
-                  sector: 'Sector'
+                  sector: 'Sector',
+                  yieldRange: 'Yield Range'
                 };
                 return (
                   <Badge 
@@ -209,13 +219,13 @@ export function AdvancedFilters({
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
-            {/* Add Strike Price filter before P/E Ratio */}
+            {/* Strike Price Range */}
             <RangeSlider
-              id="input_screener_strike_price"
-              label="Strike Price ($)"
-              value={strikePrice}
+              id="input_screener_price_range"
+              label="Strike Price Range"
               minValue={strikePrice[0]}
               maxValue={strikePrice[1]}
+              value={strikePrice}
               onChange={onStrikePriceChange}
               min={priceFilterConfig.min}
               max={priceFilterConfig.max}
@@ -224,7 +234,40 @@ export function AdvancedFilters({
               formatValue={(val) => `$${val}`}
               className="col-span-1"
             />
-            
+
+            {/* Volume Range */}
+            <RangeSlider
+              id="input_screener_volume_range"
+              label="Volume Range"
+              minValue={volumeRange[0]}
+              maxValue={volumeRange[1]}
+              value={volumeRange}
+              onChange={onVolumeRangeChange}
+              min={volumeFilterConfig.min}
+              max={volumeFilterConfig.max}
+              step={volumeFilterConfig.step}
+              tooltip={volumeFilterConfig.tooltip}
+              formatValue={(val) => val.toLocaleString()}
+              className="col-span-1"
+            />
+
+            {/* Yield Range */}
+            <RangeSlider
+              id="input_screener_yield_range"
+              label="Premium Yield %"
+              minValue={yieldRange[0]}
+              maxValue={yieldRange[1]}
+              value={yieldRange}
+              onChange={onYieldRangeChange}
+              min={yieldFilterConfig.min}
+              max={yieldFilterConfig.max}
+              step={yieldFilterConfig.step}
+              tooltip={yieldFilterConfig.tooltip}
+              formatValue={(val) => `${val}%`}
+              className="col-span-1"
+            />
+
+            {/* Moneyness Range */}
             <RangeSlider
               id="input_screener_moneyness_range"
               label="Strike Filter %"
@@ -240,6 +283,7 @@ export function AdvancedFilters({
               className="col-span-1"
             />
             
+            {/* Days to Expiration */}
             <RangeSlider
               id="input_screener_expiration"
               label="Days to Expiration"
@@ -260,6 +304,7 @@ export function AdvancedFilters({
               className="col-span-1"
             />
             
+            {/* Delta */}
             <RangeSlider
               id="input_screener_delta"
               label="Delta"
@@ -275,21 +320,7 @@ export function AdvancedFilters({
               className="col-span-1"
             />
             
-            <RangeSlider
-              id="input_screener_volume_range"
-              label="Volume"
-              value={volumeRange}
-              minValue={volumeRange[0]}
-              maxValue={volumeRange[1]}
-              onChange={onVolumeRangeChange}
-              min={volumeFilterConfig.min}
-              max={volumeFilterConfig.max}
-              step={volumeFilterConfig.step}
-              tooltip={volumeFilterConfig.tooltip}
-              formatValue={(val) => val.toLocaleString()}
-              className="col-span-1"
-            />
-            
+            {/* Implied Volatility */}
             <RangeSlider
               id="input_screener_implied_volatility"
               label="Implied Volatility (%)"
@@ -305,6 +336,7 @@ export function AdvancedFilters({
               className="col-span-1"
             />
             
+            {/* P/E Ratio */}
             <RangeSlider
               id="input_screener_pe_ratio"
               label="P/E Ratio"
@@ -318,6 +350,8 @@ export function AdvancedFilters({
               tooltip={peRatioFilterConfig.tooltip}
               className="col-span-1"
             />
+
+            {/* Market Cap */}
             <div className="relative col-span-1">
               <label className="block text-sm font-medium mb-1">Market Cap</label>
               <Select 
@@ -364,6 +398,8 @@ export function AdvancedFilters({
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Sector */}
             <div className="col-span-1">
               <label className="block text-sm font-medium mb-1">Sector</label>
               <Select 
