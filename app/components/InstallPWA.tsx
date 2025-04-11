@@ -77,8 +77,8 @@ export default function InstallPWA() {
   if (!showInstallPrompt) return null;
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 shadow-lg p-3 border-b border-gray-200 dark:border-gray-700">
-      <div className="flex items-center justify-between gap-2 max-w-7xl mx-auto">
+    <div className="fixed md:bottom-4 md:right-4 md:top-auto md:left-auto top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 shadow-lg p-3 md:rounded-lg md:border md:border-gray-200 md:dark:border-gray-700 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex items-center justify-between gap-2 md:max-w-xs max-w-7xl mx-auto">
         <div className="flex-1">
           <h3 className="text-sm font-semibold">Install Wheel Strategy Options App</h3>
           <p className="text-xs text-gray-600 dark:text-gray-300">
