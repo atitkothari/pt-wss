@@ -181,7 +181,7 @@ export default function CoveredCallCalculatorPage() {
           const option = options.sort((a: { strike: number; },b: { strike: number; })=>a.strike - b.strike)[0];
           const askPrice = isNaN(option.askPrice) ? 0 : option.askPrice || 0;
           const bidPrice = isNaN(option.bidPrice) ? 0 : option.bidPrice || 0;
-          const premium = ((askPrice + bidPrice) / 2) * 100;
+          const premium = askPrice * 100;
           
           // Calculate income based on number of contracts (shares / 100)
           const contracts = Math.floor(inputShares / 100);
