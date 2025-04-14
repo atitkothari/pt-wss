@@ -782,14 +782,14 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     impliedVolatility,
   });
 
-  const [dte, setDte] = useState(Number(searchParams.get(getParamKey('dte'))) || 30);
+  // const [dte, setDte] = useState(Number(searchParams.get(getParamKey('dte'))) || 30);
 
-  useEffect(() => {
-    const today = new Date();
-    const futureDate = addDays(today, dte);
-    const formattedDate = format(futureDate, 'yyyy-MM-dd');
-    setSelectedExpiration(formattedDate);
-  }, [dte]);
+  // useEffect(() => {
+  //   const today = new Date();
+  //   const futureDate = addDays(today, dte);
+  //   const formattedDate = format(futureDate, 'yyyy-MM-dd');
+  //   setSelectedExpiration(formattedDate);
+  // }, [dte]);
 
   const getOldestUpdateDate = () => {
     if (!data || data.length === 0) return null;
