@@ -232,6 +232,9 @@ export function AdvancedFilters({
               step={priceFilterConfig.step}
               tooltip={priceFilterConfig.tooltip}
               formatValue={(val) => `$${val}`}
+              isExponential={priceFilterConfig.isExponential}
+              toExponential={priceFilterConfig.toExponential}
+              fromExponential={priceFilterConfig.fromExponential}
               className="col-span-1"
             />
 

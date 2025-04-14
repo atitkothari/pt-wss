@@ -21,8 +21,22 @@ export const priceFilterConfig = {
   max: 2000,
   defaultMin: 0,
   defaultMax: 2000,
-  step: 50,
-  tooltip: "Strike price range in dollars"
+  step: 10,
+  tooltip: "Strike price range in dollars",
+  // Exponential scale parameters
+  isExponential: true,
+  exponent: 3, // Power for exponential scaling
+  // Helper functions for exponential scaling
+  toExponential: (linearValue: number) => {
+    const maxValue = 2000;
+    const normalizedValue = linearValue / maxValue;
+    return Math.round(Math.pow(normalizedValue, priceFilterConfig.exponent) * maxValue);
+  },
+  fromExponential: (exponentialValue: number) => {
+    const maxValue = 2000;
+    const normalizedValue = exponentialValue / maxValue;
+    return Math.round(Math.pow(normalizedValue, 1/priceFilterConfig.exponent) * maxValue);
+  }
 };
 
 // Volume Filter Configuration
