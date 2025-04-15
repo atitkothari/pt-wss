@@ -311,7 +311,7 @@ export default function SavedScreenersPage() {
             <h1 className="text-2xl font-bold mb-4">Sign in to View Saved Screeners</h1>
             <p className="text-gray-600 mb-6">Please sign in with your Google account to access your saved screeners.</p>
             <Button
-              onClick={signInWithGoogle}
+              onClick={()=>signInWithGoogle()}
               className="flex items-center gap-2 bg-white text-gray-900 hover:bg-gray-100 border border-gray-300"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">

@@ -300,7 +300,7 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
               </div>
               
               <Button
-                onClick={signInWithGoogle}
+                onClick={()=>signInWithGoogle()}
                 size="lg"
                 className="bg-white hover:bg-gray-100 text-gray-900 border shadow-sm flex items-center gap-2"
                 disabled={loading}
