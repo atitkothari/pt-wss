@@ -152,7 +152,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       // Send verification email
       await sendEmailVerification(result.user, {
-        url: window.location.origin + '/auth/verify-email?redirect=/',
+        url: window.location.origin + '/auth/verify-email?redirect=/covered-call-screener',
       });
       
       sendAnalyticsEvent({
@@ -236,7 +236,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setError(null);
       if (user && !user.emailVerified) {
         await sendEmailVerification(user, {
-          url: window.location.origin + '/auth/verify-email?redirect=/',
+          url: window.location.origin + '/auth/verify-email?redirect=/covered-call-screener',
         });
       }
     } catch (error) {

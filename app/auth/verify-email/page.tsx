@@ -14,7 +14,7 @@ export default function VerifyEmail() {
 
   useEffect(() => {
     const oobCode = searchParams.get('oobCode');
-    const redirect = searchParams.get('redirect') || '/';
+    const redirect = searchParams.get('redirect') || '/covered-call-screener';
     
     if (!oobCode) {
       setStatus('error');
