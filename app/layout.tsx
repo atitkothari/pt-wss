@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Toaster } from "@/components/ui/sonner";
 import { GoogleAnalytics } from './components/GoogleAnalytics';
-import { AuthContextProvider } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 import InstallPWA from './components/InstallPWA';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -84,13 +84,13 @@ export default function RootLayout({
           />
         </noscript>
         <GoogleAnalytics />
-        <AuthContextProvider>
+        <AuthProvider>
           <main>
             {children}
           </main>
           <Toaster />
           <InstallPWA />
-        </AuthContextProvider>
+        </AuthProvider>
       </body>
     </html>
   );

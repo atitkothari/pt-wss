@@ -1258,7 +1258,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         ) : (
           <div className="h-full flex flex-col">          
             <div className="flex-grow">
-              <BlurredTable hasSearched={hasSearched && !user}>
+              <BlurredTable hasSearched={hasSearched && (!user || !user.emailVerified)}>
                 <OptionsTable 
                   data={data}              
                   onSort={handleSortURL}
