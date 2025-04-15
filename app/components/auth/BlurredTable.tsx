@@ -4,7 +4,7 @@ import { useAuth } from "@/app/context/AuthContext";
 import { useSubscription } from "@/app/context/SubscriptionContext";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Mail } from "lucide-react";
+import { Mail, Check } from "lucide-react";
 import { useState } from "react";
 import { AuthModal } from "../modals/AuthModal";
 import { createCheckoutSession } from "@/app/lib/stripe";
@@ -14,6 +14,21 @@ interface BlurredTableProps {
   className?: string;
   hasSearched?: boolean;
 }
+
+const features = [
+  "Advanced Options Screening",
+  "Covered Call Screener",
+  "Cash-Secured Put Screener",
+  "Customizable Filters",
+  "Save & Load Screeners",
+  "Advanced Filters(Delta, IV, DTE and more)",
+  "Premium Yield Analysis",
+  "Fundamental Filters(P/E Ratio, Market Cap and more)",
+  "Column Customization",
+  "Mobile Responsive Design",
+  "API Access (Coming soon)",
+  "Export as CSV and Excel (Coming Soon)"
+];
 
 export const BlurredTable = ({ children, className, hasSearched = false }: BlurredTableProps) => {
   const { user, loading: authLoading, error, signInWithGoogle, sendVerificationEmail } = useAuth();
@@ -70,10 +85,10 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
           <div 
             className="absolute inset-0 pointer-events-none" 
             style={{ 
-              background: 'linear-gradient(to bottom, transparent 200px, rgba(255,255,255,0.9))',
+              background: 'linear-gradient(to bottom, transparent 200px, rgba(20, 24, 33, 0.95))',
             }}
           >
-            <div className="sticky top-0 flex flex-col items-center gap-4 p-4 sm:p-6 text-center bg-gradient-to-b from-gray-900 via-gray-900/95 to-transparent pointer-events-auto">
+            <div className="sticky top-0 flex flex-col items-center gap-4 p-4 sm:p-6 text-center bg-gradient-to-b from-[#1a1f2b] via-[#1a1f2b] to-transparent pointer-events-auto">
               {!user ? (
                 <>
                   <h2 className="text-xl sm:text-2xl font-bold text-white">
@@ -90,7 +105,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                   <Button
                     onClick={() => signInWithGoogle(() => setShowAuthModal(false))}
                     size="lg"
-                    className="bg-white hover:bg-gray-100 text-gray-900 border-0 mt-2 flex items-center gap-2"
+                    className="w-full sm:w-auto bg-white hover:bg-gray-100 text-gray-900 border-0 mt-2 flex items-center gap-2 justify-center"
                     disabled={loading}
                   >
                     {loading ? (
@@ -121,11 +136,29 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                     onClick={() => setShowAuthModal(true)}
                     size="lg"
                     variant="outline"
-                    className="bg-white hover:bg-gray-100 text-gray-900 border-0 mt-2 flex items-center gap-2"
+                    className="w-full sm:w-auto bg-white hover:bg-gray-100 text-gray-900 border-0 mt-2 flex items-center gap-2 justify-center"
                   >
                     <Mail className="h-5 w-5" />
                     Start your free trial with Email
                   </Button>
+                  
+                  {/* Features List */}
+                  <div className="mt-8 w-full max-w-4xl px-4">
+                    <h3 className="text-xl font-bold text-white mb-6">All Features Included</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {features.map((feature, index) => (
+                        <div 
+                          key={index} 
+                          className="flex items-center gap-3 p-3 rounded-lg bg-[#1e2533] group"
+                        >
+                          <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center">
+                            <Check className="h-3.5 w-3.5 text-green-400" />
+                          </div>
+                          <span className="text-sm text-white/90 group-hover:text-white transition-colors">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </>
               ) : !user.emailVerified ? (
                 <>
