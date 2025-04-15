@@ -4,6 +4,8 @@ import { useAuth } from "@/app/context/AuthContext";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Mail } from "lucide-react";
+import { useState } from "react";
+import { AuthModal } from "../modals/AuthModal";
 
 interface BlurredTableProps {
   children: React.ReactNode;
@@ -13,6 +15,7 @@ interface BlurredTableProps {
 
 export const BlurredTable = ({ children, className, hasSearched = false }: BlurredTableProps) => {
   const { user, loading, error, signInWithGoogle, sendVerificationEmail } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const shouldBlur = hasSearched && (!user || !user.emailVerified);
 
   const handleResendVerification = async () => {
@@ -41,6 +44,11 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
 
     return (
       <div className={cn("relative min-h-[200px]", className)}>
+        <AuthModal 
+          isOpen={showAuthModal} 
+          onClose={() => setShowAuthModal(false)}
+          initialMode="signin"
+        />
         <div className={cn(
           "transition-all duration-300 h-full",
           shouldBlur && "[&_tr:nth-child(n+12)]:blur-[3px] [&_tr:nth-child(n+12)]:pointer-events-none [&_tr:nth-child(n+12)]:select-none"
@@ -98,6 +106,15 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                       </svg>
                     )}
                     {loading ? 'Signing in...' : 'Sign in with Google'}
+                  </Button>
+                  <Button
+                    onClick={() => setShowAuthModal(true)}
+                    size="lg"
+                    variant="outline"
+                    className="bg-white hover:bg-gray-100 text-gray-900 border-0 mt-2 flex items-center gap-2"
+                  >
+                    <Mail className="h-5 w-5" />
+                    Sign in with Email
                   </Button>
                 </>
               ) : (
