@@ -22,7 +22,7 @@ export const LoginOverlay = ({ hasSearched = false }: LoginOverlayProps) => {
           Get full access to all options data and screening capabilities by signing in with your Google account.
         </p>
         <Button
-          onClick={signInWithGoogle}
+          onClick={() => signInWithGoogle()}
           size="lg"
           className="bg-white hover:bg-gray-100 text-gray-900 border-0"
         >
