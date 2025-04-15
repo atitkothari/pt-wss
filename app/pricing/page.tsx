@@ -6,9 +6,43 @@ import { Check, Clock } from "lucide-react";
 import { NavBar } from "../components/NavBar";
 import { Footer } from "../components/Footer";
 import { useState } from "react";
+import { useAuth } from "@/app/context/AuthContext";
+import { createCheckoutSession } from "@/app/lib/stripe";
+import { AuthModal } from "@/app/components/modals/AuthModal";
 
 export default function PricingPage() {
   const [isYearly, setIsYearly] = useState(true);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const { user, signInWithGoogle } = useAuth();
+
+  const MONTHLY_PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID;
+  const YEARLY_PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_PRICE_ID;
+
+  const handleStartTrial = async () => {
+    try {
+      if (!user) {
+        setShowAuthModal(true);
+        return;
+      }
+
+      if (!user.emailVerified) {
+        // You might want to show a message asking user to verify their email
+        alert("Please verify your email first!");
+        return;
+      }
+
+      // Create checkout session with the selected plan
+      const priceId = isYearly ? YEARLY_PRICE_ID : MONTHLY_PRICE_ID;
+      if (!priceId) {
+        throw new Error('Price ID not found');
+      }
+      
+      await createCheckoutSession(priceId);
+    } catch (error) {
+      console.error('Error starting trial:', error);
+      alert('Something went wrong. Please try again.');
+    }
+  };
 
   const features = [
     "Advanced Options Screening",
@@ -28,6 +62,11 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-white text-gray-900">
       <NavBar />
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)}
+        initialMode="signin"
+      />
       
       {/* Hero Section */}
       <div className="container mx-auto px-4 pb-4 pt-8 md:pt-16">
@@ -105,7 +144,10 @@ export default function PricingPage() {
               </ul>
             </CardContent>
             <CardFooter className="flex flex-col gap-3 md:gap-4 pt-6 md:pt-8 px-4 md:px-6">
-              <Button className="w-full bg-blue-600 hover:bg-blue-700 text-base md:text-lg py-4 md:py-6">
+              <Button 
+                onClick={handleStartTrial}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-base md:text-lg py-4 md:py-6"
+              >
                 Start 5-Day Free Trial
               </Button>
               <p className="text-xs md:text-sm text-gray-500 text-center">
