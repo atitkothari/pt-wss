@@ -6,7 +6,11 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   signOut,
-  onAuthStateChanged
+  onAuthStateChanged,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  UserCredential
 } from 'firebase/auth';
 import { auth } from '../config/firebase';
 import { toast } from "sonner";
@@ -17,7 +21,10 @@ interface AuthContextType {
   user: User | null;  
   loading: boolean;
   error: string | null;
-  signInWithGoogle: () => Promise<void>;
+  signInWithGoogle: () => Promise<UserCredential | undefined>;
+  signInWithEmail: (email: string, password: string) => Promise<UserCredential>;
+  signUpWithEmail: (email: string, password: string) => Promise<UserCredential>;
+  resetPassword: (email: string) => Promise<void>;
   logout: () => Promise<void>;
   userId: string | null;
 }
@@ -26,7 +33,10 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
   error: null,
-  signInWithGoogle: async () => {},
+  signInWithGoogle: async () => undefined,
+  signInWithEmail: async () => { throw new Error('Not implemented') },
+  signUpWithEmail: async () => { throw new Error('Not implemented') },
+  resetPassword: async () => {},
   logout: async () => {},
   userId: null
 });
@@ -48,15 +58,13 @@ export const AuthContextProvider = ({
       const unsubscribe = onAuthStateChanged(auth, (user) => {
         if (user) {
           setUser(user);
-          setUserId(user.uid); // Set userId directly from user object
-          // Set user ID for Google Analytics
+          setUserId(user.uid);
           if (typeof window !== 'undefined' && 'gtag' in window) {
             ((window as any).gtag)('set', { user_id: user.uid });
           }
         } else {
           setUser(null);
-          setUserId(null); // Clear userId when user signs out
-          // Clear user ID from Google Analytics
+          setUserId(null);
           if (typeof window !== 'undefined' && 'gtag' in window) {
             ((window as any).gtag)('set', { user_id: undefined });
           }
@@ -83,7 +91,6 @@ export const AuthContextProvider = ({
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       
-      // Track sign in event
       sendAnalyticsEvent({
         event_name: AnalyticsEvents.SIGN_IN,
         event_category: 'Auth',
@@ -91,18 +98,110 @@ export const AuthContextProvider = ({
       });
       
       toast.success('Successfully signed in!');
+      return result;
     } catch (error) {
       console.error('Error signing in with Google:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to sign in with Google';
       setError(errorMessage);
       toast.error(errorMessage);
       
-      // Track error event
       sendAnalyticsEvent({
         event_name: AnalyticsEvents.ERROR,
         event_category: 'Auth',
         error_message: errorMessage
       });
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signInWithEmail = async (email: string, password: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      
+      sendAnalyticsEvent({
+        event_name: AnalyticsEvents.SIGN_IN,
+        event_category: 'Auth',
+        method: 'Email'
+      });
+      
+      toast.success('Successfully signed in!');
+      return result;
+    } catch (error) {
+      console.error('Error signing in with email:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to sign in with email';
+      setError(errorMessage);
+      toast.error(errorMessage);
+      
+      sendAnalyticsEvent({
+        event_name: AnalyticsEvents.ERROR,
+        event_category: 'Auth',
+        error_message: errorMessage
+      });
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signUpWithEmail = async (email: string, password: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const result = await createUserWithEmailAndPassword(auth, email, password);
+      
+      sendAnalyticsEvent({
+        event_name: AnalyticsEvents.SIGN_UP,
+        event_category: 'Auth',
+        method: 'Email'
+      });
+      
+      toast.success('Account created successfully!');
+      return result;
+    } catch (error) {
+      console.error('Error signing up with email:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create account';
+      setError(errorMessage);
+      toast.error(errorMessage);
+      
+      sendAnalyticsEvent({
+        event_name: AnalyticsEvents.ERROR,
+        event_category: 'Auth',
+        error_message: errorMessage
+      });
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      await sendPasswordResetEmail(auth, email);
+      
+      sendAnalyticsEvent({
+        event_name: AnalyticsEvents.PASSWORD_RESET,
+        event_category: 'Auth'
+      });
+      
+      toast.success('Password reset email sent!');
+    } catch (error) {
+      console.error('Error sending password reset email:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to send password reset email';
+      setError(errorMessage);
+      toast.error(errorMessage);
+      
+      sendAnalyticsEvent({
+        event_name: AnalyticsEvents.ERROR,
+        event_category: 'Auth',
+        error_message: errorMessage
+      });
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -114,7 +213,6 @@ export const AuthContextProvider = ({
       setError(null);
       await signOut(auth);
       
-      // Track sign out event
       sendAnalyticsEvent({
         event_name: AnalyticsEvents.SIGN_OUT,
         event_category: 'Auth'
@@ -127,19 +225,29 @@ export const AuthContextProvider = ({
       setError(errorMessage);
       toast.error(errorMessage);
       
-      // Track error event
       sendAnalyticsEvent({
         event_name: AnalyticsEvents.ERROR,
         event_category: 'Auth',
         error_message: errorMessage
       });
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, signInWithGoogle, logout, userId }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      error, 
+      signInWithGoogle, 
+      signInWithEmail,
+      signUpWithEmail,
+      resetPassword,
+      logout, 
+      userId 
+    }}>
       {children}
     </AuthContext.Provider>
   );
