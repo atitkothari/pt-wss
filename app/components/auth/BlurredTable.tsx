@@ -1,11 +1,13 @@
 'use client';
 
 import { useAuth } from "@/app/context/AuthContext";
+import { useSubscription } from "@/app/context/SubscriptionContext";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Mail } from "lucide-react";
 import { useState } from "react";
 import { AuthModal } from "../modals/AuthModal";
+import { createCheckoutSession } from "@/app/lib/stripe";
 
 interface BlurredTableProps {
   children: React.ReactNode;
@@ -14,17 +16,25 @@ interface BlurredTableProps {
 }
 
 export const BlurredTable = ({ children, className, hasSearched = false }: BlurredTableProps) => {
-  const { user, loading, error, signInWithGoogle, sendVerificationEmail } = useAuth();
+  const { user, loading: authLoading, error, signInWithGoogle, sendVerificationEmail } = useAuth();
+  const { isTrialActive, daysLeftInTrial, isSubscribed, loading: subscriptionLoading } = useSubscription();
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const shouldBlur = hasSearched && (!user || !user.emailVerified);
+  const loading = authLoading || subscriptionLoading;
+  const shouldBlur = hasSearched && (!user || !user.emailVerified || (!isSubscribed && !isTrialActive));
 
   const handleResendVerification = async () => {
     try {
       await sendVerificationEmail();
-      // Show success toast or message
     } catch (error) {
-      // Handle error
       console.error('Failed to send verification email:', error);
+    }
+  };
+
+  const handleUpgrade = async () => {
+    try {
+      await createCheckoutSession(process.env.NEXT_PUBLIC_STRIPE_PRICE_ID!);
+    } catch (error) {
+      console.error('Failed to create checkout session:', error);
     }
   };
 
@@ -67,10 +77,10 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
               {!user ? (
                 <>
                   <h2 className="text-xl sm:text-2xl font-bold text-white">
-                    Sign in to see all results for FREE!
+                    Sign up for a 5-day free trial to see all results!
                   </h2>
                   <p className="text-sm sm:text-base text-gray-200 max-w-md">
-                    Get full access to all options data and screening capabilities by signing in with your Google account.
+                    Try the wheel strategy screener with all features. After your trial, continue for just $7.99/month (billed annually).
                   </p>
                   {error ? (
                     <div className="text-red-400 text-sm mb-2">
@@ -105,7 +115,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                         />
                       </svg>
                     )}
-                    {loading ? 'Signing in...' : 'Sign in with Google'}
+                    {loading ? 'Signing in...' : 'Start your free trial with Google'}
                   </Button>
                   <Button
                     onClick={() => setShowAuthModal(true)}
@@ -114,10 +124,10 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                     className="bg-white hover:bg-gray-100 text-gray-900 border-0 mt-2 flex items-center gap-2"
                   >
                     <Mail className="h-5 w-5" />
-                    Sign in with Email
+                    Start your free trial with Email
                   </Button>
                 </>
-              ) : (
+              ) : !user.emailVerified ? (
                 <>
                   <h2 className="text-xl sm:text-2xl font-bold text-white">
                     Verify your email to see all results!
@@ -132,6 +142,38 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                   >
                     <Mail className="h-5 w-5" />
                     Resend Verification Email
+                  </Button>
+                </>
+              ) : isTrialActive ? (
+                <>
+                  <h2 className="text-xl sm:text-2xl font-bold text-white">
+                    {daysLeftInTrial} {daysLeftInTrial === 1 ? 'day' : 'days'} left in your trial!
+                  </h2>
+                  <p className="text-sm sm:text-base text-gray-200 max-w-md">
+                    Upgrade now to continue using all features after your trial ends. Just $7.99/month (billed annually).
+                  </p>
+                  <Button
+                    onClick={handleUpgrade}
+                    size="lg"
+                    className="bg-white hover:bg-gray-100 text-gray-900 border-0 mt-2"
+                  >
+                    Upgrade Now
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-xl sm:text-2xl font-bold text-white">
+                    Your trial has ended
+                  </h2>
+                  <p className="text-sm sm:text-base text-gray-200 max-w-md">
+                    Upgrade to continue using all features. Just $7.99/month (billed annually).
+                  </p>
+                  <Button
+                    onClick={handleUpgrade}
+                    size="lg"
+                    className="bg-white hover:bg-gray-100 text-gray-900 border-0 mt-2"
+                  >
+                    Upgrade Now
                   </Button>
                 </>
               )}

@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google';
 import { Toaster } from "@/components/ui/sonner";
 import { GoogleAnalytics } from './components/GoogleAnalytics';
 import { AuthProvider } from './context/AuthContext';
+import { SubscriptionProvider } from './context/SubscriptionContext';
 import InstallPWA from './components/InstallPWA';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -85,11 +86,13 @@ export default function RootLayout({
         </noscript>
         <GoogleAnalytics />
         <AuthProvider>
-          <main>
-            {children}
-          </main>
-          <Toaster />
-          <InstallPWA />
+          <SubscriptionProvider>
+            <main>
+              {children}
+            </main>
+            <Toaster />
+            <InstallPWA />
+          </SubscriptionProvider>
         </AuthProvider>
       </body>
     </html>

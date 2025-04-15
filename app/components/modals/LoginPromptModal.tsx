@@ -25,7 +25,7 @@ export function LoginPromptModal({ isOpen, onClose }: LoginPromptModalProps) {
         <div className="flex flex-col items-center gap-6 py-6">
           <div className="text-center space-y-2">
             <p className="text-sm text-gray-600">
-              Unlock unlimited access to premium features, including real-time option data, advanced screening tools, and email alerts. Start your journey to smarter options trading today!
+              Try the wheel strategy screener with all features. After your trial, continue for just $7.99/month (billed annually).
             </p>
             <ul className="text-sm text-gray-600 list-disc list-inside">
               <li>Save your screeners</li>

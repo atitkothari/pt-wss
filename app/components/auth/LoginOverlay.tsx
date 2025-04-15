@@ -19,7 +19,7 @@ export const LoginOverlay = ({ hasSearched = false }: LoginOverlayProps) => {
           Sign up for a 5-day free trial
         </h2>
         <p className="text-gray-200 max-w-md">
-          Get instant access to powerful tools that help you find the best options trades. Join thousands of successful traders who use our platform daily!
+          Try the wheel strategy screener with all features. After your trial, continue for just $7.99/month (billed annually).
         </p>
         <Button
           onClick={() => signInWithGoogle()}
