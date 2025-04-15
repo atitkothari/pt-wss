@@ -308,8 +308,10 @@ export default function SavedScreenersPage() {
         <NavBar />
         <div className="max-w-screen-2xl mx-auto p-4">
           <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
-            <h1 className="text-2xl font-bold mb-4">Sign in to View Saved Screeners</h1>
-            <p className="text-gray-600 mb-6">Please sign in with your Google account to access your saved screeners.</p>
+            <h1 className="text-2xl font-bold mb-4">Sign up for a 5-day free trial</h1>
+            <p className="text-gray-600 mb-6">
+              Transform your options trading with our comprehensive suite of tools. Start your risk-free trial today and experience the difference!
+            </p>
             <Button
               onClick={signInWithGoogle}
               className="flex items-center gap-2 bg-white text-gray-900 hover:bg-gray-100 border border-gray-300"
@@ -332,7 +334,7 @@ export default function SavedScreenersPage() {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              Sign in with Google
+              Start your free trial now
             </Button>
           </div>
         </div>
