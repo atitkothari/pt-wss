@@ -77,7 +77,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
         />
         <div className={cn(
           "transition-all duration-300 h-full",
-          shouldBlur && "[&_tr:nth-child(n+12)]:blur-[3px] [&_tr:nth-child(n+12)]:pointer-events-none [&_tr:nth-child(n+12)]:select-none"
+          shouldBlur && "[&_tr:nth-child(n+12)]:blur-[1px] [&_tr:nth-child(n+12)]:pointer-events-none [&_tr:nth-child(n+12)]:select-none"
         )}>
           {children}
         </div>
@@ -86,27 +86,27 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
           <div 
             className="absolute inset-0 pointer-events-none" 
             style={{ 
-              background: 'linear-gradient(to bottom, transparent 200px, rgba(20, 24, 33, 0.95))',
+              background: 'linear-gradient(to bottom, transparent 200px, rgba(255, 255, 255, 0.85))',
             }}
           >
-            <div className="sticky top-0 flex flex-col items-center gap-4 p-4 sm:p-6 text-center bg-gradient-to-b from-[#1a1f2b] via-[#1a1f2b] to-transparent pointer-events-auto">
+            <div className="sticky top-0 flex flex-col items-center gap-4 p-4 sm:p-6 text-center bg-gradient-to-b from-white/90 via-white/90 to-transparent pointer-events-auto">
               {!user ? (
                 <>
-                  <h2 className="text-xl sm:text-2xl font-bold text-white">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                     Sign up for a 5-day free trial to see all results!
                   </h2>
-                  <p className="text-sm sm:text-base text-gray-200 max-w-md">
+                  <p className="text-sm sm:text-base text-gray-700 max-w-md">
                     Try the wheel strategy screener with all features. After your trial, continue for just $7.99/month (billed annually).
                   </p>
                   {error ? (
-                    <div className="text-red-400 text-sm mb-2">
+                    <div className="text-red-600 text-sm mb-2">
                       {error}. Please try again.
                     </div>
                   ) : null}
                   <Button
                     onClick={() => signInWithGoogle(() => setShowAuthModal(false))}
                     size="lg"
-                    className="w-full sm:w-auto bg-white hover:bg-gray-100 text-gray-900 border-0 mt-2 flex items-center gap-2 justify-center"
+                    className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white border-0 mt-2 flex items-center gap-2 justify-center"
                     disabled={loading}
                   >
                     {loading ? (
@@ -137,7 +137,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                     onClick={() => setShowAuthModal(true)}
                     size="lg"
                     variant="outline"
-                    className="w-full sm:w-auto bg-white hover:bg-gray-100 text-gray-900 border-0 mt-2 flex items-center gap-2 justify-center"
+                    className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white border-0 mt-2 flex items-center gap-2 justify-center"
                   >
                     <Mail className="h-5 w-5" />
                     Start your free trial with Email
@@ -145,17 +145,17 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                   
                   {/* Features List */}
                   <div className="mt-8 w-full max-w-4xl px-4">
-                    <h3 className="text-xl font-bold text-white mb-6">All Features Included</h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-6">All Features Included</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {features.map((feature, index) => (
                         <div 
                           key={index} 
-                          className="flex items-center gap-3 p-3 rounded-lg bg-[#1e2533] group"
+                          className="flex items-center gap-3 p-3 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors group"
                         >
-                          <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center">
-                            <Check className="h-3.5 w-3.5 text-green-400" />
+                          <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-500/10 flex items-center justify-center">
+                            <Check className="h-3.5 w-3.5 text-green-600" />
                           </div>
-                          <span className="text-sm text-white/90 group-hover:text-white transition-colors">{feature}</span>
+                          <span className="text-sm text-gray-700 group-hover:text-gray-900 transition-colors">{feature}</span>
                         </div>
                       ))}
                     </div>
@@ -163,7 +163,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                       <Link href="/pricing" className="inline-block">
                         <Button
                           size="lg"
-                          className="bg-white hover:bg-gray-100 text-gray-900 border-0 flex items-center gap-2 font-medium"
+                          className="bg-gray-900 hover:bg-gray-800 text-white border border-gray-300 flex items-center gap-2 font-medium"
                         >
                           View All Plans
                           <ExternalLink className="h-4 w-4" />
@@ -174,16 +174,16 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                 </>
               ) : !user.emailVerified ? (
                 <>
-                  <h2 className="text-xl sm:text-2xl font-bold text-white">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                     Verify your email to see all results!
                   </h2>
-                  <p className="text-sm sm:text-base text-gray-200 max-w-md">
+                  <p className="text-sm sm:text-base text-gray-700 max-w-md">
                     Please check your inbox for the verification link. Haven't received it?
                   </p>
                   <Button
                     onClick={handleResendVerification}
                     size="lg"
-                    className="bg-white hover:bg-gray-100 text-gray-900 border-0 mt-2 flex items-center gap-2"
+                    className="bg-gray-900 hover:bg-gray-800 text-white border-0 mt-2 flex items-center gap-2"
                   >
                     <Mail className="h-5 w-5" />
                     Resend Verification Email
@@ -191,32 +191,32 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                 </>
               ) : isTrialActive ? (
                 <>
-                  <h2 className="text-xl sm:text-2xl font-bold text-white">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                     {daysLeftInTrial} {daysLeftInTrial === 1 ? 'day' : 'days'} left in your trial!
                   </h2>
-                  <p className="text-sm sm:text-base text-gray-200 max-w-md">
+                  <p className="text-sm sm:text-base text-gray-700 max-w-md">
                     Upgrade now to continue using all features after your trial ends. Just $7.99/month (billed annually).
                   </p>
                   <Button
                     onClick={handleUpgrade}
                     size="lg"
-                    className="bg-white hover:bg-gray-100 text-gray-900 border-0 mt-2"
+                    className="bg-gray-900 hover:bg-gray-800 text-white border-0 mt-2"
                   >
                     Upgrade Now
                   </Button>
                 </>
               ) : (
                 <>
-                  <h2 className="text-xl sm:text-2xl font-bold text-white">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                     Your trial has ended
                   </h2>
-                  <p className="text-sm sm:text-base text-gray-200 max-w-md">
+                  <p className="text-sm sm:text-base text-gray-700 max-w-md">
                     Upgrade to continue using all features. Just $7.99/month (billed annually).
                   </p>
                   <Button
                     onClick={handleUpgrade}
                     size="lg"
-                    className="bg-white hover:bg-gray-100 text-gray-900 border-0 mt-2"
+                    className="bg-gray-900 hover:bg-gray-800 text-white border-0 mt-2"
                   >
                     Upgrade Now
                   </Button>
