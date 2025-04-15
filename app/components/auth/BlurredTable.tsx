@@ -4,10 +4,11 @@ import { useAuth } from "@/app/context/AuthContext";
 import { useSubscription } from "@/app/context/SubscriptionContext";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Mail, Check } from "lucide-react";
+import { Mail, Check, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { AuthModal } from "../modals/AuthModal";
 import { createCheckoutSession } from "@/app/lib/stripe";
+import Link from "next/link";
 
 interface BlurredTableProps {
   children: React.ReactNode;
@@ -157,6 +158,17 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                           <span className="text-sm text-white/90 group-hover:text-white transition-colors">{feature}</span>
                         </div>
                       ))}
+                    </div>
+                    <div className="mt-8 flex justify-center">
+                      <Link href="/pricing" className="inline-block">
+                        <Button
+                          size="lg"
+                          className="bg-white hover:bg-gray-100 text-gray-900 border-0 flex items-center gap-2 font-medium"
+                        >
+                          View All Plans
+                          <ExternalLink className="h-4 w-4" />
+                        </Button>
+                      </Link>
                     </div>
                   </div>
                 </>
