@@ -9,6 +9,7 @@ import { LoginButton } from '../auth/LoginButton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/app/context/AuthContext';
 
 // Custom DialogContent without the automatic close button
 const DialogContent = React.forwardRef<
@@ -41,6 +42,8 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signin' }: AuthModal
   const [mode, setMode] = React.useState<'signin' | 'signup' | 'reset'>(initialMode);
   const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+  const [needsVerification, setNeedsVerification] = React.useState(false);
+  const { sendVerificationEmail } = useAuth();
 
   // Reset all state when modal closes
   React.useEffect(() => {
@@ -48,6 +51,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signin' }: AuthModal
       setMode(initialMode);
       setSuccessMessage(null);
       setError(null);
+      setNeedsVerification(false);
     }
   }, [isOpen, initialMode]);
 
@@ -59,9 +63,9 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signin' }: AuthModal
         onClose();
       }, 3000);
     } else if (mode === 'signup') {
-      setSuccessMessage('Account created successfully! You can now sign in.');
+      setSuccessMessage('Account created! Please check your email to verify your account.');
       setError(null);
-      setMode('signin');
+      setNeedsVerification(true);
     } else {
       setSuccessMessage('Successfully signed in! Redirecting...');
       setError(null);
@@ -79,6 +83,18 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signin' }: AuthModal
       setMode('signup');
     } else if (errorMessage.includes('Incorrect password')) {
       setMode('reset');
+    } else if (errorMessage.includes('verify your email')) {
+      setNeedsVerification(true);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    try {
+      await sendVerificationEmail();
+      setSuccessMessage('Verification email sent! Please check your inbox.');
+      setError(null);
+    } catch (error) {
+      setError('Failed to send verification email. Please try again.');
     }
   };
 
@@ -139,76 +155,101 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signin' }: AuthModal
             </Alert>
           )}
 
-          {mode === 'signin' && (
+          {needsVerification ? (
             <div className="space-y-4">
-              <LoginButton />
-              
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">
-                    Or continue with email
-                  </span>
-                </div>
+              <Alert className="text-sm bg-blue-50 text-blue-700 border-blue-200">
+                <AlertDescription>
+                  Please verify your email address to continue. Check your inbox for the verification link.
+                </AlertDescription>
+              </Alert>
+              <div className="text-center">
+                <Button
+                  variant="outline"
+                  onClick={handleResendVerification}
+                  className="text-sm"
+                >
+                  Resend verification email
+                </Button>
               </div>
             </div>
+          ) : (
+            <>
+              {mode === 'signin' && (
+                <div className="space-y-4">
+                  <LoginButton />
+                  
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-background px-2 text-muted-foreground">
+                        Or continue with email
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <EmailAuthForm 
+                mode={mode} 
+                onSuccess={handleSuccess}
+                onError={handleError}
+              />
+            </>
           )}
 
-          <EmailAuthForm 
-            mode={mode} 
-            onSuccess={handleSuccess}
-            onError={handleError}
-          />
-
           <div className="text-center text-sm space-y-2">
-            {mode === 'signin' && (
+            {!needsVerification && (
               <>
-                <div>
-                  <span className="text-muted-foreground">Don't have an account? </span>
-                  <Button
-                    variant="link"
-                    className="p-0 h-auto font-semibold"
-                    onClick={() => handleModeChange('signup')}
-                  >
-                    Sign up
-                  </Button>
-                </div>
-                <div>
-                  <Button
-                    variant="link"
-                    className="p-0 h-auto text-gray-500 hover:text-gray-700"
-                    onClick={() => handleModeChange('reset')}
-                  >
-                    Forgot password?
-                  </Button>
-                </div>
+                {mode === 'signin' && (
+                  <>
+                    <div>
+                      <span className="text-muted-foreground">Don't have an account? </span>
+                      <Button
+                        variant="link"
+                        className="p-0 h-auto font-semibold"
+                        onClick={() => handleModeChange('signup')}
+                      >
+                        Sign up
+                      </Button>
+                    </div>
+                    <div>
+                      <Button
+                        variant="link"
+                        className="p-0 h-auto text-gray-500 hover:text-gray-700"
+                        onClick={() => handleModeChange('reset')}
+                      >
+                        Forgot password?
+                      </Button>
+                    </div>
+                  </>
+                )}
+                {mode === 'signup' && (
+                  <div>
+                    <span className="text-muted-foreground">Already have an account? </span>
+                    <Button
+                      variant="link"
+                      className="p-0 h-auto font-semibold"
+                      onClick={() => handleModeChange('signin')}
+                    >
+                      Sign in
+                    </Button>
+                  </div>
+                )}
+                {mode === 'reset' && (
+                  <div>
+                    <span className="text-muted-foreground">Remember your password? </span>
+                    <Button
+                      variant="link"
+                      className="p-0 h-auto font-semibold"
+                      onClick={() => handleModeChange('signin')}
+                    >
+                      Sign in
+                    </Button>
+                  </div>
+                )}
               </>
-            )}
-            {mode === 'signup' && (
-              <div>
-                <span className="text-muted-foreground">Already have an account? </span>
-                <Button
-                  variant="link"
-                  className="p-0 h-auto font-semibold"
-                  onClick={() => handleModeChange('signin')}
-                >
-                  Sign in
-                </Button>
-              </div>
-            )}
-            {mode === 'reset' && (
-              <div>
-                <span className="text-muted-foreground">Remember your password? </span>
-                <Button
-                  variant="link"
-                  className="p-0 h-auto font-semibold"
-                  onClick={() => handleModeChange('signin')}
-                >
-                  Sign in
-                </Button>
-              </div>
             )}
           </div>
         </div>

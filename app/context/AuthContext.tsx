@@ -10,44 +10,45 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
-  UserCredential
+  sendEmailVerification,
+  UserCredential,
+  Auth
 } from 'firebase/auth';
 import { auth } from '../config/firebase';
 import { toast } from "sonner";
 import { subscribeToGhost } from '../services/queryService';
 import { sendAnalyticsEvent, AnalyticsEvents } from '../utils/analytics';
+import { FirebaseError } from 'firebase/app';
 
-interface AuthContextType {
-  user: User | null;  
+export interface AuthContextType {
+  user: User | null;
   loading: boolean;
   error: string | null;
   signInWithGoogle: () => Promise<UserCredential | undefined>;
-  signInWithEmail: (email: string, password: string) => Promise<UserCredential>;
-  signUpWithEmail: (email: string, password: string) => Promise<UserCredential>;
+  signInWithEmail: (email: string, password: string) => Promise<UserCredential | undefined>;
+  signUpWithEmail: (email: string, password: string) => Promise<UserCredential | undefined>;
   resetPassword: (email: string) => Promise<void>;
   logout: () => Promise<void>;
+  sendVerificationEmail: () => Promise<void>;
   userId: string | null;
 }
 
-const AuthContext = createContext<AuthContextType>({
+export const AuthContext = createContext<AuthContextType>({
   user: null,
-  loading: true,
+  loading: false,
   error: null,
   signInWithGoogle: async () => undefined,
-  signInWithEmail: async () => { throw new Error('Not implemented') },
-  signUpWithEmail: async () => { throw new Error('Not implemented') },
+  signInWithEmail: async () => undefined,
+  signUpWithEmail: async () => undefined,
   resetPassword: async () => {},
   logout: async () => {},
+  sendVerificationEmail: async () => {},
   userId: null
 });
 
 export const useAuth = () => useContext(AuthContext);
 
-export const AuthContextProvider = ({ 
-  children 
-}: { 
-  children: React.ReactNode 
-}) => {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -122,6 +123,10 @@ export const AuthContextProvider = ({
       setError(null);
       const result = await signInWithEmailAndPassword(auth, email, password);
       
+      if (!result.user.emailVerified) {
+        throw new Error('Please verify your email address before signing in. Check your inbox for the verification link.');
+      }
+      
       sendAnalyticsEvent({
         event_name: AnalyticsEvents.SIGN_IN,
         event_category: 'Auth',
@@ -131,17 +136,9 @@ export const AuthContextProvider = ({
       toast.success('Successfully signed in!');
       return result;
     } catch (error) {
-      console.error('Error signing in with email:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to sign in with email';
-      setError(errorMessage);
-      toast.error(errorMessage);
-      
-      sendAnalyticsEvent({
-        event_name: AnalyticsEvents.ERROR,
-        event_category: 'Auth',
-        error_message: errorMessage
-      });
-      throw error;
+      const e = error as FirebaseError;
+      setError(e.message);
+      throw e;
     } finally {
       setLoading(false);
     }
@@ -153,6 +150,11 @@ export const AuthContextProvider = ({
       setError(null);
       const result = await createUserWithEmailAndPassword(auth, email, password);
       
+      // Send verification email
+      await sendEmailVerification(result.user, {
+        url: window.location.origin + '/auth/verify-email?redirect=/',
+      });
+      
       sendAnalyticsEvent({
         event_name: AnalyticsEvents.SIGN_UP,
         event_category: 'Auth',
@@ -162,17 +164,9 @@ export const AuthContextProvider = ({
       toast.success('Account created successfully!');
       return result;
     } catch (error) {
-      console.error('Error signing up with email:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to create account';
-      setError(errorMessage);
-      toast.error(errorMessage);
-      
-      sendAnalyticsEvent({
-        event_name: AnalyticsEvents.ERROR,
-        event_category: 'Auth',
-        error_message: errorMessage
-      });
-      throw error;
+      const e = error as FirebaseError;
+      setError(e.message);
+      throw e;
     } finally {
       setLoading(false);
     }
@@ -236,19 +230,40 @@ export const AuthContextProvider = ({
     }
   };
 
+  const sendVerificationEmail = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      if (user && !user.emailVerified) {
+        await sendEmailVerification(user, {
+          url: window.location.origin + '/auth/verify-email?redirect=/',
+        });
+      }
+    } catch (error) {
+      const e = error as FirebaseError;
+      setError(e.message);
+      throw e;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      loading, 
-      error, 
-      signInWithGoogle, 
-      signInWithEmail,
-      signUpWithEmail,
-      resetPassword,
-      logout, 
-      userId 
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        error,
+        signInWithGoogle,
+        signInWithEmail,
+        signUpWithEmail,
+        resetPassword,
+        logout,
+        sendVerificationEmail,
+        userId
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
-};
+}
