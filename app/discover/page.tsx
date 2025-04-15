@@ -503,7 +503,7 @@ export default function TrendingPage() {
                           <h2 className="text-xl font-bold text-white mb-2">Sign in to view High Yield data</h2>
                           <p className="text-gray-200 max-w-md mb-4">Get full access to premium yield data by signing in with your Google account.</p>
                           <Button
-                            onClick={signInWithGoogle}
+                            onClick={()=>signInWithGoogle()}
                             size="lg"
                             className="bg-white hover:bg-gray-100 text-gray-900 border-0"
                           >
@@ -524,7 +524,7 @@ export default function TrendingPage() {
                           <h2 className="text-xl font-bold text-white mb-2">Sign in to view Earnings data</h2>
                           <p className="text-gray-200 max-w-md mb-4">Get full access to earnings data by signing in with your Google account.</p>
                           <Button
-                            onClick={signInWithGoogle}
+                            onClick={()=>signInWithGoogle()}
                             size="lg"
                             className="bg-white hover:bg-gray-100 text-gray-900 border-0"
                           >
@@ -565,7 +565,7 @@ export default function TrendingPage() {
                           <h2 className="text-xl font-bold text-white mb-2">Sign in to view High Yield data</h2>
                           <p className="text-gray-200 max-w-md mb-4">Get full access to premium yield data by signing in with your Google account.</p>
                           <Button
-                            onClick={signInWithGoogle}
+                            onClick={()=>signInWithGoogle()}
                             size="lg"
                             className="bg-white hover:bg-gray-100 text-gray-900 border-0"
                           >
@@ -586,7 +586,7 @@ export default function TrendingPage() {
                           <h2 className="text-xl font-bold text-white mb-2">Sign in to view Earnings data</h2>
                           <p className="text-gray-200 max-w-md mb-4">Get full access to earnings data by signing in with your Google account.</p>
                           <Button
-                            onClick={signInWithGoogle}
+                            onClick={()=>signInWithGoogle()}
                             size="lg"
                             className="bg-white hover:bg-gray-100 text-gray-900 border-0"
                           >

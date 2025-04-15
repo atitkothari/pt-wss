@@ -313,7 +313,7 @@ export default function SavedScreenersPage() {
               Transform your options trading with our comprehensive suite of tools. Start your risk-free trial today and experience the difference!
             </p>
             <Button
-              onClick={signInWithGoogle}
+              onClick={()=>signInWithGoogle()}
               className="flex items-center gap-2 bg-white text-gray-900 hover:bg-gray-100 border border-gray-300"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
