@@ -24,6 +24,8 @@ export const AnalyticsEvents = {
   // Auth events
   SIGN_IN: 'sign_in',
   SIGN_OUT: 'sign_out',
+  SIGN_UP: 'sign_up',
+  PASSWORD_RESET: 'password_reset',
   
   // Navigation events
   PAGE_VIEW: 'page_view',

@@ -22,7 +22,7 @@ export const LoginOverlay = ({ hasSearched = false }: LoginOverlayProps) => {
           Get instant access to powerful tools that help you find the best options trades. Join thousands of successful traders who use our platform daily!
         </p>
         <Button
-          onClick={signInWithGoogle}
+          onClick={() => signInWithGoogle()}
           size="lg"
           className="bg-white hover:bg-gray-100 text-gray-900 border-0"
         >

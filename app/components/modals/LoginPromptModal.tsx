@@ -35,7 +35,7 @@ export function LoginPromptModal({ isOpen, onClose }: LoginPromptModalProps) {
           </div>
           
           <Button
-            onClick={signInWithGoogle}
+            onClick={() => signInWithGoogle(onClose)}
             className="w-full"
           >
             Start your free trial now
