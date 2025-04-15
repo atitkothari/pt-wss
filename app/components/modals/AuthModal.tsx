@@ -67,6 +67,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signin' }: AuthModal
       setError(null);
       setNeedsVerification(true);
     } else {
+      console.log('Successfully signed in! Redirecting...');
       setSuccessMessage('Successfully signed in! Redirecting...');
       setError(null);
       setTimeout(() => {
@@ -176,7 +177,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signin' }: AuthModal
             <>
               {mode === 'signin' && (
                 <div className="space-y-4">
-                  <LoginButton />
+                  <LoginButton onClose={onClose} />
                   
                   <div className="relative">
                     <div className="absolute inset-0 flex items-center">

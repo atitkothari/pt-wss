@@ -4,7 +4,11 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/app/context/AuthContext";
 import { useState } from "react";
 
-export const LoginButton = () => {
+interface LoginButtonProps {
+  onClose: () => void;
+}
+
+export const LoginButton = ({ onClose }: LoginButtonProps) => {
   const { signInWithGoogle, loading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -12,6 +16,7 @@ export const LoginButton = () => {
     setIsLoading(true);
     try {
       await signInWithGoogle();
+      onClose();
     } catch (error) {
       console.error('Google sign-in error:', error);
     } finally {

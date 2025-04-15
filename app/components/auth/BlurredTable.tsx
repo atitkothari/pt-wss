@@ -78,7 +78,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                     </div>
                   ) : null}
                   <Button
-                    onClick={() => signInWithGoogle()}
+                    onClick={() => signInWithGoogle(() => setShowAuthModal(false))}
                     size="lg"
                     className="bg-white hover:bg-gray-100 text-gray-900 border-0 mt-2 flex items-center gap-2"
                     disabled={loading}
