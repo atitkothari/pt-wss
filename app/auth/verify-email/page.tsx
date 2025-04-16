@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { applyActionCode } from 'firebase/auth';
-import { auth } from '@/app/config/firebase';
+import { auth } from '@/app/lib/firebase';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export default function VerifyEmail() {

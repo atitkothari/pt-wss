@@ -36,7 +36,6 @@ import { format } from 'date-fns';
 import { defaultScreeners } from '../config/defaultScreeners';
 import { EditScreenerModal } from '../components/modals/EditScreenerModal';
 import { screenerService } from '../services/screenerService';
-import { auth } from '../config/firebase';
 
 export default function SavedScreenersPage() {
   const { user, signInWithGoogle, userId } = useAuth();
