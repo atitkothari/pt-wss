@@ -112,7 +112,7 @@ export default function PricingPage() {
               </CardDescription>
               <div className="flex items-center justify-center gap-1 md:gap-2">
                 <span className="text-3xl md:text-4xl font-bold text-gray-900">
-                  ${isYearly ? '89' : '9'}
+                  ${isYearly ? '84' : '9'}
                 </span>
                 <span className="text-gray-600 text-base md:text-lg">
                   /{isYearly ? 'year' : 'month'}
@@ -120,7 +120,7 @@ export default function PricingPage() {
               </div>
               {isYearly && (
                 <p className="text-green-600 text-xs md:text-sm mt-2">
-                  $7.42/month, billed annually
+                  $7/month, billed annually
                 </p>
               )}
             </CardHeader>

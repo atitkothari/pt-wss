@@ -32,7 +32,7 @@ export async function POST(req: Request) {
 
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: userData.stripeCustomerId,
-      return_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard`,
+      return_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://wheelstrategyoptions.com'}/covered-call-screener`,
     });
 
     return NextResponse.json({ url: portalSession.url });

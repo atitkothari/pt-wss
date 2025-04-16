@@ -68,24 +68,13 @@ export async function POST(req: Request) {
         console.log("Created new Stripe customer:", customerId);
       }
       
-      // Use predefined price IDs from environment variables if available
-      let priceId = isYearly ? YEARLY_PRICE_ID : MONTHLY_PRICE_ID;
+      // Use fixed price IDs from environment variables
+      const priceId = isYearly ? YEARLY_PRICE_ID : MONTHLY_PRICE_ID;
       
+      // Check if price ID exists
       if (!priceId) {
-        console.log("Price ID not found in environment variables, creating dynamic price");
-        
-        // Create dynamic price if not available in environment
-        const priceData: Stripe.PriceCreateParams = {
-          product: process.env.STRIPE_PRODUCT_ID || 'prod_S8eKRMGXxohK3M',
-          currency: 'usd',
-          recurring: {
-            interval: isYearly ? 'year' : 'month' as Stripe.PriceCreateParams.Recurring.Interval,
-          },
-          unit_amount: isYearly ? 8900 : 900, // $89/year or $9/month
-        };
-
-        const price = await stripe.prices.create(priceData);
-        priceId = price.id;
+        console.error("Price ID not found in environment variables");
+        return new NextResponse('Price ID not configured. Please contact support.', { status: 500 });
       }
 
       // Create checkout session
@@ -101,7 +90,7 @@ export async function POST(req: Request) {
         subscription_data: {
           trial_period_days: 5,
         },
-        success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/covered-call-screener?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/pricing`,
         allow_promotion_codes: true,
         metadata: {
