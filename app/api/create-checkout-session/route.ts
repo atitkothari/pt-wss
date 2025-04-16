@@ -78,6 +78,7 @@ export async function POST(req: Request) {
       }
 
       // Create checkout session
+      //on trial end pause subscription
       const checkoutSession = await stripe.checkout.sessions.create({
         customer: customerId,
         line_items: [
@@ -90,6 +91,7 @@ export async function POST(req: Request) {
         subscription_data: {
           trial_period_days: 5,
         },
+        payment_method_collection: 'if_required',
         success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/covered-call-screener?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/pricing`,
         allow_promotion_codes: true,
