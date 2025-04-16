@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { db } from '@/app/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { adminDb } from '@/app/lib/firebase-admin';
 import { headers } from 'next/headers';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -22,8 +21,14 @@ export async function POST(req: Request) {
     
     console.log("Using Firebase auth user:", userId);
 
-    const userRef = doc(db, 'users', userId);
-    const userDoc = await getDoc(userRef);
+    // Use adminDb instead of client-side db
+    const userRef = adminDb.collection('users').doc(userId);
+    const userDoc = await userRef.get();
+    
+    if (!userDoc.exists) {
+      return new NextResponse('User not found', { status: 404 });
+    }
+    
     const userData = userDoc.data();
 
     if (!userData?.stripeCustomerId) {

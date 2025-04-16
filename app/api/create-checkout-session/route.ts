@@ -50,7 +50,7 @@ export async function POST(req: Request) {
         });
         customerId = customer.id;
         
-        // Update or create user document with Stripe customer ID
+        // Update or create user document with Stripe customer ID        
         if (userDoc.exists) {
           await userRef.update({ 
             stripeCustomerId: customerId,

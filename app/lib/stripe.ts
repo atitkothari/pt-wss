@@ -73,6 +73,8 @@ export async function createCustomerPortalSession() {
       email: currentUser.email
     };
     
+    console.log('Creating portal session for user:', currentUser.uid);
+    
     const response = await fetch('/api/create-portal-session', {
       method: 'POST',
       headers: {
@@ -83,13 +85,26 @@ export async function createCustomerPortalSession() {
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Failed to create portal session: ${errorText}`);
+      console.error('Portal session error response:', response.status, errorText);
+      
+      if (response.status === 400) {
+        throw new Error('You don\'t have an active subscription to manage');
+      } else if (response.status === 404) {
+        throw new Error('User profile not found. Please sign out and sign in again.');
+      } else {
+        throw new Error(`Failed to create portal session: ${errorText}`);
+      }
     }
 
-    const { url } = await response.json();
-    window.location.href = url;
+    const data = await response.json();
+    
+    if (!data.url) {
+      throw new Error('Invalid response from server: missing URL');
+    }
+    
+    window.location.href = data.url;
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error creating portal session:', error);
     throw error;
   }
 } 

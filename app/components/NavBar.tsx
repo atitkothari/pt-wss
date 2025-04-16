@@ -1,12 +1,21 @@
 "use client";
 
-import { Menu, X, LogOut, ChevronDown } from "lucide-react";
+import { Menu, X, LogOut, ChevronDown, CreditCard, User, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import { sendAnalyticsEvent, AnalyticsEvents } from '../utils/analytics';
 import { AuthModal } from './modals/AuthModal';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { createCustomerPortalSession } from "@/app/lib/stripe";
 
 export function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -42,6 +51,15 @@ export function NavBar() {
       page_path: href,
       is_external: external
     });
+  };
+
+  const handleManageSubscription = async () => {
+    try {
+      await createCustomerPortalSession();
+    } catch (error) {
+      console.error('Error opening Stripe portal:', error);
+      alert(error instanceof Error ? error.message : 'Failed to open subscription management. Please try again later.');
+    }
   };
 
   return (
@@ -119,14 +137,40 @@ export function NavBar() {
           
           <div className="flex items-center gap-4">            
             {loading ? null : user ? (
-              <Button
-                onClick={handleLogout}
-                variant="outline"
-                className="bg-white/10 text-white hover:bg-white/20 border-white/20 transition-colors"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
-              </Button>
+              <div className="flex items-center gap-4">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="bg-white/10 text-white hover:bg-white/20 border-white/20 transition-colors flex items-center gap-2">
+                      {user.photoURL ? (
+                        <img 
+                          src={user.photoURL} 
+                          alt={user.displayName || user.email || 'User'} 
+                          className="h-6 w-6 rounded-full" 
+                        />
+                      ) : (
+                        <User className="h-4 w-4" />
+                      )}
+                      <span className="max-w-[100px] truncate">
+                        {user.displayName || user.email || 'User'}
+                      </span>
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleManageSubscription} className="cursor-pointer">
+                      <CreditCard className="mr-2 h-4 w-4" />
+                      <span>Manage Subscription</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Sign Out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             ) : (
               <Button
                 onClick={() => setIsAuthModalOpen(true)}
@@ -206,14 +250,38 @@ export function NavBar() {
             </div>
             
             {loading ? null : user ? (
-              <Button
-                variant="outline"
-                onClick={handleLogout}
-                className="bg-white/10 text-white hover:bg-white/20 border-white/20 w-full transition-colors"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                <span>Log out</span>
-              </Button>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 pb-2">
+                  {user.photoURL ? (
+                    <img 
+                      src={user.photoURL} 
+                      alt={user.displayName || user.email || 'User'} 
+                      className="h-8 w-8 rounded-full" 
+                    />
+                  ) : (
+                    <User className="h-6 w-6 text-white" />
+                  )}
+                  <div className="text-white font-medium truncate">
+                    {user.displayName || user.email || 'User'}
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={handleManageSubscription}
+                  className="bg-white/10 text-white hover:bg-white/20 border-white/20 w-full transition-colors flex items-center"
+                >
+                  <CreditCard className="h-4 w-4 mr-2" />
+                  <span>Manage Subscription</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleLogout}
+                  className="bg-white/10 text-white hover:bg-white/20 border-white/20 w-full transition-colors flex items-center"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  <span>Log out</span>
+                </Button>
+              </div>
             ) : (
               <Button
                 onClick={() => {
