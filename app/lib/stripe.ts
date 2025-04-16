@@ -1,4 +1,5 @@
 import { loadStripe } from '@stripe/stripe-js';
+import { auth } from './firebase';
 
 let stripePromise: Promise<any> | null = null;
 
@@ -11,18 +12,33 @@ const getStripe = () => {
   return stripePromise;
 };
 
-export async function createCheckoutSession(priceId: string) {
+export async function createCheckoutSession(isYearly: boolean = true) {
   try {
+    // Get current Firebase user
+    const currentUser = auth.currentUser;
+    
+    if (!currentUser) {
+      throw new Error('You must be logged in to start a subscription');
+    }
+    
+    // Include Firebase user info
+    const body = { 
+      userId: currentUser.uid,
+      email: currentUser.email,
+      isYearly 
+    };
+    
     const response = await fetch('/api/create-checkout-session', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ priceId }),
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to create checkout session');
+      const errorText = await response.text();
+      throw new Error(`Failed to create checkout session: ${errorText}`);
     }
 
     const { sessionId } = await response.json();
@@ -44,12 +60,30 @@ export async function createCheckoutSession(priceId: string) {
 
 export async function createCustomerPortalSession() {
   try {
+    // Get current Firebase user
+    const currentUser = auth.currentUser;
+    
+    if (!currentUser) {
+      throw new Error('You must be logged in to manage your subscription');
+    }
+    
+    // Include Firebase user info
+    const body = {
+      userId: currentUser.uid,
+      email: currentUser.email
+    };
+    
     const response = await fetch('/api/create-portal-session', {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to create portal session');
+      const errorText = await response.text();
+      throw new Error(`Failed to create portal session: ${errorText}`);
     }
 
     const { url } = await response.json();

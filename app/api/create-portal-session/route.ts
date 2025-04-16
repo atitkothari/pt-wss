@@ -1,22 +1,28 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/lib/auth';
 import { db } from '@/app/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
+import { headers } from 'next/headers';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-03-31.basil',
 });
 
-export async function POST() {
+export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return new NextResponse('Unauthorized', { status: 401 });
+    // Get user info from request body since we're only using Firebase Auth
+    const body = await req.json();
+    const { userId } = body;
+    
+    // Check if we have a userId (required)
+    if (!userId) {
+      console.error("No user ID provided in request");
+      return new NextResponse('Unauthorized - No user ID provided', { status: 401 });
     }
+    
+    console.log("Using Firebase auth user:", userId);
 
-    const userRef = doc(db, 'users', session.user.email);
+    const userRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userRef);
     const userData = userDoc.data();
 
@@ -26,12 +32,12 @@ export async function POST() {
 
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: userData.stripeCustomerId,
-      return_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+      return_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard`,
     });
 
     return NextResponse.json({ url: portalSession.url });
   } catch (error) {
     console.error('Error creating portal session:', error);
-    return new NextResponse('Internal Server Error', { status: 500 });
+    return new NextResponse(`Internal Server Error: ${error instanceof Error ? error.message : 'Unknown error'}`, { status: 500 });
   }
 } 

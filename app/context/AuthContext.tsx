@@ -14,7 +14,7 @@ import {
   UserCredential,
   Auth
 } from 'firebase/auth';
-import { auth } from '../config/firebase';
+import { auth } from '../lib/firebase';
 import { toast } from "sonner";
 import { subscribeToGhost } from '../services/queryService';
 import { sendAnalyticsEvent, AnalyticsEvents } from '../utils/analytics';

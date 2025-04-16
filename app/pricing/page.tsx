@@ -32,12 +32,7 @@ export default function PricingPage() {
       }
 
       // Create checkout session with the selected plan
-      const priceId = isYearly ? YEARLY_PRICE_ID : MONTHLY_PRICE_ID;
-      if (!priceId) {
-        throw new Error('Price ID not found');
-      }
-      
-      await createCheckoutSession(priceId);
+      await createCheckoutSession(isYearly);
     } catch (error) {
       console.error('Error starting trial:', error);
       alert('Something went wrong. Please try again.');

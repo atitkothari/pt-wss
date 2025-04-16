@@ -48,7 +48,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
 
   const handleUpgrade = async () => {
     try {
-      await createCheckoutSession(process.env.NEXT_PUBLIC_STRIPE_PRICE_ID!);
+      await createCheckoutSession(true);
     } catch (error) {
       console.error('Failed to create checkout session:', error);
     }
