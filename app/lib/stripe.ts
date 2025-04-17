@@ -21,11 +21,11 @@ export async function createCheckoutSession(isYearly: boolean = true) {
       throw new Error('You must be logged in to start a subscription');
     }
     
-    // Include Firebase user info
+    // Include Firebase user info and selected price ID
     const body = { 
       userId: currentUser.uid,
       email: currentUser.email,
-      isYearly 
+      priceId: isYearly ? 'price_1REN1Q3yMAAql0611lQHDtI4' : 'price_1REN1Q3yMAAql061nAm7A0tN'
     };
     
     const response = await fetch('/api/create-checkout-session', {

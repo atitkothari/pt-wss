@@ -19,6 +19,8 @@ import { toast } from "sonner";
 import { subscribeToGhost } from '../services/queryService';
 import { sendAnalyticsEvent, AnalyticsEvents } from '../utils/analytics';
 import { FirebaseError } from 'firebase/app';
+import { db } from '../lib/firebase';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 export interface AuthContextType {
   user: User | null;
@@ -54,12 +56,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null); 
 
+  // Function to ensure a user document exists in Firestore
+  const ensureUserDocumentExists = async (user: User) => {
+    
+    // try {
+    //   const userRef = doc(db, 'users', user.uid);
+    //   const userDoc = await getDoc(userRef);
+      
+    //   if (!userDoc.exists()) {
+    //     // Create a new user document if it doesn't exist
+    //     await setDoc(userRef, {
+    //       email: user.email,
+    //       displayName: user.displayName,
+    //       photoURL: user.photoURL,
+    //       createdAt: new Date(),
+    //       subscriptionStatus: 'inactive',
+    //       lastSignInTime: new Date()
+    //     }, { merge: true }); // Use merge in case document exists but wasn't found
+        
+    //     console.log('Created new user document in Firestore');
+    //   } else {
+    //     // Update last sign in time if the document already exists
+    //     await setDoc(userRef, {
+    //       lastSignInTime: new Date()
+    //     }, { merge: true });
+    //   }
+    // } catch (err) {
+    //   console.error('Error ensuring user document exists:', err);
+    // }
+  };
+
   useEffect(() => {
     try {
       const unsubscribe = onAuthStateChanged(auth, (user) => {
         if (user) {
           setUser(user);
           setUserId(user.uid);
+          
+          // Ensure the user document exists in Firestore
+          ensureUserDocumentExists(user);
+          
           if (typeof window !== 'undefined' && 'gtag' in window) {
             ((window as any).gtag)('set', { user_id: user.uid });
           }
@@ -91,6 +127,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setError(null);
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
+      
+      // Ensure user document exists after successful sign-in
+      await ensureUserDocumentExists(result.user);
       
       sendAnalyticsEvent({
         event_name: AnalyticsEvents.SIGN_IN,
@@ -128,6 +167,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error('Please verify your email address before signing in. Check your inbox for the verification link.');
       }
       
+      // Ensure user document exists after successful sign-in
+      await ensureUserDocumentExists(result.user);
+      
       sendAnalyticsEvent({
         event_name: AnalyticsEvents.SIGN_IN,
         event_category: 'Auth',
@@ -150,6 +192,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(true);
       setError(null);
       const result = await createUserWithEmailAndPassword(auth, email, password);
+      
+      // Create user document in Firestore for the new user
+      await ensureUserDocumentExists(result.user);
       
       // Send verification email
       await sendEmailVerification(result.user, {

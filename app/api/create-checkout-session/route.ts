@@ -20,6 +20,16 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { userId, email: userEmail, isYearly } = body;
     
+    //read customer collection from firebase
+    const customerRef = adminDb.collection('customers').doc(userId);
+    const customerDoc = await customerRef.get();
+    
+    const stripeId = customerDoc.data()?.stripeId;
+    
+    if (!customerDoc.exists) {
+      console.error("Customer document not found in Firebase");
+      return new NextResponse('Unauthorized - Customer document not found', { status: 401 });
+    }
     // Check if we have a userId (required)
     if (!userId) {
       console.error("No user ID provided in request");
@@ -29,58 +39,17 @@ export async function POST(req: Request) {
     console.log("Processing checkout for Firebase user:", userId);
     
     try {
-      // Get or create user document in Firestore using Admin SDK
-      const userRef = adminDb.collection('users').doc(userId);
-      const userDoc = await userRef.get();
       
-      // Get or create Stripe customer
-      let customerId;
+      // Use predefined price IDs from environment variables if available
+      let priceId = isYearly ? YEARLY_PRICE_ID : MONTHLY_PRICE_ID;
       
-      if (userDoc.exists && userDoc.data()?.stripeCustomerId) {
-        // Use existing Stripe customer ID from Firestore
-        customerId = userDoc.data()?.stripeCustomerId;
-        console.log("Using existing Stripe customer:", customerId);
-      } else {
-        // Create new customer
-        const customer = await stripe.customers.create({
-          email: userEmail || userId,
-          metadata: {
-            firebaseUID: userId,
-          },
-        });
-        customerId = customer.id;
-        
-        // Update or create user document with Stripe customer ID        
-        if (userDoc.exists) {
-          await userRef.update({ 
-            stripeCustomerId: customerId,
-            updatedAt: new Date()
-          });
-        } else {
-          await userRef.set({ 
-            stripeCustomerId: customerId,
-            email: userEmail,
-            createdAt: new Date(),
-            updatedAt: new Date()
-          });
-        }
-        
-        console.log("Created new Stripe customer:", customerId);
-      }
-      
-      // Use fixed price IDs from environment variables
-      const priceId = isYearly ? YEARLY_PRICE_ID : MONTHLY_PRICE_ID;
-      
-      // Check if price ID exists
       if (!priceId) {
-        console.error("Price ID not found in environment variables");
-        return new NextResponse('Price ID not configured. Please contact support.', { status: 500 });
+        console.log("Price ID not found in environment variables, creating dynamic price");               
       }
 
       // Create checkout session
-      //on trial end pause subscription
       const checkoutSession = await stripe.checkout.sessions.create({
-        customer: customerId,
+        customer:stripeId,
         line_items: [
           {
             price: priceId,
@@ -89,9 +58,9 @@ export async function POST(req: Request) {
         ],
         mode: 'subscription',
         subscription_data: {
-          trial_period_days: 5,
+          trial_period_days: 1,
         },
-        payment_method_collection: 'if_required',
+        payment_method_collection:'if_required',
         success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/covered-call-screener?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/pricing`,
         allow_promotion_codes: true,

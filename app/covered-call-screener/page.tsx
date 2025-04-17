@@ -7,13 +7,17 @@ import { useAuth } from "../context/AuthContext";
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
+import { useUserAccess } from "../hooks/useUserAccess";
 
 export default function CoveredCallScreenerPage() {
   const { loading } = useAuth();
   const searchParams = useSearchParams();
   const router = useRouter();
   const hasSearched = Object.keys(Object.fromEntries(searchParams.entries())).length > 0;
-
+  const {status} = useUserAccess();
+  useEffect(()=>{
+    console.log("user staus: ",status)
+,[]  })
   // Redirect from old URLs
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());

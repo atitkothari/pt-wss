@@ -5,18 +5,25 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Check, Clock } from "lucide-react";
 import { NavBar } from "../components/NavBar";
 import { Footer } from "../components/Footer";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import { createCheckoutSession } from "@/app/lib/stripe";
 import { AuthModal } from "@/app/components/modals/AuthModal";
+import { useUserAccess } from "@/app/hooks/useUserAccess";
 
 export default function PricingPage() {
   const [isYearly, setIsYearly] = useState(true);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const { user, signInWithGoogle } = useAuth();
+  const { user } = useAuth();
+  const { status } = useUserAccess();
 
-  const MONTHLY_PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID;
-  const YEARLY_PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_PRICE_ID;
+  // Handle post-auth redirect
+  useEffect(() => {
+    if (user && status === 'trial') {
+      // If user is in trial, redirect to main feature
+      window.location.href = '/covered-call-screener';
+    }
+  }, [user, status]);
 
   const handleStartTrial = async () => {
     try {
@@ -26,17 +33,27 @@ export default function PricingPage() {
       }
 
       if (!user.emailVerified) {
-        // You might want to show a message asking user to verify their email
         alert("Please verify your email first!");
         return;
       }
 
-      // Create checkout session with the selected plan
-      await createCheckoutSession(isYearly);
+      // If user is not in trial and not pro, start checkout
+      if (status === 'needs_subscription') {
+        await createCheckoutSession(isYearly);
+      } else if (status === 'trial') {
+        // If user is in trial, redirect to main feature
+        window.location.href = '/covered-call-screener';
+      }
     } catch (error) {
       console.error('Error starting trial:', error);
       alert('Something went wrong. Please try again.');
     }
+  };
+
+  // Handle successful auth modal close
+  const handleAuthModalClose = () => {
+    setShowAuthModal(false);
+    // After successful auth, the useEffect above will handle the redirect
   };
 
   const features = [
@@ -59,7 +76,7 @@ export default function PricingPage() {
       <NavBar />
       <AuthModal 
         isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)}
+        onClose={handleAuthModalClose}
         initialMode="signin"
       />
       
@@ -142,12 +159,15 @@ export default function PricingPage() {
               <Button 
                 onClick={handleStartTrial}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-base md:text-lg py-4 md:py-6"
+                disabled={status === 'pro'}
               >
-                Start 5-Day Free Trial
+                {status === 'pro' ? 'Current Plan' : 'Start 5-Day Free Trial'}
               </Button>
-              <p className="text-xs md:text-sm text-gray-500 text-center">
-                No credit card required
-              </p>
+              {status !== 'pro' && (
+                <p className="text-xs md:text-sm text-gray-500 text-center">
+                  No credit card required
+                </p>
+              )}
             </CardFooter>
           </Card>
         </div>
