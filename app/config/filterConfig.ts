@@ -216,6 +216,11 @@ export const impliedVolatilityFilterConfig = {
  * @param optionType - The type of option ('call' or 'put')
  */
 export const setDefaultFilterValues = (optionType: 'call' | 'put') => {
+  // Only run in browser environment
+  if (typeof window === 'undefined') {
+    return;
+  }
+  
   // Yield filter
   localStorage.setItem(`${optionType}_yieldRange`, JSON.stringify([yieldFilterConfig.min, yieldFilterConfig.max]));
 

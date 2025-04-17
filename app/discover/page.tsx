@@ -252,17 +252,20 @@ export default function TrendingPage() {
         console.log(stocks);
     // Generate the appropriate URL parameters based on the list type
     let optionsUrl = optionType === 'call' ? '/covered-call-screener?' : '/cash-secured-put-screener?';    
-    setDefaultFilterValues(optionType)
-
+    
+    // Only call setDefaultFilterValues and access localStorage in the browser
+    if (typeof window !== 'undefined') {
+      setDefaultFilterValues(optionType);
+      localStorage.setItem(`${optionType}_minDte`, "0");
+      localStorage.setItem(`${optionType}_maxDte`, "7");
+    }
+    
     const paramPrefix = optionType === 'call' ? 'call_' : 'put_';
     
     const today = new Date();
     const nextWeek = addWeeks(today, 1);
     const formattedToday = format(today, 'yyyy-MM-dd');
     const formattedNextWeek = format(nextWeek, 'yyyy-MM-dd');
-
-    localStorage.setItem(`${optionType}_minDte`, "0");
-    localStorage.setItem(`${optionType}_maxDte`, "7");
     
     optionsUrl += `${paramPrefix}min_expiration=${formattedToday}&${paramPrefix}max_expiration=${formattedNextWeek}&`;      
     // Common filters for all lists using default values from filterConfig    
