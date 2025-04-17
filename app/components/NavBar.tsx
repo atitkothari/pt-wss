@@ -32,9 +32,10 @@ export function NavBar() {
     tools: [
       { name: 'Discover', href: '/discover' },
       { name: 'Covered Call Calculator', href: '/covered-call-calculator' },
+      { name: 'Pricing', href: '/pricing'},
     ],
     resources: [
-      { name: 'Blog', href: 'https://wheelstrategyoptions.com/blog/', external: true },
+      { name: 'Blog', href: 'https://wheelstrategyoptions.com/blog/', external: true },      
     ],
   };
 

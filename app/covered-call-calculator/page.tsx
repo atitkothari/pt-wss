@@ -290,7 +290,7 @@ export default function CoveredCallCalculatorPage() {
           )}
         </div>
         
-        <BlurredTable hasSearched={hasSearched}>
+        {/* <BlurredTable hasSearched={hasSearched}> */}
           {results.length > 0 && (
             <div>
               <h2 className="text-xl font-semibold mb-4">{inputSymbol}</h2>
@@ -408,7 +408,7 @@ export default function CoveredCallCalculatorPage() {
               </div>
               </div>
             )}
-          </BlurredTable>       
+          {/* </BlurredTable>        */}
         <Footer />
       </div>
     </PageLayout>
