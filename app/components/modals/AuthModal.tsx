@@ -89,12 +89,12 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signin' }: AuthModal
           
           // For a new user or a user that needs subscription, go to pricing
           if (status === 'needs_subscription') {
-            window.location.href = '/pricing';
+            // window.location.href = '/pricing';
             return;
           }
           
           // For users with active pro or trial subscriptions
-          window.location.href = '/covered-call-screener';
+          // window.location.href = '/covered-call-screener';
           return;
         }
         
@@ -107,13 +107,13 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signin' }: AuthModal
         }
         
         // Increment retry count and try again with backoff
-        setRetryCount(prev => prev + 1);
-        const delay = Math.min(200 * Math.pow(1.1, retryCount), 500); // Capped at 500ms
-        setTimeout(checkStatusAndRedirect, delay);
+        // setRetryCount(prev => prev + 1);
+        // const delay = Math.min(200 * Math.pow(1.1, retryCount), 500); // Capped at 500ms
+        // setTimeout(checkStatusAndRedirect, delay);
       };
       
       // Start checking after a short delay
-      setTimeout(checkStatusAndRedirect, 500);
+      // setTimeout(checkStatusAndRedirect, 500);
     }
   };
 
