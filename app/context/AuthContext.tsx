@@ -58,32 +58,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Function to ensure a user document exists in Firestore
   const ensureUserDocumentExists = async (user: User) => {
-    
-    // try {
-    //   const userRef = doc(db, 'users', user.uid);
-    //   const userDoc = await getDoc(userRef);
-      
-    //   if (!userDoc.exists()) {
-    //     // Create a new user document if it doesn't exist
-    //     await setDoc(userRef, {
-    //       email: user.email,
-    //       displayName: user.displayName,
-    //       photoURL: user.photoURL,
-    //       createdAt: new Date(),
-    //       subscriptionStatus: 'inactive',
-    //       lastSignInTime: new Date()
-    //     }, { merge: true }); // Use merge in case document exists but wasn't found
-        
-    //     console.log('Created new user document in Firestore');
-    //   } else {
-    //     // Update last sign in time if the document already exists
-    //     await setDoc(userRef, {
-    //       lastSignInTime: new Date()
-    //     }, { merge: true });
-    //   }
-    // } catch (err) {
-    //   console.error('Error ensuring user document exists:', err);
-    // }
+    // This function is no longer needed as customer documents are created by Stripe webhooks
+    return;
   };
 
   useEffect(() => {

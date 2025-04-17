@@ -3,8 +3,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, Clock } from "lucide-react";
-import { NavBar } from "../components/NavBar";
 import { Footer } from "../components/Footer";
+import { PageLayout } from "../components/PageLayout";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import { createCheckoutSession } from "@/app/lib/stripe";
@@ -72,8 +72,7 @@ export default function PricingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
-      <NavBar />
+    <PageLayout className="bg-white text-gray-900">
       <AuthModal 
         isOpen={showAuthModal} 
         onClose={handleAuthModalClose}
@@ -193,6 +192,6 @@ export default function PricingPage() {
       </div>
 
       <Footer />
-    </div>
+    </PageLayout>
   );
 } 

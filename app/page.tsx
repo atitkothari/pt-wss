@@ -10,13 +10,12 @@ import {
   LineChart,
   ArrowRight
 } from "lucide-react";
-import { NavBar } from "./components/NavBar";
 import { Footer } from "./components/Footer";
+import { PageLayout } from "./components/PageLayout";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-gray-900 text-white">      
-      <NavBar />
+    <PageLayout className="bg-gray-900 text-white">      
       {/* Logo Section */}
       <div className="flex flex-col items-center justify-center pt-4 md:pt-8">
         <img src="/logo.png" className="h-20 md:h-24 mb-3 md:mb-4" alt="Wheel Strategy Options Logo" />
@@ -107,8 +106,8 @@ export default function LandingPage() {
           </Link>
         </div>
       </div>
-      <Footer/>
-    </div>
+      <Footer />
+    </PageLayout>
   );
 }
 

@@ -2,7 +2,7 @@
 
 import { OptionsTableComponent } from "../components/shared/OptionsTableComponent";
 import { Footer } from "../components/Footer";
-import { NavBar } from "../components/NavBar";
+import { PageLayout } from "../components/PageLayout";
 import { useAuth } from "../context/AuthContext";
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -35,43 +35,33 @@ export default function CoveredCallScreenerPage() {
     }
   }, [searchParams, router]);
 
-  const renderContent = () => {
-    if (loading) {
-      return (
-        <div className="min-h-screen bg-gray-50">
-          <NavBar />
-          <div className="max-w-screen-2xl mx-auto p-4">
-            <div className="flex justify-center items-center min-h-[400px]">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
+  if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <NavBar />
-        <div className="max-w-screen-2xl mx-auto p-4">
-          <div className="mb-4">
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold">Covered Call Screener</h1>
-              <Link 
-                href="/cash-secured-put-screener" 
-                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-              >
-                Switch to Cash Secured Put Screener →
-              </Link>
-            </div>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm relative">
-            <OptionsTableComponent option="call" />
-          </div>
-          <Footer />
+      <PageLayout>
+        <div className="flex justify-center items-center min-h-[400px]">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+        </div>
+      </PageLayout>
+    );
+  }
+
+  return (
+    <PageLayout>
+      <div className="mb-4">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Covered Call Screener</h1>
+          <Link 
+            href="/cash-secured-put-screener" 
+            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+          >
+            Switch to Cash Secured Put Screener →
+          </Link>
         </div>
       </div>
-    );
-  };
-
-  return renderContent();
+      <div className="bg-white p-4 rounded-lg shadow-sm relative">
+        <OptionsTableComponent option="call" />
+      </div>
+      <Footer />
+    </PageLayout>
+  );
 } 

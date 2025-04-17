@@ -6,27 +6,93 @@ export type UserAccessStatus =
   | 'unauthenticated'
   | 'pro'
   | 'trial'
+  | 'past_due'
+  | 'canceled'
+  | 'incomplete'
+  | 'incomplete_expired'
+  | 'unpaid'
   | 'needs_subscription'
   | 'loading';
 
 export function useUserAccess() {
   const { user, loading: authLoading } = useAuth();
-  const { isSubscribed, isTrialActive, loading: subscriptionLoading } = useSubscription();
+  const { 
+    isSubscribed, 
+    isTrialActive, 
+    loading: subscriptionLoading, 
+    subscriptionStatus,
+    currentPeriodEnd 
+  } = useSubscription();
   const router = useRouter();
 
   const loading = authLoading || subscriptionLoading;
 
   const getUserStatus = (): UserAccessStatus => {
     if (loading) return 'loading';
-    if (!user) return 'unauthenticated';    
-    if (isSubscribed) return 'pro';
-    if (isTrialActive) return 'trial';
-    return 'needs_subscription';
+    if (!user) return 'unauthenticated';
+
+    // If there's no subscription status, user needs to subscribe
+    if (!subscriptionStatus) return 'needs_subscription';
+
+    // Map subscription status to user access status
+    switch (subscriptionStatus) {
+      case 'active':
+        return 'pro';
+      case 'trialing':
+        return 'trial';
+      case 'past_due':
+        return 'past_due';
+      case 'canceled':
+        return 'canceled';
+      case 'incomplete':
+        return 'incomplete';
+      case 'incomplete_expired':
+        return 'incomplete_expired';
+      case 'unpaid':
+        return 'unpaid';
+      default:
+        return 'needs_subscription';
+    }
   };
 
   const canAccessFeature = () => {
     const status = getUserStatus();
+    // Only active and trial subscriptions can access features
     return status === 'pro' || status === 'trial';
+  };
+
+  const shouldShowPaymentWarning = () => {
+    const status = getUserStatus();
+    // Show warning for past_due and incomplete statuses
+    return status === 'past_due' || status === 'incomplete';
+  };
+
+  const getStatusMessage = (): string => {
+    const status = getUserStatus();
+    switch (status) {
+      case 'pro':
+        return 'You have full access to all features';
+      case 'trial':
+        return 'You are currently in your trial period';
+      case 'past_due':
+        return 'Your payment is past due. Please update your payment method';
+      case 'canceled':
+        return 'Your subscription has been canceled';
+      case 'incomplete':
+        return 'Your payment is incomplete. Please complete the payment process';
+      case 'incomplete_expired':
+        return 'Your payment has expired. Please subscribe again';
+      case 'unpaid':
+        return 'Your subscription is unpaid. Please update your payment method';
+      case 'needs_subscription':
+        return 'Please subscribe to access features';
+      case 'unauthenticated':
+        return 'Please sign in to access features';
+      case 'loading':
+        return 'Loading...';
+      default:
+        return 'Unknown status';
+    }
   };
 
   const redirectToAppropriateScreen = () => {
@@ -37,7 +103,14 @@ export function useUserAccess() {
         router.push('/auth/signin');
         break;
       case 'needs_subscription':
+      case 'canceled':
+      case 'incomplete_expired':
         router.push('/pricing');
+        break;
+      case 'past_due':
+      case 'incomplete':
+      case 'unpaid':
+        router.push('/billing');
         break;
       default:
         break;
@@ -48,6 +121,9 @@ export function useUserAccess() {
     status: getUserStatus(),
     canAccessFeature,
     redirectToAppropriateScreen,
-    loading
+    shouldShowPaymentWarning,
+    getStatusMessage,
+    loading,
+    currentPeriodEnd
   };
 } 
