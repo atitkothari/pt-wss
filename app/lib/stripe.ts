@@ -1,5 +1,7 @@
 import { loadStripe } from '@stripe/stripe-js';
 import { auth } from './firebase';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import { app } from './firebase';
 
 let stripePromise: Promise<any> | null = null;
 
@@ -61,43 +63,24 @@ export async function createCheckoutSession(isYearly: boolean = true) {
 export async function createCustomerPortalSession() {
   try {
     // Get current Firebase user
-    const currentUser = auth.currentUser;
+    const user = auth.currentUser;
     
-    if (!currentUser) {
+    if (!user) {
       throw new Error('You must be logged in to manage your subscription');
     }
-    
-    // Include Firebase user info
-    const body = {
-      userId: currentUser.uid,
-      email: currentUser.email
-    };
-    
-    console.log('Creating portal session for user:', currentUser.uid);
-    
-    const response = await fetch('/api/create-portal-session', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
+       
+    const functions = getFunctions(app, "us-central1");
+    const functionRef = httpsCallable(
+      functions,
+      "ext-firestore-stripe-payments-createPortalLink"
+    );
+    const response = await functionRef({
+      customerId: user?.uid,
+      returnUrl: window.location.origin,
     });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Portal session error response:', response.status, errorText);
-      
-      if (response.status === 400) {
-        throw new Error('You don\'t have an active subscription to manage');
-      } else if (response.status === 404) {
-        throw new Error('User profile not found. Please sign out and sign in again.');
-      } else {
-        throw new Error(`Failed to create portal session: ${errorText}`);
-      }
-    }
-
-    const data = await response.json();
     
+    const data = response.data as { url: string };    
+    console.log(data.url)
     if (!data.url) {
       throw new Error('Invalid response from server: missing URL');
     }
