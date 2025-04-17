@@ -34,11 +34,11 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
   const { status, loading } = useUserAccess();
   const [showAuthModal, setShowAuthModal] = useState(false);
 
-  const shouldBlur = hasSearched && (status === 'unauthenticated' || status === 'needs_subscription');
+  const shouldBlur = hasSearched || status !== 'trial' && status !== 'pro';
 
-  const handleUpgrade = async () => {
+  const handleUpgrade = async (isYearly: boolean = true) => {
     try {
-      await createCheckoutSession(true);
+      await createCheckoutSession(isYearly);
     } catch (error) {
       console.error('Failed to create checkout session:', error);
     }
@@ -56,67 +56,85 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
     if (shouldBlur) {
       return (
         <div className="relative">
-          <div className={cn("filter blur-sm pointer-events-none", className)}>
-            {children}
-          </div>
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/5 backdrop-blur-sm p-4 text-center">
-            {status === 'unauthenticated' ? (
-              <>
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-                  Sign in to see all results!
-                </h2>
-                <Button
-                  onClick={() => setShowAuthModal(true)}
-                  size="lg"
-                  variant="outline"
-                  className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white border-0 mt-2 flex items-center gap-2 justify-center"
-                  disabled={loading}
-                >
-                  <Mail className="h-5 w-5" />
-                  Start your free trial with Email
-                </Button>
-              </>
-            ) : (
-              <>
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-                  Upgrade to Pro to see all results!
-                </h2>
-                <Button
-                  onClick={handleUpgrade}
-                  size="lg"
-                  className="bg-gray-900 hover:bg-gray-800 text-white border-0 mt-2"
-                >
-                  Upgrade Now
-                </Button>
-              </>
-            )}
-
-            {/* Features List */}
-            <div className="mt-8 w-full max-w-4xl px-4">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">All Features Included</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {features.map((feature, index) => (
-                  <div 
-                    key={index} 
-                    className="flex items-center gap-3 p-3 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors group"
-                  >
-                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-500/10 flex items-center justify-center">
-                      <Check className="h-3.5 w-3.5 text-green-600" />
-                    </div>
-                    <span className="text-sm text-gray-700 group-hover:text-gray-900 transition-colors">{feature}</span>
-                  </div>
-                ))}
+          <div className={cn("relative", className)}>
+            {/* Blurred Content with Gradient that shows some rows */}
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-t from-transparent from-5% via-indigo-50/30 via-30% to-indigo-100/90 to-100% pointer-events-none z-10"></div>
+              <div className="filter blur-[2px] pointer-events-none">
+                {children}
               </div>
-              <div className="mt-8 flex justify-center">
-                <Link href="/pricing" className="inline-block">
+            </div>
+            
+            {/* CTA Section */}
+            <div className="absolute inset-0 flex flex-col items-center bg-transparent p-4 text-center z-20 pt-[10vh]">
+              {status === 'unauthenticated' ? (
+                <>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 bg-white/80 px-4 py-2 rounded-md shadow-sm">
+                    Sign in to see all results!
+                  </h2>
                   <Button
+                    onClick={() => setShowAuthModal(true)}
                     size="lg"
-                    className="bg-gray-900 hover:bg-gray-800 text-white border border-gray-300 flex items-center gap-2 font-medium"
+                    variant="outline"
+                    className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white border-0 mt-2 flex items-center gap-2 justify-center shadow-md"
+                    disabled={loading}
                   >
-                    View All Plans
-                    <ExternalLink className="h-4 w-4" />
+                    <Mail className="h-5 w-5" />
+                    Start your free trial now
                   </Button>
-                </Link>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 bg-white/80 px-4 py-2 rounded-md shadow-sm">
+                    Upgrade to Pro to see all results!
+                  </h2>
+                  <div className="flex flex-col sm:flex-row gap-3 mt-2">
+                    <Button
+                      onClick={() => handleUpgrade(false)}
+                      size="lg"
+                      className="bg-gray-900 hover:bg-gray-800 text-white border-0 shadow-md"
+                    >
+                      Monthly Plan
+                    </Button>
+                    <Button
+                      onClick={() => handleUpgrade(true)}
+                      size="lg"
+                      className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white border-0 relative shadow-md"
+                    >
+                      <span>Yearly Plan</span>
+                      <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 20%</span>
+                    </Button>
+                  </div>
+                </>
+              )}
+
+              {/* Features List - Moved back to the bottom */}
+              <div className="mt-8 w-full max-w-4xl px-4">
+                <h3 className="text-xl font-bold text-gray-900 mb-6 bg-white/80 px-4 py-2 rounded-md shadow-sm inline-block">All Features Included</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {features.map((feature, index) => (
+                    <div 
+                      key={index} 
+                      className="flex items-center gap-3 p-3 rounded-lg bg-white/90 hover:bg-white transition-colors group shadow-sm border border-gray-100"
+                    >
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-500/10 flex items-center justify-center">
+                        <Check className="h-3.5 w-3.5 text-green-600" />
+                      </div>
+                      <span className="text-sm font-medium text-gray-800 group-hover:text-gray-900 transition-colors">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-8 flex justify-center">
+                  <Link href="/pricing" className="inline-block">
+                    <Button
+                      size="lg"
+                      className="bg-white text-gray-900 hover:bg-gray-100 border border-gray-300 flex items-center gap-2 font-medium shadow-md"
+                    >
+                      View All Plans
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

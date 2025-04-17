@@ -46,6 +46,7 @@ import { SavedScreener, EmailFrequency } from "@/app/types/screener";
 import { defaultScreeners } from '@/app/config/defaultScreeners';
 import { ColumnCustomizer } from "../table/ColumnCustomizer";
 import { screenerService } from "@/app/services/screenerService";
+import { useUserAccess } from "@/app/hooks/useUserAccess";
 
 interface Filter {
   field: string;
@@ -90,6 +91,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const { symbols } = useSymbols();
   const { user, userId } = useAuth();
   const [savedScreeners, setSavedScreeners] = useState<SavedScreener[]>([]);
+
+  const {status} = useUserAccess()
 
   const getParamKey = (key: string) => `${option}_${key}`;
   
