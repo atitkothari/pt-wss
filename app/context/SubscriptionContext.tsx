@@ -30,15 +30,11 @@ interface SubscriptionDocument {
   trial_start: string;
 }
 
-interface SubscriptionContextType {
-  isTrialActive: boolean;
-  daysLeftInTrial: number;
-  isSubscribed: boolean;
+interface SubscriptionContextType {  
   loading: boolean;
   error: string | null;
   subscriptionStatus: string | null;
-  currentPeriodEnd: Date | null;
-  subscriptions: SubscriptionDocument[] | null;
+  
 }
 
 export const getPremiumStatus = async (userId: string) => {
@@ -70,27 +66,17 @@ export const getPremiumStatus = async (userId: string) => {
   });
 };
 
-const SubscriptionContext = createContext<SubscriptionContextType>({
-  isTrialActive: false,
-  daysLeftInTrial: 0,
-  isSubscribed: false,
+const SubscriptionContext = createContext<SubscriptionContextType>({  
   loading: true,
   error: null,
-  subscriptionStatus: null,
-  currentPeriodEnd: null,
-  subscriptions: null
+  subscriptionStatus: null,    
 });
 
 export function SubscriptionProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
-  const [isTrialActive, setIsTrialActive] = useState(false);
-  const [daysLeftInTrial, setDaysLeftInTrial] = useState(0);
-  const [isSubscribed, setIsSubscribed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null);
-  const [currentPeriodEnd, setCurrentPeriodEnd] = useState<Date | null>(null);
-  const [subscriptions, setSubscriptions] = useState<SubscriptionDocument[] | null>(null);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null);    
 
   useEffect(() => {
     if (!user) {
@@ -100,54 +86,26 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
 
     // Create a query to get active or trialing subscriptions
     const customerRef = doc(db, 'customers', user.uid);
-    const subscriptionsRef = collection(customerRef, 'subscriptions');
-    const activeSubscriptionsQuery = query(
-      subscriptionsRef,
-      where("status", "in", ["trialing", "active"])
-    );
-    const unsubscribe = onSnapshot(activeSubscriptionsQuery, (snapshot) => {
+    const subscriptionsRef = collection(customerRef, 'subscriptions');   
+    const unsubscribe = onSnapshot(subscriptionsRef, (snapshot) => {
       if (!snapshot.empty) {
         const subscriptionDocs = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         })) as SubscriptionDocument[];
         
-        // Get the most recent active subscription
-        const activeSubscription = subscriptionDocs.find(sub => 
-          sub.status === 'active' || sub.status === 'trialing'
+        // Sort subscriptions by created date in descending order (newest first)
+        const sortedSubscriptions = subscriptionDocs.sort((a, b) => 
+          new Date(b.created).getTime() - new Date(a.created).getTime()
         );
-
-        if (activeSubscription) {
-          setSubscriptionStatus(activeSubscription.status);
-          setCurrentPeriodEnd(activeSubscription.current_period_end?.toDate());
-          setSubscriptions(subscriptionDocs);
-
-          if (activeSubscription.status === 'trialing') {
-            const trialEnd = activeSubscription.trial_end?.toDate();
-            if (trialEnd) {
-              const now = new Date();
-              const daysLeft = Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-              setIsTrialActive(daysLeft > 0);
-              setDaysLeftInTrial(daysLeft);
-            }
-          }
-
-          setIsSubscribed(activeSubscription.status === 'active');
-        } else {
-          // No active subscription found
-          setSubscriptionStatus(null);
-          setCurrentPeriodEnd(null);
-          setIsTrialActive(false);
-          setDaysLeftInTrial(0);
-          setIsSubscribed(false);
-        }
+        
+        // Get the most recent active subscription
+        const activeSubscription = sortedSubscriptions[0];
+        setSubscriptionStatus(activeSubscription?.status || null);
+        
       } else {
         // No subscriptions found
         setSubscriptionStatus(null);
-        setCurrentPeriodEnd(null);
-        setIsTrialActive(false);
-        setDaysLeftInTrial(0);
-        setIsSubscribed(false);
       }
       setLoading(false);
     }, (error) => {
@@ -160,15 +118,10 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
   }, [user]);
 
   return (
-    <SubscriptionContext.Provider value={{
-      isTrialActive,
-      daysLeftInTrial,
-      isSubscribed,
+    <SubscriptionContext.Provider value={{      
       loading,
       error,
-      subscriptionStatus,
-      currentPeriodEnd,
-      subscriptions
+      subscriptionStatus,      
     }}>
       {children}
     </SubscriptionContext.Provider>

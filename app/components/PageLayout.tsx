@@ -2,7 +2,6 @@
 
 import { ReactNode } from "react";
 import { NavBar } from "./NavBar";
-import { SubscriptionBanner } from "./SubscriptionBanner";
 import { useAuth } from "@/app/context/AuthContext";
 
 interface PageLayoutProps {
@@ -16,8 +15,7 @@ export function PageLayout({ children, showBanner = true, className = "" }: Page
 
   return (
     <div className={`min-h-screen bg-gray-50 ${className}`}>
-      <NavBar />
-      {showBanner && user && <SubscriptionBanner />}
+      <NavBar />      
       <div className="max-w-screen-2xl mx-auto p-4">
         {children}
       </div>

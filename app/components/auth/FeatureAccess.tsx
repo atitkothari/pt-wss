@@ -3,7 +3,6 @@
 import { useUserAccess } from "@/app/hooks/useUserAccess";
 import { useEffect } from "react";
 import { AuthModal } from "../modals/AuthModal";
-import { SubscriptionBanner } from "../SubscriptionBanner";
 
 interface FeatureAccessProps {
   children: React.ReactNode;
@@ -34,7 +33,7 @@ export function FeatureAccess({ children }: FeatureAccessProps) {
 
   return (
     <div>
-      <SubscriptionBanner />
+      {/* <SubscriptionBanner /> */}
       {canAccessFeature() ? children : null}
     </div>
   );

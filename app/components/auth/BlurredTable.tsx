@@ -35,7 +35,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
   const { status, loading } = useUserAccess();
   const [showAuthModal, setShowAuthModal] = useState(false);
 
-  const shouldBlur = hasSearched || status !== 'trial' && status !== 'pro';
+  const shouldBlur = hasSearched || (status !== 'trialing' && status !== 'active' && status !== 'incomplete_expired');
 
   const handleUpgrade = async (isYearly: boolean = true) => {
     try {
@@ -53,7 +53,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
         </div>
       );
     }
-
+    {()=>console.log(status)}
     if (shouldBlur) {
       return (
         <div className="relative">
@@ -67,23 +67,50 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
             </div>
             
             {/* CTA Section */}
-            <div className="absolute inset-0 flex flex-col items-center bg-transparent p-4 text-center z-20 pt-[10vh]">
+            <div className="absolute inset-0 flex flex-col items-center bg-transparent p-4 text-center z-20 pt-[10vh]">              
               {status === 'unauthenticated' ? (
                 <>
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 bg-white/80 px-4 py-2 rounded-md shadow-sm">
-                    Sign in to see all results!
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 px-4 py-2 rounded-md">
+                    Create an account to see all results!
                   </h2>
                   <Button
                     onClick={() => setShowAuthModal(true)}
                     size="lg"
-                    variant="outline"
-                    className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white border-0 mt-2 flex items-center gap-2 justify-center shadow-md"
+                    variant="outline"                    
+                    className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white border-0 relative shadow-md flex flex-col py-4 h-auto"
                     disabled={loading}
-                  >
-                    <Mail className="h-5 w-5" />
+                  >                    
                     Start your 5-day free trial
                   </Button>
                   <p className="text-sm text-gray-600 mt-2">No credit card required</p>
+                </>
+              ) : status === 'paused' ? (
+                <>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 px-4 py-2 rounded-md">
+                    Your subscription has ended
+                  </h2>
+                  <p className="text-sm text-gray-600 mb-2">
+                    Upgrade to continue accessing all features
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3 mt-2">
+                    <Button
+                      onClick={() => handleUpgrade(false)}
+                      size="lg"
+                      className="bg-gray-900 hover:bg-gray-800 text-white border-0 shadow-md flex flex-col py-4 h-auto"
+                    >
+                      <span className="text-base font-semibold">Monthly Plan</span>
+                      <span className="text-xs font-normal opacity-90">$9/month</span>
+                    </Button>
+                    <Button
+                      onClick={() => handleUpgrade(true)}
+                      size="lg"
+                      className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white border-0 relative shadow-md flex flex-col py-4 h-auto"
+                    >
+                      <span className="text-base font-semibold">Yearly Plan</span>
+                      <span className="text-xs font-normal opacity-90">$7/month</span>
+                      <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 22%</span>
+                    </Button>
+                  </div>
                 </>
               ) : (
                 <>
@@ -122,7 +149,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                   {features.map((feature, index) => (
                     <div 
                       key={index} 
-                      className="flex items-center gap-3 p-3 rounded-lg bg-white/90 hover:bg-white transition-colors group shadow-sm border border-gray-100 text-left"
+                      className="flex items-center gap-3 p-3 rounded-lg bg-white/90 hover:bg-white transition-colors group shadow-lg border border-gray-100 text-left"
                     >
                       <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-500/10 flex items-center justify-center">
                         <Check className="h-3.5 w-3.5 text-green-600" />
@@ -135,10 +162,9 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                   <Link href="/pricing" className="inline-block">
                     <Button
                       size="lg"
-                      className="bg-white text-gray-900 hover:bg-gray-100 border border-gray-300 flex items-center gap-2 font-medium shadow-md"
+                      className="bg-black text-white hover:bg-gray-100 border border-gray-300 flex items-center gap-2 font-medium shadow-md"
                     >
-                      See Pricing
-                      <ExternalLink className="h-4 w-4" />
+                      See Pricing                      
                     </Button>
                   </Link>
                 </div>

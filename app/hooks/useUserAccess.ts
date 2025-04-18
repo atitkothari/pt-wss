@@ -4,24 +4,22 @@ import { useRouter } from "next/navigation";
 
 export type UserAccessStatus = 
   | 'unauthenticated'
-  | 'pro'
-  | 'trial'
+  | 'active'
+  | 'trialing'
   | 'past_due'
   | 'canceled'
   | 'incomplete'
   | 'incomplete_expired'
   | 'unpaid'
+  | 'paused'
   | 'needs_subscription'
   | 'loading';
 
 export function useUserAccess() {
   const { user, loading: authLoading } = useAuth();
-  const { 
-    isSubscribed, 
-    isTrialActive, 
+  const {     
     loading: subscriptionLoading, 
-    subscriptionStatus,
-    currentPeriodEnd 
+    subscriptionStatus,    
   } = useSubscription();
   const router = useRouter();
 
@@ -30,26 +28,34 @@ export function useUserAccess() {
   const getUserStatus = (): UserAccessStatus => {
     if (loading) return 'loading';
     if (!user) return 'unauthenticated';
-
+    console.log("subs",subscriptionStatus)
     // If there's no subscription status, user needs to subscribe
     if (!subscriptionStatus) return 'needs_subscription';
 
     // Map subscription status to user access status
     switch (subscriptionStatus) {
       case 'active':
-        return 'pro';
+        return 'active';
       case 'trialing':
-        return 'trial';
+        return 'trialing';
       case 'past_due':
-        return 'past_due';
       case 'canceled':
-        return 'canceled';
       case 'incomplete':
-        return 'incomplete';
       case 'incomplete_expired':
-        return 'incomplete_expired';
       case 'unpaid':
-        return 'unpaid';
+      case 'paused':
+        return 'paused';
+      //   return 'past_due';
+      // case 'canceled':
+      //   return 'canceled';
+      // case 'incomplete':
+      //   return 'incomplete';
+      // case 'incomplete_expired':
+      //   return 'incomplete_expired';
+      // case 'unpaid':
+      //   return 'unpaid';
+      // case 'paused':
+      //   return 'paused';
       default:
         return 'needs_subscription';
     }
@@ -58,7 +64,7 @@ export function useUserAccess() {
   const canAccessFeature = () => {
     const status = getUserStatus();
     // Only active and trial subscriptions can access features
-    return status === 'pro' || status === 'trial';
+    return status === 'active' || status === 'trialing';
   };
 
   const shouldShowPaymentWarning = () => {
@@ -70,9 +76,9 @@ export function useUserAccess() {
   const getStatusMessage = (): string => {
     const status = getUserStatus();
     switch (status) {
-      case 'pro':
+      case 'active':
         return 'You have full access to all features';
-      case 'trial':
+      case 'trialing':
         return 'You are currently in your trial period';
       case 'past_due':
         return 'Your payment is past due. Please update your payment method';
@@ -81,9 +87,11 @@ export function useUserAccess() {
       case 'incomplete':
         return 'Your payment is incomplete. Please complete the payment process';
       case 'incomplete_expired':
-        return 'Your payment has expired. Please subscribe again';
+        return 'Your trial has ended. Please subscribe to continue accessing features';
       case 'unpaid':
         return 'Your subscription is unpaid. Please update your payment method';
+      case 'paused':
+        return 'Your subscription is paused';
       case 'needs_subscription':
         return 'Please subscribe to access features';
       case 'unauthenticated':
@@ -123,7 +131,6 @@ export function useUserAccess() {
     redirectToAppropriateScreen,
     shouldShowPaymentWarning,
     getStatusMessage,
-    loading,
-    currentPeriodEnd
+    loading    
   };
 } 
