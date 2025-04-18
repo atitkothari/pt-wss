@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, X, LogOut, ChevronDown, CreditCard, User, Settings } from "lucide-react";
+import { Menu, X, LogOut, ChevronDown, CreditCard, User, Settings, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useState } from "react";
@@ -16,12 +16,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { createCustomerPortalSession } from "@/app/lib/stripe";
+import { useRouter } from "next/navigation";
 
 export function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScreenersOpen, setIsScreenersOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { user, loading, logout } = useAuth();
+  const router = useRouter();
   
   const navigation = {
     screeners: [
@@ -54,13 +57,8 @@ export function NavBar() {
     });
   };
 
-  const handleManageSubscription = async () => {
-    try {
-      await createCustomerPortalSession();
-    } catch (error) {
-      console.error('Error opening Stripe portal:', error);
-      alert(error instanceof Error ? error.message : 'Failed to open subscription management. Please try again later.');
-    }
+  const handleManageSubscription = () => {
+    router.push('/manage-subscription');
   };
 
   return (
@@ -163,6 +161,7 @@ export function NavBar() {
                     <DropdownMenuItem onClick={handleManageSubscription} className="cursor-pointer">
                       <CreditCard className="mr-2 h-4 w-4" />
                       <span>Manage Subscription</span>
+                      {isLoading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
@@ -270,9 +269,11 @@ export function NavBar() {
                   variant="outline"
                   onClick={handleManageSubscription}
                   className="bg-white/10 text-white hover:bg-white/20 border-white/20 w-full transition-colors flex items-center"
+                  disabled={isLoading}
                 >
                   <CreditCard className="h-4 w-4 mr-2" />
                   <span>Manage Subscription</span>
+                  {isLoading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
                 </Button>
                 <Button
                   variant="outline"
