@@ -88,10 +88,10 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
               ) : (
                 <>
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 px-4 py-2 rounded-md">
-                    Signup for 5 day free trial. No credit card required.
+                    Signup for 5 day free trial
                   </h2>
                   <p className="text-sm text-gray-600 mb-2 ">
-                    Try the wheel strategy screener with all features. After your trial, continue for just $7/month(billed annually)
+                    No Credit Card Required
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3 mt-2">
                     <Button
