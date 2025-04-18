@@ -45,12 +45,39 @@ export async function POST(req: Request) {
     const customerDoc = await customerRef.get();
     
     if (!customerDoc.exists) {
-      console.error("Customer document not found in Firebase for userId:", userId);
-      return new NextResponse('Unauthorized - Customer document not found', { status: 401 });
+      console.log("Customer document not found in Firebase for userId:", userId, "Creating new customer document...");
+      // Create a new customer document with an empty stripeId
+      await customerRef.set({
+        stripeId: null, // Initialize with null
+        // You might want to add other fields like email, createdAt, etc.
+        email: userEmail,
+        createdAt: new Date().toISOString(),
+      });
+      console.log("Created new customer document for userId:", userId);
     }
 
-    const stripeId = customerDoc.data()?.stripeId;
+    let stripeId = customerDoc.exists ? customerDoc.data()?.stripeId : null;
     console.log('Found Stripe customer ID:', stripeId);
+
+    // If stripeId doesn't exist, create a new Stripe customer and update Firestore
+    if (!stripeId) {
+      try {
+        // Create a new Stripe customer
+        const stripeCustomer = await stripe.customers.create({
+          email: userEmail,
+        });
+        stripeId = stripeCustomer.id;
+
+        // Update Firestore with the new Stripe customer ID
+        await customerRef.update({
+          stripeId: stripeId,
+        });
+        console.log('Created new Stripe customer and updated Firestore');
+      } catch (error) {
+        console.error('Stripe error details:', error);
+        return new NextResponse(`Stripe error: ${error instanceof Error ? error.message : 'Unknown error'}`, { status: 500 });
+      }
+    }
     
     try {
       // Use predefined price IDs from environment variables if available

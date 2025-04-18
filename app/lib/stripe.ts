@@ -63,7 +63,7 @@ export async function createCheckoutSession(isYearly: boolean = true) {
     }
 
     const { sessionId } = await response.json();
-    console.log('Received session ID:', sessionId);
+    // console.log('Received session ID:', sessionId);
     
     if (!sessionId) {
       throw new Error('No session ID returned from server');
