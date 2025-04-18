@@ -114,13 +114,21 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                     No Credit Card Required
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3 mt-2">
-                    <Button
-                      onClick={() => router.push('/manage-subscription')}
-                      size="lg"
-                      className="bg-white/10 text-white hover:bg-white/20 border-white/20 transition-colors flex items-center gap-2"
-                    >
-                      <CreditCard className="h-4 w-4" />
-                      <span>Manage Subscription</span>
+                  <Button
+                       onClick={() => handleUpgrade(false)}
+                       size="lg"
+                       className="bg-gray-900 hover:bg-gray-800 text-white border-0 shadow-md flex flex-col py-4 h-auto"
+                     >
+                       <span className="text-base font-semibold">Monthly Plan</span>
+                       <span className="text-xs font-normal opacity-90">$9/month</span>
+                     </Button>
+                     <Button
+                       onClick={() => handleUpgrade(true)}
+                        size="lg"
+                        className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white border-0 relative shadow-md flex flex-col py-4 h-auto">
+                        <span className="text-base font-semibold">Yearly Plan</span>
+                        <span className="text-xs font-normal opacity-90">$7/month</span>
+                        <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 22%</span>
                     </Button>
                   </div>
                 </>
