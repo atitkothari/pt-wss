@@ -8,12 +8,21 @@ let stripePromise: Promise<any> | null = null;
 const getStripe = () => {
   if (typeof window === 'undefined') return null;
   
+  console.log('Stripe publishable key:', process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+  
   if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+    console.error('Stripe publishable key is missing from environment variables');
     throw new Error('Stripe publishable key is not configured');
   }
   
   if (!stripePromise) {
-    stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+    try {
+      stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+      console.log('Stripe initialized successfully');
+    } catch (error) {
+      console.error('Error initializing Stripe:', error);
+      throw error;
+    }
   }
   return stripePromise;
 };
@@ -34,6 +43,8 @@ export async function createCheckoutSession(isYearly: boolean = true) {
       isYearly: isYearly,      
     }
     
+    console.log('Creating checkout session with body:', body);
+    
     const response = await fetch('/api/create-checkout-session', {
       method: 'POST',
       headers: {
@@ -44,10 +55,12 @@ export async function createCheckoutSession(isYearly: boolean = true) {
     
     if (!response.ok) {
       const errorText = await response.text();
+      console.error('Server response error:', errorText);
       throw new Error(`Failed to create checkout session: ${errorText}`);
     }
 
     const { sessionId } = await response.json();
+    console.log('Received session ID:', sessionId);
     
     if (!sessionId) {
       throw new Error('No session ID returned from server');
@@ -58,15 +71,15 @@ export async function createCheckoutSession(isYearly: boolean = true) {
     if (!stripe) {
       throw new Error('Stripe failed to initialize');
     }
-    console.log("redirecting...")
-    
-    console.log(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+
+    console.log('Redirecting to checkout...');
     const { error } = await stripe.redirectToCheckout({ sessionId });
     if (error) {
+      console.error('Stripe redirect error:', error);
       throw error;
     }
   } catch (error) {
-    console.error('Error while redirecting:', error);
+    console.error('Error in createCheckoutSession:', error);
     throw error;
   }
 }
