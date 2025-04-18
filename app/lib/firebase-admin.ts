@@ -19,7 +19,7 @@ function initializeFirebaseAdmin() {
       privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n') ?? '',
     };
 
-    console.log('Private Key:', process.env.FIREBASE_PRIVATE_KEY);
+    console.log('Private Key:', process.env);
 
     try {
       const app = initializeApp({
