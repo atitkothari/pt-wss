@@ -89,9 +89,7 @@ export default function PricingPage() {
         onClose={handleAuthModalClose}
         initialMode="signin"
       />
-      
-      {/* Debug Environment Variables */}
-      <DebugEnv />
+            
       
       {/* Hero Section */}
       <div className="container mx-auto px-4 pb-4 pt-8 md:pt-16">
