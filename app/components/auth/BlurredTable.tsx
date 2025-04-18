@@ -120,15 +120,15 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                        className="bg-gray-900 hover:bg-gray-800 text-white border-0 shadow-md flex flex-col py-4 h-auto"
                      >
                        <span className="text-base font-semibold">Monthly Plan</span>
-                       <span className="text-xs font-normal opacity-90">$9/month</span>
+                       <span className="text-xs font-normal opacity-90">$19.99/month</span>
                      </Button>
                      <Button
                        onClick={() => handleUpgrade(true)}
                         size="lg"
                         className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white border-0 relative shadow-md flex flex-col py-4 h-auto">
                         <span className="text-base font-semibold">Yearly Plan</span>
-                        <span className="text-xs font-normal opacity-90">$7/month</span>
-                        <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 22%</span>
+                        <span className="text-xs font-normal opacity-90">$16.5/month</span>
+                        <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 20%</span>
                     </Button>
                   </div>
                 </>
