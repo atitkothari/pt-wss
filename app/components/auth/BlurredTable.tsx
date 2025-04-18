@@ -72,14 +72,19 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
           <div className={cn("relative", className)}>
             {/* Blurred Content with Gradient that shows some rows */}
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-t from-transparent from-5% via-indigo-50/30 via-30% to-indigo-100/90 to-100% pointer-events-none z-10"></div>
-              <div className="filter blur-[2px] pointer-events-none">
-                {children}
+              <div className="absolute inset-0 bg-gradient-to-t from-transparent from-5% via-indigo-50/30 via-30% to-indigo-100/90 to-100% pointer-events-none z-10" style={{ top: '200px' }}></div>
+              <div className="relative">
+                <div className="absolute top-0 left-0 right-0 h-[200px] overflow-hidden">
+                  {children}
+                </div>
+                <div className="filter blur-[2px] pointer-events-none" style={{ clipPath: 'inset(200px 0 0 0)' }}>
+                  {children}
+                </div>
               </div>
             </div>
             
             {/* CTA Section */}
-            <div className="absolute inset-0 flex flex-col items-center p-8 z-20">
+            <div className="absolute inset-0 flex flex-col items-center p-8 z-20" style={{ top: '200px' }}>
               {status === 'unauthenticated' ? (
                 <>
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 px-4 py-2 rounded-md">
