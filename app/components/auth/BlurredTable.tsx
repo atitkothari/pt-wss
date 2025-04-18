@@ -29,9 +29,11 @@ const features = [
   "Fundamental Filters(P/E Ratio, Market Cap and more)",
   "Column Customization",
   "Mobile Responsive Design",
+  "Newsletter",
+  "Early access to new features",
+  "Priority support",
   "API Access (Coming soon)",
-  "Export as CSV and Excel (Coming Soon)",
-  "Newsletter"
+  "Export as CSV and Excel (Coming Soon)",  
 ];
 
 export const BlurredTable = ({ children, className, hasSearched = false }: BlurredTableProps) => {
