@@ -2,6 +2,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { auth } from './firebase';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { app } from './firebase';
+import { config } from '../config';
 
 let stripePromise: Promise<any> | null = null;
 
@@ -23,8 +24,8 @@ const getStripe = () => {
   
   if (!stripePromise) {
     try {
-      console.log('Initializing Stripe with key:', process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
-      stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+      console.log('Initializing Stripe with key:', config.stripe.publishableKey);
+      stripePromise = loadStripe(config.stripe.publishableKey);
       console.log('Stripe initialized successfully');
     } catch (error) {
       console.error('Error initializing Stripe:', error);
