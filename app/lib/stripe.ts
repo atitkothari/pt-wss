@@ -27,8 +27,8 @@ export async function createCheckoutSession(isYearly: boolean = true) {
     const body = { 
       userId: currentUser.uid,
       email: currentUser.email,
-      priceId: isYearly ? 'price_1REN1Q3yMAAql0611lQHDtI4' : 'price_1REN1Q3yMAAql061nAm7A0tN'
-    };
+      isYearly: isYearly,      
+    }
     
     const response = await fetch('/api/create-checkout-session', {
       method: 'POST',
@@ -38,6 +38,8 @@ export async function createCheckoutSession(isYearly: boolean = true) {
       body: JSON.stringify(body),
     });
 
+    console.log(response)
+    
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`Failed to create checkout session: ${errorText}`);
