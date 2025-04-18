@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { headers } from 'next/headers';
 import { adminDb } from '../../lib/firebase-admin';
-import { config } from '../../config';
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('STRIPE_SECRET_KEY is not set in environment variables');
@@ -15,9 +14,14 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 // Get these from environment variables in production
 const MONTHLY_PRICE_ID = process.env.STRIPE_MONTHLY_PRICE_ID;
 const YEARLY_PRICE_ID = process.env.STRIPE_YEARLY_PRICE_ID;
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL;
 
 if (!MONTHLY_PRICE_ID || !YEARLY_PRICE_ID) {
   throw new Error('Stripe price IDs are not set in environment variables');
+}
+
+if (!APP_URL) {
+  throw new Error('NEXT_PUBLIC_APP_URL is not set in environment variables');
 }
 
 export async function POST(req: Request) {
@@ -73,8 +77,8 @@ export async function POST(req: Request) {
           trial_period_days: 1,
         },
         payment_method_collection: 'if_required',
-        success_url: `${config.app.url}/covered-call-screener?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${config.app.url}/pricing`,
+        success_url: `${APP_URL}/covered-call-screener?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${APP_URL}/pricing`,
         allow_promotion_codes: true,
         metadata: {
           userId,

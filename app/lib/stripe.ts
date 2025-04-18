@@ -2,7 +2,6 @@ import { loadStripe } from '@stripe/stripe-js';
 import { auth } from './firebase';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { app } from './firebase';
-import { config } from '../config';
 
 let stripePromise: Promise<any> | null = null;
 
@@ -11,21 +10,17 @@ const getStripe = () => {
     console.log('Running on server side, returning null');
     return null;
   }
+
+  const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
   
-  console.log('Environment variables:', {
-    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL
-  });
-  
-  if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+  if (!publishableKey) {
     console.error('Stripe publishable key is missing from environment variables');
     throw new Error('Stripe publishable key is not configured');
   }
   
   if (!stripePromise) {
     try {
-      console.log('Initializing Stripe with key:', config.stripe.publishableKey);
-      stripePromise = loadStripe(config.stripe.publishableKey);
+      stripePromise = loadStripe(publishableKey);
       console.log('Stripe initialized successfully');
     } catch (error) {
       console.error('Error initializing Stripe:', error);
