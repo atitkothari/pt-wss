@@ -19,6 +19,8 @@ function initializeFirebaseAdmin() {
       privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
     };
 
+    console.log('Private Key:', process.env.FIREBASE_PRIVATE_KEY);
+
     try {
       const app = initializeApp({
         credential: cert(serviceAccount),
