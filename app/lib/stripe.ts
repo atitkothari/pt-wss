@@ -6,9 +6,15 @@ import { app } from './firebase';
 let stripePromise: Promise<any> | null = null;
 
 const getStripe = () => {
-  if (typeof window === 'undefined') return null;
+  if (typeof window === 'undefined') {
+    console.log('Running on server side, returning null');
+    return null;
+  }
   
-  console.log('Stripe publishable key:', process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+  console.log('Environment variables:', {
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL
+  });
   
   if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
     console.error('Stripe publishable key is missing from environment variables');
@@ -17,6 +23,7 @@ const getStripe = () => {
   
   if (!stripePromise) {
     try {
+      console.log('Initializing Stripe with key:', process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
       stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
       console.log('Stripe initialized successfully');
     } catch (error) {

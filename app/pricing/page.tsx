@@ -10,6 +10,7 @@ import { useAuth } from "@/app/context/AuthContext";
 import { createCheckoutSession } from "@/app/lib/stripe";
 import { AuthModal } from "@/app/components/modals/AuthModal";
 import { useUserAccess } from "@/app/hooks/useUserAccess";
+import DebugEnv from "../components/DebugEnv";
 
 export default function PricingPage() {
   const [isYearly, setIsYearly] = useState(true);
@@ -78,6 +79,9 @@ export default function PricingPage() {
         onClose={handleAuthModalClose}
         initialMode="signin"
       />
+      
+      {/* Debug Environment Variables */}
+      <DebugEnv />
       
       {/* Hero Section */}
       <div className="container mx-auto px-4 pb-4 pt-8 md:pt-16">
