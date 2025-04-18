@@ -59,6 +59,8 @@ export async function createCheckoutSession(isYearly: boolean = true) {
       throw new Error('Stripe failed to initialize');
     }
     console.log("redirecting...")
+    
+    console.log(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
     const { error } = await stripe.redirectToCheckout({ sessionId });
     if (error) {
       throw error;
