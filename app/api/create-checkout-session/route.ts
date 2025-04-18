@@ -59,6 +59,13 @@ export async function POST(req: Request) {
       console.log('Creating checkout session with price ID:', priceId);
 
       // Create checkout session
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://wheelstrategyoptions.com';
+      
+      if (!baseUrl) {
+        console.error('NEXT_PUBLIC_APP_URL is not set');
+        return new NextResponse('Internal server error - App URL not configured', { status: 500 });
+      }
+
       const checkoutSession = await stripe.checkout.sessions.create({
         customer: stripeId,
         line_items: [
@@ -72,8 +79,8 @@ export async function POST(req: Request) {
           trial_period_days: 1,
         },
         payment_method_collection: 'if_required',
-        success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/covered-call-screener?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/pricing`,
+        success_url: `${baseUrl}/covered-call-screener?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${baseUrl}/pricing`,
         allow_promotion_codes: true,
         metadata: {
           userId,
