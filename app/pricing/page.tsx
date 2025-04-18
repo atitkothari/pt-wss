@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, Clock } from "lucide-react";
+import { Check, Clock, Mail } from "lucide-react";
 import { Footer } from "../components/Footer";
 import { PageLayout } from "../components/PageLayout";
 import { useState, useEffect } from "react";
@@ -11,6 +11,7 @@ import { createCheckoutSession } from "@/app/lib/stripe";
 import { AuthModal } from "@/app/components/modals/AuthModal";
 import { useUserAccess } from "@/app/hooks/useUserAccess";
 import DebugEnv from "../components/DebugEnv";
+import { sendAnalyticsEvent, AnalyticsEvents } from '../utils/analytics';
 
 export default function PricingPage() {
   const [isYearly, setIsYearly] = useState(true);
@@ -55,6 +56,15 @@ export default function PricingPage() {
   const handleAuthModalClose = () => {
     setShowAuthModal(false);
     // After successful auth, the useEffect above will handle the redirect
+  };
+
+  const handleContactClick = () => {
+    sendAnalyticsEvent({
+      event_name: AnalyticsEvents.CONTACT_CLICK,
+      event_category: 'Contact',
+      event_label: 'Pricing Page'
+    });
+    window.location.href = 'mailto:reply@wheelstrategyoptions.com';
   };
 
   const features = [
@@ -171,6 +181,14 @@ export default function PricingPage() {
                   No credit card required
                 </p>
               )}
+              <Button
+                onClick={handleContactClick}
+                size="sm"
+                variant="ghost"
+                className="text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+              >
+                Have Questions?
+              </Button>
             </CardFooter>
           </Card>
         </div>
@@ -191,7 +209,7 @@ export default function PricingPage() {
           <div className="bg-gray-50 p-4 md:p-6 rounded-lg border border-gray-200">
             <h3 className="text-lg md:text-xl font-semibold mb-2">What payment methods do you accept?</h3>
             <p className="text-sm md:text-base text-gray-700">We accept all major credit cards, PayPal, and bank transfers for annual plans.</p>
-          </div>          
+          </div>
         </div>
       </div>
 

@@ -27,7 +27,8 @@ const features = [
   "Column Customization",
   "Mobile Responsive Design",
   "API Access (Coming soon)",
-  "Export as CSV and Excel (Coming Soon)"
+  "Export as CSV and Excel (Coming Soon)",
+  "Newsletter"
 ];
 
 export const BlurredTable = ({ children, className, hasSearched = false }: BlurredTableProps) => {
@@ -86,7 +87,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                 </>
               ) : (
                 <>
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 bg-white/80 px-4 py-2 rounded-md shadow-sm">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 px-4 py-2 rounded-md">
                     Signup for 5 day free trial. No credit card required.
                   </h2>
                   <p className="text-sm text-gray-600 mb-2 ">
@@ -116,17 +117,17 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
 
               {/* Features List - Moved back to the bottom */}
               <div className="mt-8 w-full max-w-4xl px-4">
-                <h3 className="text-xl font-bold text-gray-900 mb-6 bg-white/80 px-4 py-2 rounded-md shadow-sm inline-block">All Features Included</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-6 px-4 py-2 rounded-md inline-block">All Features Included</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {features.map((feature, index) => (
                     <div 
                       key={index} 
-                      className="flex items-center gap-3 p-3 rounded-lg bg-white/90 hover:bg-white transition-colors group shadow-sm border border-gray-100"
+                      className="flex items-center gap-3 p-3 rounded-lg bg-white/90 hover:bg-white transition-colors group shadow-sm border border-gray-100 text-left"
                     >
                       <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-500/10 flex items-center justify-center">
                         <Check className="h-3.5 w-3.5 text-green-600" />
                       </div>
-                      <span className="text-sm font-medium text-gray-800 group-hover:text-gray-900 transition-colors">{feature}</span>
+                      <span className="text-sm font-medium text-gray-800 group-hover:text-gray-900 transition-colors text-left">{feature}</span>
                     </div>
                   ))}
                 </div>
@@ -136,7 +137,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                       size="lg"
                       className="bg-white text-gray-900 hover:bg-gray-100 border border-gray-300 flex items-center gap-2 font-medium shadow-md"
                     >
-                      View All Plans
+                      See Pricing
                       <ExternalLink className="h-4 w-4" />
                     </Button>
                   </Link>

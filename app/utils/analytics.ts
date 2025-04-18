@@ -44,6 +44,9 @@ export const AnalyticsEvents = {
   DISCOVER_TAB_CHANGE: 'discover_tab_change',
   STOCK_DETAIL_VIEW: 'stock_detail_view',
   
+  // Contact events
+  CONTACT_CLICK: 'contact_click',
+  
   // Error events
   ERROR: 'error'
 } as const; 
