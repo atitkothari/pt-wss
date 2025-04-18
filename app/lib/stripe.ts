@@ -8,8 +8,12 @@ let stripePromise: Promise<any> | null = null;
 const getStripe = () => {
   if (typeof window === 'undefined') return null;
   
+  if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+    throw new Error('Stripe publishable key is not configured');
+  }
+  
   if (!stripePromise) {
-    stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+    stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
   }
   return stripePromise;
 };
@@ -37,28 +41,30 @@ export async function createCheckoutSession(isYearly: boolean = true) {
       },
       body: JSON.stringify(body),
     });
-
     
-    console.log(response)
-    
-    // if (!response.ok) {
-    //   const errorText = await response.text();
-    //   throw new Error(`Failed to create checkout session: ${errorText}`);
-    // }
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to create checkout session: ${errorText}`);
+    }
 
     const { sessionId } = await response.json();
+    
+    if (!sessionId) {
+      throw new Error('No session ID returned from server');
+    }
+
     const stripe = await getStripe();
     
     if (!stripe) {
       throw new Error('Stripe failed to initialize');
     }
-
+    console.log("redirecting...")
     const { error } = await stripe.redirectToCheckout({ sessionId });
     if (error) {
       throw error;
     }
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error while redirecting:', error);
     throw error;
   }
 }
