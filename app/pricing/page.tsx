@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, Clock, Mail } from "lucide-react";
+import { Check, Clock, Mail, CreditCard } from "lucide-react";
 import { Footer } from "../components/Footer";
 import { PageLayout } from "../components/PageLayout";
 import { useState, useEffect } from "react";
@@ -12,16 +12,18 @@ import { AuthModal } from "@/app/components/modals/AuthModal";
 import { useUserAccess } from "@/app/hooks/useUserAccess";
 import DebugEnv from "../components/DebugEnv";
 import { sendAnalyticsEvent, AnalyticsEvents } from '../utils/analytics';
+import { useRouter } from "next/navigation";
 
 export default function PricingPage() {
   const [isYearly, setIsYearly] = useState(true);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { user } = useAuth();
   const { status } = useUserAccess();
+  const router = useRouter();
 
   // Handle post-auth redirect
   useEffect(() => {
-    if (user && status === 'trial') {
+    if (user && status === 'trialing') {
       // If user is in trial, redirect to main feature
       window.location.href = '/covered-call-screener';
     }
@@ -39,10 +41,10 @@ export default function PricingPage() {
         return;
       }
 
-      // If user is not in trial and not pro, start checkout
+      // If user is not in trial and not active, start checkout
       if (status === 'needs_subscription') {
         await createCheckoutSession(isYearly);
-      } else if (status === 'trial') {
+      } else if (status === 'trialing') {
         // If user is in trial, redirect to main feature
         window.location.href = '/covered-call-screener';
       }
@@ -167,17 +169,26 @@ export default function PricingPage() {
               </ul>
             </CardContent>
             <CardFooter className="flex flex-col gap-3 md:gap-4 pt-6 md:pt-8 px-4 md:px-6">
-              <Button 
-                onClick={handleStartTrial}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-base md:text-lg py-4 md:py-6"
-                disabled={status === 'pro'}
-              >
-                {status === 'pro' ? 'Current Plan' : 'Start 5-Day Free Trial'}
-              </Button>
-              {status !== 'pro' && (
-                <p className="text-xs md:text-sm text-gray-500 text-center">
-                  No credit card required
-                </p>
+              {status === 'active' || status === 'trialing' || status === 'paused' ? (
+                <Button 
+                  onClick={() => router.push('/manage-subscription')}
+                  className="w-full bg-black text-white flex items-center gap-2"
+                >
+                  <CreditCard className="h-4 w-4" />
+                  <span>Manage Subscription</span>
+                </Button>
+              ) : (
+                <>
+                  <Button 
+                    onClick={handleStartTrial}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-base md:text-lg py-4 md:py-6"
+                  >
+                    Start 5-Day Free Trial
+                  </Button>
+                  <p className="text-xs md:text-sm text-gray-500 text-center">
+                    No credit card required
+                  </p>
+                </>
               )}
               <Button
                 onClick={handleContactClick}

@@ -3,11 +3,12 @@
 import { useUserAccess } from "@/app/hooks/useUserAccess";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Mail, Check, ExternalLink } from "lucide-react";
+import { Mail, Check, ExternalLink, CreditCard } from "lucide-react";
 import { useState } from "react";
 import { AuthModal } from "../modals/AuthModal";
 import { createCheckoutSession } from "@/app/lib/stripe";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface BlurredTableProps {
   children: React.ReactNode;
@@ -34,6 +35,7 @@ const features = [
 export const BlurredTable = ({ children, className, hasSearched = false }: BlurredTableProps) => {
   const { status, loading } = useUserAccess();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const router = useRouter();
 
   const shouldBlur = hasSearched || (status !== 'trialing' && status !== 'active' && status !== 'incomplete_expired');
 
@@ -71,7 +73,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
               {status === 'unauthenticated' ? (
                 <>
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 px-4 py-2 rounded-md">
-                    Create an account to see all results!
+                    Create an account to see results!
                   </h2>
                   <Button
                     onClick={() => setShowAuthModal(true)}
@@ -82,7 +84,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                   >                    
                     Start your 5-day free trial
                   </Button>
-                  <p className="text-sm text-gray-600 mt-2">No credit card required</p>
+                  <p className="text-sm text-gray-600 mt-2"><b>No credit card required</b></p>
                 </>
               ) : status === 'paused' ? (
                 <>
@@ -90,53 +92,35 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                     Your subscription has ended
                   </h2>
                   <p className="text-sm text-gray-600 mb-2">
-                    Upgrade to continue accessing all features
+                    Provide payment method to continue
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3 mt-2">
                     <Button
-                      onClick={() => handleUpgrade(false)}
+                      onClick={() => router.push('/manage-subscription')}
                       size="lg"
-                      className="bg-gray-900 hover:bg-gray-800 text-white border-0 shadow-md flex flex-col py-4 h-auto"
+                      className="bg-black text-white hover:bg-white/20 border-white/20 transition-colors flex items-center gap-2"
                     >
-                      <span className="text-base font-semibold">Monthly Plan</span>
-                      <span className="text-xs font-normal opacity-90">$9/month</span>
-                    </Button>
-                    <Button
-                      onClick={() => handleUpgrade(true)}
-                      size="lg"
-                      className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white border-0 relative shadow-md flex flex-col py-4 h-auto"
-                    >
-                      <span className="text-base font-semibold">Yearly Plan</span>
-                      <span className="text-xs font-normal opacity-90">$7/month</span>
-                      <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 22%</span>
+                      <CreditCard className="h-4 w-4" />
+                      <span>Manage Subscription</span>
                     </Button>
                   </div>
                 </>
               ) : (
                 <>
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 px-4 py-2 rounded-md">
-                    Signup for 5 day free trial
+                    Account Created! Start your free trial
                   </h2>
                   <p className="text-sm text-gray-600 mb-2 ">
                     No Credit Card Required
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3 mt-2">
                     <Button
-                      onClick={() => handleUpgrade(false)}
+                      onClick={() => router.push('/manage-subscription')}
                       size="lg"
-                      className="bg-gray-900 hover:bg-gray-800 text-white border-0 shadow-md flex flex-col py-4 h-auto"
+                      className="bg-white/10 text-white hover:bg-white/20 border-white/20 transition-colors flex items-center gap-2"
                     >
-                      <span className="text-base font-semibold">Monthly Plan</span>
-                      <span className="text-xs font-normal opacity-90">$9/month</span>
-                    </Button>
-                    <Button
-                      onClick={() => handleUpgrade(true)}
-                      size="lg"
-                      className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white border-0 relative shadow-md flex flex-col py-4 h-auto"
-                    >
-                      <span className="text-base font-semibold">Yearly Plan</span>
-                      <span className="text-xs font-normal opacity-90">$7/month</span>
-                      <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 22%</span>
+                      <CreditCard className="h-4 w-4" />
+                      <span>Manage Subscription</span>
                     </Button>
                   </div>
                 </>
