@@ -38,12 +38,13 @@ export async function createCheckoutSession(isYearly: boolean = true) {
       body: JSON.stringify(body),
     });
 
+    
     console.log(response)
     
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to create checkout session: ${errorText}`);
-    }
+    // if (!response.ok) {
+    //   const errorText = await response.text();
+    //   throw new Error(`Failed to create checkout session: ${errorText}`);
+    // }
 
     const { sessionId } = await response.json();
     const stripe = await getStripe();
