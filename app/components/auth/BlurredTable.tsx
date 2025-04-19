@@ -164,7 +164,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                     >
                       <span className="text-base font-semibold">Yearly Plan</span>
                       <span className="text-xs font-normal opacity-90">$16.5/month</span>
-                      <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 20%</span>
+                      <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 18%</span>
                     </Button>
                   </div>
                 </>

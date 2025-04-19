@@ -150,7 +150,7 @@ export default function PricingPage() {
               </div>
               {isYearly && (
                 <p className="text-green-600 text-xs md:text-sm mt-2">
-                  $7/month, billed annually
+                  $16.5/month, billed annually
                 </p>
               )}
             </CardHeader>
