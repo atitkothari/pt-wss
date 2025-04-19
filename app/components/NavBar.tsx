@@ -189,7 +189,7 @@ export function NavBar() {
 
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="absolute top-[64px] left-0 right-0 bg-white/90 backdrop-blur-sm border-b border-gray-200 p-4 lg:hidden z-50 animate-in slide-in-from-top duration-200">
+        <div className="absolute top-[64px] left-0 right-0 bg-white shadow-lg border border-gray-200 p-4 lg:hidden z-50 animate-in slide-in-from-top duration-200">
           <div className="flex flex-col space-y-4">
             {/* Screeners Section */}
             <div className="border-b border-gray-200 pb-4">
