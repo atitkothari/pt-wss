@@ -27,8 +27,7 @@ export function useUserAccess() {
 
   const getUserStatus = (): UserAccessStatus => {
     if (loading) return 'loading';
-    if (!user) return 'unauthenticated';
-    console.log("subs",subscriptionStatus)
+    if (!user) return 'unauthenticated';    
     // If there's no subscription status, user needs to subscribe
     if (!subscriptionStatus) return 'needs_subscription';
 
