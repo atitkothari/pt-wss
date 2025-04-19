@@ -340,13 +340,7 @@ export default function SavedScreenersPage() {
     <PageLayout>
       <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Saved Screeners</h1>
-          <Button
-            onClick={() => setEditingScreener(null)}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            Create New Screener
-          </Button>
+          <h1 className="text-2xl font-bold">Your Saved Screeners</h1>         
         </div>
 
         {/* Covered Call Screeners Section */}
