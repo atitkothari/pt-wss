@@ -47,13 +47,13 @@ export default function LandingPage() {
       <div className="bg-transparent py-12 md:py-20 mt-12 md:mt-20">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-4xl font-bold text-center mb-8 md:mb-12 text-gray-800">
-            Blazing Fast Screening Of Over 350,000 Option Contracts
+            Blazing Fast Screening of Over 350,000 Option Contracts
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             <FeatureCard
               icon={<BarChart2 className="h-6 md:h-8 w-6 md:w-8 text-blue-500" />}
               title="Covered Call Screener"
-              description="Find the best covered call opportunities with our advanced screening tools. Filter by premium yield, strike price, expiration, earnings and more."
+              description="Find the best covered call opportunities with our advanced screening tools. Filter by premium yield, strike price, expiration, earnings, and more."
             />
             <FeatureCard
               icon={<DollarSign className="h-6 md:h-8 w-6 md:w-8 text-blue-500" />}
@@ -94,7 +94,7 @@ export default function LandingPage() {
             icon={<Target className="h-5 md:h-6 w-5 md:w-6 text-white" />}
             number="1"
             title="Choose Your Strategy"
-            description="Select between covered calls or cash-secured puts based on your where you are in the wheel cycle."
+            description="Select between covered calls or cash-secured puts based on where you are in the wheel cycle."
           />
           <StepCard
             icon={<Filter className="h-5 md:h-6 w-5 md:w-6 text-white" />}

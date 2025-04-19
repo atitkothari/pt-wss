@@ -76,29 +76,29 @@ export function useUserAccess() {
     const status = getUserStatus();
     switch (status) {
       case 'active':
-        return 'You have full access to all features';
+        return 'You have full access to all features.';
       case 'trialing':
-        return 'You are currently in your trial period';
+        return 'You are currently in your trial period.';
       case 'past_due':
-        return 'Your payment is past due. Please update your payment method';
+        return 'Your payment is past due. Please update your payment method.';
       case 'canceled':
-        return 'Your subscription has been canceled';
+        return 'Your subscription has been canceled.';
       case 'incomplete':
-        return 'Your payment is incomplete. Please complete the payment process';
+        return 'Your payment is incomplete. Please complete the payment process.';
       case 'incomplete_expired':
-        return 'Your trial has ended. Please subscribe to continue accessing features';
+        return 'Your trial has ended. Please subscribe to continue accessing features.';
       case 'unpaid':
-        return 'Your subscription is unpaid. Please update your payment method';
+        return 'Your subscription is unpaid. Please update your payment method.';
       case 'paused':
-        return 'Your subscription is paused';
+        return 'Your subscription is paused.';
       case 'needs_subscription':
-        return 'Please subscribe to access features';
+        return 'Please subscribe to access features.';
       case 'unauthenticated':
-        return 'Please sign in to access features';
+        return 'Please sign in to access features.';
       case 'loading':
         return 'Loading...';
       default:
-        return 'Unknown status';
+        return 'Unknown status.';
     }
   };
 

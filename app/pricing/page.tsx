@@ -68,9 +68,9 @@ export default function PricingPage() {
     "Cash-Secured Put Screener",
     "Customizable Filters",
     "Save & Load Screeners",
-    "Advanced Filters(Delta, IV, DTE and more)",
+    "Advanced Filters (Delta, IV, DTE and more)",
     "Premium Yield Analysis",
-    "Fundamental Filters(P/E Ratio, Market Cap and more)",
+    "Fundamental Filters (P/E Ratio, Market Cap and more)",
     "Column Customization",
     "Mobile Responsive Design",
     "API Access (Coming soon)",
@@ -143,7 +143,7 @@ export default function PricingPage() {
               </div>
               {isYearly && (
                 <p className="text-green-600 text-xs md:text-sm mt-2">
-                  $16.5/month, billed annually
+                  $16.50/month, billed annually
                 </p>
               )}
             </CardHeader>
