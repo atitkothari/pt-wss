@@ -240,6 +240,20 @@ export function NavBar() {
               >
                 Pricing
               </Link>
+
+              {/* Saved Screeners - Only show if user is logged in */}
+              {user && (
+                <Link
+                  href="/saved-screeners"
+                  className="block text-gray-700 hover:text-gray-900 py-2 transition-colors font-medium"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    handleNavigation('Saved Screeners', '/saved-screeners');
+                  }}
+                >
+                  Saved Screeners
+                </Link>
+              )}
             </div>
             
             {loading ? null : user ? (
