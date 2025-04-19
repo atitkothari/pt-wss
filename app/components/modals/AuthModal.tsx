@@ -85,25 +85,8 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signin' }: AuthModal
         // If we're no longer loading, we can proceed
         if (!loading) {
           console.log('Final status check:', status);
-          onClose();
-          
-          // For a new user or a user that needs subscription, go to pricing
-          if (status === 'needs_subscription') {
-            // window.location.href = '/pricing';
-            return;
-          }
-          
-          // For users with active pro or trial subscriptions
-          // window.location.href = '/covered-call-screener';
-          return;
-        }
-        
-        // If we've exceeded max retries, assume they need to go to pricing
-        if (retryCount >= maxRetries) {
-          console.log('Max retries reached. Redirecting to pricing.');
-          onClose();
-          window.location.href = '/pricing';
-          return;
+          onClose();   
+          return;     
         }
         
         // Increment retry count and try again with backoff

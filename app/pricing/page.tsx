@@ -21,13 +21,6 @@ export default function PricingPage() {
   const { status } = useUserAccess();
   const router = useRouter();
 
-  // Handle post-auth redirect
-  useEffect(() => {
-    if (user && status === 'trialing') {
-      // If user is in trial, redirect to main feature
-      window.location.href = '/covered-call-screener';
-    }
-  }, [user, status]);
 
   const handleStartTrial = async () => {
     try {
@@ -215,10 +208,10 @@ export default function PricingPage() {
             <h3 className="text-lg md:text-xl font-semibold mb-2">Can I cancel anytime?</h3>
             <p className="text-sm md:text-base text-gray-700">Yes, you can cancel your subscription at any time. No questions asked.</p>
           </div>
-          <div className="bg-gray-50 p-4 md:p-6 rounded-lg border border-gray-200">
+          {/* <div className="bg-gray-50 p-4 md:p-6 rounded-lg border border-gray-200">
             <h3 className="text-lg md:text-xl font-semibold mb-2">What payment methods do you accept?</h3>
             <p className="text-sm md:text-base text-gray-700">We accept all major credit cards, PayPal, and bank transfers for annual plans.</p>
-          </div>
+          </div> */}
         </div>
       </div>
 
