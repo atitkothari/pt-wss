@@ -17,21 +17,15 @@ import { PageLayout } from "./components/PageLayout";
 
 export default function LandingPage() {
   return (
-    <PageLayout className="bg-gradient-to-br from-gray-100 via-blue-50 to-amber-50 text-gray-900 min-h-screen">      
-      {/* Logo Section */}
-      <div className="flex flex-col items-center justify-center pt-4 md:pt-8">
-        {/* <img src="/logo.png" className="h-20 md:h-24 mb-3 md:mb-4" alt="Wheel Strategy Options Logo" /> */}
-        <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-4 md:mb-6">
-          Wheel Strategy Options
-        </h2>
-      </div>
-
+    <PageLayout className="bg-gradient-to-br from-gray-100 via-blue-50 to-amber-50 text-gray-900 min-h-screen">            
+      
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-4 md:py-6">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-800 leading-normal pb-1">
-            One-Stop Solution for Option Selling
+            Analyze High Premium Option Contracts 
           </h1>
+          <p className="text-lg md:text-2xl text-gray-600 mb-6 md:mb-8 px-2 md:px-0 leading-relaxed"><b>Fast. Easy. Affordable.</b></p>
           <p className="text-lg md:text-2xl text-gray-600 mb-6 md:mb-8 px-2 md:px-0 leading-relaxed">
             Scan 350,000+ option contracts in seconds. Discover high-yield trades that maximize premium income — with powerful filters built by option sellers for option sellers.
           </p>
@@ -43,10 +37,25 @@ export default function LandingPage() {
         </div>
       </div>
 
+      {/* Learn More About Wheel Strategy Section */}
+      <div className="container mx-auto px-4 py-2">
+        <p className="text-lg text-gray-500 mb-2 text-center">
+          New to Wheel Strategy? Learn more about it {' '}
+          <a 
+            href="https://wheelstrategyoptions.com/blog/selling-options-for-income-a-practical-guide-2/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-800 underline font-medium"
+          >
+            here.
+          </a>
+        </p>
+      </div>
+
       {/* Features Section */}
-      <div className="bg-transparent py-12 md:py-20 mt-12 md:mt-20">
+      <div className="bg-transparent py-8 md:py-12 mt-4 md:mt-8">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl md:text-4xl font-bold text-center mb-8 md:mb-12 text-gray-800">
+          <h2 className="text-2xl md:text-4xl font-bold text-center mb-6 md:mb-8 text-gray-800">
             Blazing Fast Screening of Over 350,000 Option Contracts
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">

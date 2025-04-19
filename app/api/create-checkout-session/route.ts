@@ -101,7 +101,7 @@ export async function POST(req: Request) {
         ],
         mode: 'subscription',
         subscription_data: {
-          trial_period_days: 1,
+          trial_period_days: 5,
         },
         payment_method_collection: 'if_required',
         success_url: `${APP_URL}/covered-call-screener?session_id={CHECKOUT_SESSION_ID}`,
