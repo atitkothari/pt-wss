@@ -17,11 +17,11 @@ import { PageLayout } from "./components/PageLayout";
 
 export default function LandingPage() {
   return (
-    <PageLayout className="bg-gray-900 text-white">      
+    <PageLayout className="bg-gradient-to-br from-gray-100 via-blue-50 to-amber-50 text-gray-900 min-h-screen">      
       {/* Logo Section */}
       <div className="flex flex-col items-center justify-center pt-4 md:pt-8">
         <img src="/logo.png" className="h-20 md:h-24 mb-3 md:mb-4" alt="Wheel Strategy Options Logo" />
-        <h2 className="text-2xl md:text-3xl font-semibold text-white mb-4 md:mb-6">
+        <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-4 md:mb-6">
           Wheel Strategy Options
         </h2>
       </div>
@@ -29,14 +29,14 @@ export default function LandingPage() {
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-4 md:py-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-2xl md:text-4xl font-bold mb-4 md:mb-6">
+          <h1 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-800 leading-normal pb-1">
             One-Stop Solution for Option Selling
           </h1>
-          <p className="text-base md:text-xl text-gray-300 mb-6 md:mb-8 px-2 md:px-0">
-          Scan 350,000+ option contracts in seconds. Discover high-yield trades that maximize premium income — with powerful filters built by option sellers for option sellers.
+          <p className="text-lg md:text-2xl text-gray-600 mb-6 md:mb-8 px-2 md:px-0 leading-relaxed">
+            Scan 350,000+ option contracts in seconds. Discover high-yield trades that maximize premium income — with powerful filters built by option sellers for option sellers.
           </p>
           <Link href="/options">
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-base md:text-lg px-6 md:px-8 py-4 md:py-6">
+            <Button size="lg" className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white text-base md:text-lg px-8 md:px-10 py-6 md:py-7 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
               Launch Screener <ArrowRight className="ml-2 h-4 md:h-5 w-4 md:w-5" />
             </Button>
           </Link>
@@ -44,39 +44,39 @@ export default function LandingPage() {
       </div>
 
       {/* Features Section */}
-      <div className="bg-gray-800 py-12 md:py-20 mt-12 md:mt-20">
+      <div className="bg-transparent py-12 md:py-20 mt-12 md:mt-20">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl md:text-4xl font-bold text-center mb-8 md:mb-12">
+          <h2 className="text-2xl md:text-4xl font-bold text-center mb-8 md:mb-12 text-gray-800">
             Blazing Fast Screening Of Over 350,000 Option Contracts
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             <FeatureCard
-              icon={<BarChart2 className="h-6 md:h-8 w-6 md:w-8 text-blue-400" />}
+              icon={<BarChart2 className="h-6 md:h-8 w-6 md:w-8 text-blue-500" />}
               title="Covered Call Screener"
               description="Find the best covered call opportunities with our advanced screening tools. Filter by premium yield, strike price, expiration, earnings and more."
             />
             <FeatureCard
-              icon={<DollarSign className="h-6 md:h-8 w-6 md:w-8 text-blue-400" />}
+              icon={<DollarSign className="h-6 md:h-8 w-6 md:w-8 text-blue-500" />}
               title="Cash-Secured Put Screener"
               description="Screen for cash-secured put opportunities that match your risk tolerance and income targets."
             />
             <FeatureCard
-              icon={<Filter className="h-6 md:h-8 w-6 md:w-8 text-blue-400" />}
+              icon={<Filter className="h-6 md:h-8 w-6 md:w-8 text-blue-500" />}
               title="Advanced Filters"
               description="Filter by Delta, Implied Volatility, Days to Expiration, P/E Ratio, Market Cap, and more to find the perfect trade."
             />
             <FeatureCard
-              icon={<Save className="h-6 md:h-8 w-6 md:w-8 text-blue-400" />}
+              icon={<Save className="h-6 md:h-8 w-6 md:w-8 text-blue-500" />}
               title="Save & Load Screeners"
               description="Save your favorite screeners and load them anytime. Perfect for recurring strategies and quick access to your preferred setups."
             />
             <FeatureCard
-              icon={<BellRing className="h-6 md:h-8 w-6 md:w-8 text-blue-400" />}
+              icon={<BellRing className="h-6 md:h-8 w-6 md:w-8 text-blue-500" />}
               title="Email Notifications"
               description="Get notified when your saved screeners find new opportunities matching your criteria."
             />
             <FeatureCard
-              icon={<LineChart className="h-6 md:h-8 w-6 md:w-8 text-blue-400" />}
+              icon={<LineChart className="h-6 md:h-8 w-6 md:w-8 text-blue-500" />}
               title="Fundamental Analysis"
               description="Screen by P/E Ratio, Market Cap, and sector to find fundamentally sound companies for your options strategy."
             />
@@ -86,7 +86,7 @@ export default function LandingPage() {
 
       {/* How It Works Section */}
       <div className="container mx-auto px-4 py-12 md:py-20">
-        <h2 className="text-2xl md:text-4xl font-bold text-center mb-8 md:mb-12">
+        <h2 className="text-2xl md:text-4xl font-bold text-center mb-8 md:mb-12 text-gray-800">
           How It Works
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -112,16 +112,16 @@ export default function LandingPage() {
       </div>
 
       {/* CTA Section */}
-      <div className="bg-gray-800 py-12 md:py-20">
+      <div className="bg-transparent py-12 md:py-20">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-4xl font-bold mb-4 md:mb-6">
+          <h2 className="text-2xl md:text-4xl font-bold mb-4 md:mb-6 text-gray-800">
             Ready to Maximize Your Income?
           </h2>
-          <p className="text-base md:text-xl text-gray-300 mb-6 md:mb-8 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-gray-600 mb-6 md:mb-8 max-w-2xl mx-auto">
             Join successful options traders who use our platform to find and execute high-yield trades.
           </p>
           <Link href="/options">
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-base md:text-lg px-6 md:px-8 py-4 md:py-6">
+            <Button size="lg" className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white text-base md:text-lg px-8 md:px-10 py-6 md:py-7 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
               Launch Screener <Search className="ml-2 h-4 md:h-5 w-4 md:w-5" />
             </Button>
           </Link>
@@ -134,12 +134,12 @@ export default function LandingPage() {
 
 function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
   return (
-    <div className="bg-gray-700 rounded-lg p-6">
+    <div className="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-100">
       <div className="mb-4">
         {icon}
       </div>
-      <h3 className="text-xl font-semibold mb-4">{title}</h3>
-      <p className="text-gray-300">{description}</p>
+      <h3 className="text-xl font-semibold mb-4 text-gray-800">{title}</h3>
+      <p className="text-gray-600 leading-relaxed">{description}</p>
     </div>
   );
 }
@@ -152,11 +152,11 @@ function StepCard({ icon, number, title, description }: {
 }) {
   return (
     <div className="text-center">
-      <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+      <div className="w-14 h-14 bg-gradient-to-r from-blue-600 to-blue-700 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4 shadow-md">
         {icon}
       </div>
-      <h3 className="text-xl font-semibold mb-4">{title}</h3>
-      <p className="text-gray-300">{description}</p>
+      <h3 className="text-xl font-semibold mb-4 text-gray-800">{title}</h3>
+      <p className="text-gray-600 leading-relaxed">{description}</p>
     </div>
   );
 }
