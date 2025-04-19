@@ -93,7 +93,7 @@ export default function PricingPage() {
             Simple, Transparent Pricing
           </h1>
           <p className="text-lg sm:text-xl text-gray-600 mb-6 md:mb-8 px-4">
-            Start with a 5-day free trial. No credit card required.
+          Scan 350,000+ option contracts in seconds. Start with a 5-day free trial. No credit card required.
           </p>
 
           {/* Billing Toggle */}
