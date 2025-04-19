@@ -71,7 +71,7 @@ export function NavBar() {
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center justify-end flex-1 gap-6">
+        <div className="hidden lg:flex items-center justify-end flex-1 gap-6">
           <div className="flex items-center gap-6">
             {/* Individual Screener Links */}
             {navigation.screeners.map((item) => (
@@ -181,7 +181,7 @@ export function NavBar() {
         {/* Mobile Menu Button */}
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="md:hidden text-gray-900 hover:text-gray-700 transition-colors"
+          className="lg:hidden text-gray-900 hover:text-gray-700 transition-colors"
         >
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -189,7 +189,7 @@ export function NavBar() {
 
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="absolute top-[64px] left-0 right-0 bg-white/90 backdrop-blur-sm border-b border-gray-200 p-4 md:hidden z-50 animate-in slide-in-from-top duration-200">
+        <div className="absolute top-[64px] left-0 right-0 bg-white/90 backdrop-blur-sm border-b border-gray-200 p-4 lg:hidden z-50 animate-in slide-in-from-top duration-200">
           <div className="flex flex-col space-y-4">
             {/* Screeners Section */}
             <div className="border-b border-gray-200 pb-4">
