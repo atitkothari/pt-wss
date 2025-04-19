@@ -20,7 +20,7 @@ export default function LandingPage() {
     <PageLayout className="bg-gradient-to-br from-gray-100 via-blue-50 to-amber-50 text-gray-900 min-h-screen">      
       {/* Logo Section */}
       <div className="flex flex-col items-center justify-center pt-4 md:pt-8">
-        <img src="/logo.png" className="h-20 md:h-24 mb-3 md:mb-4" alt="Wheel Strategy Options Logo" />
+        {/* <img src="/logo.png" className="h-20 md:h-24 mb-3 md:mb-4" alt="Wheel Strategy Options Logo" /> */}
         <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-4 md:mb-6">
           Wheel Strategy Options
         </h2>

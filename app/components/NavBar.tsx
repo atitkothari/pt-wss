@@ -63,31 +63,31 @@ export function NavBar() {
 
   return (
     <nav className="bg-gradient-to-br from-gray-50 via-white to-blue-50 w-full border-b border-gray-200 p-4 z-40 relative">
-      <div className="max-w-screen-2xl mx-auto flex justify-between items-center">
-        <Link href="/" className="flex items-center hover:opacity-90 transition-opacity">
-          <img src="/logo.png" className="h-8 md:h-12 mr-2 md:mr-3" alt="Wheel Strategy Options Logo" />
-          <span className="self-center text-lg md:text-2xl font-semibold whitespace-nowrap text-gray-800 hidden sm:inline">
+      <div className="max-w-screen-2xl mx-auto flex justify-between items-center gap-4">
+        <Link href="/" className="flex items-center hover:opacity-90 transition-opacity shrink-0">
+          <img src="/logo.png" className="h-8 md:h-10 mr-2 md:mr-3" alt="Wheel Strategy Options Logo" />
+          <span className="self-center text-base md:text-xl font-semibold whitespace-nowrap text-gray-800 hidden sm:inline">
             Wheel Strategy Options
           </span>
-          <span className="self-center text-lg md:text-2xl font-semibold whitespace-nowrap text-gray-800 sm:hidden">
-            Wheel Strategy Options
+          <span className="self-center text-base md:text-xl font-semibold whitespace-nowrap text-gray-800 sm:hidden">
+          Wheel Strategy Options
           </span>
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-8">
-          <div className="flex space-x-8">
+        <div className="hidden md:flex items-center justify-end flex-1 gap-6">
+          <div className="flex items-center gap-6">
             {/* Screeners Dropdown */}
-            <div className="relative group">
+            <div className="relative">
               <button
                 onClick={() => setIsScreenersOpen(!isScreenersOpen)}
-                className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+                className="flex items-center text-gray-600 hover:text-gray-900 transition-colors whitespace-nowrap"
               >
                 Screeners
                 <ChevronDown className="ml-1 h-4 w-4" />
               </button>
               {isScreenersOpen && (
-                <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transform transition-all duration-200 ease-in-out">
+                <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transform transition-all duration-200 ease-in-out">
                   <div className="py-1">
                     {navigation.screeners.map((item) => (
                       <Link
@@ -112,7 +112,7 @@ export function NavBar() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-gray-600 hover:text-gray-900 transition-colors"
+                className="text-gray-600 hover:text-gray-900 transition-colors whitespace-nowrap"
                 onClick={() => handleNavigation(item.name, item.href)}
               >
                 {item.name}
@@ -126,7 +126,7 @@ export function NavBar() {
                 href={item.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-600 hover:text-gray-900 transition-colors"
+                className="text-gray-600 hover:text-gray-900 transition-colors whitespace-nowrap"
                 onClick={() => handleNavigation(item.name, item.href, true)}
               >
                 {item.name}
@@ -134,9 +134,9 @@ export function NavBar() {
             ))}
           </div>
           
-          <div className="flex items-center gap-4">            
+          <div className="flex items-center">            
             {loading ? null : user ? (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="bg-white/50 text-gray-800 hover:bg-white/80 border-gray-200 transition-colors flex items-center gap-2">
@@ -175,7 +175,7 @@ export function NavBar() {
               <Button
                 onClick={() => setIsAuthModalOpen(true)}
                 variant="outline"
-                className="bg-white/50 text-gray-800 hover:bg-white/80 border-gray-200 transition-colors"
+                className="bg-white/50 text-gray-800 hover:bg-white/80 border-gray-200 transition-colors whitespace-nowrap"
               >
                 Sign In
               </Button>
