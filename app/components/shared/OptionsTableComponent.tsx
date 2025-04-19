@@ -1354,16 +1354,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                 ) : (
                   <span>* Data last updated on {getOldestUpdateDate()}</span>
                 )}
-              </div>
-              <Button
-                id="btn_buy_coffee_bottom"
-                variant="outline"
-                size="sm"
-                onClick={() => window.open('https://buymeacoffee.com/wheelstrategyoptions', '_blank')}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                Support
-              </Button>
+              </div>             
             </div>
           </div>
         )}
