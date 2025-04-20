@@ -1,12 +1,13 @@
 import { MetadataRoute } from 'next'
+import { validSymbols } from './lib/valid-symbols';
 
 const baseUrl = 'https://wheelstrategyoptions.com'
 
 // List of valid stock symbols
-const validSymbols = [
-  "A", "AAPL", "ABBV", "ABNB", "ABT", "ACGL", "ACHR", "ACN", "ADBE", "ADI",
-  // ... rest of your symbols
-];
+// const validSymbols = [
+//   "A", "AAPL", "ABBV", "ABNB", "ABT", "ACGL", "ACHR", "ACN", "ADBE", "ADI",
+//   // ... rest of your symbols
+// ];
 
 // Static routes that should always be included
 const staticRoutes = [
