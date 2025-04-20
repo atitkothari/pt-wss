@@ -71,22 +71,22 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
     if (shouldBlur) {
       return (
         <div className="relative">
-          <div className={cn("relative min-h-[1560px] lg:min-h-[700px]", className)}>
+          <div className={cn("relative", className)}>
             {/* Blurred Content with Gradient that shows some rows */}
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-t from-transparent from-5% via-indigo-50/30 via-30% to-indigo-100/90 to-100% pointer-events-none z-10"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-transparent from-5% via-indigo-50/30 via-30% to-indigo-100/90 to-100% pointer-events-none z-10" style={{ top: '200px' }}></div>
               <div className="relative">
-                <div className="relative">
+                <div className="absolute top-0 left-0 right-0 h-[200px] overflow-hidden">
                   {children}
                 </div>
-                <div className="absolute inset-0 filter blur-[2px] pointer-events-none">
+                <div className="filter blur-[2px] pointer-events-none" style={{ clipPath: 'inset(200px 0 0 0)' }}>
                   {children}
                 </div>
               </div>
             </div>
             
             {/* CTA Section */}
-            <div className="absolute inset-0 flex flex-col items-center p-8 z-20">
+            <div className="absolute inset-0 flex flex-col items-center p-8 z-20" style={{ top: '200px' }}>
               {status === 'unauthenticated' ? (
                 <>
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 px-4 py-2 rounded-md">
@@ -164,7 +164,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                     >
                       <span className="text-base font-semibold">Yearly Plan</span>
                       <span className="text-xs font-normal opacity-90">$16.5/month</span>
-                      <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 17%</span>
+                      <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 20%</span>
                     </Button>
                   </div>
                 </>
