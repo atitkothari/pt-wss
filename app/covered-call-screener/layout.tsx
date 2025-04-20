@@ -1,14 +1,34 @@
-import { Metadata } from 'next';
+import { generateMetadata } from '@/app/lib/metadata';
+import { generateOrganizationSchema } from '@/app/lib/structured-data';
 
-export const metadata: Metadata = {
-  title: 'Covered Call Screener',
-  description: 'Screen for covered call opportunities with our advanced options screener. Find high-yield covered calls that match your investment strategy.',
-};
+export const metadata = generateMetadata({
+  title: 'Covered Call Screener - Find High-Yield Options',
+  description: 'Scan 350,000+ option contracts in seconds. Find the best covered calls for the wheel strategy with our advanced screener.',
+  path: '/covered-call-screener',
+  type: 'website',
+});
 
-export default function CoveredCallScreenerLayout({
+export default function CoveredCallLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  const organizationSchema = generateOrganizationSchema({
+    name: 'Wheel Strategy Options',
+    url: 'https://wheelstrategyoptions.com',
+    logo: 'https://wheelstrategyoptions.com/logo.png',
+    description: 'Advanced options trading platform for the wheel strategy',
+  });
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+      <div className="min-h-screen bg-gray-50">
+        {children}
+      </div>
+    </>
+  );
 } 

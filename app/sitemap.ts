@@ -1,50 +1,75 @@
 import { MetadataRoute } from 'next'
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://wheelstrategyoptions.com'
+const baseUrl = 'https://wheelstrategyoptions.com'
 
+// List of valid stock symbols
+const validSymbols = [
+  "A", "AAPL", "ABBV", "ABNB", "ABT", "ACGL", "ACHR", "ACN", "ADBE", "ADI",
+  // ... rest of your symbols
+];
+
+// Static routes that should always be included
+const staticRoutes = [
+  {
+    url: baseUrl,
+    priority: 1,
+  },
+  {
+    url: `${baseUrl}/covered-call-screener`,
+    priority: 0.9,
+  },
+  {
+    url: `${baseUrl}/cash-secured-put-screener`,
+    priority: 0.8,
+  },
+  {
+    url: `${baseUrl}/discover`,
+    priority: 0.7,
+  },
+  {
+    url: `${baseUrl}/options`,
+    priority: 0.7,
+  },
+  {
+    url: `${baseUrl}/covered-call-calculator`,
+    priority: 0.6,
+  },
+  {
+    url: `${baseUrl}/pricing`,
+    priority: 0.6,
+  },
+  {
+    url: `${baseUrl}/available-stocks`,
+    priority: 0.5,
+  },
+  {
+    url: `${baseUrl}/available-filters`,
+    priority: 0.5,
+  },
+]
+
+// Function to generate dynamic routes
+async function generateDynamicRoutes(): Promise<MetadataRoute.Sitemap> {
+  // Generate routes for each stock symbol
+  const stockRoutes = validSymbols.map(symbol => ({
+    url: `${baseUrl}/covered-call/${symbol}`,
+    lastModified: new Date(),
+    changeFrequency: 'daily' as const,
+    priority: 0.5,
+  }));
+
+  return stockRoutes;
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const dynamicRoutes = await generateDynamicRoutes()
+  
   return [
-    {
-      url: baseUrl,
+    ...staticRoutes.map(route => ({
+      ...route,
       lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1,
-    },
-    {
-      url: `${baseUrl}/covered-call-screener`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/cash-secured-put-screener`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/discover`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/options`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/covered-call-calculator`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/blog`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.5,
-    },
+      changeFrequency: 'daily' as const,
+    })),
+    ...dynamicRoutes,
   ]
 } 
