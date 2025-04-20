@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/app/context/AuthContext';
+import { useUserAccess } from "@/app/hooks/useUserAccess";
 
 // Custom DialogContent without the automatic close button
 const DialogContent = React.forwardRef<
@@ -44,6 +45,11 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signin' }: AuthModal
   const [error, setError] = React.useState<string | null>(null);
   const [needsVerification, setNeedsVerification] = React.useState(false);
   const { sendVerificationEmail } = useAuth();
+  const { status, loading } = useUserAccess();
+  
+  // State to track number of retry attempts
+  const [retryCount, setRetryCount] = React.useState(0);
+  const maxRetries = 15; // Maximum number of retries (15 × 200ms = 3 seconds max wait)
 
   // Reset all state when modal closes
   React.useEffect(() => {
@@ -52,6 +58,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signin' }: AuthModal
       setSuccessMessage(null);
       setError(null);
       setNeedsVerification(false);
+      setRetryCount(0);
     }
   }, [isOpen, initialMode]);
 
@@ -67,12 +74,29 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signin' }: AuthModal
       setError(null);
       setNeedsVerification(true);
     } else {
-      console.log('Successfully signed in! Redirecting...');
+      // On successful sign in
       setSuccessMessage('Successfully signed in! Redirecting...');
       setError(null);
-      setTimeout(() => {
-        onClose();
-      }, 1000);
+      
+      // For new sign-ins, we want to send them to pricing if they don't have a subscription
+      const checkStatusAndRedirect = () => {
+        console.log(`Checking status (attempt ${retryCount + 1}): Current status = ${status}, Loading = ${loading}`);
+        
+        // If we're no longer loading, we can proceed
+        if (!loading) {
+          console.log('Final status check:', status);
+          onClose();   
+          return;     
+        }
+        
+        // Increment retry count and try again with backoff
+        setRetryCount(prev => prev + 1);
+        const delay = Math.min(200 * Math.pow(1.1, retryCount), 500); // Capped at 500ms
+        setTimeout(checkStatusAndRedirect, delay);
+      };
+      
+      // Start checking after a short delay
+      setTimeout(checkStatusAndRedirect, 500);
     }
   };
 

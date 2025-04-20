@@ -18,14 +18,14 @@ export function LoginPromptModal({ isOpen, onClose }: LoginPromptModalProps) {
         <DialogHeader>
           <DialogTitle>Sign in Required</DialogTitle>
           <DialogDescription>
-            Please sign in with your Google account to save screeners and access premium features.
+            Sign up for a 5-day free trial to access all premium features.
           </DialogDescription>
         </DialogHeader>
         
         <div className="flex flex-col items-center gap-6 py-6">
           <div className="text-center space-y-2">
             <p className="text-sm text-gray-600">
-              Sign in to access these features:
+              Try the wheel strategy screener with all features. After your trial, continue for just $7.99/month (billed annually).
             </p>
             <ul className="text-sm text-gray-600 list-disc list-inside">
               <li>Save your screeners</li>
@@ -38,7 +38,7 @@ export function LoginPromptModal({ isOpen, onClose }: LoginPromptModalProps) {
             onClick={() => signInWithGoogle(onClose)}
             className="w-full"
           >
-            Sign in with Google
+            Start your free trial now
           </Button>
         </div>
       </DialogContent>

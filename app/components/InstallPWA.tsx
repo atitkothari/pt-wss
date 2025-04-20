@@ -16,20 +16,22 @@ export default function InstallPWA() {
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     // Check if the app is already installed
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-    console.log('Is app already installed (standalone mode)?', isStandalone);
+    // console.log('Is app already installed (standalone mode)?', isStandalone);
     
     // Check if browser supports PWA installation
     const isPWAInstallable = 'beforeinstallprompt' in window;
-    console.log('Does browser support PWA installation?', isPWAInstallable);
+    // console.log('Does browser support PWA installation?', isPWAInstallable);
     
     if (isStandalone) {
       return;
     }
 
     const handler = (e: Event) => {
-      console.log('beforeinstallprompt event fired');
+      // console.log('beforeinstallprompt event fired');
       // Prevent Chrome 67 and earlier from automatically showing the prompt
       e.preventDefault();
       // Stash the event so it can be triggered later
@@ -39,17 +41,17 @@ export default function InstallPWA() {
     };
 
     window.addEventListener('beforeinstallprompt', handler);
-    console.log('Added beforeinstallprompt event listener');
+    // console.log('Added beforeinstallprompt event listener');
 
     // Check if the prompt was already fired
     if (window.deferredPrompt) {
-      console.log('Found existing deferredPrompt');
+      // console.log('Found existing deferredPrompt');
       setDeferredPrompt(window.deferredPrompt);
       setShowInstallPrompt(true);
     }
 
     // Log if we're in a secure context (required for PWA)
-    console.log('Is secure context?', window.isSecureContext);
+    // console.log('Is secure context?', window.isSecureContext);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handler);
@@ -64,7 +66,7 @@ export default function InstallPWA() {
       deferredPrompt.prompt();
       // Wait for the user to respond to the prompt
       const { outcome } = await deferredPrompt.userChoice;
-      console.log(`User response to the install prompt: ${outcome}`);
+      // console.log(`User response to the install prompt: ${outcome}`);
       // Clear the deferredPrompt variable
       setDeferredPrompt(null);
       // Hide the install prompt

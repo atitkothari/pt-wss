@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { NavBar } from "../components/NavBar";
 import { Footer } from "../components/Footer";
+import { PageLayout } from "../components/PageLayout";
 import { fetchTickersWithHighestYield, fetchTickersWithHighestImpliedVolatility, fetchTickersWithNextEarnings } from "../services/api";
 import { Option } from "../types/option";
 import { format, parseISO, addDays, isAfter, isBefore, addWeeks } from 'date-fns';
@@ -252,17 +252,20 @@ export default function TrendingPage() {
         console.log(stocks);
     // Generate the appropriate URL parameters based on the list type
     let optionsUrl = optionType === 'call' ? '/covered-call-screener?' : '/cash-secured-put-screener?';    
-    setDefaultFilterValues(optionType)
-
+    
+    // Only call setDefaultFilterValues and access localStorage in the browser
+    if (typeof window !== 'undefined') {
+      setDefaultFilterValues(optionType);
+      localStorage.setItem(`${optionType}_minDte`, "0");
+      localStorage.setItem(`${optionType}_maxDte`, "7");
+    }
+    
     const paramPrefix = optionType === 'call' ? 'call_' : 'put_';
     
     const today = new Date();
     const nextWeek = addWeeks(today, 1);
     const formattedToday = format(today, 'yyyy-MM-dd');
     const formattedNextWeek = format(nextWeek, 'yyyy-MM-dd');
-
-    localStorage.setItem(`${optionType}_minDte`, "0");
-    localStorage.setItem(`${optionType}_maxDte`, "7");
     
     optionsUrl += `${paramPrefix}min_expiration=${formattedToday}&${paramPrefix}max_expiration=${formattedNextWeek}&`;      
     // Common filters for all lists using default values from filterConfig    
@@ -606,12 +609,145 @@ export default function TrendingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <NavBar />
-      <div className="max-w-screen-2xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
-        {renderContent()}
+    <PageLayout>
+      <div className="space-y-8 sm:space-y-12">
+        <div className="space-y-3 sm:space-y-4">                    
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2 sm:mb-3">
+            <h1 className="text-xl sm:text-2xl font-bold">Discover new ideas!</h1>
+            <span className="text-gray-500 text-xs sm:text-sm">
+              These are based on weekly trends. Updated daily.
+            </span>
+          </div>
+
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+            {/* Covered Call Section */}
+            <div className="space-y-4 bg-white rounded-lg shadow-sm p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900">Covered Call</h2>
+                <span className="text-sm text-gray-500">Weekly Opportunities</span>
+              </div>
+              
+              {/* Category Tabs for Covered Call */}
+              <div className="mb-6">
+                {renderTabs(activeCallTab, handleCallTabChange, 'call')}
+              </div>
+
+              {/* Content based on active tab for Covered Call */}
+              <div className="w-full relative">
+                {activeCallTab === 'highIV' && (
+                  renderStockList(highIVStocks, 'impliedVolatility', 'Top Stocks with High IV', 'call')
+                )}
+                {activeCallTab === 'highYield' && (
+                  <>
+                    {user ? (
+                      renderStockList(highYieldStocks, 'yieldPercent', 'Top Stocks with High Premium Yield', 'call')
+                    ) : (
+                      <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm min-h-[300px] relative">
+                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/95 via-gray-900/60 to-transparent flex flex-col items-center justify-center p-6 text-center">
+                          <h2 className="text-xl font-bold text-white mb-2">Sign in to view High Yield data</h2>
+                          <p className="text-gray-200 max-w-md mb-4">Get full access to premium yield data by signing in with your Google account.</p>
+                          <Button
+                            onClick={()=>signInWithGoogle()}
+                            size="lg"
+                            className="bg-white hover:bg-gray-100 text-gray-900 border-0"
+                          >
+                            Sign in with Google for FREE
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+                {activeCallTab === 'earnings' && (
+                  <>
+                    {user ? (
+                      renderStockList(earningsStocks, 'earningsDate', 'Top Stocks with Earnings This Week', 'call')
+                    ) : (
+                      <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm min-h-[300px] relative">
+                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/95 via-gray-900/60 to-transparent flex flex-col items-center justify-center p-6 text-center">
+                          <h2 className="text-xl font-bold text-white mb-2">Sign in to view Earnings data</h2>
+                          <p className="text-gray-200 max-w-md mb-4">Get full access to earnings data by signing in with your Google account.</p>
+                          <Button
+                            onClick={()=>signInWithGoogle()}
+                            size="lg"
+                            className="bg-white hover:bg-gray-100 text-gray-900 border-0"
+                          >
+                            Sign in with Google for FREE
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Cash Secured Put Section */}
+            <div className="space-y-4 bg-white rounded-lg shadow-sm p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900">Cash Secured Put</h2>
+                <span className="text-sm text-gray-500">Weekly Opportunities</span>
+              </div>
+              
+              {/* Category Tabs for Cash Secured Put */}
+              <div className="mb-6">
+                {renderTabs(activePutTab, handlePutTabChange, 'put')}
+              </div>
+
+              {/* Content based on active tab for Cash Secured Put */}
+              <div className="w-full relative">
+                {activePutTab === 'highIV' && (
+                  renderStockList(highIVPutStocks, 'impliedVolatility', 'Top Stocks with High IV', 'put')
+                )}
+                {activePutTab === 'highYield' && (
+                  <>
+                    {user ? (
+                      renderStockList(highYieldPutStocks, 'yieldPercent', 'Top Stocks with High Premium Yield', 'put')
+                    ) : (
+                      <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm min-h-[300px] relative">
+                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/95 via-gray-900/60 to-transparent flex flex-col items-center justify-center p-6 text-center">
+                          <h2 className="text-xl font-bold text-white mb-2">Sign in to view High Yield data</h2>
+                          <p className="text-gray-200 max-w-md mb-4">Get full access to premium yield data by signing in with your Google account.</p>
+                          <Button
+                            onClick={()=>signInWithGoogle()}
+                            size="lg"
+                            className="bg-white hover:bg-gray-100 text-gray-900 border-0"
+                          >
+                            Sign in with Google for FREE
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+                {activePutTab === 'earnings' && (
+                  <>
+                    {user ? (
+                      renderStockList(earningsPutStocks, 'earningsDate', 'Top Stocks with Earnings This Week', 'put')
+                    ) : (
+                      <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm min-h-[300px] relative">
+                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/95 via-gray-900/60 to-transparent flex flex-col items-center justify-center p-6 text-center">
+                          <h2 className="text-xl font-bold text-white mb-2">Sign in to view Earnings data</h2>
+                          <p className="text-gray-200 max-w-md mb-4">Get full access to earnings data by signing in with your Google account.</p>
+                          <Button
+                            onClick={()=>signInWithGoogle()}
+                            size="lg"
+                            className="bg-white hover:bg-gray-100 text-gray-900 border-0"
+                          >
+                            Sign in with Google for FREE
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
         <Footer />
       </div>
-    </div>
+    </PageLayout>
   );
 }

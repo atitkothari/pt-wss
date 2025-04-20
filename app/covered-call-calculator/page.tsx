@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { FilterInput } from "../components/filters/FilterInput";
-import { NavBar } from "../components/NavBar";
 import { Footer } from "../components/Footer";
+import { PageLayout } from "../components/PageLayout";
 import { useSymbols } from "../hooks/useSymbols";
 import { fetchOptionsData } from "../services/api";
 import { format, parseISO, addDays, addMonths, isLastDayOfMonth } from 'date-fns';
@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Search } from 'lucide-react';
 import { useAuth } from "../context/AuthContext";
 import { BlurredTable } from "../components/auth/BlurredTable";
+
 interface CalculatorResult {
   expiration: string;
   income: number;
@@ -222,182 +223,180 @@ export default function CoveredCallCalculatorPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <NavBar />
-      <div className="max-w-screen-2xl mx-auto p-4">
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-          <h1 className="text-2xl font-bold mb-6">Covered Call Calculator</h1>
+    <PageLayout>
+      <div className="bg-white p-6 rounded-lg shadow-sm">
+        <h1 className="text-2xl font-bold mb-6">Covered Call Calculator</h1>
+        
+        <div className="mb-8">
+          <p className="text-gray-600 mb-4 text-sm">
+          Earn income by selling call options on stocks you own. Enter the details below and view potential monthly income.
+          </p>
           
-          <div className="mb-8">
-            <p className="text-gray-600 mb-4 text-sm">
-            Earn income by selling call options on stocks you own. Enter the details below and view potential monthly income.
-            </p>
-            
-            <div className="flex flex-wrap items-end gap-4 mb-6">
-              <div className="flex-1 min-w-[200px]">
-                <FilterInput
-                  label="Symbol"
-                  value={inputSymbol}
-                  onChange={setInputSymbol}
-                  placeholder="Enter stock symbol (e.g. AAPL)"
-                  suggestions={symbols}
-                  showSuggestions={true}
-                  onSelect={handleSymbolSelect}
-                  id={"covered_call_calculator_symbol"}
-                />
-              </div>
-              
-              {/* <div className="flex-1 min-w-[200px]">
-                <FilterInput
-                  label="Number of Shares"
-                  value={inputShares}
-                  onChange={setInputShares}
-                  type="number"
-                  min="100"
-                  step="100"
-                  placeholder="Enter number of shares (100 or more)"
-                  id={"covered_call_calculator_shares"}
-                />
-              </div> */}
-              
-              <div className="flex-1 min-w-[200px]">
-                <label className="block text-sm font-medium mb-1">Option Timeframe</label>
-                <select 
-                  className="w-full px-3 py-2 border rounded-md"
-                  value={optionType}
-                  onChange={(e) => setOptionType(e.target.value as 'weekly' | 'monthly')}
-                  id="covered_call_calculator_option_type"
-                >
-                  <option value="weekly">Weekly</option>
-                  <option value="monthly">Monthly</option>
-                </select>
-              </div>
+          <div className="flex flex-wrap items-end gap-4 mb-6">
+            <div className="flex-1 min-w-[200px]">
+              <FilterInput
+                label="Symbol"
+                value={inputSymbol}
+                onChange={setInputSymbol}
+                placeholder="Enter stock symbol (e.g. AAPL)"
+                suggestions={symbols}
+                showSuggestions={true}
+                onSelect={handleSymbolSelect}
+                id={"covered_call_calculator_symbol"}
+              />
             </div>
             
-            <Button
-              onClick={calculateIncome}
-              disabled={loading}              
-              className="w-full sm:w-auto"
-              id="btn_covered_call_calculator_search"
-            >
-              <Search className="h-4 w-4 mr-2" />
-              {loading ? 'Calculating...' : 'Calculate Income'}
-            </Button>
+            {/* <div className="flex-1 min-w-[200px]">
+              <FilterInput
+                label="Number of Shares"
+                value={inputShares}
+                onChange={setInputShares}
+                type="number"
+                min="100"
+                step="100"
+                placeholder="Enter number of shares (100 or more)"
+                id={"covered_call_calculator_shares"}
+              />
+            </div> */}
             
-            {error && (
-              <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-md">
-                {error}
-              </div>
-            )}
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-sm font-medium mb-1">Option Timeframe</label>
+              <select 
+                className="w-full px-3 py-2 border rounded-md"
+                value={optionType}
+                onChange={(e) => setOptionType(e.target.value as 'weekly' | 'monthly')}
+                id="covered_call_calculator_option_type"
+              >
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+              </select>
+            </div>
           </div>
           
-          <BlurredTable hasSearched={hasSearched}>
-            {results.length > 0 && (
-              <div>
-                <h2 className="text-xl font-semibold mb-4">{inputSymbol}</h2>
-                
-                <div className="overflow-x-auto">
-                  <div className="rounded-md border overflow-hidden">
-                    <table className="w-full border-collapse">
-                      <thead>
-                        <tr className="bg-gray-100">
-                          <th className="p-2 sm:p-3 text-center font-medium text-xs sm:text-sm">Option Expiration Date</th>
-                          <th className="p-2 sm:p-3 text-right font-medium text-xs sm:text-sm">Premium (per 100 shares owned)</th>
-                          <th className="p-2 sm:p-3 text-right font-medium text-xs sm:text-sm">Annualized Return</th>
-                          <th className="p-2 sm:p-3 text-center font-medium text-xs sm:text-sm w-10"></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {results.map((result, index) => (
-                          <>
-                            <tr 
-                              key={index} 
-                              className={`border-b hover:bg-blue-50 cursor-pointer transition-colors duration-150 relative group ${expandedRowIndex === index ? 'bg-blue-50 border-l-4 border-l-blue-500' : 'hover:border-l-4 hover:border-l-blue-300'}`} 
-                              onClick={() => setExpandedRowIndex(expandedRowIndex === index ? null : index)}
-                              title="Click to see more details"
-                            >
-                              <td className="p-2 sm:p-3 text-center text-xs sm:text-sm">{result.expiration}</td>
-                              <td className="p-2 sm:p-3 text-right text-xs sm:text-sm">${result.income.toFixed(0)}</td>
-                              <td className="p-2 sm:p-3 text-right text-xs sm:text-sm">
-                                {result.annualizedReturn.toFixed(0)}%
-                              </td>
-                              <td className="p-2 sm:p-3 text-center">
-                                <div className="flex items-center justify-center w-5 h-5 rounded-full bg-orange-500 text-white">
-                                  {expandedRowIndex === index ? (
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                      <line x1="5" y1="12" x2="19" y2="12"></line>
-                                    </svg>
-                                  ) : (
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                      <line x1="5" y1="12" x2="19" y2="12"></line>
-                                      <line x1="12" y1="5" x2="12" y2="19"></line>
-                                    </svg>
-                                  )}
-                                </div>
-                              </td>
-                            </tr>
-                            {expandedRowIndex === index && (
-                              <tr key={`${index}-expanded`} className="bg-gray-50">
-                                <td colSpan={4} className="p-2 sm:p-6 border-b">
-                                <div className="bg-white rounded-lg shadow-sm p-3 sm:p-5 border border-gray-200">
-                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 text-sm mb-4">
-                                    <div className="bg-blue-50 rounded-lg p-3 sm:p-4">
-                                      <p className="font-semibold text-blue-800 mb-2 sm:mb-3 text-center border-b border-blue-100 pb-2 text-sm sm:text-base">Option Details</p>
-                                      <div className="space-y-2">
-                                        <div className="flex justify-between items-center">
-                                          <span className="text-gray-600">Current Price:</span>
-                                          <span className="font-medium">${result.option.stockPrice}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                          <span className="text-gray-600">Strike Price:</span>
-                                          <span className="font-medium">${result.option.strike}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                          <span className="text-gray-600">Bid:</span>
-                                          <span className="font-medium">${result.option.bidPrice}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                          <span className="text-gray-600">Ask:</span>
-                                          <span className="font-medium">${result.option.askPrice}</span>
-                                        </div>
+          <Button
+            onClick={calculateIncome}
+            disabled={loading}              
+            className="w-full sm:w-auto"
+            id="btn_covered_call_calculator_search"
+          >
+            <Search className="h-4 w-4 mr-2" />
+            {loading ? 'Calculating...' : 'Calculate Income'}
+          </Button>
+          
+          {error && (
+            <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-md">
+              {error}
+            </div>
+          )}
+        </div>
+        
+        {/* <BlurredTable hasSearched={hasSearched}> */}
+          {results.length > 0 && (
+            <div>
+              <h2 className="text-xl font-semibold mb-4">{inputSymbol}</h2>
+              
+              <div className="overflow-x-auto">
+                <div className="rounded-md border overflow-hidden">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="p-2 sm:p-3 text-center font-medium text-xs sm:text-sm">Option Expiration Date</th>
+                        <th className="p-2 sm:p-3 text-right font-medium text-xs sm:text-sm">Premium (per 100 shares owned)</th>
+                        <th className="p-2 sm:p-3 text-right font-medium text-xs sm:text-sm">Annualized Return</th>
+                        <th className="p-2 sm:p-3 text-center font-medium text-xs sm:text-sm w-10"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {results.map((result, index) => (
+                        <>
+                          <tr 
+                            key={index} 
+                            className={`border-b hover:bg-blue-50 cursor-pointer transition-colors duration-150 relative group ${expandedRowIndex === index ? 'bg-blue-50 border-l-4 border-l-blue-500' : 'hover:border-l-4 hover:border-l-blue-300'}`} 
+                            onClick={() => setExpandedRowIndex(expandedRowIndex === index ? null : index)}
+                            title="Click to see more details"
+                          >
+                            <td className="p-2 sm:p-3 text-center text-xs sm:text-sm">{result.expiration}</td>
+                            <td className="p-2 sm:p-3 text-right text-xs sm:text-sm">${result.income.toFixed(0)}</td>
+                            <td className="p-2 sm:p-3 text-right text-xs sm:text-sm">
+                              {result.annualizedReturn.toFixed(0)}%
+                            </td>
+                            <td className="p-2 sm:p-3 text-center">
+                              <div className="flex items-center justify-center w-5 h-5 rounded-full bg-orange-500 text-white">
+                                {expandedRowIndex === index ? (
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                  </svg>
+                                ) : (
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                  </svg>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                          {expandedRowIndex === index && (
+                            <tr key={`${index}-expanded`} className="bg-gray-50">
+                              <td colSpan={4} className="p-2 sm:p-6 border-b">
+                              <div className="bg-white rounded-lg shadow-sm p-3 sm:p-5 border border-gray-200">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 text-sm mb-4">
+                                  <div className="bg-blue-50 rounded-lg p-3 sm:p-4">
+                                    <p className="font-semibold text-blue-800 mb-2 sm:mb-3 text-center border-b border-blue-100 pb-2 text-sm sm:text-base">Option Details</p>
+                                    <div className="space-y-2">
+                                      <div className="flex justify-between items-center">
+                                        <span className="text-gray-600">Current Price:</span>
+                                        <span className="font-medium">${result.option.stockPrice}</span>
                                       </div>
-                                    </div>
-                                    <div className="bg-green-50 rounded-lg p-3 sm:p-4 mt-4 sm:mt-0">
-                                      <p className="font-semibold text-green-800 mb-2 sm:mb-3 text-center border-b border-green-100 pb-2 text-sm sm:text-base">Additional Info</p>
-                                      <div className="space-y-2">
-                                        <div className="flex justify-between items-center">
-                                          <span className="text-gray-600">Volume:</span>
-                                          <span className="font-medium">{result.option.volume}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                          <span className="text-gray-600">Open Interest:</span>
-                                          <span className="font-medium">{result.option.openInterest}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                          <span className="text-gray-600">Implied Volatility:</span>
-                                          <span className="font-medium">{(result.option.impliedVolatility).toFixed(2)}%</span>
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                          <span className="text-gray-600">Delta:</span>
-                                          <span className="font-medium">{(result.option.delta).toFixed(2)}</span>
-                                        </div>
+                                      <div className="flex justify-between items-center">
+                                        <span className="text-gray-600">Strike Price:</span>
+                                        <span className="font-medium">${result.option.strike}</span>
+                                      </div>
+                                      <div className="flex justify-between items-center">
+                                        <span className="text-gray-600">Bid:</span>
+                                        <span className="font-medium">${result.option.bidPrice}</span>
+                                      </div>
+                                      <div className="flex justify-between items-center">
+                                        <span className="text-gray-600">Ask:</span>
+                                        <span className="font-medium">${result.option.askPrice}</span>
                                       </div>
                                     </div>
                                   </div>
-                                  <div className="text-center mt-3 sm:mt-2">
-                                    <Link href={`/covered-call-screener?call_search=${inputSymbol}&call_expiration=${result.option.expiration}`} className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors text-xs sm:text-sm py-2">
-                                      Try our Options Screener
-                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 sm:h-4 sm:w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                      </svg>
-                                    </Link>
+                                  <div className="bg-green-50 rounded-lg p-3 sm:p-4 mt-4 sm:mt-0">
+                                    <p className="font-semibold text-green-800 mb-2 sm:mb-3 text-center border-b border-green-100 pb-2 text-sm sm:text-base">Additional Info</p>
+                                    <div className="space-y-2">
+                                      <div className="flex justify-between items-center">
+                                        <span className="text-gray-600">Volume:</span>
+                                        <span className="font-medium">{result.option.volume}</span>
+                                      </div>
+                                      <div className="flex justify-between items-center">
+                                        <span className="text-gray-600">Open Interest:</span>
+                                        <span className="font-medium">{result.option.openInterest}</span>
+                                      </div>
+                                      <div className="flex justify-between items-center">
+                                        <span className="text-gray-600">Implied Volatility:</span>
+                                        <span className="font-medium">{(result.option.impliedVolatility).toFixed(2)}%</span>
+                                      </div>
+                                      <div className="flex justify-between items-center">
+                                        <span className="text-gray-600">Delta:</span>
+                                        <span className="font-medium">{(result.option.delta).toFixed(2)}</span>
+                                      </div>
+                                    </div>
                                   </div>
                                 </div>
-                              </td>
-                            </tr>
-                          )}
-                          </>
-                        ))}
+                                <div className="text-center mt-3 sm:mt-2">
+                                  <Link href={`/covered-call-screener?call_search=${inputSymbol}&call_expiration=${result.option.expiration}`} className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors text-xs sm:text-sm py-2">
+                                    Try our Options Screener
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 sm:h-4 sm:w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    </svg>
+                                  </Link>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                        </>
+                      ))}
                     </tbody>
                   </table>
                 </div>                                
@@ -409,10 +408,9 @@ export default function CoveredCallCalculatorPage() {
               </div>
               </div>
             )}
-          </BlurredTable>       
+          {/* </BlurredTable>        */}
         <Footer />
       </div>
-    </div>
-    </div>
+    </PageLayout>
   );
 }
