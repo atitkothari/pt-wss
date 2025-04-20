@@ -20,20 +20,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   return {
-    title: `${symbol} Covered Call Screener - Find High-Yield Options`,
+    title: `${symbol} Covered Call Screener - Find Options for ${symbol}`,
     description: `Find the best covered call options for ${symbol}. Analyze premium yields, expiration dates, and strike prices for optimal covered call strategies.`,
     openGraph: {
-      title: `${symbol} Covered Call Screener - Find High-Yield Options`,
+      title: `${symbol} Covered Call Screener - Find Options for ${symbol}`,
       description: `Find the best covered call options for ${symbol}. Analyze premium yields, expiration dates, and strike prices for optimal covered call strategies.`,
       url: `https://wheelstrategyoptions.com/covered-call/${symbol}`,
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${symbol} Covered Call Screener - Find High-Yield Options`,
+      title: `${symbol} Covered Call Screener - Find Options for ${symbol}`,
       description: `Find the best covered call options for ${symbol}. Analyze premium yields, expiration dates, and strike prices for optimal covered call strategies.`,
     },
   };
+}
+
+export async function generateStaticParams() {
+  return validSymbols.map((symbol) => ({
+    symbol,
+  }));
 }
 
 export default function StockCoveredCallPage({ params }: Props) {
@@ -57,37 +63,9 @@ export default function StockCoveredCallPage({ params }: Props) {
 
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: 'Home', url: 'https://wheelstrategyoptions.com' },
-    { name: 'Covered Call Screener', url: 'https://wheelstrategyoptions.com/covered-call-screener' },
+    { name: 'Covered Call Screener', url: 'https://wheelstrategyoptions.com/covered-call' },
     { name: `${symbol} Covered Calls`, url: `https://wheelstrategyoptions.com/covered-call/${symbol}` },
   ]);
-
-  // Add stock-specific schema
-  const stockSchema = {
-    "@context": "https://schema.org",
-    "@type": "Stock",
-    "name": symbol,
-    "description": `Covered call options for ${symbol}`,
-    "tickerSymbol": symbol,
-    "potentialAction": {
-      "@type": "TradeAction",
-      "target": {
-        "@type": "EntryPoint",
-        "urlTemplate": `https://wheelstrategyoptions.com/covered-call-screener?call_search=${symbol}`,
-        "actionPlatform": [
-          "http://schema.org/DesktopWebPlatform",
-          "http://schema.org/MobileWebPlatform"
-        ]
-      },
-      "priceSpecification": {
-        "@type": "PriceSpecification",
-        "priceCurrency": "USD"
-      }
-    },
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": `https://wheelstrategyoptions.com/covered-call/${symbol}`
-    }
-  };
 
   // Redirect to the main screener with call_search parameter
   redirect(`/covered-call-screener?call_search=${symbol}`);
@@ -103,10 +81,6 @@ export default function StockCoveredCallPage({ params }: Props) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(stockSchema) }}
       />
     </>
   );
