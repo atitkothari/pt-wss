@@ -9,23 +9,6 @@ interface Props {
   };
 }
 
-export async function getServerSideProps({ params }: { params: { symbol: string } }) {
-  const { symbol } = params;
-  
-  if (!validSymbols.includes(symbol)) {
-    return {
-      notFound: true,
-    };
-  }
-
-  return {
-    redirect: {
-      destination: `/covered-call-screener?call_search=${symbol}`,
-      permanent: true, // 301 redirect
-    },
-  };
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { symbol } = params;
   
@@ -37,29 +20,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   return {
-    title: `${symbol} Covered Call Screener - Find High-Yield Options`,
-    description: `Find the best covered call options for ${symbol}. Analyze premium yields, expiration dates, and strike prices for optimal covered call strategies.`,
+    title: `${symbol} Cash Secured Put Screener - Find High-Yield Options`,
+    description: `Find the best cash secured put options for ${symbol}. Analyze premium yields, expiration dates, and strike prices for optimal put selling strategies.`,
     openGraph: {
-      title: `${symbol} Covered Call Screener - Find High-Yield Options`,
-      description: `Find the best covered call options for ${symbol}. Analyze premium yields, expiration dates, and strike prices for optimal covered call strategies.`,
-      url: `https://wheelstrategyoptions.com/covered-call/${symbol}`,
+      title: `${symbol} Cash Secured Put Screener - Find High-Yield Options`,
+      description: `Find the best cash secured put options for ${symbol}. Analyze premium yields, expiration dates, and strike prices for optimal put selling strategies.`,
+      url: `https://wheelstrategyoptions.com/cash-secured-put/${symbol}`,
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${symbol} Covered Call Screener - Find High-Yield Options`,
-      description: `Find the best covered call options for ${symbol}. Analyze premium yields, expiration dates, and strike prices for optimal covered call strategies.`,
+      title: `${symbol} Cash Secured Put Screener - Find High-Yield Options`,
+      description: `Find the best cash secured put options for ${symbol}. Analyze premium yields, expiration dates, and strike prices for optimal put selling strategies.`,
     },
   };
 }
 
-export async function generateStaticParams() {
-  return validSymbols.map((symbol) => ({
-    symbol,
-  }));
-}
-
-export default function StockCoveredCallPage({ params }: Props) {
+export default function StockCashSecuredPutPage({ params }: Props) {
   const { symbol } = params;
 
   if (!validSymbols.includes(symbol)) {
@@ -73,15 +50,15 @@ export default function StockCoveredCallPage({ params }: Props) {
 
   // Generate structured data for SEO
   const webPageSchema = generateWebPageSchema({
-    title: `${symbol} Covered Call Screener`,
-    description: `Find the best covered call options for ${symbol}. Analyze premium yields, expiration dates, and strike prices.`,
-    url: `https://wheelstrategyoptions.com/covered-call/${symbol}`,
+    title: `${symbol} Cash Secured Put Screener`,
+    description: `Find the best cash secured put options for ${symbol}. Analyze premium yields, expiration dates, and strike prices.`,
+    url: `https://wheelstrategyoptions.com/cash-secured-put/${symbol}`,
   });
 
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: 'Home', url: 'https://wheelstrategyoptions.com' },
-    { name: 'Covered Call Screener', url: 'https://wheelstrategyoptions.com/covered-call-screener' },
-    { name: `${symbol} Covered Calls`, url: `https://wheelstrategyoptions.com/covered-call/${symbol}` },
+    { name: 'Cash Secured Put Screener', url: 'https://wheelstrategyoptions.com/cash-secured-put-screener' },
+    { name: `${symbol} Cash Secured Puts`, url: `https://wheelstrategyoptions.com/cash-secured-put/${symbol}` },
   ]);
 
   // Add stock-specific schema
@@ -89,13 +66,13 @@ export default function StockCoveredCallPage({ params }: Props) {
     "@context": "https://schema.org",
     "@type": "Stock",
     "name": symbol,
-    "description": `Covered call options for ${symbol}`,
+    "description": `Cash secured put options for ${symbol}`,
     "tickerSymbol": symbol,
     "potentialAction": {
       "@type": "TradeAction",
       "target": {
         "@type": "EntryPoint",
-        "urlTemplate": `https://wheelstrategyoptions.com/covered-call-screener?call_search=${symbol}`,
+        "urlTemplate": `https://wheelstrategyoptions.com/cash-secured-put-screener?put_search=${symbol}`,
         "actionPlatform": [
           "http://schema.org/DesktopWebPlatform",
           "http://schema.org/MobileWebPlatform"
@@ -108,12 +85,12 @@ export default function StockCoveredCallPage({ params }: Props) {
     },
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://wheelstrategyoptions.com/covered-call/${symbol}`
+      "@id": `https://wheelstrategyoptions.com/cash-secured-put/${symbol}`
     }
   };
 
-  // Redirect to the main screener with call_search parameter
-  redirect(`/covered-call-screener?call_search=${symbol}`);
+  // Redirect to the main screener with put_search parameter
+  redirect(`/cash-secured-put-screener?put_search=${symbol}`);
 
   // This return statement is never reached due to the redirect,
   // but it's needed for TypeScript and to maintain SEO benefits
