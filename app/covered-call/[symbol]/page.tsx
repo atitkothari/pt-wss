@@ -9,23 +9,6 @@ interface Props {
   };
 }
 
-export async function getServerSideProps({ params }: { params: { symbol: string } }) {
-  const { symbol } = params;
-  
-  if (!validSymbols.includes(symbol)) {
-    return {
-      notFound: true,
-    };
-  }
-
-  return {
-    redirect: {
-      destination: `/covered-call-screener?call_search=${symbol}`,
-      permanent: true, // 301 redirect
-    },
-  };
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { symbol } = params;
   
@@ -51,12 +34,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: `Find the best covered call options for ${symbol}. Analyze premium yields, expiration dates, and strike prices for optimal covered call strategies.`,
     },
   };
-}
-
-export async function generateStaticParams() {
-  return validSymbols.map((symbol) => ({
-    symbol,
-  }));
 }
 
 export default function StockCoveredCallPage({ params }: Props) {
