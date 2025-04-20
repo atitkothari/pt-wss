@@ -11,6 +11,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { sendAnalyticsEvent, AnalyticsEvents } from "@/app/utils/analytics";
 
 interface BlurredTableProps {
   children: React.ReactNode;
@@ -46,6 +47,12 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
 
   const handleUpgrade = async (isYearly: boolean = true) => {
     try {
+      sendAnalyticsEvent({
+        event_name: isYearly ? AnalyticsEvents.PRICING_YEARLY_CLICK : AnalyticsEvents.PRICING_MONTHLY_CLICK,
+        event_category: 'Pricing',
+        event_label: isYearly ? 'Yearly' : 'Monthly',
+        plan_type: isYearly ? 'yearly' : 'monthly'
+      });
       await createCheckoutSession(isYearly);
     } catch (error) {
       console.error('Failed to create checkout session:', error);

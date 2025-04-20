@@ -36,6 +36,12 @@ export default function PricingPage() {
 
       // If user is not in trial and not active, start checkout
       if (status === 'needs_subscription') {
+        sendAnalyticsEvent({
+          event_name: AnalyticsEvents.PRICING_START_TRIAL_CLICK,
+          event_category: 'Pricing',
+          event_label: isYearly ? 'Yearly' : 'Monthly',
+          plan_type: isYearly ? 'yearly' : 'monthly'
+        });
         await createCheckoutSession(isYearly);
       } else if (status === 'trialing') {
         // If user is in trial, redirect to main feature
@@ -102,7 +108,14 @@ export default function PricingPage() {
               Monthly
             </span>
             <button
-              onClick={() => setIsYearly(!isYearly)}
+              onClick={() => {
+                setIsYearly(!isYearly);
+                sendAnalyticsEvent({
+                  event_name: isYearly ? AnalyticsEvents.PRICING_MONTHLY_CLICK : AnalyticsEvents.PRICING_YEARLY_CLICK,
+                  event_category: 'Pricing',
+                  event_label: isYearly ? 'Monthly' : 'Yearly'
+                });
+              }}
               className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               style={{ backgroundColor: isYearly ? '#3B82F6' : '#E5E7EB' }}
             >

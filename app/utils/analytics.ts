@@ -47,6 +47,11 @@ export const AnalyticsEvents = {
   // Contact events
   CONTACT_CLICK: 'contact_click',
   
+  // Pricing events
+  PRICING_MONTHLY_CLICK: 'pricing_monthly_click',
+  PRICING_YEARLY_CLICK: 'pricing_yearly_click',
+  PRICING_START_TRIAL_CLICK: 'pricing_start_trial_click',
+  
   // Error events
   ERROR: 'error'
 } as const; 
