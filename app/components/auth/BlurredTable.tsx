@@ -71,7 +71,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
     if (shouldBlur) {
       return (
         <div className="relative">
-          <div className={cn("relative", className)}>
+          <div className={cn("relative min-h-[1560px] lg:min-h-[900px]", className)}>
             {/* Blurred Content with Gradient that shows some rows */}
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-t from-transparent from-5% via-indigo-50/30 via-30% to-indigo-100/90 to-100% pointer-events-none z-10" style={{ top: '200px' }}></div>
