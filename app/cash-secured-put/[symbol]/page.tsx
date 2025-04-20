@@ -68,7 +68,7 @@ export default function StockCoveredCallPage({ params }: Props) {
   ]);
 
   // Redirect to the main screener with call_search parameter
-  redirect(`/cash-secured-put-screener?call_search=${symbol}`);
+  redirect(`/cash-secured-put-screener?put_search=${symbol}`);
 
   // This return statement is never reached due to the redirect,
   // but it's needed for TypeScript and to maintain SEO benefits
