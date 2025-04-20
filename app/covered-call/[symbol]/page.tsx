@@ -606,6 +606,23 @@ const validSymbols =
   "ZTS"
 ]
 
+export async function getServerSideProps({ params }: { params: { symbol: string } }) {
+  const { symbol } = params;
+  
+  if (!validSymbols.includes(symbol)) {
+    return {
+      notFound: true,
+    };
+  }
+
+  return {
+    redirect: {
+      destination: `/covered-call-screener?call_search=${symbol}`,
+      permanent: true, // 301 redirect
+    },
+  };
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { symbol } = params;
   
@@ -664,6 +681,34 @@ export default function StockCoveredCallPage({ params }: Props) {
     { name: `${symbol} Covered Calls`, url: `https://wheelstrategyoptions.com/covered-call/${symbol}` },
   ]);
 
+  // Add stock-specific schema
+  const stockSchema = {
+    "@context": "https://schema.org",
+    "@type": "Stock",
+    "name": symbol,
+    "description": `Covered call options for ${symbol}`,
+    "tickerSymbol": symbol,
+    "potentialAction": {
+      "@type": "TradeAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": `https://wheelstrategyoptions.com/covered-call-screener?call_search=${symbol}`,
+        "actionPlatform": [
+          "http://schema.org/DesktopWebPlatform",
+          "http://schema.org/MobileWebPlatform"
+        ]
+      },
+      "priceSpecification": {
+        "@type": "PriceSpecification",
+        "priceCurrency": "USD"
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://wheelstrategyoptions.com/covered-call/${symbol}`
+    }
+  };
+
   // Redirect to the main screener with call_search parameter
   redirect(`/covered-call-screener?call_search=${symbol}`);
 
@@ -678,6 +723,10 @@ export default function StockCoveredCallPage({ params }: Props) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(stockSchema) }}
       />
     </>
   );
