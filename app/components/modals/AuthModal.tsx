@@ -137,7 +137,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signin' }: AuthModal
   const getDescription = () => {
     switch (mode) {
       case 'signin':
-        return 'Sign in to access your account and saved screeners.';
+        return 'Sign in to access your account and receive periodic blog posts.';
       case 'signup':
         return 'Create a new account to save your screeners and set up alerts.';
       case 'reset':

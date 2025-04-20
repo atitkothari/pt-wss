@@ -254,6 +254,12 @@ export const EmailAuthForm = ({ mode, onSuccess, onError }: EmailAuthFormProps) 
         </>
       )}
 
+      {mode === 'signup' && (
+        <p className="text-sm text-gray-500 text-left mb-4">
+          By signing up, you will periodically receive insightful articles on wheel strategy.
+        </p>
+      )}
+
       <Button
         type="submit"
         className="w-full font-semibold"
