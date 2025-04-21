@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Info, Eye, EyeOff } from 'lucide-react';
 import { UserCredential } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '@/app/lib/firebase';
 
 interface EmailAuthFormProps {
   mode: 'signin' | 'signup' | 'reset';
@@ -31,6 +33,7 @@ export const EmailAuthForm = ({ mode, onSuccess, onError }: EmailAuthFormProps) 
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [marketingConsent, setMarketingConsent] = useState(false);
   const [passwordValidation, setPasswordValidation] = useState({
     minLength: false,
     hasUpperCase: false,
@@ -97,6 +100,15 @@ export const EmailAuthForm = ({ mode, onSuccess, onError }: EmailAuthFormProps) 
         authResult = await signInWithEmail(email, password);
       } else if (mode === 'signup') {
         authResult = await signUpWithEmail(email, password);
+        
+        // Store marketing consent in Firestore
+        if (authResult?.user) {
+          const userRef = doc(db, 'users', authResult.user.uid);
+          await setDoc(userRef, {
+            marketingConsent: marketingConsent,
+            consentDate: new Date().toISOString()
+          }, { merge: true });
+        }
       }
 
       // Only call onSuccess if we have a valid user
@@ -251,14 +263,25 @@ export const EmailAuthForm = ({ mode, onSuccess, onError }: EmailAuthFormProps) 
               </li>
             </ul>
           </div>
-        </>
-      )}
 
-      {mode === 'signup' && (
-        <p className="text-sm text-gray-500 text-left mb-4">
-          By signing up, you will periodically receive insightful articles on wheel strategy.
-        </p>
-      )}
+          <div className="flex items-start space-x-2 p-4 border rounded-lg bg-gray-50">
+            <div className="flex items-center h-5">
+              <input
+                type="checkbox"
+                id="marketingConsent"
+                checked={marketingConsent}
+                onChange={(e) => setMarketingConsent(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+            </div>
+            <div className="ml-2">
+              <label htmlFor="marketingConsent" className="text-sm text-gray-700">
+              Yes, send me occasional blog posts, special offers, and marketing communications
+              </label>
+            </div>
+          </div>
+        </>
+      )}      
 
       <Button
         type="submit"
