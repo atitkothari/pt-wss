@@ -41,8 +41,7 @@ export function MarketingConsentPopup() {
       await setDoc(userRef, {
         marketingConsent: consent,
         consentDate: new Date().toISOString(),
-        email: user.email,
-        createdAt: new Date().toISOString()
+        email: user.email        
       }, { merge: true });
       setConsentGiven(true);
       setIsOpen(false);

@@ -106,7 +106,7 @@ export const EmailAuthForm = ({ mode, onSuccess, onError }: EmailAuthFormProps) 
           const userRef = doc(db, 'users', authResult.user.uid);
           await setDoc(userRef, {
             marketingConsent: marketingConsent,
-            consentDate: new Date().toISOString()
+            consentDate: new Date().toISOString(),            
           }, { merge: true });
         }
       }
