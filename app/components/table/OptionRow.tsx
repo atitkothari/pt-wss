@@ -20,6 +20,33 @@ export function OptionRow({ option, index, visibleColumns }: OptionRowProps) {
     }
   };
 
+  const getRatingColor = (rating: string | undefined) => {
+    if (!rating) return '';
+    
+    switch (rating) {
+      case 'A+':
+      case 'A':
+        return 'bg-green-100 text-green-800';
+      case 'A-':
+        return 'bg-green-50 text-green-700';
+      case 'B+':
+        return 'bg-emerald-50 text-emerald-700';
+      case 'B':
+        return 'bg-yellow-50 text-yellow-700';
+      case 'B-':
+        return 'bg-orange-50 text-orange-700';
+      case 'C+':
+      case 'C':
+        return 'bg-red-50 text-red-700';
+      case 'C-':
+      case 'D':
+      case 'F':
+        return 'bg-red-100 text-red-800';
+      default:
+        return '';
+    }
+  };
+
   const renderCell = (columnKey: string) => {
     switch (columnKey) {
       case 'symbol':
@@ -58,6 +85,13 @@ export function OptionRow({ option, index, visibleColumns }: OptionRowProps) {
         return option.annualizedReturn 
           ? <TableCell className="text-right">{option.annualizedReturn.toFixed(1)}%</TableCell>
           : <TableCell className="text-right">"-"</TableCell>;
+      case 'rating':
+        const ratingColor = getRatingColor(option.rating);
+        return <TableCell className="text-right">
+          <span className={`inline-block px-2 py-1 rounded-full ${ratingColor}`}>
+            {option.rating ?? 'N/A'}
+          </span>
+        </TableCell>;
       default:
         return null;
     }

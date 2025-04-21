@@ -18,6 +18,7 @@ import { useSearchParams } from 'next/navigation';
 import { defaultVisibleColumns as configDefaultVisibleColumns } from '@/app/config/filterConfig';
 
 export const DEFAULT_COLUMNS: ColumnDef[] = [
+  { key: "rating", label: "Rating" },
   { key: "symbol", label: "Symbol" },
   { key: "stockPrice", label: "Stock Price" },
   { key: "strike", label: "Strike" },
@@ -78,13 +79,46 @@ const formatCell = (value: any, columnKey: string): string|any => {
     case 'volume':
     case 'openInterest':
       return value.toLocaleString();
+    
     case 'symbol':
       let link = "https://screenwich.com/stock-details/"+value      
       return <a href={link} target="_blank">{String(value)}</a>
     
     case 'peRatio':
       return value ? Number(value).toFixed(2) : '-';
-      
+    
+    case 'rating':
+      const getRatingColor = (rating: string) => {
+        if (!rating) return '';
+        switch (rating) {
+          case 'A+':
+          case 'A':
+            return 'bg-green-100 text-green-800 border border-green-200';
+          case 'A-':
+            return 'bg-green-50 text-green-700 border border-green-100';
+          case 'B+':
+            return 'bg-emerald-50 text-emerald-700 border border-emerald-100';
+          case 'B':
+            return 'bg-yellow-50 text-yellow-700 border border-yellow-100';
+          case 'B-':
+            return 'bg-orange-50 text-orange-700 border border-orange-100';
+          case 'C+':
+          case 'C':
+            return 'bg-red-50 text-red-700 border border-red-100';
+          case 'C-':
+          case 'D':
+          case 'F':
+            return 'bg-red-100 text-red-800 border border-red-200';
+          default:
+            return '';
+        }
+      };
+      return (
+        <span className={`inline-block px-3 py-1.5 rounded-full font-semibold text-sm ${getRatingColor(value)}`}>
+          {value}
+        </span>
+      );
+    
     case 'marketCap':
       if (!value) return '-';
       const marketCapValue = Number(value);

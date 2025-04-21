@@ -168,6 +168,7 @@ export const marketCapCategories = [
 
 // Default visible columns for options tables
 export const defaultVisibleColumns = [
+  'rating',
   'symbol',
   'stockPrice',
   'strike',

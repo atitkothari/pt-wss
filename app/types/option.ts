@@ -19,6 +19,7 @@ export interface Option {
   marketCap?: number; // Market capitalization in billions
   sector?: string; // Company sector
   movingAverageCrossover?: string; // Moving average crossover status
+  rating?: string; // Rating field (A+, A, A-, B+, etc.)
 }
 
 export type OptionType = 'call' | 'put';
