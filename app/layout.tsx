@@ -6,6 +6,7 @@ import { GoogleAnalytics } from './components/GoogleAnalytics';
 import { AuthProvider } from './context/AuthContext';
 import { SubscriptionProvider } from './context/SubscriptionContext';
 import InstallPWA from './components/InstallPWA';
+import { MarketingConsentPopup } from './components/auth/MarketingConsentPopup';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -92,6 +93,7 @@ export default function RootLayout({
             </main>
             <Toaster />
             <InstallPWA />
+            <MarketingConsentPopup />
           </SubscriptionProvider>
         </AuthProvider>
       </body>
