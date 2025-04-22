@@ -22,6 +22,20 @@ import { FirebaseError } from 'firebase/app';
 import { db } from '../lib/firebase';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 
+const sendUserLoginWebhook = async (email: string) => {
+  try {
+    await fetch('https://n8n-ncsw48oo08gwc0okcwcg0c0c.194.195.92.250.sslip.io/webhook/user-login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+  } catch (error) {
+    console.error('Error sending user login webhook:', error);
+  }
+};
+
 export interface AuthContextType {
   user: User | null;
   loading: boolean;
@@ -107,6 +121,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Ensure user document exists after successful sign-in
       await ensureUserDocumentExists(result.user);
       
+      // Send user login webhook
+      if (result.user.email) {
+        await sendUserLoginWebhook(result.user.email);
+      }
+      
       sendAnalyticsEvent({
         event_name: AnalyticsEvents.SIGN_IN,
         event_category: 'Auth',
@@ -146,6 +165,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Ensure user document exists after successful sign-in
       await ensureUserDocumentExists(result.user);
       
+      // Send user login webhook
+      await sendUserLoginWebhook(email);
+      
       sendAnalyticsEvent({
         event_name: AnalyticsEvents.SIGN_IN,
         event_category: 'Auth',
@@ -171,6 +193,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       // Create user document in Firestore for the new user
       await ensureUserDocumentExists(result.user);
+      
+      // Send user login webhook
+      await sendUserLoginWebhook(email);
       
       // Send verification email
       await sendEmailVerification(result.user, {
