@@ -51,13 +51,21 @@ const staticRoutes = [
 
 // Function to generate dynamic routes
 async function generateDynamicRoutes(): Promise<MetadataRoute.Sitemap> {
-  // Generate routes for each stock symbol
-  const stockRoutes = validSymbols.map(symbol => ({
-    url: `${baseUrl}/covered-call/${symbol}`,
-    lastModified: new Date(),
-    changeFrequency: 'daily' as const,
-    priority: 0.5,
-  }));
+  // Generate routes for each stock symbol for both covered calls and cash secured puts
+  const stockRoutes = validSymbols.flatMap(symbol => [
+    {
+      url: `${baseUrl}/covered-call/${symbol}`,
+      lastModified: new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 0.5,
+    },
+    {
+      url: `${baseUrl}/cash-secured-put/${symbol}`,
+      lastModified: new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 0.5,
+    }
+  ]);
 
   return stockRoutes;
 }

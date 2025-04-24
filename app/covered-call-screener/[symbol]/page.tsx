@@ -20,17 +20,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   return {
-    title: `${symbol} Covered Call Screener - Find High-Yield Options`,
+    title: `${symbol} Covered Call Screener - Find Options for ${symbol}`,
     description: `Find the best covered call options for ${symbol}. Analyze premium yields, expiration dates, and strike prices for optimal covered call strategies.`,
     openGraph: {
-      title: `${symbol} Covered Call Screener - Find High-Yield Options`,
+      title: `${symbol} Covered Call Screener - Find Options for ${symbol}`,
       description: `Find the best covered call options for ${symbol}. Analyze premium yields, expiration dates, and strike prices for optimal covered call strategies.`,
       url: `https://wheelstrategyoptions.com/covered-call-screener/${symbol}`,
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${symbol} Covered Call Screener - Find High-Yield Options`,
+      title: `${symbol} Covered Call Screener - Find Options for ${symbol}`,
       description: `Find the best covered call options for ${symbol}. Analyze premium yields, expiration dates, and strike prices for optimal covered call strategies.`,
     },
   };
