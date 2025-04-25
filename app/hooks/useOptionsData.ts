@@ -6,7 +6,7 @@ import { Option, OptionType, StrikeFilter } from '../types/option';
 import { parseISO, addDays, format } from 'date-fns';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
-import { yieldFilterConfig, volumeFilterConfig, priceFilterConfig } from '../config/filterConfig';
+import { yieldFilterConfig, volumeFilterConfig, priceFilterConfig, moneynessFilterConfig } from '../config/filterConfig';
 
 export function useOptionsData(
   symbols: string[] = [],
@@ -104,7 +104,9 @@ export function useOptionsData(
       
       // Add moneyness range filters
       if (moneynessRange) {
-        filters.push({ operation: 'gte', field: 'strikeFilter', value: moneynessRange[0]/100 });
+        if(moneynessRange[0] > moneynessFilterConfig.min)
+          filters.push({ operation: 'gte', field: 'strikeFilter', value: moneynessRange[0]/100 });
+        if(moneynessRange[1] < moneynessFilterConfig.max)
         filters.push({ operation: 'lte', field: 'strikeFilter', value: moneynessRange[1]/100 });
       }
       
