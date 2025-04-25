@@ -25,7 +25,7 @@ export function LoginPromptModal({ isOpen, onClose }: LoginPromptModalProps) {
         <div className="flex flex-col items-center gap-6 py-6">
           <div className="text-center space-y-2">
             <p className="text-sm text-gray-600">
-              Try the wheel strategy screener with all features. After your trial, continue for just $7.99/month (billed annually).
+              Try the wheel strategy screener with all features. After your trial, continue for just $16.5/month (billed annually).
             </p>
             <ul className="text-sm text-gray-600 list-disc list-inside">
               <li>Save your screeners</li>
