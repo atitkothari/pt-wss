@@ -217,9 +217,9 @@ export default function CoveredCallCalculatorPage() {
       trackCalculatorEvent('calculate', {
         symbol: inputSymbol,
         shares: inputShares,
-        strikePrice: strikePrice,
-        expirationDate: expirationDate,
-        hasResults: results.length > 0,
+        // strikePrice: strikePrice,
+        // expirationDate: expirationDate,
+        // hasResults: results.length > 0,
       });
 
     } catch (err) {
