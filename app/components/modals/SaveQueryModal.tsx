@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/app/context/AuthContext";
+import { usePlausibleTracking } from '@/app/hooks/usePlausibleTracking';
 import {
   Dialog,
   DialogContent,
@@ -30,6 +31,7 @@ interface SaveQueryModalProps {
 
 export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModalProps) {
   const { user, loading, error, signInWithGoogle } = useAuth();
+  const { trackQueryEvent } = usePlausibleTracking();
   const [email, setEmail] = useState("");
   const [frequency, setFrequency] = useState("daily");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -231,6 +233,10 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
         }))
       };
       await saveQuery(sanitizedRequestBody);
+      trackQueryEvent('save', {
+        frequency,
+        filterCount: sanitizedRequestBody.filter_data.length,
+      });
       toast.success("Query saved successfully!");
       onClose();
     } catch (error) {

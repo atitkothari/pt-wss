@@ -7,6 +7,7 @@ import { AuthProvider } from './context/AuthContext';
 import { SubscriptionProvider } from './context/SubscriptionContext';
 import InstallPWA from './components/InstallPWA';
 import { MarketingConsentPopup } from './components/auth/MarketingConsentPopup';
+import PlausibleProvider from 'next-plausible';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -85,17 +86,26 @@ export default function RootLayout({
             style={{display: 'none', visibility: 'hidden'}}
           />
         </noscript>
-        <GoogleAnalytics />
-        <AuthProvider>
-          <SubscriptionProvider>
-            <main>
-              {children}
-            </main>
-            <Toaster />
-            <InstallPWA />
-            <MarketingConsentPopup />
-          </SubscriptionProvider>
-        </AuthProvider>
+        <PlausibleProvider
+          domain="wheelstrategyoptions.com"
+          trackOutboundLinks={true}
+          hash={true}          
+          scriptProps={{
+            src: "https://pl-plausible.194.195.92.250.sslip.io/js/script.js",
+          }}
+        >
+          <GoogleAnalytics />
+          <AuthProvider>
+            <SubscriptionProvider>
+              <main>
+                {children}
+              </main>
+              <Toaster />
+              <InstallPWA />
+              <MarketingConsentPopup />
+            </SubscriptionProvider>
+          </AuthProvider>
+        </PlausibleProvider>
       </body>
     </html>
   );

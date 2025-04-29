@@ -10,6 +10,7 @@ import { Info, Eye, EyeOff } from 'lucide-react';
 import { UserCredential } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/app/lib/firebase';
+import { usePlausibleTracking } from '@/app/hooks/usePlausibleTracking';
 
 interface EmailAuthFormProps {
   mode: 'signin' | 'signup' | 'reset';
@@ -27,6 +28,7 @@ const PASSWORD_REQUIREMENTS = {
 
 export const EmailAuthForm = ({ mode, onSuccess, onError }: EmailAuthFormProps) => {
   const { signInWithEmail, signUpWithEmail, resetPassword, loading: authLoading } = useAuth();
+  const { trackAuthEvent } = usePlausibleTracking();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -75,6 +77,7 @@ export const EmailAuthForm = ({ mode, onSuccess, onError }: EmailAuthFormProps) 
 
       if (mode === 'reset') {
         await resetPassword(email);
+        trackAuthEvent('reset_password', 'email');
         onSuccess?.();
         return;
       }
@@ -98,8 +101,10 @@ export const EmailAuthForm = ({ mode, onSuccess, onError }: EmailAuthFormProps) 
       
       if (mode === 'signin') {
         authResult = await signInWithEmail(email, password);
+        trackAuthEvent('sign_in', 'email');
       } else if (mode === 'signup') {
         authResult = await signUpWithEmail(email, password);
+        trackAuthEvent('sign_up', 'email');
         
         // Store marketing consent in Firestore
         if (authResult?.user) {

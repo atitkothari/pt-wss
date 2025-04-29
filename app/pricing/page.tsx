@@ -13,6 +13,7 @@ import { useUserAccess } from "@/app/hooks/useUserAccess";
 import DebugEnv from "../components/DebugEnv";
 import { sendAnalyticsEvent, AnalyticsEvents } from '../utils/analytics';
 import { useRouter } from "next/navigation";
+import { usePlausibleTracking } from '../hooks/usePlausibleTracking';
 
 export default function PricingPage() {
   const [isYearly, setIsYearly] = useState(true);
@@ -20,7 +21,17 @@ export default function PricingPage() {
   const { user } = useAuth();
   const { status } = useUserAccess();
   const router = useRouter();
+  const { trackPricingEvent } = usePlausibleTracking();
 
+  const handleBillingToggle = (isYearly: boolean) => {
+    setIsYearly(isYearly);
+    sendAnalyticsEvent({
+      event_name: isYearly ? AnalyticsEvents.PRICING_YEARLY_CLICK : AnalyticsEvents.PRICING_MONTHLY_CLICK,
+      event_category: 'Pricing',
+      event_label: isYearly ? 'Yearly' : 'Monthly'
+    });
+    trackPricingEvent('billing_toggle', { isYearly });
+  };
 
   const handleStartTrial = async () => {
     try {
@@ -39,9 +50,9 @@ export default function PricingPage() {
         sendAnalyticsEvent({
           event_name: AnalyticsEvents.PRICING_START_TRIAL_CLICK,
           event_category: 'Pricing',
-          event_label: isYearly ? 'Yearly' : 'Monthly',
-          plan_type: isYearly ? 'yearly' : 'monthly'
+          event_label: isYearly ? 'Yearly' : 'Monthly'
         });
+        trackPricingEvent('start_trial');
         await createCheckoutSession(isYearly);
       } else if (status === 'trialing') {
         // If user is in trial, redirect to main feature
@@ -65,6 +76,7 @@ export default function PricingPage() {
       event_category: 'Contact',
       event_label: 'Pricing Page'
     });
+    trackPricingEvent('contact');
     window.location.href = 'mailto:reply@wheelstrategyoptions.com';
   };
 
@@ -109,12 +121,7 @@ export default function PricingPage() {
             </span>
             <button
               onClick={() => {
-                setIsYearly(!isYearly);
-                sendAnalyticsEvent({
-                  event_name: isYearly ? AnalyticsEvents.PRICING_MONTHLY_CLICK : AnalyticsEvents.PRICING_YEARLY_CLICK,
-                  event_category: 'Pricing',
-                  event_label: isYearly ? 'Monthly' : 'Yearly'
-                });
+                handleBillingToggle(!isYearly);
               }}
               className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               style={{ backgroundColor: isYearly ? '#3B82F6' : '#E5E7EB' }}

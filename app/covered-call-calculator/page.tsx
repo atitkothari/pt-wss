@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Search } from 'lucide-react';
 import { useAuth } from "../context/AuthContext";
 import { BlurredTable } from "../components/auth/BlurredTable";
+import { usePlausibleTracking } from '@/app/hooks/usePlausibleTracking';
 
 interface CalculatorResult {
   expiration: string;
@@ -21,6 +22,7 @@ interface CalculatorResult {
 }
 
 export default function CoveredCallCalculatorPage() {
+  const { trackCalculatorEvent } = usePlausibleTracking();
   // Input state (what user types)
   const [inputSymbol, setInputSymbol] = useState<string>('');
   const [inputShares, setInputShares] = useState<number>(100);
@@ -58,6 +60,7 @@ export default function CoveredCallCalculatorPage() {
     
     setLoading(true);
     setError(null);
+    setResults([]);
     
     try {
       // Fetch call options for the selected symbol with date range filtering
@@ -210,6 +213,15 @@ export default function CoveredCallCalculatorPage() {
       });
  
       setResults(calculatedResults);
+
+      trackCalculatorEvent('calculate', {
+        symbol: inputSymbol,
+        shares: inputShares,
+        strikePrice: strikePrice,
+        expirationDate: expirationDate,
+        hasResults: results.length > 0,
+      });
+
     } catch (err) {
       console.error('Error calculating income:', err);
       setError("Failed to calculate income. Please try again.");
