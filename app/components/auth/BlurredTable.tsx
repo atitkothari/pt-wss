@@ -41,12 +41,14 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
   const { status, loading } = useUserAccess();
   const { user, sendVerificationEmail } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isUpgrading, setIsUpgrading] = useState(false);
   const router = useRouter();
 
   const shouldBlur = hasSearched || (status !== 'trialing' && status !== 'active' && status !== 'incomplete_expired');
 
   const handleUpgrade = async (isYearly: boolean = true) => {
     try {
+      setIsUpgrading(true);
       sendAnalyticsEvent({
         event_name: isYearly ? AnalyticsEvents.PRICING_YEARLY_CLICK : AnalyticsEvents.PRICING_MONTHLY_CLICK,
         event_category: 'Pricing',
@@ -56,6 +58,8 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
       await createCheckoutSession(isYearly);
     } catch (error) {
       console.error('Failed to create checkout session:', error);
+    } finally {
+      setIsUpgrading(false);
     }
   };
 
@@ -189,19 +193,39 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                     <Button
                       onClick={() => handleUpgrade(false)}
                       size="lg"
-                      className="bg-gray-900 hover:bg-gray-800 text-white border-0 shadow-md flex flex-col py-4 h-auto"
+                      disabled={isUpgrading}
+                      className="bg-gray-900 hover:bg-gray-800 text-white border-0 shadow-md flex flex-col py-4 h-auto disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <span className="text-base font-semibold">Monthly Plan</span>
-                      <span className="text-xs font-normal opacity-90">$19.99/month</span>
+                      {isUpgrading ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                          <span>Loading...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <span className="text-base font-semibold">Monthly Plan</span>
+                          <span className="text-xs font-normal opacity-90">$19.99/month</span>
+                        </>
+                      )}
                     </Button>
                     <Button
                       onClick={() => handleUpgrade(true)}
                       size="lg"
-                      className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white border-0 relative shadow-md flex flex-col py-4 h-auto"
+                      disabled={isUpgrading}
+                      className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white border-0 relative shadow-md flex flex-col py-4 h-auto disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <span className="text-base font-semibold">Yearly Plan</span>
-                      <span className="text-xs font-normal opacity-90">$16.5/month</span>
-                      <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 20%</span>
+                      {isUpgrading ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                          <span>Loading...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <span className="text-base font-semibold">Yearly Plan</span>
+                          <span className="text-xs font-normal opacity-90">$16.5/month</span>
+                          <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 20%</span>
+                        </>
+                      )}
                     </Button>
                   </div>
                 </>

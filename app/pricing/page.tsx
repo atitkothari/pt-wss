@@ -18,6 +18,7 @@ import { usePlausibleTracking } from '../hooks/usePlausibleTracking';
 export default function PricingPage() {
   const [isYearly, setIsYearly] = useState(true);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
   const { status } = useUserAccess();
   const router = useRouter();
@@ -35,6 +36,7 @@ export default function PricingPage() {
 
   const handleStartTrial = async () => {
     try {
+      setIsLoading(true);
       if (!user) {
         setShowAuthModal(true);
         return;
@@ -46,7 +48,7 @@ export default function PricingPage() {
       }
 
       // If user is not in trial and not active, start checkout
-      if (status === 'needs_subscription') {
+      // if (status === 'needs_subscription') {
         sendAnalyticsEvent({
           event_name: AnalyticsEvents.PRICING_START_TRIAL_CLICK,
           event_category: 'Pricing',
@@ -54,13 +56,12 @@ export default function PricingPage() {
         });
         trackPricingEvent('start_trial');
         await createCheckoutSession(isYearly);
-      } else if (status === 'trialing') {
-        // If user is in trial, redirect to main feature
-        window.location.href = '/covered-call-screener';
-      }
+      // }
     } catch (error) {
       console.error('Error starting trial:', error);
       alert('Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -194,9 +195,17 @@ export default function PricingPage() {
                 <>
                   <Button 
                     onClick={handleStartTrial}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-base md:text-lg py-4 md:py-6"
+                    disabled={isLoading}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-base md:text-lg py-4 md:py-6 flex items-center justify-center gap-2"
                   >
-                    Get all the features!
+                    {isLoading ? (
+                      <>
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        <span>Loading...</span>
+                      </>
+                    ) : (
+                      'Get all the features!'
+                    )}
                   </Button>                  
                 </>
               )}
