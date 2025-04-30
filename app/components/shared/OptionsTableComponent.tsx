@@ -604,7 +604,9 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     impliedVolatility,
     activeFilters
   ]);
-
+  
+  const[symbolInput, setSymbolInput] = useState('')
+  
   const handleSearch = () => {
     setHasSearched(true);
     setIsFromCache(false);
@@ -613,7 +615,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     const newCount = searchCount + 1;
     setSearchCount(newCount);
     localStorage.setItem('searchCount', newCount.toString());
-
+    
     setActiveFilters({
       searchTerm: selectedStocks.join(','),
       yieldRange,
@@ -656,7 +658,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     });
 
     fetchData(
-      selectedStocks, 
+      [...selectedStocks, symbolInput], 
       yieldRange[0], 
       yieldRange[1],
       minPrice, 
@@ -988,6 +990,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     setSector(Array.isArray(screener.filters.sector) ? screener.filters.sector[0] : (screener.filters.sector || sectorOptions[0]));
   };
 
+  
+
   // Update the Save Screener button click handlers
   const handleSaveScreenerClick = () => {
     if (!user) {
@@ -1126,7 +1130,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                   } else {
                     setSearchTerm(stocks.join(','));
                   }
-                }}
+                }}                
+                onInputChange={(inputValue)=>{setSymbolInput(inputValue)}}
                 placeholder="Enter symbols..."
                 onKeyPress={handleKeyPress}
                 suggestions={symbols}

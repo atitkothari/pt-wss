@@ -22,6 +22,7 @@ interface MultiStockSelectProps {
   showSuggestions?: boolean;
   tooltip?: string;
   className?: string;
+  onInputChange?: (value: string) => void;
 }
 
 export function MultiStockSelect({
@@ -34,7 +35,8 @@ export function MultiStockSelect({
   suggestions = [],
   showSuggestions = false,
   tooltip,
-  className
+  className,
+  onInputChange
 }: MultiStockSelectProps) {
   const [inputValue, setInputValue] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
@@ -150,10 +152,11 @@ export function MultiStockSelect({
             className={`border-0 shadow-none flex-grow min-w-[100px] h-6 p-0 focus-visible:ring-0 ${isFocused ? 'outline-none' : ''}`}
             placeholder={selectedStocks.length === 0 ? placeholder : ''}
             value={inputValue}
-            onChange={(e) => {
+            onChange={(e) => {              
               setInputValue(e.target.value);
               setShowDropdown(true);
               setSelectedIndex(-1);
+              onInputChange?.(e.target.value);
             }}
             onBlur={() => {
               setTimeout(() => {
