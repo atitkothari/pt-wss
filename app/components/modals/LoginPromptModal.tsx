@@ -17,9 +17,9 @@ export function LoginPromptModal({ isOpen, onClose }: LoginPromptModalProps) {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Sign in Required</DialogTitle>
-          <DialogDescription>
+          {/* <DialogDescription>
             Sign up for a 5-day free trial to access all premium features.
-          </DialogDescription>
+          </DialogDescription> */}
         </DialogHeader>
         
         <div className="flex flex-col items-center gap-6 py-6">

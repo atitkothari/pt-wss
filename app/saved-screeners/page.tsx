@@ -303,7 +303,7 @@ export default function SavedScreenersPage() {
     return (
       <PageLayout showBanner={false}>
         <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
-          <h1 className="text-2xl font-bold mb-4">Sign up for a 5-day free trial</h1>
+          {/* <h1 className="text-2xl font-bold mb-4">Sign up for a 5-day free trial</h1> */}
           <p className="text-gray-600 mb-6">
             Transform your options trading with our comprehensive suite of tools. Start your risk-free trial today and experience the difference!
           </p>
