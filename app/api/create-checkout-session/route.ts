@@ -59,7 +59,7 @@ export async function POST(req: Request) {
     let stripeId = customerDoc.exists ? customerDoc.data()?.stripeId : null;
     console.log('Found Stripe customer ID:', stripeId);
 
-    // If stripeId doesn't exist, create a new Stripe customer and update Firestore
+    // If stripeId doesn't exist or if the customer doesn't exist in Stripe, create a new Stripe customer
     if (!stripeId) {
       try {
         // Create a new Stripe customer
@@ -76,6 +76,25 @@ export async function POST(req: Request) {
       } catch (error) {
         console.error('Stripe error details:', error);
         return new NextResponse(`Stripe error: ${error instanceof Error ? error.message : 'Unknown error'}`, { status: 500 });
+      }
+    } else {
+      // Verify if the customer exists in Stripe
+      try {
+        await stripe.customers.retrieve(stripeId);
+        console.log('Verified existing Stripe customer');
+      } catch (error) {
+        console.log('Stripe customer not found, creating new one');
+        // Create a new Stripe customer
+        const stripeCustomer = await stripe.customers.create({
+          email: userEmail,
+        });
+        stripeId = stripeCustomer.id;
+
+        // Update Firestore with the new Stripe customer ID
+        await customerRef.update({
+          stripeId: stripeId,
+        });
+        console.log('Created new Stripe customer and updated Firestore');
       }
     }
     
@@ -99,11 +118,7 @@ export async function POST(req: Request) {
             quantity: 1,
           },
         ],
-        mode: 'subscription',
-        subscription_data: {
-          trial_period_days: 5,
-        },
-        payment_method_collection: 'if_required',
+        mode: 'subscription',        
         success_url: `${APP_URL}/covered-call-screener?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${APP_URL}/pricing`,
         allow_promotion_codes: true,

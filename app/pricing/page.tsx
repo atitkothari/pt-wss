@@ -182,7 +182,7 @@ export default function PricingPage() {
               </ul>
             </CardContent>
             <CardFooter className="flex flex-col gap-3 md:gap-4 pt-6 md:pt-8 px-4 md:px-6">
-              {status === 'active' || status === 'trialing' || status === 'paused' ? (
+              {status === 'active' || status === 'paused' ? (
                 <Button 
                   onClick={() => router.push('/manage-subscription')}
                   className="w-full bg-black text-white flex items-center gap-2"
@@ -196,11 +196,8 @@ export default function PricingPage() {
                     onClick={handleStartTrial}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-base md:text-lg py-4 md:py-6"
                   >
-                    Start 5-Day Free Trial
-                  </Button>
-                  <p className="text-xs md:text-sm text-gray-500 text-center">
-                    No credit card required
-                  </p>
+                    Get all the features!
+                  </Button>                  
                 </>
               )}
               <Button

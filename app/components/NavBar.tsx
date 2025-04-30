@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
+import { useSubscription } from "@/app/context/SubscriptionContext";
 import { sendAnalyticsEvent, AnalyticsEvents } from '../utils/analytics';
 import { AuthModal } from './modals/AuthModal';
 import {
@@ -24,6 +25,7 @@ export function NavBar() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { user, loading, logout } = useAuth();
+  const { subscriptionStatus } = useSubscription();
   const router = useRouter();
   
   const navigation = {
@@ -153,11 +155,13 @@ export function NavBar() {
                       <Save className="mr-2 h-4 w-4" />
                       <span>Saved Screeners</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleManageSubscription} className="cursor-pointer text-gray-700 hover:text-gray-900">
-                      <CreditCard className="mr-2 h-4 w-4" />
-                      <span>Manage Subscription</span>
-                      {isLoading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
-                    </DropdownMenuItem>
+                    {subscriptionStatus && (
+                      <DropdownMenuItem onClick={handleManageSubscription} className="cursor-pointer text-gray-700 hover:text-gray-900">
+                        <CreditCard className="mr-2 h-4 w-4" />
+                        <span>Manage Subscription</span>
+                        {isLoading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-gray-700 hover:text-gray-900">
                       <LogOut className="mr-2 h-4 w-4" />
@@ -272,16 +276,19 @@ export function NavBar() {
                     {user.displayName || user.email || 'User'}
                   </div>
                 </div>
-                <Button
-                  variant="outline"
-                  onClick={handleManageSubscription}
-                  className="bg-white/50 text-gray-800 hover:bg-white/80 border-gray-200 w-full transition-colors flex items-center"
-                  disabled={isLoading}
-                >
-                  <CreditCard className="h-4 w-4 mr-2" />
-                  <span>Manage Subscription</span>
-                  {isLoading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
-                </Button>
+                
+                {subscriptionStatus && (
+                  <Button
+                    variant="outline"
+                    onClick={handleManageSubscription}
+                    className="bg-white/50 text-gray-800 hover:bg-white/80 border-gray-200 w-full transition-colors flex items-center"
+                    disabled={isLoading}
+                  >
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    <span>Manage Subscription</span>
+                    {isLoading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   onClick={handleLogout}

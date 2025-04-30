@@ -1,5 +1,6 @@
 import { useAuth } from "@/app/context/AuthContext";
 import { useSubscription } from "@/app/context/SubscriptionContext";
+import { differenceInDays } from "date-fns";
 import { useRouter } from "next/navigation";
 
 export type UserAccessStatus = 
@@ -13,7 +14,8 @@ export type UserAccessStatus =
   | 'unpaid'
   | 'paused'
   | 'needs_subscription'
-  | 'loading';
+  | 'loading'
+  | 'trial_ended';
 
 export function useUserAccess() {
   const { user, loading: authLoading } = useAuth();
@@ -24,12 +26,26 @@ export function useUserAccess() {
   const router = useRouter();
 
   const loading = authLoading || subscriptionLoading;
+  const isTrialEnded = (): boolean => {
+    if (!user?.metadata?.creationTime) return false;
+    const accountCreationDate = new Date(user.metadata.creationTime);
+    const daysSinceCreation = differenceInDays(new Date(), accountCreationDate);
+    return daysSinceCreation > 5;
+  };
 
   const getUserStatus = (): UserAccessStatus => {
     if (loading) return 'loading';
     if (!user) return 'unauthenticated';    
     // If there's no subscription status, user needs to subscribe
-    if (!subscriptionStatus) return 'needs_subscription';
+    if (!subscriptionStatus){
+      // Check if trial has ended
+      if (isTrialEnded()) {
+        return 'trial_ended';
+      }
+      else{
+        return 'trialing';
+      }
+    }
 
     // Map subscription status to user access status
     switch (subscriptionStatus) {
