@@ -152,7 +152,7 @@ export default function PricingPage() {
             <CardHeader className="text-center pb-6 md:pb-8 border-b px-4 md:px-6">
               <CardTitle className="text-2xl md:text-3xl font-bold mb-2">Pro Plan</CardTitle>
               <CardDescription className="text-base md:text-lg text-gray-600 mb-4 md:mb-6">
-                Everything you need for options trading
+              The yearly plan costs less than one week’s covered call premium.
               </CardDescription>
               <div className="flex items-center justify-center gap-1 md:gap-2">
                 <span className="text-3xl md:text-4xl font-bold text-gray-900">

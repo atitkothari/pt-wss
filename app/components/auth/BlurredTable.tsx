@@ -187,8 +187,9 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
               ) : (                
                 <>
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 px-4 py-2 rounded-md">
-                    Your trial has ended, please select a plan to continue.
-                  </h2>                  
+                  Your trial has ended. To continue, please choose a subscription plan.
+                  </h2>
+                  <span className="text-base font-semibold"> The yearly plan costs less than one week’s covered call premium.</span>
                   <div className="flex flex-col sm:flex-row gap-3 mt-2">
                     <Button
                       onClick={() => handleUpgrade(false)}
