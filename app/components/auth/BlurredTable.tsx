@@ -186,10 +186,10 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                 </>
               ) : (                
                 <>
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 px-4 py-2 rounded-md">
-                  Your trial has ended. To continue, please choose a subscription plan.
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 px-4 py-2 rounded-md text-center">
+                  Welcome back! Your trial has ended. Please choose a subscription plan.
                   </h2>
-                  <span className="text-base font-semibold"> The yearly plan costs less than one week’s covered call premium.</span>
+                  {/* <span className="text-base font-semibold"> The yearly plan costs less than one week's covered call premium.</span> */}
                   <div className="flex flex-col sm:flex-row gap-3 mt-2">
                     <Button
                       onClick={() => handleUpgrade(false)}
@@ -205,7 +205,12 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                       ) : (
                         <>
                           <span className="text-base font-semibold">Monthly Plan</span>
-                          <span className="text-xs font-normal opacity-90">$19.99/month</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-normal opacity-90 line-through">$19.99</span>
+                            <span className="text-xs font-normal opacity-90">$9.99/month for first month</span>
+                          </div>
+                          {/* <span className="absolute -top-2 -right-2 bg-yellow-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">50% OFF</span> */}
+                          <span className="text-xs text-yellow-300 mt-1">Use code: THANKYOU50</span>
                         </>
                       )}
                     </Button>
@@ -224,7 +229,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                         <>
                           <span className="text-base font-semibold">Yearly Plan</span>
                           <span className="text-xs font-normal opacity-90">$16.5/month</span>
-                          <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 20%</span>
+                          {/* <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 20%</span> */}
                         </>
                       )}
                     </Button>

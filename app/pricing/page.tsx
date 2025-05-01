@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 import { usePlausibleTracking } from '../hooks/usePlausibleTracking';
 
 export default function PricingPage() {
-  const [isYearly, setIsYearly] = useState(true);
+  const [isYearly, setIsYearly] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
@@ -151,20 +151,42 @@ export default function PricingPage() {
           <Card className="bg-white border-2 border-blue-100 shadow-lg">
             <CardHeader className="text-center pb-6 md:pb-8 border-b px-4 md:px-6">
               <CardTitle className="text-2xl md:text-3xl font-bold mb-2">Pro Plan</CardTitle>
-              <CardDescription className="text-base md:text-lg text-gray-600 mb-4 md:mb-6">
-              The yearly plan costs less than one week’s covered call premium.
-              </CardDescription>
+              {/* <CardDescription className="text-base md:text-lg text-gray-600 mb-4 md:mb-6">
+              The yearly plan costs less than one week's covered call premium.
+              </CardDescription> */}
               <div className="flex items-center justify-center gap-1 md:gap-2">
-                <span className="text-3xl md:text-4xl font-bold text-gray-900">
-                  ${isYearly ? '198' : '19.99'}
-                </span>
-                <span className="text-gray-600 text-base md:text-lg">
-                  /{isYearly ? 'year' : 'month'}
-                </span>
+                {isYearly ? (
+                  <>
+                    <span className="text-3xl md:text-4xl font-bold text-gray-900">
+                      $198
+                    </span>
+                    <span className="text-gray-600 text-base md:text-lg">
+                      /year
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <span className="text-3xl md:text-4xl font-bold text-gray-900 line-through opacity-50">
+                        $19.99
+                      </span>
+                      <span className="text-3xl md:text-4xl font-bold text-gray-900">
+                        $9.99
+                      </span>
+                      <span className="text-gray-600 text-base md:text-lg">
+                        /month for first month
+                      </span>
+                    </div>
+                  </>
+                )}
               </div>
-              {isYearly && (
+              {isYearly ? (
                 <p className="text-green-600 text-xs md:text-sm mt-2">
                   $16.50/month, billed annually
+                </p>
+              ) : (
+                <p className="bg-black text-yellow-300 text-xs md:text-sm mt-2 px-2 py-1 rounded-md inline-block">
+                  Use code: THANKYOU50
                 </p>
               )}
             </CardHeader>
