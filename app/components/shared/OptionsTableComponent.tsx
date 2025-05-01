@@ -808,7 +808,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       day: 'numeric',
       hour: 'numeric',
       minute: 'numeric',      
-      timeZoneName: 'short'
+      // timeZoneName: 'short'
     });
   };
 
@@ -1357,7 +1357,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                 {loading ? (
                   <span>Loading update information...</span>
                 ) : (
-                  <span>* Data last updated on {getOldestUpdateDate()}</span>
+                  <span>* Data last updated on {getOldestUpdateDate()} EST</span>
                 )}
               </div>             
             </div>
