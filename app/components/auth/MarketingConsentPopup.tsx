@@ -56,7 +56,7 @@ export function MarketingConsentPopup() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex-1">
             <p className="text-sm text-gray-700">
-              Would you like to receive occasional updates about wheel strategy insights and special offers?
+              Yes, I’d like to get early access to new features, product updates, wheel strategy tips and exclusive offers.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4">
@@ -74,7 +74,7 @@ export function MarketingConsentPopup() {
                 className="flex-1 bg-green-600 hover:bg-green-700 text-white"
                 onClick={() => handleConsent(true)}
               >
-                Yes, I'm interested
+                I'm interested
               </Button>
             </div>
             <button

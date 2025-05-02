@@ -281,7 +281,7 @@ export const EmailAuthForm = ({ mode, onSuccess, onError }: EmailAuthFormProps) 
             </div>
             <div className="ml-2">
               <label htmlFor="marketingConsent" className="text-sm text-gray-700">
-              Yes, send me occasional blog posts, special offers, and marketing communications
+              Yes, I’d like to get early access to new features, product updates, wheel strategy tips and exclusive offers
               </label>
             </div>
           </div>
