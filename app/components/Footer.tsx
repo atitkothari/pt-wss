@@ -15,7 +15,7 @@ export function Footer() {
     resources: [
       { name: 'Available Stocks', href: '/available-stocks' },
       { name: 'Blog', href: 'https://wheelstrategyoptions.com/blog/', external: true },
-      { name: 'API', href: 'https://forms.gle/FRLem4M35jQV3W7Z6', external: true },
+      { name: 'API', href: 'https://rapidapi.com/wheel-strategy-options-wheel-strategy-options-default/api/wheel-options-strategy', external: true },
       { name: 'Privacy Policy', href: 'https://wheelstrategyoptions.com/blog/privacy-policy-for-wheel-strategy-options/', external: true },
       { name: 'Terms of Service', href: 'https://wheelstrategyoptions.com/blog/terms-of-service-for-wheel-strategy-options/', external: true },
     ],

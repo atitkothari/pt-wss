@@ -12,7 +12,7 @@ import { Option, OptionType, StrikeFilter } from "../../types/option";
 import { DEFAULT_COLUMNS, OptionsTable } from "../table/OptionsTable";
 import { format, addDays } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Search, Mail, Save, Coffee, RotateCcw, BellRing, FolderOpen } from "lucide-react";
+import { Search, Mail, Save, Coffee, RotateCcw, BellRing, FolderOpen, FilterX } from "lucide-react";
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSymbols } from '../../hooks/useSymbols';
 import { SaveQueryModal } from "../modals/SaveQueryModal";
@@ -1211,8 +1211,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                 onClick={handleReset}
                 className="flex items-center gap-2"
               >
-                <RotateCcw className="h-4 w-4" />
-                Reset Filters
+                <FilterX className="h-4 w-4" />                
               </Button>
               <ColumnCustomizer
                 columns={DEFAULT_COLUMNS}
@@ -1230,8 +1229,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
               onClick={handleReset}
               className="flex items-center gap-2"
             >
-              <RotateCcw className="h-4 w-4" />
-              Reset Filters
+              <FilterX className="h-4 w-4" />              
             </Button>
             <ColumnCustomizer
               columns={DEFAULT_COLUMNS}

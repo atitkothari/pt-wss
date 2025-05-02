@@ -26,8 +26,7 @@ export function ColumnCustomizer({ columns, visibleColumns, onColumnToggle }: Co
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="ml-auto">
-          <Settings2 className="h-4 w-4 mr-2" />
-          Columns
+          <Settings2 className="h-4 w-4 mr-2" />          
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[200px]">
