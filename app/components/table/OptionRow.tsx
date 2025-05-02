@@ -11,7 +11,7 @@ interface OptionRowProps {
 }
 
 export function OptionRow({ option, index, visibleColumns }: OptionRowProps) {
-  const formatEarningsDate = (date: string | null) => {
+  const formatEarningsDate = (date: string | null) => {    
     if (!date) return 'N/A';
     try {
       return format(new Date(`${date}T00:00:00Z`), "MMM d, yyyy");
