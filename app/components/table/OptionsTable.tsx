@@ -60,7 +60,7 @@ const formatCell = (value: any, columnKey: string): string|any => {
     case 'expiration':
       try {
         const date = parseISO(value);
-        const utcDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
         return format(utcDate, 'MMM d, yyyy');
       } catch {
         return value;
