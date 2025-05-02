@@ -168,7 +168,7 @@ export function useOptionsData(
       const updatedResult = result.options.map((option: any) => {
         const askPrice = isNaN(option.askPrice) ? 0 : option.askPrice || 0;
         const bidPrice = isNaN(option.bidPrice) ? 0 : option.bidPrice || 0;
-        const premium = askPrice * 100;
+        const premium = bidPrice * 100;
 
         const expirationDate = addDays(parseISO(option.expiration), 1);
         const correctedExpiration = format(expirationDate, 'yyyy-MM-dd');
