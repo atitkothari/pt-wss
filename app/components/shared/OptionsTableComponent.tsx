@@ -1243,13 +1243,13 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       <div className="mt-1 mb-2 flex justify-end items-center text-sm text-gray-500">
               <div className="text-xs text-gray-500 mt-2">
                 {loading ? (
-                  <span>Loading update information...</span>
-                ) : (
+                  <span>Loading...</span>
+                ) : getOldestUpdateDate() ? (
                   <span>* Data last updated on {getOldestUpdateDate()} EST</span>
-                )}
+                ) : null}
               </div>             
             </div>
-      : null}
+      : null}      
       {/* Results Section - Fixed height container */}
       <div className="relative flex-1 min-h-[400px] bg-white rounded-lg shadow-sm overflow-hidden">
         {!hasSearched && !activeFilters.searchTerm && 
