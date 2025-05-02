@@ -87,12 +87,12 @@ export default function PricingPage() {
     "Cash-Secured Put Screener",
     "Customizable Filters",
     "Save & Load Screeners",
+    "API Access",
     "Advanced Filters (Delta, IV, DTE and more)",
     "Premium Yield Analysis",
     "Fundamental Filters (P/E Ratio, Market Cap and more)",
     "Column Customization",
-    "Mobile Responsive Design",
-    "API Access (Coming soon)",
+    "Mobile Responsive Design",    
     "Export as CSV and Excel (Coming Soon)"
   ];
 

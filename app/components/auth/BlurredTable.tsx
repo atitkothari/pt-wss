@@ -25,6 +25,7 @@ const features = [
   "Cash-Secured Put Screener",
   "Customizable Filters",
   "Save & Load Screeners",
+  "API Access",
   "Advanced Filters(Delta, IV, DTE and more)",
   "Premium Yield Analysis",
   "Fundamental Filters(P/E Ratio, Market Cap and more)",
@@ -32,8 +33,7 @@ const features = [
   "Mobile Responsive Design",
   "Newsletter",
   "Early access to new features",
-  "Priority support",
-  "API Access (Coming soon)",
+  "Priority support",  
   "Export as CSV and Excel (Coming Soon)",  
 ];
 

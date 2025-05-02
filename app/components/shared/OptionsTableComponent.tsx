@@ -1222,7 +1222,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           </div>
           
           {/* Mobile buttons */}
-          <div className="md:hidden flex items-center justify-end gap-2">
+          <div className="md:hidden flex items-end justify-end gap-2">
             <Button
               variant="outline"
               size="sm"
@@ -1239,7 +1239,15 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           </div>
         </div>
       </div>
-
+      <div className="mt-6 flex justify-end items-center text-sm text-gray-500">
+              <div className="text-xs text-gray-500 mt-2">
+                {!hasSearched && loading ? (
+                  <span>Loading update information...</span>
+                ) : (
+                  <span>* Data last updated on {getOldestUpdateDate()} EST</span>
+                )}
+              </div>             
+            </div>
       {/* Results Section - Fixed height container */}
       <div className="relative flex-1 min-h-[400px] bg-white rounded-lg shadow-sm overflow-hidden">
         {!hasSearched && !activeFilters.searchTerm && 
@@ -1347,18 +1355,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                   Next
                 </Button>
               </div>
-            </div>
+            </div>                      
             
-            {/* Add footnote */}
-            <div className="mt-6 flex justify-between items-center text-sm text-gray-500">
-              <div className="text-xs text-gray-500 mt-2">
-                {loading ? (
-                  <span>Loading update information...</span>
-                ) : (
-                  <span>* Data last updated on {getOldestUpdateDate()} EST</span>
-                )}
-              </div>             
-            </div>
           </div>
         )}
       </div>
