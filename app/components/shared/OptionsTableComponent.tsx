@@ -1239,15 +1239,17 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           </div>
         </div>
       </div>
-      <div className="mt-6 flex justify-end items-center text-sm text-gray-500">
+      {!filtersChanged? 
+      <div className="mt-1 mb-2 flex justify-end items-center text-sm text-gray-500">
               <div className="text-xs text-gray-500 mt-2">
-                {!hasSearched && loading ? (
+                {loading ? (
                   <span>Loading update information...</span>
                 ) : (
                   <span>* Data last updated on {getOldestUpdateDate()} EST</span>
                 )}
               </div>             
             </div>
+      : null}
       {/* Results Section - Fixed height container */}
       <div className="relative flex-1 min-h-[400px] bg-white rounded-lg shadow-sm overflow-hidden">
         {!hasSearched && !activeFilters.searchTerm && 
