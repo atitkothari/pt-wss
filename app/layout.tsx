@@ -7,6 +7,8 @@ import { AuthProvider } from './context/AuthContext';
 import { SubscriptionProvider } from './context/SubscriptionContext';
 import InstallPWA from './components/InstallPWA';
 import { MarketingConsentPopup } from './components/auth/MarketingConsentPopup';
+import { AnnouncementBanner } from './components/AnnouncementBanner';
+import { sendAnalyticsEvent } from './utils/analytics';
 import PlausibleProvider from 'next-plausible';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -98,6 +100,16 @@ export default function RootLayout({
           <AuthProvider>
             <SubscriptionProvider>
               <main>
+                <AnnouncementBanner 
+                  id="api-announcement"
+                  message="🚀 Access 350,000+ options contracts via API and get all the premium features for just $9.99/month!"
+                  link={{
+                    text: "Upgrade to Pro",
+                    href: "/pricing"
+                  }}
+                  analyticsEventName="upgrade_to_pro_banner"
+                  className="bg-gradient-to-r from-blue-600 to-blue-500"
+                />
                 {children}
               </main>
               <Toaster />
