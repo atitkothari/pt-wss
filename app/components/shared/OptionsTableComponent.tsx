@@ -47,6 +47,7 @@ import { defaultScreeners } from '@/app/config/defaultScreeners';
 import { ColumnCustomizer } from "../table/ColumnCustomizer";
 import { screenerService } from "@/app/services/screenerService";
 import { useUserAccess } from "@/app/hooks/useUserAccess";
+import { SaveSearchPromptModal } from "../modals/SaveSearchPromptModal";
 
 interface Filter {
   field: string;
@@ -556,10 +557,22 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
   const [searchCount, setSearchCount] = useState(() => {
     if (typeof window !== 'undefined') {
-      return Number(localStorage.getItem('searchCount') || '0');
+      const count = localStorage.getItem('searchCount');
+      return count ? parseInt(count, 10) : 0;
     }
     return 0;
   });
+
+  // Add useEffect to handle search count changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('searchCount', searchCount.toString());     
+      // Show save prompt when search count reaches 5
+      if (searchCount >= 5) {
+        setShowSavePrompt(true);
+      }
+    }
+  }, [searchCount]);
 
   // Track filter changes
   useEffect(() => {
@@ -612,9 +625,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     setIsFromCache(false);
     setFiltersChanged(false); // Reset the filters changed flag when search is performed
     
-    const newCount = searchCount + 1;
-    setSearchCount(newCount);
-    localStorage.setItem('searchCount', newCount.toString());
+    // Increment search count
+    setSearchCount(prevCount => prevCount + 1);
     
     setActiveFilters({
       searchTerm: selectedStocks.join(','),
@@ -903,6 +915,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [isLoadModalOpen, setIsLoadModalOpen] = useState(false);
   const [isLoginPromptOpen, setIsLoginPromptOpen] = useState(false);
+  const [showSavePrompt, setShowSavePrompt] = useState(false);
 
   const handleSaveScreener = async (screener: SavedScreener) => {
     if (typeof window === 'undefined') return;
@@ -1430,6 +1443,14 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       <LoginPromptModal
         isOpen={isLoginPromptOpen}
         onClose={() => setIsLoginPromptOpen(false)}
+      />
+      <SaveSearchPromptModal 
+        isOpen={showSavePrompt}
+        onClose={() => setShowSavePrompt(false)}
+        onSaveClick={() => {
+          setShowSavePrompt(false);
+          handleSaveScreenerClick();
+        }}
       />
     </div>
   );
