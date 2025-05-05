@@ -102,7 +102,7 @@ export default function RootLayout({
               <main>
                 <AnnouncementBanner 
                   id="api-announcement"
-                  message="🚀 Access 350,000+ options contracts via API and get all the premium features for just $9.99/month!"
+                  message="🚀 Scan 350,000+ options contracts quickly and get all the premium features for just $9.99/for the first month!"
                   link={{
                     text: "Upgrade to Pro",
                     href: "/pricing"
