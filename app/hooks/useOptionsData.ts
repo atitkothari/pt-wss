@@ -153,7 +153,6 @@ export function useOptionsData(
         field: sortBy,
         direction: sortDir || 'asc'
       } : undefined;
-      console.log(strikeFilter)
       const result = await fetchOptionsData(
         filters, 
         pageNo, 
@@ -163,7 +162,8 @@ export function useOptionsData(
         option,
         userId, // Pass userId to the API call
         pageName
-      );   
+      );  
+      
 
       const updatedResult = result.options.map((option: any) => {
         const askPrice = isNaN(option.askPrice) ? 0 : option.askPrice || 0;
