@@ -10,6 +10,7 @@ import { MarketingConsentPopup } from './components/auth/MarketingConsentPopup';
 import { AnnouncementBanner } from './components/AnnouncementBanner';
 import { sendAnalyticsEvent } from './utils/analytics';
 import PlausibleProvider from 'next-plausible';
+import { ClarityAnalytics } from './components/ClarityAnalytics';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -64,13 +65,6 @@ export default function RootLayout({
       <head>
         <meta name="google-adsense-account" content="ca-pub-8741511572242021" />
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8741511572242021" crossOrigin="anonymous" />
-        <script type="text/javascript">
-          {`(function(c,l,a,r,i,t,y){
-            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-          })(window, document, "clarity", "script", "rfhrc9jayi");`}
-        </script>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
         <meta name="theme-color" content="#000000" />
         <meta name="mobile-web-app-capable" content="yes" />
@@ -86,6 +80,7 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
+        <ClarityAnalytics />
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe 
