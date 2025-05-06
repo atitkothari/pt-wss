@@ -27,8 +27,8 @@ export function useUserAccess() {
 
   const loading = authLoading || subscriptionLoading;
   const isTrialEnded = (): boolean => {
-    if (!user?.metadata?.creationTime) return false;
-    const accountCreationDate = new Date(user.metadata.creationTime);
+    if (!user?.metadata?.creationTime) return false;    
+    const accountCreationDate = new Date(user.metadata.creationTime);    
     const daysSinceCreation = differenceInDays(new Date(), accountCreationDate);
     return daysSinceCreation > 5;
   };
