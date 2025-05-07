@@ -1,11 +1,70 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CookieConsent from 'react-cookie-consent';
 import { Button } from '@/components/ui/button';
 
+// List of countries that require cookie consent by law
+const COUNTRIES_REQUIRING_CONSENT = [
+  'AT', // Austria
+  'BE', // Belgium
+  'BG', // Bulgaria
+  'HR', // Croatia
+  'CY', // Cyprus
+  'CZ', // Czech Republic
+  'DK', // Denmark
+  'EE', // Estonia
+  'FI', // Finland
+  'FR', // France
+  'DE', // Germany
+  'GR', // Greece
+  'HU', // Hungary
+  'IE', // Ireland
+  'IT', // Italy
+  'LV', // Latvia
+  'LT', // Lithuania
+  'LU', // Luxembourg
+  'MT', // Malta
+  'NL', // Netherlands
+  'PL', // Poland
+  'PT', // Portugal
+  'RO', // Romania
+  'SK', // Slovakia
+  'SI', // Slovenia
+  'ES', // Spain
+  'SE', // Sweden
+  'GB', // United Kingdom
+  'UK', // United Kingdom (alternative code)
+  'BR', // Brazil
+  'CA', // Canada
+  'JP', // Japan
+  'KR', // South Korea
+  'ZA', // South Africa
+];
+
 export function CookieConsentBanner() {
   const [showDetails, setShowDetails] = useState(false);
+  const [showBanner, setShowBanner] = useState(false);
+  const [userCountry, setUserCountry] = useState<string | null>(null);
+
+  useEffect(() => {
+    const detectCountry = async () => {
+      try {
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        setUserCountry(data.country_code);
+        setShowBanner(COUNTRIES_REQUIRING_CONSENT.includes(data.country_code));
+      } catch (error) {
+        console.error('Error detecting country:', error);
+        // If we can't detect the country, show the banner to be safe
+        setShowBanner(true);
+      }
+    };
+
+    detectCountry();
+  }, []);
+
+  if (!showBanner) return null;
 
   return (
     <CookieConsent
@@ -91,8 +150,7 @@ export function CookieConsentBanner() {
             <p className="mb-1">We use the following types of cookies:</p>
             <ul className="list-disc list-inside space-y-0.5">
               <li>Necessary cookies (required for site functionality)</li>
-              <li>Analytics cookies (Google Analytics, Plausible, Microsoft Clarity)</li>
-              <li>Marketing cookies (Google Adsense)</li>
+              <li>Analytics cookies (Google Analytics, Plausible, Microsoft Clarity)</li>              
             </ul>
             <a
               href="/privacy-policy"
