@@ -11,6 +11,8 @@ import { AnnouncementBanner } from './components/AnnouncementBanner';
 import { sendAnalyticsEvent } from './utils/analytics';
 import PlausibleProvider from 'next-plausible';
 import { ClarityAnalytics } from './components/ClarityAnalytics';
+import { CookieConsentBanner } from '@/components/CookieConsent';
+import { hasAcceptedAnalytics } from '@/lib/cookiePreferences';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -90,36 +92,39 @@ export default function RootLayout({
             style={{display: 'none', visibility: 'hidden'}}
           />
         </noscript>
-        <PlausibleProvider
-          domain="wheelstrategyoptions.com"
-          trackOutboundLinks={true}
-          hash={true}          
-          scriptProps={{
-            src: "https://pl-plausible.194.195.92.250.sslip.io/js/script.js",
-          }}
-        >
-          <GoogleAnalytics />
-          <AuthProvider>
-            <SubscriptionProvider>
-              <main>
-                <AnnouncementBanner 
-                  id="api-announcement"
-                  message="🚀 Scan 350,000+ options contracts quickly and get all the premium features for just $9.99/for the first month!"
-                  link={{
-                    text: "Upgrade to Pro",
-                    href: "/pricing"
-                  }}
-                  analyticsEventName="upgrade_to_pro_banner"
-                  className="bg-gradient-to-r from-blue-600 to-blue-500"
-                />
-                {children}
-              </main>
-              <Toaster />
-              <InstallPWA />
-              <MarketingConsentPopup />
-            </SubscriptionProvider>
-          </AuthProvider>
-        </PlausibleProvider>
+        {hasAcceptedAnalytics() && (
+          <PlausibleProvider
+            domain="wheelstrategyoptions.com"
+            trackOutboundLinks={true}
+            hash={true}          
+            scriptProps={{
+              src: "https://pl-plausible.194.195.92.250.sslip.io/js/script.js",
+            }}
+          >
+            <GoogleAnalytics />
+          </PlausibleProvider>
+        )}
+        <AuthProvider>
+          <SubscriptionProvider>
+            <main>
+              <AnnouncementBanner 
+                id="api-announcement"
+                message="🚀 Scan 350,000+ options contracts quickly and get all the premium features for just $9.99/for the first month!"
+                link={{
+                  text: "Upgrade to Pro",
+                  href: "/pricing"
+                }}
+                analyticsEventName="upgrade_to_pro_banner"
+                className="bg-gradient-to-r from-blue-600 to-blue-500"
+              />
+              {children}
+            </main>
+            <Toaster />
+            <InstallPWA />
+            <MarketingConsentPopup />
+            <CookieConsentBanner />
+          </SubscriptionProvider>
+        </AuthProvider>
       </body>
     </html>
   );
