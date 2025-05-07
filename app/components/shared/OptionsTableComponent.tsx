@@ -478,8 +478,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const [selectedExpiration, setSelectedExpiration] = useState(searchParams.get(getParamKey('max_expiration')) || "");
   const [minSelectedExpiration, setMinSelectedExpiration] = useState(searchParams.get(getParamKey('min_expiration')) || "");
   const [sortConfig, setSortConfig] = useState<{ field: keyof Option; direction: 'asc' | 'desc' | null }>({ 
-    field: "symbol", 
-    direction: null 
+    field: "yieldPercent", 
+    direction: 'desc' 
   });
   
   const [activeFilters, setActiveFilters] = useState({
@@ -654,8 +654,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       max_market_cap: marketCap[1],
       min_iv: impliedVolatility[0],
       max_iv: impliedVolatility[1],      
-      sector: sector
+      sector: sector,            
     });
+    
+    // handleSortURL('yieldPercent')
 
     fetchData(
       [...selectedStocks, symbolInput], 
@@ -786,7 +788,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       newSortDir = sortDirection === 'asc' ? 'desc' : 'asc';      
     } else {
       // Set new column and default to ascending
-      newSortDir = 'asc';      
+      newSortDir = 'desc';      
     }
     
     params.set('sortBy', columnId);
