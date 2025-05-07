@@ -9,7 +9,7 @@ export const getCookiePreferences = (): CookiePreferences => {
   if (typeof window === 'undefined') {
     return {
       necessary: true,
-      analytics: false,
+      analytics: true,
       marketing: false,
       timestamp: new Date().toISOString()
     };
@@ -19,7 +19,7 @@ export const getCookiePreferences = (): CookiePreferences => {
   if (!stored) {
     return {
       necessary: true,
-      analytics: false,
+      analytics: true,
       marketing: false,
       timestamp: new Date().toISOString()
     };
