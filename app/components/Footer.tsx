@@ -83,7 +83,7 @@ export function Footer() {
         {/* Disclaimer */}
         <div className="mt-4">
           <p className="text-xs text-gray-600">
-            The data returned by this free screener is for information and educational purposes only. 
+            The data returned by this screener is for information and educational purposes only. 
             It is not a recommendation to buy or sell a security. All investors should consult a qualified 
             professional before trading in any security. Stock and option trading involves risk and is not 
             suitable for all investors.
