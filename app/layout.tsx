@@ -14,7 +14,12 @@ import { ClarityAnalytics } from './components/ClarityAnalytics';
 import { CookieConsentBanner } from '@/components/CookieConsent';
 import { hasAcceptedAnalytics } from '@/lib/cookiePreferences';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ 
+  subsets: ['latin'],
+  display: 'swap',
+  preload: true,
+  variable: '--font-inter'
+});
 
 export const metadata: Metadata = {
   title: {
@@ -63,8 +68,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={inter.variable}>
       <head>
+        <link
+          rel="preload"
+          href="/_next/static/media/inter-var.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
         <meta name="google-adsense-account" content="ca-pub-8741511572242021" />
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8741511572242021" crossOrigin="anonymous" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
@@ -81,7 +93,7 @@ export default function RootLayout({
           sizes="<generated>"
         />
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.className} antialiased`}>
         <ClarityAnalytics />
         {/* Google Tag Manager (noscript) */}
         <noscript>

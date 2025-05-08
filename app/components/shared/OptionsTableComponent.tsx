@@ -723,8 +723,9 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       setFiltersChanged(false); // Reset the filters changed flag when search is performed
       console.log("setting set change to false")
     }).catch(console.error);
+
     setCurrentPage(1);
-    
+    setSymbolInput('')
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
