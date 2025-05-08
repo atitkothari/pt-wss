@@ -1226,12 +1226,24 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             Run a search to view results
           </div>
         ) : filtersChanged ? (
-          <div className="absolute inset-0 flex justify-center text-gray-600">
-            Filters have been updated. Click the Search button to view updated results.
+          <div className="absolute inset-0 flex flex-col justify-center items-center text-gray-600 gap-2">
+            <div>Filters have been updated. Click the Search button to view updated results.</div>
+            <Button
+              variant="default"
+              size="sm"
+              onClick={handleSearch}
+            >
+              Search
+            </Button>
           </div>
         ) : loading ? (
           <div className="absolute inset-0 flex items-center justify-center">
             <LoadingSpinner />
+          </div>
+        ) : data.length === 0 ? (
+          <div className="absolute inset-0 flex flex-col items-center text-gray-600 gap-2">
+            <div>No results match your filter criteria</div>
+            <div className="text-sm text-gray-500">Try broadening your search filters</div>
           </div>
         ) : (
           <div className="h-full flex flex-col">          

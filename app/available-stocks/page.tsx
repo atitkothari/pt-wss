@@ -4,10 +4,13 @@ import { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useRouter } from 'next/navigation';
 import { useSymbols } from '@/app/hooks/useSymbols';
 import { PageLayout } from '../components/PageLayout';
 
 export default function AvailableStocksPage() {
+  const router = useRouter();
   const { symbols, loading } = useSymbols();
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredTickers, setFilteredTickers] = useState<string[]>([]);
@@ -23,6 +26,14 @@ export default function AvailableStocksPage() {
       setFilteredTickers(filtered);
     }
   }, [searchTerm, symbols]);
+
+  const handleSellCalls = (ticker: string) => {
+    router.push(`/covered-call-screener?call_search=${ticker}`);
+  };
+
+  const handleSellPuts = (ticker: string) => {
+    router.push(`/cash-secured-put-screener?put_search=${ticker}`);
+  };
 
   if (loading) {
     return (
@@ -71,6 +82,7 @@ export default function AvailableStocksPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Ticker Symbol</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -78,11 +90,32 @@ export default function AvailableStocksPage() {
                     filteredTickers.map((ticker) => (
                       <TableRow key={ticker}>
                         <TableCell className="font-medium">{ticker}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-row justify-end gap-2 sm:gap-1">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="whitespace-nowrap"
+                              onClick={() => handleSellCalls(ticker)}
+                            >
+                              Sell Calls
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="whitespace-nowrap"
+                              onClick={() => handleSellPuts(ticker)}
+                            >
+                              Sell Puts
+                            </Button>
+                          </div>
+                        </TableCell>
                       </TableRow>
                     ))
                   ) : (
                     <TableRow>
                       <TableCell className="text-center py-4">No tickers found</TableCell>
+                      <TableCell></TableCell>
                     </TableRow>
                   )}
                 </TableBody>
