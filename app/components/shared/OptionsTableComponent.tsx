@@ -1206,7 +1206,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
               <div className="text-xs text-gray-500 mt-2">
                 {loading ? (
                   <span>Loading...</span>
-                ) : getOldestUpdateDate() ? (
+                ) : userId && getOldestUpdateDate() ? (
                   <span>* Data last updated on {getOldestUpdateDate()} EST</span>
                 ) : null}
               </div>             
