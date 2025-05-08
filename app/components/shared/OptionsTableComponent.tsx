@@ -551,6 +551,49 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     router.push(`?${params.toString()}`);
   };
 
+  useEffect(() => {
+    // Auto fetch data on initial load regardless of URL parameters
+    if (!isFromCache) {
+      // Set isFromCache first to prevent multiple API calls
+      setIsFromCache(true);
+      // Use a small timeout to prevent immediate API call on page load
+      const timer = setTimeout(() => {
+        // If URL has parameters, use those for search
+        if (Array.from(searchParams.entries()).length > 0) {
+          handleSearch();          
+        } else {
+          // Otherwise, fetch with default values
+          fetchData(
+            selectedStocks, 
+            yieldRange[0], 
+            yieldRange[1],
+            minPrice, 
+            maxPrice, 
+            volumeRange[0],
+            volumeRange[1], 
+            selectedExpiration,
+            1,
+            rowsPerPage,
+            sortConfig.direction ? sortConfig : undefined,
+            undefined,
+            deltaFilter,
+            peRatio,
+            marketCap,            
+            sector,
+            moneynessRange,
+            impliedVolatility,
+            minSelectedExpiration
+          ).catch(console.error);
+          console.log(hasSearched)
+          setHasSearched(true);
+          setFiltersChanged(false)
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+  
+
   const [isFromCache, setIsFromCache] = useState(false);
   const [filtersChanged, setFiltersChanged] = useState(false);
 
@@ -585,7 +628,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       moneynessRange[0] !== activeFilters.moneynessRange[0] ||
       moneynessRange[1] !== activeFilters.moneynessRange[1];
     
-    if (hasChanged) {
+    if (hasChanged) {      
       setFiltersChanged(true);
     }
   }, [
@@ -609,8 +652,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   
   const handleSearch = () => {
     setHasSearched(true);
-    setIsFromCache(false);
-    setFiltersChanged(false); // Reset the filters changed flag when search is performed
+    setIsFromCache(false);    
     
     const newCount = searchCount + 1;
     setSearchCount(newCount);
@@ -656,9 +698,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       max_iv: impliedVolatility[1],      
       sector: sector,            
     });
-    
-    // handleSortURL('yieldPercent')
-
+        
     fetchData(
       [...selectedStocks, symbolInput], 
       yieldRange[0], 
@@ -679,8 +719,12 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       moneynessRange,
       impliedVolatility,
       minSelectedExpiration
-    ).catch(console.error);
+    ).then(()=>{
+      setFiltersChanged(false); // Reset the filters changed flag when search is performed
+      console.log("setting set change to false")
+    }).catch(console.error);
     setCurrentPage(1);
+    
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
