@@ -1,5 +1,6 @@
 import { Option, OptionType } from "../types/option";
 import { StrikeFilter as StrikeFilterType } from '../types/option';
+import { generateAuthToken } from '../utils/auth';
 
 interface HighYieldTicker {
   symbol: string;
@@ -94,6 +95,7 @@ export async function fetchOptionsData(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'X-Token': generateAuthToken(),
     },
     body: JSON.stringify(body),
   });
@@ -118,6 +120,7 @@ export async function fetchTickersWithHighestYield(): Promise<HighYieldResponse>
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
+      'X-Token': generateAuthToken(),
     },
   });
 
@@ -157,6 +160,7 @@ export async function fetchTickersWithHighestImpliedVolatility(): Promise<HighIV
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
+      'X-Token': generateAuthToken(),
     },
   });
 
@@ -198,6 +202,7 @@ export async function fetchTickersWithNextEarnings(): Promise<NextEarningsRespon
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
+      'X-Token': generateAuthToken(),
     },
   });
 
