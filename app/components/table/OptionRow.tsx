@@ -69,7 +69,7 @@ export function OptionRow({ option, index, visibleColumns }: OptionRowProps) {
         return <TableCell className="text-right">{option.openInterest}</TableCell>;
       case 'expiration':
         return <TableCell className="text-right">
-          {format(new Date(option.expiration), "MMM d, yyyy")}
+          {format(new Date(option.expiration), "MMM d, yyyy")}          
         </TableCell>;
       case 'earningsDate':
         return <TableCell className="text-right">
