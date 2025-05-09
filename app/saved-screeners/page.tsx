@@ -33,7 +33,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { format } from 'date-fns';
-import { defaultScreeners } from '../config/defaultScreeners';
 import { EditScreenerModal } from '../components/modals/EditScreenerModal';
 import { screenerService } from '../services/screenerService';
 import { PageLayout } from '../components/PageLayout';

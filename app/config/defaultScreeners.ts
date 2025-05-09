@@ -7,10 +7,12 @@ export const defaultScreeners: SavedScreener[] = [
     name: 'High IV',
     filters: {
       optionType: 'call',
-      impliedVolatility: [50, 200],
+      impliedVolatility: [70, 200],
       volumeRange: [100, 1000000],
-      minPrice: 5,
-      maxPrice: 1000
+      minPrice: 5,      
+      deltaFilter:[0,.85],
+      moneynessRange:[2,100],
+      maxDte: 30,
     },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -23,35 +25,39 @@ export const defaultScreeners: SavedScreener[] = [
       optionType: 'call',
       yieldRange: [2, 100],
       volumeRange: [100, 1000000],
-      minPrice: 5,
-      maxPrice: 1000
+      minPrice: 5,      
+      deltaFilter:[0,.85],
+      moneynessRange:[2,100],
+      maxDte: 30,
     },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     isDefault: true
   },
-  {
-    id: 'earnings-next-week-call',
-    name: 'Earnings Next Week',
-    filters: {
-      optionType: 'call',
-      minDte: 1,
-      maxDte: 7,
-      impliedVolatility: [30, 200],
-      volumeRange: [100, 1000000]
-    },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    isDefault: true
-  },
+  // {
+  //   id: 'earnings-next-week-call',
+  //   name: 'Earnings Next Week',
+  //   filters: {
+  //     optionType: 'call',
+  //     minDte: 1,
+  //     maxDte: 7,
+  //     impliedVolatility: [30, 200],
+  //     volumeRange: [100, 1000000]
+  //   },
+  //   createdAt: new Date().toISOString(),
+  //   updatedAt: new Date().toISOString(),
+  //   isDefault: true
+  // },
   {
     id: 'high-volume-call',
     name: 'High Volume',
     filters: {
       optionType: 'call',
-      volumeRange: [100, 1000000],
-      minPrice: 5,
-      maxPrice: 1000
+      volumeRange: [500, 1000000],
+      minPrice: 5,      
+      deltaFilter:[0,.85],
+      moneynessRange:[2,100],
+      maxDte: 30,      
     },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -63,10 +69,12 @@ export const defaultScreeners: SavedScreener[] = [
     name: 'High IV',
     filters: {
       optionType: 'put',
-      impliedVolatility: [50, 200],
+      impliedVolatility: [70, 200],
       volumeRange: [100, 1000000],
-      minPrice: 5,
-      maxPrice: 1000
+      minPrice: 5,      
+      deltaFilter:[-0.85,0],
+      moneynessRange:[2,100],
+      maxDte: 30,   
     },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -79,35 +87,39 @@ export const defaultScreeners: SavedScreener[] = [
       optionType: 'put',
       yieldRange: [2, 100],
       volumeRange: [100, 1000000],
-      minPrice: 5,
-      maxPrice: 1000
+      minPrice: 5,      
+      deltaFilter:[-0.85,0],
+      moneynessRange:[2,100],
+      maxDte: 30,  
     },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     isDefault: true
   },
-  {
-    id: 'earnings-next-week-put',
-    name: 'Earnings Next Week',
-    filters: {
-      optionType: 'put',
-      minDte: 1,
-      maxDte: 7,
-      impliedVolatility: [30, 200],
-      volumeRange: [100, 1000000]
-    },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    isDefault: true
-  },
+  // {
+  //   id: 'earnings-next-week-put',
+  //   name: 'Earnings Next Week',
+  //   filters: {
+  //     optionType: 'put',
+  //     minDte: 1,
+  //     maxDte: 7,
+  //     impliedVolatility: [30, 200],
+  //     volumeRange: [100, 1000000]
+  //   },
+  //   createdAt: new Date().toISOString(),
+  //   updatedAt: new Date().toISOString(),
+  //   isDefault: true
+  // },
   {
     id: 'high-volume-put',
     name: 'High Volume',
     filters: {
       optionType: 'put',
       volumeRange: [100, 1000000],
-      minPrice: 5,
-      maxPrice: 1000
+      minPrice: 5,      
+      deltaFilter:[-0.85,0],
+      moneynessRange:[2,100],
+      maxDte: 30,  
     },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
