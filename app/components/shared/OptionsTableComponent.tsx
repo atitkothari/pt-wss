@@ -1062,6 +1062,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                 window.location.href = '/saved-screeners';
                 return;
               }
+              if (value === "save") {
+                handleSaveScreenerClick();
+                return;
+              }
               if (value === "default") return;
               const allScreeners = [...defaultScreeners, ...savedScreeners];
               const selectedScreener = allScreeners.find((s: SavedScreener) => s.id === value);
@@ -1107,9 +1111,18 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                 );
               })()}
 
-              {/* Manage Saved Screeners Option - Only show if user is logged in */}
-              {user && (
                 <div className="px-2 py-1.5 text-sm font-semibold text-gray-500 border-t">
+                  
+                  <SelectItem 
+                    value="save" 
+                    className="text-blue-600 hover:text-blue-800 cursor-pointer"
+                  >
+                    Save Your Configuration
+                  </SelectItem>
+                  </div>
+              {/* Actions Section - Only show if user is logged in */}              
+              {user && (
+                <div className="px-2 py-1.5 text-sm font-semibold text-gray-500 border-t">                
                   <SelectItem 
                     value="manage" 
                     className="text-blue-600 hover:text-blue-800 cursor-pointer"
