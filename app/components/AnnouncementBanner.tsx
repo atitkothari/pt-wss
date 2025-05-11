@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { sendAnalyticsEvent } from '../utils/analytics';
+import { CountdownTimer } from './CountdownTimer';
 
 interface AnnouncementBannerProps {
   id: string; // Unique identifier for this announcement
@@ -13,6 +14,7 @@ interface AnnouncementBannerProps {
   dismissDuration?: number; // Duration in days before showing again
   className?: string;
   analyticsEventName?: string;
+  countdownDate?: Date; // New prop for countdown feature
 }
 
 export function AnnouncementBanner({ 
@@ -21,7 +23,8 @@ export function AnnouncementBanner({
   link,
   dismissDuration = 7,
   className = "bg-blue-600",
-  analyticsEventName
+  analyticsEventName,
+  countdownDate
 }: AnnouncementBannerProps) {
   const [isVisible, setIsVisible] = useState(false);
   const storageKey = `announcement-${id}-dismissed`;
@@ -68,23 +71,34 @@ export function AnnouncementBanner({
   return (
     <div className={`hidden md:block text-white px-4 py-3 relative ${className}`}>
       <div className="max-w-screen-xl mx-auto flex items-center justify-between">
-        <div className="flex items-center">
-          <span>
-            {message}{' '}
-            {link && (
+        <div className="flex items-center flex-wrap gap-3">
+          <span className="font-medium">{message}</span>
+          {countdownDate && (
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-px bg-white/30" />
+              <span className="font-medium">Offer ends in:</span>
+              <CountdownTimer 
+                targetDate={countdownDate}
+                onComplete={handleDismiss}
+              />
+            </div>
+          )}
+          {link && (
+            <>
+              <div className="h-4 w-px bg-white/30" />
               <a 
                 href={link.href} 
-                className="underline font-semibold hover:text-blue-100 transition-colors"
+                className="font-semibold hover:text-blue-100 transition-colors"
                 onClick={handleLinkClick}
               >
                 {link.text} →
               </a>
-            )}
-          </span>
+            </>
+          )}
         </div>
         <button
           onClick={handleDismiss}
-          className="text-white hover:text-blue-100 transition-colors"
+          className="text-white hover:text-blue-100 transition-colors ml-4"
           aria-label="Dismiss announcement"
         >
           <X size={20} />

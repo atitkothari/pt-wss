@@ -175,8 +175,7 @@ export function useOptionsData(
 
         if(option.expiration!="redacted" && expirationDate!="redacted"){
           expirationDate = option.expiration;
-          correctedExpiration = option.expiration;
-          console.log(correctedExpiration)
+          correctedExpiration = option.expiration;          
         }                                 
         // Handle potential NaN values in numeric fields
         const safeOption = {

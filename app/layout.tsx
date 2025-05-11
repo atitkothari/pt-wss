@@ -121,13 +121,14 @@ export default function RootLayout({
             <main>
               <AnnouncementBanner 
                 id="api-announcement"
-                message="🚀 Scan 350,000+ options contracts quickly and get all the premium features for just $9.99/for the first month!"
+                message="🎉 Limited Time Offer: Get 50% OFF your first month! Only $9.99 instead of $19.99"
                 link={{
                   text: "Upgrade to Pro",
                   href: "/pricing"
                 }}
                 analyticsEventName="upgrade_to_pro_banner"
                 className="bg-gradient-to-r from-blue-600 to-blue-500"
+                countdownDate={new Date('2025-05-13')}
               />
               {children}
             </main>
