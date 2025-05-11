@@ -68,6 +68,7 @@ export default function LandingPage() {
               icon={<DollarSign className="h-6 md:h-8 w-6 md:w-8 text-blue-500" />}
               title="Cash-Secured Put Screener"
               description="Screen for cash-secured put opportunities that match your risk tolerance and income targets."
+              href="/cash-secured-put-screener"
             />
             <FeatureCard
               icon={<Filter className="h-6 md:h-8 w-6 md:w-8 text-blue-500" />}
@@ -141,15 +142,22 @@ export default function LandingPage() {
   );
 }
 
-function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
+function FeatureCard({ icon, title, description, href = "/options" }: { 
+  icon: React.ReactNode; 
+  title: string; 
+  description: string;
+  href?: string;
+}) {
   return (
-    <div className="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-100">
-      <div className="mb-4">
-        {icon}
+    <Link href={href} className="block">
+      <div className="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-blue-200 hover:scale-[1.02] cursor-pointer">
+        <div className="mb-4">
+          {icon}
+        </div>
+        <h3 className="text-xl font-semibold mb-4 text-gray-800">{title}</h3>
+        <p className="text-gray-600 leading-relaxed">{description}</p>
       </div>
-      <h3 className="text-xl font-semibold mb-4 text-gray-800">{title}</h3>
-      <p className="text-gray-600 leading-relaxed">{description}</p>
-    </div>
+    </Link>
   );
 }
 
