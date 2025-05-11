@@ -107,7 +107,7 @@ export async function createCustomerPortalSession() {
     });
     
     const data = response.data as { url: string };    
-    console.log(data.url)
+    // console.log(data.url)
     if (!data.url) {
       throw new Error('Invalid response from server: missing URL');
     }
