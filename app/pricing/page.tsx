@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 import { usePlausibleTracking } from '../hooks/usePlausibleTracking';
 
 export default function PricingPage() {
-  const [isYearly, setIsYearly] = useState(false);
+  const [isYearly, setIsYearly] = useState(true);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
@@ -158,23 +158,20 @@ export default function PricingPage() {
                 {isYearly ? (
                   <>
                     <span className="text-3xl md:text-4xl font-bold text-gray-900">
-                      $198
+                      $16.50
                     </span>
                     <span className="text-gray-600 text-base md:text-lg">
-                      /year
+                      /month
                     </span>
                   </>
                 ) : (
                   <>
                     <div className="flex items-center gap-2">
-                      <span className="text-3xl md:text-4xl font-bold text-gray-900 line-through opacity-50">
-                        $19.99
-                      </span>
                       <span className="text-3xl md:text-4xl font-bold text-gray-900">
-                        $9.99
-                      </span>
+                        $19.99
+                      </span>                      
                       <span className="text-gray-600 text-base md:text-lg">
-                        /month for first month
+                        /month
                       </span>
                     </div>
                   </>
@@ -182,13 +179,9 @@ export default function PricingPage() {
               </div>
               {isYearly ? (
                 <p className="text-green-600 text-xs md:text-sm mt-2">
-                  $16.50/month, billed annually
+                  $198/year
                 </p>
-              ) : (
-                <p className="bg-black text-yellow-300 text-xs md:text-sm mt-2 px-2 py-1 rounded-md inline-block">
-                  Use code: THANKYOU50
-                </p>
-              )}
+              ):<></>}
             </CardHeader>
             <CardContent className="pt-6 md:pt-8 px-4 md:px-6">
               <ul className="space-y-3 md:space-y-4">
@@ -226,7 +219,7 @@ export default function PricingPage() {
                         <span>Loading...</span>
                       </>
                     ) : (
-                      'Get all the features!'
+                      'Upgrade'
                     )}
                   </Button>                  
                 </>
