@@ -10,7 +10,7 @@ export function calculateHash(epoch: number, secretKey: string): string {
 export function generateAuthToken(): string {
     // console.log("generateAuthTocken")
   const epoch = Math.floor(Date.now() / 1000);
-  const secretKey = process.env.API_SECRET_KEY || '';
+  const secretKey = process.env.NEXT_PUBLIC_API_SECRET_KEY || '';
   if (!secretKey) {
     // throw new Error('API_SECRET_KEY is not defined in environment variables');
     console.log('API_SECRET_KEY is not defined in environment variables')
