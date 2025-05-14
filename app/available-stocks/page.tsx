@@ -89,7 +89,7 @@ export default function AvailableStocksPage() {
                   {filteredTickers.length > 0 ? (
                     filteredTickers.map((ticker) => (
                       <TableRow key={ticker}>
-                        <TableCell className="font-medium">{ticker}</TableCell>
+                        <TableCell className="font-medium"><Button variant="link" onClick={() => handleSellCalls(ticker)}>{ticker}</Button></TableCell>
                         <TableCell>
                           <div className="flex flex-row justify-end gap-2 sm:gap-1">
                             <Button
