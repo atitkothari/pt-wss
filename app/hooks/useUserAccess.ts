@@ -26,6 +26,15 @@ export function useUserAccess() {
   const router = useRouter();
 
   const loading = authLoading || subscriptionLoading;
+
+  const getRemainingTrialDays = (): number => {
+    if (!user?.metadata?.creationTime) return 0;    
+    const accountCreationDate = new Date(user.metadata.creationTime);    
+    const daysSinceCreation = differenceInDays(new Date(), accountCreationDate);
+    const remainingDays = Math.max(0, 5 - daysSinceCreation);
+    return remainingDays;
+  };
+
   const isTrialEnded = (): boolean => {
     if (!user?.metadata?.creationTime) return false;    
     const accountCreationDate = new Date(user.metadata.creationTime);    
@@ -146,6 +155,7 @@ export function useUserAccess() {
     redirectToAppropriateScreen,
     shouldShowPaymentWarning,
     getStatusMessage,
-    loading    
+    loading,
+    getRemainingTrialDays
   };
 } 

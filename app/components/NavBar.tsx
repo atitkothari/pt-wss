@@ -18,14 +18,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { createCustomerPortalSession } from "@/app/lib/stripe";
 import { useRouter } from "next/navigation";
+import { useUserAccess } from "@/app/hooks/useUserAccess";
 
 export function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScreenersOpen, setIsScreenersOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { user, loading, logout } = useAuth();
+  const { user, loading: authLoading, logout } = useAuth();
   const { subscriptionStatus } = useSubscription();
+  const { status, getRemainingTrialDays } = useUserAccess();
   const router = useRouter();
   
   const navigation = {
@@ -61,16 +63,35 @@ export function NavBar() {
 
   return (
     <nav className="bg-gradient-to-br from-gray-50 via-white to-blue-50 w-full border-b border-gray-200 p-4 z-40 relative">
-      <div className="max-w-screen-2xl mx-auto flex justify-between items-center gap-4">
-        <Link href="/" className="flex items-center hover:opacity-90 transition-opacity shrink-0">
-          <img src="/logo.png" className="h-8 md:h-10 mr-2 md:mr-3" alt="Wheel Strategy Options Logo" />
-          <span className="self-center text-base md:text-xl font-semibold whitespace-nowrap text-gray-900 hidden sm:inline">
-            Wheel Strategy Options
-          </span>
-          <span className="self-center text-base md:text-xl font-semibold whitespace-nowrap text-gray-900 sm:hidden">
-            Wheel Strategy Options
-          </span>
-        </Link>
+      <div className="max-w-screen-2xl mx-auto flex flex-wrap items-center gap-4">
+        <div className="flex items-center justify-between w-full lg:w-auto">
+          <Link href="/" className="flex items-center hover:opacity-90 transition-opacity shrink-0">
+            <img src="/logo.png" className="h-8 md:h-10 mr-2 md:mr-3" alt="Wheel Strategy Options Logo" />
+            <span className="self-center text-base md:text-xl font-semibold whitespace-nowrap text-gray-900 hidden sm:inline">
+              Wheel Strategy Options
+            </span>
+            <span className="self-center text-base md:text-xl font-semibold whitespace-nowrap text-gray-900 sm:hidden">
+              Wheel Strategy Options
+            </span>
+          </Link>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="lg:hidden text-gray-900 hover:text-gray-700 transition-colors"
+          >
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+
+        {/* Trial Days Indicator - Always Visible */}
+        {!authLoading && user && status === 'trialing' && (
+          <div className="flex-shrink-0 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100 flex items-center order-2 lg:order-none">
+            <div className="text-sm text-blue-700 font-medium whitespace-nowrap">
+              <span className="font-bold">{getRemainingTrialDays()}</span> days left in trial
+            </div>
+          </div>
+        )}
 
         {/* Desktop Navigation */}
         <div className="hidden lg:flex items-center justify-end flex-1 gap-6">
@@ -128,7 +149,7 @@ export function NavBar() {
           </div>
           
           <div className="flex items-center">            
-            {loading ? null : user ? (
+            {authLoading ? null : user ? (
               <div className="flex items-center">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -181,20 +202,12 @@ export function NavBar() {
             )}
           </div>
         </div>
-
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="lg:hidden text-gray-900 hover:text-gray-700 transition-colors"
-        >
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
       </div>
 
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="absolute top-[64px] left-0 right-0 bg-white shadow-lg border border-gray-200 p-4 lg:hidden z-50 animate-in slide-in-from-top duration-200">
-          <div className="flex flex-col space-y-4">
+        <div className="fixed top-[72px] left-0 right-0 bottom-0 bg-white shadow-lg border-t border-gray-200 p-4 lg:hidden z-50 overflow-y-auto">
+          <div className="flex flex-col space-y-4 max-w-screen-2xl mx-auto">
             {/* Screeners Section */}
             <div className="border-b border-gray-200 pb-4">
               <h3 className="text-gray-900 text-sm font-semibold mb-2 uppercase tracking-wider">Screeners</h3>
@@ -260,7 +273,7 @@ export function NavBar() {
               )}
             </div>
             
-            {loading ? null : user ? (
+            {authLoading ? null : user ? (
               <div className="space-y-2">
                 <div className="flex items-center gap-2 pb-2">
                   {user.photoURL ? (

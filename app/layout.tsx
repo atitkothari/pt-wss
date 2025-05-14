@@ -120,21 +120,20 @@ export default function RootLayout({
           <SubscriptionProvider>
             <main>
               <AnnouncementBanner 
-                id="api-announcement"
-                message="🎉 Limited Time Offer: Get 50% OFF your first month! Only $9.99 instead of $19.99"
+                id="api-announcement-trial"
+                message="🎉 Get 50% OFF first month! Get it for <s>$19.99</s> $9.99 (Code: THANKYOU50)"
                 link={{
                   text: "Upgrade to Pro",
                   href: "/pricing"
                 }}
                 analyticsEventName="upgrade_to_pro_banner"
                 className="bg-gradient-to-r from-blue-600 to-blue-500"
-                countdownDate={new Date('2025-05-13')}
               />
               {children}
             </main>
             <Toaster />
             <InstallPWA />
-            <MarketingConsentPopup />
+            {/* <MarketingConsentPopup /> */}
             <CookieConsentBanner />
           </SubscriptionProvider>
         </AuthProvider>
