@@ -119,8 +119,8 @@ export const marketCapFilterConfig = {
 
 // Moneyness Range Filter Configuration
 export const moneynessFilterConfig = {
-  min: -15,
-  max: 15,
+  min: -30,
+  max: 30,
   defaultMin: -15,
   defaultMax: 15,
   step: 1,
