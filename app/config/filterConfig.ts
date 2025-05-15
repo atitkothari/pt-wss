@@ -121,8 +121,8 @@ export const marketCapFilterConfig = {
 export const moneynessFilterConfig = {
   min: -30,
   max: 30,
-  defaultMin: -15,
-  defaultMax: 15,
+  defaultMin: -30,
+  defaultMax: 30,
   step: 1,
   tooltip: "Percentage difference between strike price and current stock price"
 };
