@@ -272,7 +272,14 @@ export default function PricingPage() {
           </div> */}
         </div>
       </div>
-
+      <Button
+                onClick={handleContactClick}
+                size="lg"
+                variant="default"
+                className="mx-auto block hover:text-gray-900 hover:bg-gray-100"
+              >
+                Contact Us
+      </Button>
       <Footer />
     </PageLayout>
   );

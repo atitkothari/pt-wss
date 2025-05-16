@@ -11,16 +11,16 @@ export function Footer() {
     tools: [
       { name: 'Discover', href: '/discover' },
       { name: 'Covered Call Calculator', href: '/covered-call-calculator' },
-    ],
-    resources: [
       { name: 'Available Stocks', href: '/available-stocks' },
-      { name: 'Blog', href: 'https://wheelstrategyoptions.com/blog/', external: true },
       { name: 'API', href: 'https://rapidapi.com/wheel-strategy-options-wheel-strategy-options-default/api/wheel-options-strategy', external: true },
+    ],
+    resources: [      
+      { name: 'Blog', href: 'https://wheelstrategyoptions.com/blog/', external: true },
+      { name: 'Contact Us', href: 'mailto:reply@wheelstrategyoptions.com', external: true },      
       { name: 'Privacy Policy', href: 'https://wheelstrategyoptions.com/blog/privacy-policy-for-wheel-strategy-options/', external: true },
-      { name: 'Terms of Service', href: 'https://wheelstrategyoptions.com/blog/terms-of-service-for-wheel-strategy-options/', external: true },
+      { name: 'Terms of Service', href: 'https://wheelstrategyoptions.com/blog/terms-of-service-for-wheel-strategy-options/', external: true },      
     ],
   };
-
   return (
     <footer className="mt-8 bg-gray-50 border-t border-gray-200">
       <div className="max-w-screen-2xl mx-auto px-4 py-8">
