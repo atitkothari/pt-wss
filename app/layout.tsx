@@ -121,7 +121,7 @@ export default function RootLayout({
             <main>
               <AnnouncementBanner 
                 id="api-announcement-trial"
-                message="🎉 Get 50% OFF first month! Get it for <s>$19.99</s> $9.99 (Code: THANKYOU50)"
+                message="🎉 Get 95% OFF first month! Get it for <s>$19.99</s> $0.99 (Code: MEMORIALDAY)"
                 link={{
                   text: "Upgrade to Pro",
                   href: "/pricing"

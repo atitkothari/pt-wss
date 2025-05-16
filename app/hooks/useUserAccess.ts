@@ -35,6 +35,14 @@ export function useUserAccess() {
     return remainingDays;
   };
 
+  const showDiscount = ():boolean =>{
+    const status = getUserStatus()
+    if(status=='trial_ended' || status=='trialing')
+      return true
+    else
+      return false
+  }
+
   const isTrialEnded = (): boolean => {
     if (!user?.metadata?.creationTime) return false;    
     const accountCreationDate = new Date(user.metadata.creationTime);    
@@ -156,6 +164,7 @@ export function useUserAccess() {
     shouldShowPaymentWarning,
     getStatusMessage,
     loading,
-    getRemainingTrialDays
+    getRemainingTrialDays,
+    showDiscount
   };
 } 

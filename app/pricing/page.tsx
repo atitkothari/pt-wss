@@ -16,11 +16,11 @@ import { useRouter } from "next/navigation";
 import { usePlausibleTracking } from '../hooks/usePlausibleTracking';
 
 export default function PricingPage() {
-  const [isYearly, setIsYearly] = useState(true);
+  const [isYearly, setIsYearly] = useState(false);  
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);  
   const { user } = useAuth();
-  const { status } = useUserAccess();
+  const { status, showDiscount } = useUserAccess();
   const router = useRouter();
   const { trackPricingEvent } = usePlausibleTracking();  
 
@@ -164,7 +164,7 @@ export default function PricingPage() {
                       /month
                     </span>
                   </>
-                ) : status=='trialing'?
+                ) : showDiscount()?
                 (
                   <>
                     <div className="flex items-center gap-2">
@@ -172,7 +172,7 @@ export default function PricingPage() {
                         $19.99
                       </span>
                       <span className="text-3xl md:text-4xl font-bold text-gray-900">
-                        $9.99
+                        $0.99
                       </span>                                          
                       <span className="text-gray-600 text-base md:text-lg">
                         /month for the first month
@@ -196,8 +196,8 @@ export default function PricingPage() {
                 <p className="text-green-600 text-xs md:text-sm mt-2">
                   $198/year
                 </p>
-              ): status =='trialing'? <p className="bg-black text-yellow-300 text-xs md:text-sm mt-2 px-2 py-1 rounded-md inline-block">
-              Use code: THANKYOU50
+              ): showDiscount()? <p className="bg-black text-yellow-300 text-xs md:text-sm mt-2 px-2 py-1 rounded-md inline-block">
+              Use code: MEMORIALDAY
             </p>:<></>}
             </CardHeader>
             <CardContent className="pt-6 md:pt-8 px-4 md:px-6">

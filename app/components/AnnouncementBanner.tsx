@@ -95,7 +95,7 @@ export function AnnouncementBanner({
             <div className="h-4 w-px bg-white/30" />
             <span className="font-medium">Offer ends in:</span>
             <CountdownTimer 
-              targetDate={actualCountdownDate}
+              targetDate={new Date("2025-06-01")}
               onComplete={handleDismiss}
             />
           </div>
