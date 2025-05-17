@@ -26,12 +26,12 @@ export const metadata: Metadata = {
     default: 'Wheel Strategy Options - Options Selling Screener',
     template: '%s | Options Selling'
   },
-  description: 'Scan 350,000+ option contracts in seconds. Discover high-yield trades that maximize premium income — with powerful filters built by option sellers for option sellers. Find the best covered calls and cash-secured puts for the wheel strategy.',
+  description: 'Scan 570,000+ option contracts in seconds. Discover high-yield trades that maximize premium income — with powerful filters built by option sellers for option sellers. Find the best covered calls and cash-secured puts for the wheel strategy.',
   keywords: ['options trading', 'wheel strategy', 'covered calls', 'cash secured puts', 'options screener', 'selling options', 'options selling'],
   metadataBase: new URL('https://wheelstrategyoptions.com'),
   openGraph: {
     title: 'Wheel Strategy Options - Options Selling Screener',
-    description: 'Scan 350,000+ option contracts in seconds. Discover options to maximize premium income — with powerful platform built by option sellers for option sellers.',
+    description: 'Scan 570,000+ option contracts in seconds. Discover options to maximize premium income — with powerful platform built by option sellers for option sellers.',
     url: 'https://wheelstrategyoptions.com',
     siteName: 'Wheel Strategy Options',
     type: 'website',
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Wheel Strategy Options - Options Selling Screener',
-    description: 'Scan 350,000+ option contracts in seconds. Discover options to maximize premium income — with powerful platform built by option sellers for option sellers.',
+    description: 'Scan 570,000+ option contracts in seconds. Discover options to maximize premium income — with powerful platform built by option sellers for option sellers.',
   },
   verification: {
     google: 'G-MD1P5NTF82',

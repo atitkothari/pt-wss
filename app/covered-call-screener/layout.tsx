@@ -3,7 +3,7 @@ import { generateOrganizationSchema } from '@/app/lib/structured-data';
 
 export const metadata = generateMetadata({
   title: 'Covered Call Screener - Find High-Yield Options',
-  description: 'Scan 350,000+ option contracts in seconds. Find the best covered calls for the wheel strategy with our advanced screener.',
+  description: 'Scan 570,000+ option contracts in seconds. Find the best covered calls for the wheel strategy with our advanced screener.',
   path: '/covered-call-screener',
   type: 'website',
 });

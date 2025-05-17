@@ -27,7 +27,7 @@ export default function LandingPage() {
           </h1>
           <p className="text-lg md:text-2xl text-gray-600 mb-6 md:mb-8 px-2 md:px-0 leading-relaxed"><b>Fast. Easy. Affordable.</b></p>
           <p className="text-lg md:text-2xl text-gray-600 mb-6 md:mb-8 px-2 md:px-0 leading-relaxed">
-            Scan 350,000+ option contracts in seconds. Discover high-yield trades that maximize premium income — with powerful filters built by option sellers for option sellers.
+            Scan 570,000+ option contracts in seconds. Discover high-yield trades that maximize premium income — with powerful filters built by option sellers for option sellers.
           </p>
           <Link href="/options">
             <Button size="lg" className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white text-base md:text-lg px-8 md:px-10 py-6 md:py-7 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
@@ -56,7 +56,7 @@ export default function LandingPage() {
       <div className="bg-transparent py-8 md:py-12 mt-4 md:mt-8">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-4xl font-bold text-center mb-6 md:mb-8 text-gray-800">
-            Blazing Fast Screening of Over 350,000 Option Contracts
+            Blazing Fast Screening of Over 570,000 Option Contracts
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             <FeatureCard

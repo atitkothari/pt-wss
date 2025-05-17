@@ -112,7 +112,7 @@ export default function PricingPage() {
             Simple, Transparent Pricing
           </h1>
           <p className="text-lg sm:text-xl text-gray-600 mb-6 md:mb-8 px-4">
-          Scan 350,000+ option contracts in seconds.
+          Scan 570,000+ option contracts in seconds.
           </p>
 
           {/* Billing Toggle */}

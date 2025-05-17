@@ -10,7 +10,7 @@ interface GenerateMetadataProps {
 
 export function generateMetadata({
   title = 'Wheel Strategy Options - Options Selling Screener',
-  description = 'Scan 350,000+ option contracts in seconds. Discover high-yield trades that maximize premium income — with powerful filters built by option sellers for option sellers.',
+  description = 'Scan 570,000+ option contracts in seconds. Discover high-yield trades that maximize premium income — with powerful filters built by option sellers for option sellers.',
   path = '',
   image = 'https://wheelstrategyoptions.com/og-image.png',
   type = 'website'
