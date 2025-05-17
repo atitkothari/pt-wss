@@ -164,7 +164,7 @@ export default function PricingPage() {
                       /month
                     </span>
                   </>
-                ) : showDiscount()?
+                ) : (!user || showDiscount())?
                 (
                   <>
                     <div className="flex items-center gap-2">
@@ -196,7 +196,7 @@ export default function PricingPage() {
                 <p className="text-green-600 text-xs md:text-sm mt-2">
                   $198/year
                 </p>
-              ): showDiscount()? <p className="bg-black text-yellow-300 text-xs md:text-sm mt-2 px-2 py-1 rounded-md inline-block">
+              ): (!user || showDiscount())? <p className="bg-black text-yellow-300 text-xs md:text-sm mt-2 px-2 py-1 rounded-md inline-block">
               Use code: MEMORIALDAY
             </p>:<></>}
             </CardHeader>
