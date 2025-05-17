@@ -46,7 +46,14 @@ export const EmailAuthForm = ({ mode, onSuccess, onError }: EmailAuthFormProps) 
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+    if (!emailRegex.test(email)) {
+      return false;
+    }
+    // Prevent mailslurp.biz domain
+    if (email.toLowerCase().endsWith('@mailslurp.biz')) {
+      return false;
+    }
+    return true;
   };
 
   const validatePassword = (password: string) => {
@@ -72,6 +79,9 @@ export const EmailAuthForm = ({ mode, onSuccess, onError }: EmailAuthFormProps) 
 
     try {
       if (!validateEmail(email)) {
+        if (email.toLowerCase().endsWith('@mailslurp.biz')) {
+          throw new Error('This email domain is not allowed for registration');
+        }
         throw new Error('Please enter a valid email address');
       }
 
@@ -281,7 +291,7 @@ export const EmailAuthForm = ({ mode, onSuccess, onError }: EmailAuthFormProps) 
             </div>
             <div className="ml-2">
               <label htmlFor="marketingConsent" className="text-sm text-gray-700">
-              Yes, I’d like to get early access to new features, product updates, wheel strategy tips and exclusive offers
+              Yes, I'd like to get early access to new features, product updates, wheel strategy tips and exclusive offers
               </label>
             </div>
           </div>
