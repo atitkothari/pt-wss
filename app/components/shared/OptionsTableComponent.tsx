@@ -12,7 +12,7 @@ import { Option, OptionType, StrikeFilter } from "../../types/option";
 import { DEFAULT_COLUMNS, OptionsTable } from "../table/OptionsTable";
 import { format, addDays } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Search, Mail, Save, Coffee, RotateCcw, BellRing, FolderOpen, FilterX } from "lucide-react";
+import { Search, Mail, Save, Coffee, RotateCcw, BellRing, FolderOpen, FilterX, Share2 } from "lucide-react";
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSymbols } from '../../hooks/useSymbols';
 import { SaveQueryModal } from "../modals/SaveQueryModal";
@@ -47,6 +47,9 @@ import { defaultScreeners } from '@/app/config/defaultScreeners';
 import { ColumnCustomizer } from "../table/ColumnCustomizer";
 import { screenerService } from "@/app/services/screenerService";
 import { useUserAccess } from "@/app/hooks/useUserAccess";
+import { toast } from 'sonner';
+import { usePlausibleTracking } from '@/app/hooks/usePlausibleTracking';
+import { sendAnalyticsEvent, AnalyticsEvents } from '@/app/utils/analytics';
 
 interface Filter {
   field: string;
@@ -91,6 +94,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const { symbols } = useSymbols();
   const { user, userId } = useAuth();
   const [savedScreeners, setSavedScreeners] = useState<SavedScreener[]>([]);
+  const { trackAuthEvent } = usePlausibleTracking();
 
   const {status} = useUserAccess()
 
@@ -1008,6 +1012,20 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     setIsSaveModalOpen(true);
   };
 
+  const handleShare = () => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      toast.success('URL copied to clipboard!');
+      sendAnalyticsEvent({
+        event_name: 'share_screener',
+        event_category: 'Screener',
+        event_label: option === 'call' ? 'Covered Call' : 'Cash Secured Put'
+      });
+    }).catch(() => {
+      toast.error('Failed to copy URL');
+    });
+  };
+
   // Move error check here, after all hooks are declared
   if (error) return <div className="text-red-500 p-4">{error}</div>;
 
@@ -1228,6 +1246,14 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
               <Button
                 variant="outline"
                 size="sm"
+                onClick={handleShare}
+                className="flex items-center gap-2"
+              >
+                <Share2 className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={handleReset}
                 className="flex items-center gap-2"
               >
@@ -1243,6 +1269,14 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           
           {/* Mobile buttons */}
           <div className="md:hidden flex items-end justify-end gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleShare}
+              className="flex items-center gap-2"
+            >
+              <Share2 className="h-4 w-4" />
+            </Button>
             <Button
               variant="outline"
               size="sm"
