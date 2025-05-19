@@ -67,8 +67,13 @@ export default function LandingPage() {
         </div>
       </div>
 
+      {/* Divider */}
+      <div className="w-full px-4 py-7">
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+      </div>
+
       {/* Features Section */}
-      <div className="bg-transparent py-8 md:py-12 mt-4 md:mt-8">
+      {/* <div className="bg-transparent py-8 md:py-12 mt-4 md:mt-8">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-4xl font-bold text-center mb-6 md:mb-8 text-gray-800">
             Blazing Fast Screening of Over 570,000 Option Contracts
@@ -107,10 +112,43 @@ export default function LandingPage() {
             />
           </div>
         </div>
-      </div>
+      </div> */}
 
+      {/* Detailed Features Section */}
+      <div className="py-16 md:py-7">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">
+          Blazing Fast Screening of Over 570,000 Option Contracts
+          </h2>
+          <div className="space-y-20">
+            <DetailedFeature
+              title="Covered Call and Cash Secured Put Screener"
+              description="Find the best covered call opportunities with our advanced screening tools. Filter by premium yield, strike price, expiration, earnings, and more. Screen for cash-secured put opportunities that match your risk tolerance and income targets."
+              imageSrc="/Screener.webp"
+              imageAlt="Covered Call and Cash Secured Put Screener"
+            />
+            <DetailedFeature
+              title="Advanced Filters"
+              description="Filter by Delta, Implied Volatility, Days to Expiration, P/E Ratio, Market Cap, and more to find the perfect trade."
+              imageSrc="/AdvancedFilters.webp"
+              imageAlt="Advanced Filters Interface"
+              reverse
+            />
+            <DetailedFeature
+              title="Save and Load Screener"
+              description="Save your favorite screeners and load them anytime. Perfect for recurring strategies and quick access to your preferred setups."
+              imageSrc="/SaveFilters.webp"
+              imageAlt="Save and Load Screener Interface"
+            />
+          </div>
+        </div>
+      </div>
+    {/* Divider */}
+    <div className="w-full px-4 py-7">
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+      </div>
       {/* How It Works Section */}
-      <div className="container mx-auto px-4 py-12 md:py-20">
+      <div className="container mx-auto px-4 py-7 md:py-20">
         <h2 className="text-2xl md:text-4xl font-bold text-center mb-8 md:mb-12 text-gray-800">
           How It Works
         </h2>
@@ -135,7 +173,10 @@ export default function LandingPage() {
           />
         </div>
       </div>
-
+{/* Divider */}
+<div className="w-full px-4 py-7">
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+      </div>
       {/* CTA Section */}
       <div className="bg-transparent py-12 md:py-20">
         <div className="container mx-auto px-4 text-center">
@@ -189,6 +230,38 @@ function StepCard({ icon, number, title, description }: {
       </div>
       <h3 className="text-xl font-semibold mb-4 text-gray-800">{title}</h3>
       <p className="text-gray-600 leading-relaxed">{description}</p>
+    </div>
+  );
+}
+
+function DetailedFeature({ 
+  title, 
+  description, 
+  imageSrc, 
+  imageAlt,
+  reverse = false 
+}: { 
+  title: string;
+  description: string;
+  imageSrc: string;
+  imageAlt: string;
+  reverse?: boolean;
+}) {
+  return (
+    <div className={`flex flex-col ${reverse ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-8 lg:gap-12 items-center px-4 md:px-8 lg:px-12`}>
+      <Link href="/options" className="lg:w-1/2 group">
+        <div>
+          <h3 className="text-2xl md:text-3xl font-bold mb-4 text-blue-600 group-hover:text-blue-700 transition-colors duration-300">{title}</h3>
+          <p className="text-lg text-500 leading-relaxed group-hover:text-blue-600 transition-colors duration-300">{description}</p>
+        </div>
+      </Link>
+      <Link href="/options" className="lg:w-1/2 group">
+        <img 
+          src={imageSrc} 
+          alt={imageAlt}
+          className="w-full h-auto max-h-[300px] object-contain rounded-lg transition-all duration-300 group-hover:opacity-90"
+        />
+      </Link>
     </div>
   );
 }
