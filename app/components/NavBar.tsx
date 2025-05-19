@@ -78,11 +78,21 @@ export function NavBar() {
             </Link>
             
             {(!authLoading && user && status === 'trialing')? (
-              <div className="flex-shrink-0 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100 flex items-center">
-                <div className="text-sm text-blue-700 font-medium whitespace-nowrap">
-                  <span className="font-bold">{getRemainingTrialDays()}</span> days left in trial
+              // <div className="flex-shrink-0 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100 flex items-center">
+              //   <div className="text-sm text-blue-700 font-medium whitespace-nowrap">
+              //     <span className="font-bold">{getRemainingTrialDays()}</span> days left in trial
+              //   </div>
+              // </div>
+              (<div               
+                onClick={() => {
+                  router.push('/pricing')
+                  handleNavigation('Pricing', '/pricing')
+                }}
+                className="flex-shrink-0 bg-green-50 px-3 py-1.5 rounded-full border border-green-100 flex items-center">
+                <div className="text-sm text-black-700 font-medium whitespace-nowrap">
+                Get all features for $0.99 💪
                 </div>
-              </div>
+              </div>)
             )        
             :(!authLoading && user && status === 'active')?(
               <div className="flex-shrink-0 bg-green-50 px-3 py-1.5 rounded-full border border-green-100 flex items-center">
@@ -100,7 +110,19 @@ export function NavBar() {
                   Trusted by  <span className="font-bold">1,000+</span> option sellers. Join now! 💰
                 </div>
               </div>
-            ):<></>}
+            )
+            :(!authLoading && user && status==='trial_ended')?
+            (<div               
+              onClick={() => {
+                router.push('/pricing')
+                handleNavigation('Pricing', '/pricing')
+              }}
+              className="flex-shrink-0 bg-green-50 px-3 py-1.5 rounded-full border border-green-100 flex items-center">
+              <div className="text-sm text-black-700 font-medium whitespace-nowrap">
+              Get all features for $0.99 💪
+              </div>
+            </div>)
+            :<></>}
           </div>
 
           {/* Mobile Menu Button */}
