@@ -1229,10 +1229,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                 className="flex items-center gap-2 relative"
               >
                 <Save className="h-4 w-4" />
-                <span>Save Screener</span>
-                <span className="absolute -top-1 -right-1 px-1.5 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
-                  New
-                </span>
+                <span>Save Screener</span>                
               </Button>
               <Button
                 onClick={handleSearch}
@@ -1438,10 +1435,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             className="flex items-center gap-2 relative"
           >
             <Save className="h-4 w-4" />
-            <span>Save Screener</span>
-            <span className="absolute -top-1 -right-1 px-1.5 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
-              New
-            </span>
+            <span>Save Screener</span>            
           </Button>
           <Button
             onClick={handleSearch}
