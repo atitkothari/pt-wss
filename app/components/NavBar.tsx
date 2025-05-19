@@ -66,15 +66,42 @@ export function NavBar() {
     <nav className="bg-gradient-to-br from-gray-50 via-white to-blue-50 w-full border-b border-gray-200 p-4 z-40 relative">
       <div className="max-w-screen-2xl mx-auto flex flex-wrap items-center gap-4">
         <div className="flex items-center justify-between w-full lg:w-auto">
-          <Link href="/" className="flex items-center hover:opacity-90 transition-opacity shrink-0">
-            <img src="/logo.png" className="h-8 md:h-10 mr-2 md:mr-3" alt="Wheel Strategy Options Logo" />
-            <span className="self-center text-base md:text-xl font-semibold whitespace-nowrap text-gray-900 hidden sm:inline">
-              Wheel Strategy Options
-            </span>
-            <span className="self-center text-base md:text-xl font-semibold whitespace-nowrap text-gray-900 sm:hidden">
-              Wheel Strategy Options
-            </span>
-          </Link>
+          <div className="flex items-center flex-wrap gap-2 md:gap-4">
+            <Link href="/" className="flex items-center hover:opacity-90 transition-opacity shrink-0">
+              <img src="/logo.png" className="h-8 md:h-10 mr-2 md:mr-3" alt="Wheel Strategy Options Logo" />
+              <span className="self-center text-base md:text-xl font-semibold whitespace-nowrap text-gray-900 hidden sm:inline">
+                Wheel Strategy Options
+              </span>
+              <span className="self-center text-base md:text-xl font-semibold whitespace-nowrap text-gray-900 sm:hidden">
+                Wheel Strategy Options
+              </span>
+            </Link>
+            
+            {(!authLoading && user && status === 'trialing')? (
+              <div className="flex-shrink-0 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100 flex items-center">
+                <div className="text-sm text-blue-700 font-medium whitespace-nowrap">
+                  <span className="font-bold">{getRemainingTrialDays()}</span> days left in trial
+                </div>
+              </div>
+            )        
+            :(!authLoading && user && status === 'active')?(
+              <div className="flex-shrink-0 bg-green-50 px-3 py-1.5 rounded-full border border-green-100 flex items-center">
+                <div className="text-sm text-black-700 font-medium whitespace-nowrap">
+                👑 Pro
+                </div>
+              </div>
+            )        
+            :(!authLoading && !user)?(
+              <div 
+                onClick={() => setIsAuthModalOpen(true)}
+                className="flex-shrink-0 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100 flex items-center cursor-pointer hover:bg-blue-100 transition-colors"
+              >
+                <div className="text-sm text-blue-700 font-medium whitespace-nowrap">
+                  Trusted by  <span className="font-bold">1,000+</span> option sellers. Join now! 💰
+                </div>
+              </div>
+            ):<></>}
+          </div>
 
           {/* Mobile Menu Button */}
           <button
@@ -84,25 +111,7 @@ export function NavBar() {
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
-
-        {/* Trial Days Indicator - Always Visible */}
-        {(!authLoading && user && status === 'trialing')? (
-          <div className="flex-shrink-0 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100 flex items-center order-2 lg:order-none">
-            <div className="text-sm text-blue-700 font-medium whitespace-nowrap">
-              <span className="font-bold">{getRemainingTrialDays()}</span> days left in trial
-            </div>
-          </div>
-        ):!user?(
-          <div 
-            onClick={() => setIsAuthModalOpen(true)}
-            className="flex-shrink-0 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100 flex items-center order-2 lg:order-none cursor-pointer hover:bg-blue-100 transition-colors"
-          >
-            <div className="text-sm text-blue-700 font-medium whitespace-nowrap">
-              Trusted by  <span className="font-bold">1,000+</span> option sellers. Join now! 💰
-            </div>
-          </div>
-        ):<></>}
-
+        
         {/* Desktop Navigation */}
         <div className="hidden lg:flex items-center justify-end flex-1 gap-6">
           <div className="flex items-center gap-6">

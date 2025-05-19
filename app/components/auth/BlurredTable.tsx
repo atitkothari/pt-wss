@@ -204,11 +204,11 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                         </div>
                       ) : (
                         <>
-                          <span className="text-base font-semibold">Monthly Plan</span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-normal line-through">$19.99/month</span>                            
-                            <span className="text-xs font-normal">$0.99/month for first month</span>                            
+                          <div className="flex items-center gap-1">
+                            {/* <span className="text-xs font-normal line-through">$19.99/month</span>                             */}
+                            <span className="text-base font-normal">$0.99/month for first month</span>                            
                           </div>
+                          <span className="text-xs font-semibold">Monthly Plan</span>                          
                           <span className="text-xs text-yellow-300 mt-1">Use code: MEMORIALDAY</span>
                         </>
                       )}
@@ -226,8 +226,8 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                         </div>
                       ) : (
                         <>
-                          <span className="text-base font-semibold">Yearly Plan</span>
-                          <span className="text-xs font-normal opacity-90">$16.5/month</span>
+                          <span className="text-base font-normal">$16.5/month</span>
+                          <span className="text-xs font-semibold">Yearly Plan</span>                          
                           {/* <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 20%</span> */}
                         </>
                       )}
