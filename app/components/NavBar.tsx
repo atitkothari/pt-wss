@@ -39,7 +39,8 @@ export function NavBar() {
       { name: 'Discover', href: '/discover' },      
       { name: 'Covered Call Calculator', href: '/covered-call-calculator' },
       { name: 'Blog', href: 'https://wheelstrategyoptions.com/blog/', external: true },
-      { name: 'Contact Us', href: 'mailto:reply@wheelstrategyoptions.com', external: true },            
+      { name: 'Contact Us', href: 'mailto:reply@wheelstrategyoptions.com', external: true },       
+      { name: 'Pricing', href: '/pricing' },            
     ],
   };
 
@@ -175,18 +176,17 @@ export function NavBar() {
                         {item.name}
                       </Link>
                     ))}
+                    {/* <Link
+                    href="/pricing"
+                    className="text-gray-700 hover:text-gray-900 font-medium transition-colors whitespace-nowrap"
+                    onClick={() => handleNavigation('Pricing', '/pricing')}
+                  >
+                    Pricing
+                  </Link> */}
                   </div>
                 </div>
               )}
-            </div>
-
-            <Link
-              href="/pricing"
-              className="text-gray-700 hover:text-gray-900 font-medium transition-colors whitespace-nowrap"
-              onClick={() => handleNavigation('Pricing', '/pricing')}
-            >
-              Pricing
-            </Link>
+            </div>            
           </div>
           
           <div className="flex items-center">            
