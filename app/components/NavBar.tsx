@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, X, LogOut, ChevronDown, CreditCard, User, Settings, Loader2, Save } from "lucide-react";
+import { Menu, X, LogOut, ChevronDown, CreditCard, User, Settings, Loader2, Save, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useState } from "react";
@@ -217,6 +217,10 @@ export function NavBar() {
                       <Save className="mr-2 h-4 w-4" />
                       <span>Saved Screeners</span>
                     </DropdownMenuItem>
+                    {!subscriptionStatus && (<DropdownMenuItem onClick={() => router.push('/pricing')} className="cursor-pointer text-gray-700 hover:text-gray-900">
+                      <Crown className="mr-2 h-4 w-4" />
+                      <span>Get Pro Plan</span>
+                    </DropdownMenuItem>)}
                     {subscriptionStatus && (
                       <DropdownMenuItem onClick={handleManageSubscription} className="cursor-pointer text-gray-700 hover:text-gray-900">
                         <CreditCard className="mr-2 h-4 w-4" />
