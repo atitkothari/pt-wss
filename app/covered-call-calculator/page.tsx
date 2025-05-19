@@ -25,6 +25,7 @@ export default function CoveredCallCalculatorPage() {
   const { trackCalculatorEvent } = usePlausibleTracking();
   // Input state (what user types)
   const [inputSymbol, setInputSymbol] = useState<string>('');
+  const [searchedSymbol, setSearchedSymbol] = useState<string>('');
   const [inputShares, setInputShares] = useState<number>(100);
   const [optionType, setOptionType] = useState<'weekly' | 'monthly'>('weekly');
   
@@ -206,13 +207,14 @@ export default function CoveredCallCalculatorPage() {
           };
         })
         .filter(Boolean) as CalculatorResult[];
-        console.log(calculatedResults);
+        // console.log(calculatedResults);
       // Sort by expiration date
       calculatedResults.sort((a, b) => {
         return new Date(a.expiration).getTime() - new Date(b.expiration).getTime();
       });
  
       setResults(calculatedResults);
+      setSearchedSymbol(inputSymbol)
 
       trackCalculatorEvent('calculate', {
         symbol: inputSymbol,
@@ -305,7 +307,7 @@ export default function CoveredCallCalculatorPage() {
         {/* <BlurredTable hasSearched={hasSearched}> */}
           {results.length > 0 && (
             <div>
-              <h2 className="text-xl font-semibold mb-4">{inputSymbol}</h2>
+              <h2 className="text-xl font-semibold mb-4">{searchedSymbol}</h2>
               
               <div className="overflow-x-auto">
                 <div className="rounded-md border overflow-hidden">
