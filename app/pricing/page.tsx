@@ -260,7 +260,7 @@ export default function PricingPage() {
         <div className="max-w-3xl mx-auto space-y-4 md:space-y-6">
           <div className="bg-gray-50 p-4 md:p-6 rounded-lg border border-gray-200">
             <h3 className="text-lg md:text-xl font-semibold mb-2">What's included in the free trial?</h3>
-            <p className="text-sm md:text-base text-gray-700">The free trial includes full access to all features for 5 days. No credit card required.</p>
+            <p className="text-sm md:text-base text-gray-700">The free trial includes full access to all features. No credit card required.</p>
           </div>
           <div className="bg-gray-50 p-4 md:p-6 rounded-lg border border-gray-200">
             <h3 className="text-lg md:text-xl font-semibold mb-2">Can I cancel anytime?</h3>

@@ -47,7 +47,7 @@ export function useUserAccess() {
     if (!user?.metadata?.creationTime) return false;    
     const accountCreationDate = new Date(user.metadata.creationTime);    
     const daysSinceCreation = differenceInDays(new Date(), accountCreationDate);
-    return daysSinceCreation > 5;
+    return daysSinceCreation > 3;
   };
 
   const getUserStatus = (): UserAccessStatus => {
