@@ -654,6 +654,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   
   const[symbolInput, setSymbolInput] = useState('')
   
+  const [isAdvancedFiltersExpanded, setIsAdvancedFiltersExpanded] = useState(false);
+
   const handleSearch = () => {
     setHasSearched(true);
     setIsFromCache(false);    
@@ -729,7 +731,12 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     }).catch(console.error);
 
     setCurrentPage(1);
-    setSymbolInput('')
+    setSymbolInput('');
+    
+    // Close advanced filters on mobile
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setIsAdvancedFiltersExpanded(false);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -1215,6 +1222,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             onYieldRangeChange={setYieldRange}
             autoSearch={false}
             onSearch={handleSearch}
+            isExpanded={isAdvancedFiltersExpanded}
+            onExpandedChange={setIsAdvancedFiltersExpanded}
           />
         </div>
 

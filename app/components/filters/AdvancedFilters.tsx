@@ -63,6 +63,9 @@ interface AdvancedFiltersProps {
   // Optional prop to trigger search automatically
   autoSearch?: boolean;
   onSearch?: () => void;
+  // Add isExpanded prop
+  isExpanded?: boolean;
+  onExpandedChange?: (expanded: boolean) => void;
 }
 
 export function AdvancedFilters({
@@ -97,9 +100,22 @@ export function AdvancedFilters({
   onYieldRangeChange,
   // Auto search props
   autoSearch = true,
-  onSearch
+  onSearch,
+  // Add isExpanded props
+  isExpanded: controlledIsExpanded,
+  onExpandedChange
 }: AdvancedFiltersProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [internalIsExpanded, setInternalIsExpanded] = useState(false);
+  
+  // Use controlled or uncontrolled state
+  const isExpanded = controlledIsExpanded ?? internalIsExpanded;
+  const setIsExpanded = (value: boolean) => {
+    if (onExpandedChange) {
+      onExpandedChange(value);
+    } else {
+      setInternalIsExpanded(value);
+    }
+  };
   
   // Create debounced search function
   const debouncedSearch = useMemo(
