@@ -21,35 +21,50 @@ export default function LandingPage() {
       
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-4 md:py-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-800 leading-normal pb-1">
-            Analyze High Premium Option Contracts 
-          </h1>
-          <p className="text-lg md:text-2xl text-gray-600 mb-6 md:mb-8 px-2 md:px-0 leading-relaxed"><b>Fast. Easy. Affordable.</b></p>
-          <p className="text-lg md:text-2xl text-gray-600 mb-6 md:mb-8 px-2 md:px-0 leading-relaxed">
-            Scan 570,000+ option contracts in seconds. Discover high-yield trades that maximize premium income — with powerful filters built by option sellers for option sellers.
-          </p>
-          <Link href="/options">
-            <Button size="lg" className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white text-base md:text-lg px-8 md:px-10 py-6 md:py-7 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-              Launch Screener <ArrowRight className="ml-2 h-4 md:h-5 w-4 md:w-5" />
-            </Button>
-          </Link>
-        </div>
-      </div>
-
-      {/* Learn More About Wheel Strategy Section */}
-      <div className="container mx-auto px-4 py-2">
-        <p className="text-lg text-gray-500 mb-2 text-center">
-          New to Wheel Strategy? Learn more about it {' '}
-          <a 
+        <div className="grid lg:grid-cols-10 gap-3 lg:gap-8 items-center">
+          {/* Left side - Copy */}
+          <div className="text-left pr-0 lg:pr-8 lg:col-span-7">
+            <h1 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-800 leading-normal pb-1">
+              Analyze High Premium Option Contracts 
+            </h1>
+            <p className="text-lg md:text-2xl text-gray-600 mb-6 md:mb-8 leading-relaxed"><b>Fast. Easy. Affordable.</b></p>
+            <p className="text-lg md:text-2xl text-gray-600 mb-6 md:mb-8 leading-relaxed">
+              Scan 570,000+ option contracts in seconds. Discover high-yield trades that maximize premium income — with powerful filters built by option sellers for option sellers.
+            </p>
+            <Link href="/options">
+              <Button size="lg" className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white text-base md:text-lg px-8 md:px-10 py-6 md:py-7 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+                Launch Screener <ArrowRight className="ml-2 h-4 md:h-5 w-4 md:w-5" />
+              </Button>
+            </Link>
+            <div className="container mx-auto py-2">
+            <p className="text-lg text-gray-500 mb-2">
+            <a 
             href="https://wheelstrategyoptions.com/blog/selling-options-for-income-a-practical-guide-2/" 
             target="_blank" 
             rel="noopener noreferrer"
             className="text-blue-600 hover:text-blue-800 underline font-medium"
-          >
-            here.
-          </a>
+          >Learn more</a> 
+           {' '} about Wheel Strategy.
+
         </p>
+        </div>
+                  {/* Learn More About Wheel Strategy Section */}
+    
+          </div>
+
+          {/* Right side - Video */}
+          <div className="mt-4 lg:mt-0 w-full lg:w-full lg:col-span-3 lg:ml-auto h-full flex items-center">
+            <video 
+              poster="video-poster.png"
+              className="w-full max-h-[50vh] lg:max-h-none rounded-xl shadow-[0_8px_30px_rgb(0,0,0,.5)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.16)] transition-shadow duration-300 object-contain"              
+              muted
+              autoPlay           
+            >
+              <source src="/demoVideo.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
       </div>
 
       {/* Features Section */}
