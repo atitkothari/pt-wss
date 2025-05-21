@@ -72,7 +72,7 @@ export function useOptionsData(
       }
       if (excludedSymbolsList && excludedSymbolsList.length > 0) {
         if (excludedSymbolsList.length === 1) {
-          filters.push({ operation: 'exclude', field: 'symbol', value: `"${excludedSymbolsList[0]}"` });
+          filters.push({ operation: 'exclude', field: 'symbol', value: `${excludedSymbolsList[0]}` });
         } else {
           filters.push({ 
             operation: 'exclude', 

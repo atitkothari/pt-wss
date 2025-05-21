@@ -969,7 +969,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         filters: JSON.stringify(screener.filters),
         is_alerting: screener.emailNotifications?.enabled??false
       };
-
+      console.log(JSON.stringify(screener.filters))
       // Save to backend
       await screenerService.saveFilter(payload);
       
@@ -1041,7 +1041,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     setPeRatio(screener.filters.peRatio || [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax]);
     setMarketCap(screener.filters.marketCap || [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax]);
     setMoneynessRange(screener.filters.moneynessRange || [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax]);
-    setSector(Array.isArray(screener.filters.sector) ? screener.filters.sector[0] : (screener.filters.sector || sectorOptions[0]));
+    setSector(Array.isArray(screener.filters.sector) ? screener.filters.sector[0] : (screener.filters.sector || sectorOptions[0]));    
   };
 
   
@@ -1530,7 +1530,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             marketCap,
             movingAverageCrossover,
             sector,
-            moneynessRange
+            moneynessRange,
+            excludedStocks
           }}
         />
       )}

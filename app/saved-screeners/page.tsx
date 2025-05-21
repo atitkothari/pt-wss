@@ -233,6 +233,11 @@ export default function SavedScreenersPage() {
               <span className="font-medium">Symbol:</span> {filters.searchTerm}
             </div>
           )}
+          {filters.excludedStocks && (
+            <div className="text-sm">
+              <span className="font-medium">Excluded Symbols:</span> {filters.excludedStocks}
+            </div>
+          )}
           {filters.minPrice !== undefined && filters.maxPrice !== undefined && (
             <div className="text-sm">
               <span className="font-medium">Price Range:</span> ${filters.minPrice} to ${filters.maxPrice}
