@@ -21,7 +21,8 @@ export function useOptionsData(
   minDelta: number = -1,
   maxDelta: number = 1,
   minExpiration: string = '',
-  pageName: string = ''
+  pageName: string = '',
+  excludedSymbols: string[] = []
 ) {
   const [data, setData] = useState<Option[]>([]);
   const [loading, setLoading] = useState(false);
@@ -49,7 +50,8 @@ export function useOptionsData(
     sector?: string,
     moneynessRange?: [number, number],
     impliedVolatilityRange?: [number, number],
-    minSelectedExpiration: string = minExpiration
+    minSelectedExpiration: string = minExpiration,
+    excludedSymbolsList: string[] = excludedSymbols
   ) => {
     setLoading(true);
     try {
@@ -65,6 +67,17 @@ export function useOptionsData(
             operation: 'in', 
             field: 'symbol', 
             value: `${searchTerms.join(',')}`
+          });
+        }
+      }
+      if (excludedSymbolsList && excludedSymbolsList.length > 0) {
+        if (excludedSymbolsList.length === 1) {
+          filters.push({ operation: 'exclude', field: 'symbol', value: `"${excludedSymbolsList[0]}"` });
+        } else {
+          filters.push({ 
+            operation: 'exclude', 
+            field: 'symbol', 
+            value: `${excludedSymbolsList.join(',')}`
           });
         }
       }

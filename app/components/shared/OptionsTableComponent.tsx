@@ -155,6 +155,26 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     return [];
   });
   
+  const [excludedStocks, setExcludedStocks] = useState<string[]>(() => {
+    const paramKey = getParamKey('exclude');
+    const localStorageKey = `${option}_excludedStocks`;
+    const excludeParam = searchParams.get(paramKey);
+    if (excludeParam) {
+      return excludeParam.split(',');
+    }
+    if (typeof window !== 'undefined') {
+      const storedValue = localStorage.getItem(localStorageKey);
+      if (storedValue) {
+        try {
+          return JSON.parse(storedValue);
+        } catch (e) {
+          console.error(`Error parsing localStorage value for ${localStorageKey}:`, e);
+        }
+      }
+    }
+    return [];
+  });
+  
   const [yieldRange, setYieldRange] = useState<[number, number]>(() => {
     const minYieldParam = getParamKey('min_yield');
     const maxYieldParam = getParamKey('max_yield');
@@ -403,6 +423,12 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      localStorage.setItem(`${option}_excludedStocks`, JSON.stringify(excludedStocks));
+    }
+  }, [excludedStocks, option]);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
       localStorage.setItem(`${option}_yieldRange`, JSON.stringify(yieldRange));
     }
   }, [yieldRange, option]);
@@ -500,7 +526,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     sector: sectorOptions[0],
     moneynessRange: [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax] as [number, number],
     impliedVolatility: [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax] as [number, number],
-    deltaFilter: [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax] as [number, number]
+    deltaFilter: [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax] as [number, number],
+    excludedStocks: ""
   });
 
   const [hasSearched, setHasSearched] = useState(false);
@@ -586,7 +613,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             sector,
             moneynessRange,
             impliedVolatility,
-            minSelectedExpiration
+            minSelectedExpiration,
+            excludedStocks
           ).catch(console.error);
           console.log(hasSearched)
           setHasSearched(true);
@@ -630,7 +658,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       impliedVolatility[0] !== activeFilters.impliedVolatility[0] ||
       impliedVolatility[1] !== activeFilters.impliedVolatility[1] || 
       moneynessRange[0] !== activeFilters.moneynessRange[0] ||
-      moneynessRange[1] !== activeFilters.moneynessRange[1];
+      moneynessRange[1] !== activeFilters.moneynessRange[1] ||
+      activeFilters.excludedStocks !== excludedStocks.join(',');
     
     if (hasChanged) {      
       setFiltersChanged(true);
@@ -649,7 +678,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     sector,
     moneynessRange,
     impliedVolatility,
-    activeFilters
+    activeFilters,
+    excludedStocks
   ]);
   
   const[symbolInput, setSymbolInput] = useState('')
@@ -678,11 +708,13 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       sector,
       moneynessRange,
       impliedVolatility,
-      deltaFilter
+      deltaFilter,
+      excludedStocks: excludedStocks.join(',')
     });
 
     updateURL({
       search: selectedStocks.join(','),
+      exclude: excludedStocks.join(','),
       min_yield: yieldRange[0],
       max_yield: yieldRange[1],
       maxPrice,
@@ -724,7 +756,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       sector,
       moneynessRange,
       impliedVolatility,
-      minSelectedExpiration
+      minSelectedExpiration,
+      excludedStocks
     ).then(()=>{
       setFiltersChanged(false); // Reset the filters changed flag when search is performed
       console.log("setting set change to false")
@@ -876,9 +909,9 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   }, [sortColumn, sortDirection, router, searchParams, activeFilters, currentPage, rowsPerPage, strikeFilter, deltaFilter, fetchData]);  
 
   const handleReset = () => {
-    // Reset all filter states to their default values
     setSelectedStocks([]);
-    setSearchTerm("");
+    setExcludedStocks([]);
+    setSearchTerm('');
     setYieldRange([yieldFilterConfig.min, yieldFilterConfig.max]);
     setMinPrice(priceFilterConfig.defaultMin);
     setMaxPrice(priceFilterConfig.defaultMax);
@@ -908,7 +941,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       sector: sectorOptions[0],
       moneynessRange: [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax] as [number, number],
       impliedVolatility: [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax] as [number, number],
-      deltaFilter: [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax] as [number, number]
+      deltaFilter: [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax] as [number, number],
+      excludedStocks:""
     });
     
     // Reset URL parameters
@@ -988,11 +1022,13 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       sector: Array.isArray(screener.filters.sector) ? screener.filters.sector[0] : (screener.filters.sector || sectorOptions[0]),
       moneynessRange: screener.filters.moneynessRange || [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax],
       impliedVolatility: screener.filters.impliedVolatility || [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax],
-      deltaFilter: screener.filters.deltaFilter || [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax]
+      deltaFilter: screener.filters.deltaFilter || [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax],
+      excludedStocks: screener.filters.excludedStocks?.join(",") || ''
     });
 
     // Update individual states
     setSearchTerm(screener.filters.searchTerm || '');
+    setExcludedStocks(screener.filters.excludedStocks || []);
     setSelectedStocks(screener.filters.selectedStocks || []);
     setYieldRange(screener.filters.yieldRange || [yieldFilterConfig.min, yieldFilterConfig.max]);
     setMinPrice(screener.filters.minPrice || priceFilterConfig.defaultMin);
@@ -1182,6 +1218,19 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                 suggestions={symbols}
                 showSuggestions={true}
                 tooltip="Enter stock symbols (e.g., AAPL, MSFT) to filter options"
+              />
+              <MultiStockSelect
+                id="input_screener_exclude_symbol"
+                label="Exclude Symbol"
+                selectedStocks={excludedStocks}
+                onChange={(stocks) => {
+                  setExcludedStocks(stocks);
+                }}                
+                placeholder="Enter symbols to exclude..."
+                onKeyPress={handleKeyPress}
+                suggestions={symbols}
+                showSuggestions={true}
+                tooltip="Enter stock symbols to exclude from the results"
               />
             </div>
           </div>

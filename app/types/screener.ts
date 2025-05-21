@@ -20,6 +20,7 @@ export interface SavedScreener {
     moneynessRange?: [number, number];
     movingAverageCrossover?: string[];
     sector?: string[];
+    excludedStocks?: string[];
   };
   emailNotifications?: {
     enabled: boolean;
