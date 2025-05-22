@@ -168,19 +168,49 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
               ) : status === 'paused' ? (
                 <>
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 px-4 py-2 rounded-md">
-                    Your subscription has ended
+                    Your subscription has ended. Please choose a subscription plan.
                   </h2>
-                  <p className="text-sm text-gray-600 mb-2">
-                    Provide payment method to continue
-                  </p>
                   <div className="flex flex-col sm:flex-row gap-3 mt-2">
                     <Button
-                      onClick={() => router.push('/manage-subscription')}
+                      onClick={() => handleUpgrade(false)}
                       size="lg"
-                      className="bg-black text-white hover:bg-white/20 border-white/20 transition-colors flex items-center gap-2"
+                      disabled={isUpgrading}
+                      className="bg-gray-900 hover:bg-gray-800 text-white border-0 shadow-md flex flex-col py-4 h-auto disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <CreditCard className="h-4 w-4" />
-                      <span>Manage Subscription</span>
+                      {isUpgrading ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                          <span>Loading...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex items-center gap-1">
+                            {/* <span className="text-xs font-normal line-through">$19.99/month</span>                             */}
+                            <span className="text-base font-normal">$0.99/month for first month</span>                            
+                          </div>
+                          <span className="text-xs font-semibold">Monthly Plan</span>                          
+                          <span className="text-xs text-yellow-300 mt-1">Use code: MEMORIALDAY</span>
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      onClick={() => handleUpgrade(true)}
+                      size="lg"
+                      disabled={isUpgrading}
+                      className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white border-0 relative shadow-md flex flex-col py-4 h-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isUpgrading ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                          <span>Loading...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <span className="text-base font-normal">$16.5/month</span>
+                          <span className="text-xs font-semibold">Yearly Plan</span>                          
+                          {/* <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 20%</span> */}
+                        </>
+                      )}
                     </Button>
                   </div>
                 </>
