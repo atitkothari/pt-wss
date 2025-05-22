@@ -58,7 +58,8 @@ export default function LandingPage() {
               poster="video-poster.png"
               className="w-full max-h-[50vh] lg:max-h-none rounded-xl shadow-[0_8px_30px_rgb(0,0,0,.5)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.16)] transition-shadow duration-300 object-contain"              
               muted
-              autoPlay           
+              autoPlay       
+              loop    
             >
               <source src="/demoVideo.mp4" type="video/mp4" />
               Your browser does not support the video tag.
