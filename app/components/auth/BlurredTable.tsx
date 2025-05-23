@@ -34,7 +34,7 @@ const features = [
   "Newsletter",
   "Early access to new features",
   "Priority support",  
-  "Export as CSV and Excel (Coming Soon)",  
+  "Watchlist (Coming Soon)",  
 ];
 
 export const BlurredTable = ({ children, className, hasSearched = false }: BlurredTableProps) => {

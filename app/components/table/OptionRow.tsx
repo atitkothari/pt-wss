@@ -99,7 +99,7 @@ export function OptionRow({ option, index, visibleColumns }: OptionRowProps) {
 
   return (
     <TableRow key={`${option.symbol}-${option.strike}-${index}`}>
-      {visibleColumns.map(columnKey => renderCell(columnKey))}
+      {visibleColumns.map(columnKey => renderCell(columnKey))}      
     </TableRow>
   );
 }

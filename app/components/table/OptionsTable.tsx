@@ -10,12 +10,15 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { ColumnCustomizer, ColumnDef } from "./ColumnCustomizer";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format, parseISO } from "date-fns";
 import { useSearchParams } from 'next/navigation';
+import { useToast } from "@/hooks/use-toast";
+import { toast } from 'sonner';
   // Import the defaultVisibleColumns from filterConfig
 import { defaultVisibleColumns as configDefaultVisibleColumns } from '@/app/config/filterConfig';
+import { sendAnalyticsEvent } from "@/app/utils/analytics";
 
 export const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: "rating", label: "Rating" },
@@ -148,7 +151,15 @@ interface OptionsTableProps {
 export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps) {
   const searchParams = useSearchParams();
   const sortColumn = searchParams.get('sortBy');
-  const sortDirection = searchParams.get('sortDir');
+  const sortDirection = searchParams.get('sortDir');  
+
+  const handleStarClick = () => {
+    toast.success("Watchlist feature is coming soon!");
+    sendAnalyticsEvent({
+      event_name: 'watchlist',
+      event_category: 'Feature',
+    });
+  };
 
   return (
     <div>
@@ -192,6 +203,12 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
                       {formatCell(option[column as keyof Option], column)}
                     </td>
                   ))}
+                  <td className="text-right w-[50px] p-2 md:p-2.5">
+                    <Star 
+                      className="h-4 w-4 text-yellow-400 mx-auto cursor-pointer hover:text-yellow-500 transition-colors" 
+                      onClick={handleStarClick}
+                    />
+                  </td>
                 </tr>
               ))}
             </tbody>

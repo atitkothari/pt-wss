@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, X, LogOut, ChevronDown, CreditCard, User, Settings, Loader2, Save, Crown } from "lucide-react";
+import { Menu, X, LogOut, ChevronDown, CreditCard, User, Settings, Loader2, Save, Crown, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useState } from "react";
@@ -150,6 +150,16 @@ export function NavBar() {
               </Link>
             ))}
 
+            {/* Watchlist Button */}
+            <Link
+              href="/watchlist"
+              className="text-gray-700 hover:text-gray-900 font-medium transition-colors whitespace-nowrap flex items-center gap-1"
+              onClick={() => handleNavigation('Watchlist', '/watchlist')}
+            >
+              <Star className="h-4 w-4" />
+              Watchlist              
+            </Link>
+
             {/* Resources Dropdown */}
             <div className="relative">
               <button
@@ -269,6 +279,18 @@ export function NavBar() {
                   {item.name}
                 </Link>
               ))}
+              {/* Watchlist Link */}
+              <Link
+                href="/watchlist"
+                className="block text-gray-700 hover:text-gray-900 py-2 transition-colors font-medium flex items-center gap-2"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  handleNavigation('Watchlist', '/watchlist');
+                }}
+              >
+                <Star className="h-4 w-4" />
+                Watchlist                
+              </Link>
             </div>
 
             {/* Resources Section */}
