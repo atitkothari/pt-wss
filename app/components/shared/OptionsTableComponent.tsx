@@ -1254,11 +1254,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             onVolumeRangeChange={setVolumeRange}
             handleKeyPress={handleKeyPress}
             strikePrice={[minPrice, maxPrice]}
-            onStrikePriceChange={([min, max]) => {
-              if (!canAccessFeature()) {
-                setIsLoginPromptOpen(true);
-                return;
-              }
+            onStrikePriceChange={([min, max]) => {              
               setMinPrice(min);
               setMaxPrice(max);
             }}
@@ -1268,11 +1264,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             onMoneynessRangeChange={setMoneynessRange}
             minDte={minDte}
             maxDte={maxDte}
-            onDteChange={([min, max]) => {
-              if (!canAccessFeature()) {
-                setIsLoginPromptOpen(true);
-                return;
-              }
+            onDteChange={([min, max]) => {              
               setMinDte(min);
               setMaxDte(max);
             }}
