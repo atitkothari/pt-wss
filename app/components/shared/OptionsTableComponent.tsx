@@ -1500,16 +1500,14 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           <Button
             variant="outline"
             onClick={handleSaveScreenerClick}
-            className="flex items-center gap-2 relative"
-            disabled={!canAccessFeature()}
+            className="flex items-center gap-2 relative"            
           >
             <Save className="h-4 w-4" />
             <span>Save Screener</span>            
           </Button>
           <Button
             onClick={handleSearch}
-            className="flex items-center gap-2"
-            disabled={!canAccessFeature()}
+            className="flex items-center gap-2"            
           >
             <Search className="h-4 w-4" />
             Search

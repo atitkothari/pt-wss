@@ -257,11 +257,7 @@ export default function PricingPage() {
       {/* FAQ Section */}
       <div className="container mx-auto px-4 py-8 md:py-12">
         <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-8">Frequently Asked Questions</h2>
-        <div className="max-w-3xl mx-auto space-y-4 md:space-y-6">
-          <div className="bg-gray-50 p-4 md:p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg md:text-xl font-semibold mb-2">What's included in the free trial?</h3>
-            <p className="text-sm md:text-base text-gray-700">The free trial includes full access to all features. No credit card required.</p>
-          </div>
+        <div className="max-w-3xl mx-auto space-y-4 md:space-y-6">          
           <div className="bg-gray-50 p-4 md:p-6 rounded-lg border border-gray-200">
             <h3 className="text-lg md:text-xl font-semibold mb-2">Can I cancel anytime?</h3>
             <p className="text-sm md:text-base text-gray-700">Yes, you can cancel your subscription at any time. No questions asked.</p>
