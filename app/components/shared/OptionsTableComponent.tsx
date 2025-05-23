@@ -95,6 +95,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const { user, userId } = useAuth();
   const [savedScreeners, setSavedScreeners] = useState<SavedScreener[]>([]);
   const { trackAuthEvent } = usePlausibleTracking();
+  const { canAccessFeature } = useUserAccess();
 
   const {status} = useUserAccess()
 
@@ -1118,7 +1119,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         {/* Screener Dropdown */}
         <div className="mb-4">
           <Select
-            onValueChange={(value) => {
+            onValueChange={(value) => {              
               if (value === "manage") {
                 window.location.href = '/saved-screeners';
                 return;
@@ -1172,15 +1173,15 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                 );
               })()}
 
-                <div className="px-2 py-1.5 text-sm font-semibold text-gray-500 border-t">
+              <div className="px-2 py-1.5 text-sm font-semibold text-gray-500 border-t">
                   
-                  <SelectItem 
-                    value="save" 
-                    className="text-blue-600 hover:text-blue-800 cursor-pointer"
-                  >
-                    Save Your Configuration
-                  </SelectItem>
-                  </div>
+                <SelectItem 
+                  value="save" 
+                  className="text-blue-600 hover:text-blue-800 cursor-pointer"
+                >
+                  Save Your Configuration
+                </SelectItem>
+              </div>
               {/* Actions Section - Only show if user is logged in */}              
               {user && (
                 <div className="px-2 py-1.5 text-sm font-semibold text-gray-500 border-t">                
@@ -1204,7 +1205,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                 id="input_screener_symbol"
                 label="Search Symbol"
                 selectedStocks={selectedStocks}
-                onChange={(stocks) => {
+                onChange={(stocks) => {                  
                   setSelectedStocks(stocks);
                   if (stocks.length === 1) {
                     setSearchTerm(stocks[0]);
@@ -1217,7 +1218,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                 onKeyPress={handleKeyPress}
                 suggestions={symbols}
                 showSuggestions={true}
-                tooltip="Enter stock symbols (e.g., AAPL, MSFT) to filter options"
+                tooltip="Enter stock symbols (e.g., AAPL, MSFT) to filter options"                
               />
               <MultiStockSelect
                 id="input_screener_exclude_symbol"
@@ -1230,7 +1231,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                 onKeyPress={handleKeyPress}
                 suggestions={symbols}
                 showSuggestions={true}
-                tooltip="Enter stock symbols to exclude from the results"
+                tooltip="Enter stock symbols to exclude from the results"                
               />
             </div>
           </div>
@@ -1254,6 +1255,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             handleKeyPress={handleKeyPress}
             strikePrice={[minPrice, maxPrice]}
             onStrikePriceChange={([min, max]) => {
+              if (!canAccessFeature()) {
+                setIsLoginPromptOpen(true);
+                return;
+              }
               setMinPrice(min);
               setMaxPrice(max);
             }}
@@ -1264,6 +1269,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             minDte={minDte}
             maxDte={maxDte}
             onDteChange={([min, max]) => {
+              if (!canAccessFeature()) {
+                setIsLoginPromptOpen(true);
+                return;
+              }
               setMinDte(min);
               setMaxDte(max);
             }}
@@ -1273,6 +1282,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             onSearch={handleSearch}
             isExpanded={isAdvancedFiltersExpanded}
             onExpandedChange={setIsAdvancedFiltersExpanded}
+            // disabled={!canAccessFeature()}
           />
         </div>
 
@@ -1284,14 +1294,14 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
               <Button
                 variant="outline"
                 onClick={handleSaveScreenerClick}
-                className="flex items-center gap-2 relative"
+                className="flex items-center gap-2 relative"                
               >
                 <Save className="h-4 w-4" />
                 <span>Save Screener</span>                
               </Button>
               <Button
                 onClick={handleSearch}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2"                
               >
                 <Search className="h-4 w-4" />
                 Search
@@ -1302,7 +1312,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                 variant="outline"
                 size="sm"
                 onClick={handleShare}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2"                
               >
                 <Share2 className="h-4 w-4" />
               </Button>
@@ -1310,14 +1320,14 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                 variant="outline"
                 size="sm"
                 onClick={handleReset}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2"                
               >
                 <FilterX className="h-4 w-4" />                
               </Button>
               <ColumnCustomizer
                 columns={DEFAULT_COLUMNS}
                 visibleColumns={visibleColumns}
-                onColumnToggle={handleColumnToggle}
+                onColumnToggle={handleColumnToggle}                
               />
             </div>
           </div>
@@ -1328,7 +1338,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
               variant="outline"
               size="sm"
               onClick={handleShare}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2"              
             >
               <Share2 className="h-4 w-4" />
             </Button>
@@ -1336,14 +1346,14 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
               variant="outline"
               size="sm"
               onClick={handleReset}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2"              
             >
               <FilterX className="h-4 w-4" />              
             </Button>
             <ColumnCustomizer
               columns={DEFAULT_COLUMNS}
               visibleColumns={visibleColumns}
-              onColumnToggle={handleColumnToggle}
+              onColumnToggle={handleColumnToggle}              
             />
           </div>
         </div>
@@ -1491,6 +1501,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             variant="outline"
             onClick={handleSaveScreenerClick}
             className="flex items-center gap-2 relative"
+            disabled={!canAccessFeature()}
           >
             <Save className="h-4 w-4" />
             <span>Save Screener</span>            
@@ -1498,6 +1509,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           <Button
             onClick={handleSearch}
             className="flex items-center gap-2"
+            disabled={!canAccessFeature()}
           >
             <Search className="h-4 w-4" />
             Search

@@ -96,7 +96,7 @@ export function useUserAccess() {
   const canAccessFeature = () => {
     const status = getUserStatus();
     // Only active and trial subscriptions can access features
-    return status === 'active' || status === 'trialing';
+    return status === 'active';
   };
 
   const shouldShowPaymentWarning = () => {

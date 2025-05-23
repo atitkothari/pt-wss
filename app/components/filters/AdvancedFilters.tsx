@@ -29,6 +29,7 @@ import {
   dteFilterConfig,
   yieldFilterConfig
 } from "@/app/config/filterConfig";
+import { useUserAccess } from '@/app/hooks/useUserAccess';
 
 interface AdvancedFiltersProps {
   peRatio: [number, number];
@@ -66,6 +67,7 @@ interface AdvancedFiltersProps {
   // Add isExpanded prop
   isExpanded?: boolean;
   onExpandedChange?: (expanded: boolean) => void;
+  disabled?: boolean;
 }
 
 export function AdvancedFilters({
@@ -103,10 +105,10 @@ export function AdvancedFilters({
   onSearch,
   // Add isExpanded props
   isExpanded: controlledIsExpanded,
-  onExpandedChange
+  onExpandedChange,  
 }: AdvancedFiltersProps) {
   const [internalIsExpanded, setInternalIsExpanded] = useState(false);
-  
+  const { canAccessFeature } = useUserAccess();
   // Use controlled or uncontrolled state
   const isExpanded = controlledIsExpanded ?? internalIsExpanded;
   const setIsExpanded = (value: boolean) => {
@@ -187,7 +189,7 @@ export function AdvancedFilters({
         <Button
           variant="ghost"
           className="flex-1 flex justify-between items-center p-0 h-auto"
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={() => setIsExpanded(!isExpanded)}          
         >
           <div className="flex items-center gap-2">
             <span className="text-lg font-semibold text-primary">Advanced Filters</span>
@@ -251,7 +253,7 @@ export function AdvancedFilters({
               isExponential={priceFilterConfig.isExponential}
               toExponential={priceFilterConfig.toExponential}
               fromExponential={priceFilterConfig.fromExponential}
-              className="col-span-1"
+              className="col-span-1"              
             />
 
             {/* Volume Range */}
@@ -267,7 +269,7 @@ export function AdvancedFilters({
               step={volumeFilterConfig.step}
               tooltip={volumeFilterConfig.tooltip}
               formatValue={(val) => val.toLocaleString()}
-              className="col-span-1"
+              className="col-span-1"              
             />
 
             {/* Yield Range */}
@@ -284,6 +286,7 @@ export function AdvancedFilters({
               tooltip={yieldFilterConfig.tooltip}
               formatValue={(val) => `${val}%`}
               className="col-span-1"
+              disabled={!canAccessFeature()}
             />
 
             {/* Moneyness Range */}
@@ -299,7 +302,7 @@ export function AdvancedFilters({
               step={moneynessFilterConfig.step}
               tooltip={moneynessFilterConfig.tooltip}
               formatValue={(val) => `${val}%`}
-              className="col-span-1"
+              className="col-span-1"              
             />
             
             {/* Days to Expiration */}
@@ -320,7 +323,7 @@ export function AdvancedFilters({
               isExponential={dteFilterConfig.isExponential}
               toExponential={dteFilterConfig.toExponential}
               fromExponential={dteFilterConfig.fromExponential}
-              className="col-span-1"
+              className="col-span-1"              
             />
             
             {/* Delta */}
@@ -337,6 +340,7 @@ export function AdvancedFilters({
               tooltip={deltaFilterConfig.tooltip}
               formatValue={(val) => val.toFixed(2)}
               className="col-span-1"
+              disabled={!canAccessFeature()}
             />
             
             {/* Implied Volatility */}
@@ -353,6 +357,7 @@ export function AdvancedFilters({
               tooltip={impliedVolatilityFilterConfig.tooltip}
               formatValue={(val) => `${val}%`}
               className="col-span-1"
+              disabled={!canAccessFeature()}
             />
             
             {/* P/E Ratio */}
@@ -368,6 +373,7 @@ export function AdvancedFilters({
               step={peRatioFilterConfig.step}
               tooltip={peRatioFilterConfig.tooltip}
               className="col-span-1"
+              disabled={!canAccessFeature()}
             />
 
             {/* Market Cap */}

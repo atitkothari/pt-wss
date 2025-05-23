@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { Slider } from "@/components/ui/slider";
-import { Info } from "lucide-react";
+import { Info, Crown } from "lucide-react";
+import { useRouter } from 'next/navigation';
 import {
   Tooltip,
   TooltipContent,
@@ -26,6 +27,7 @@ interface RangeSliderProps {
   isExponential?: boolean;
   toExponential?: (linearValue: number) => number;
   fromExponential?: (exponentialValue: number) => number;
+  disabled?:boolean
 }
 
 export function RangeSlider({
@@ -44,13 +46,15 @@ export function RangeSlider({
     if (Math.abs(val - max) < Number.EPSILON) return `> ${val}`;
     return val.toString();
   },
-  className,
+  className = "",
   isExponential = false,
   toExponential = (val) => val,
-  fromExponential = (val) => val
+  fromExponential = (val) => val,
+  disabled = false
 }: RangeSliderProps) {
   const [localValue, setLocalValue] = useState<[number, number]>(value);
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
+  const router = useRouter();
   
   // Update local state when props change
   useEffect(() => {
@@ -58,6 +62,7 @@ export function RangeSlider({
   }, [value]);
 
   const handleSliderChange = (newValue: number[]) => {
+    if (disabled) return;
     let typedValue: [number, number];
     
     if (isExponential) {
@@ -86,42 +91,51 @@ export function RangeSlider({
     ? [fromExponential(localValue[0]), fromExponential(localValue[1])] 
     : localValue;
 
+  const handleCrownClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    router.push('/pricing');
+  };
+
   return (
-    <div className={`flex-1 relative ${className || ''}`}>
-      <div className="flex items-center justify-between mb-1">
+    <div className={`space-y-2 ${className}`}>
+      <div className="flex justify-between items-center">
         <div className="flex items-center gap-1">
-          <label htmlFor={id} className="block text-sm font-medium">{label}</label>
-          {tooltip && (
-            <TooltipProvider delayDuration={0}>
-              <Tooltip open={isTooltipOpen} onOpenChange={setIsTooltipOpen}>
+          <label htmlFor={id} className="text-sm font-medium text-gray-700">
+            {label}
+          </label>
+          {disabled && (
+            <TooltipProvider>
+              <Tooltip>
                 <TooltipTrigger asChild>
-                  <Info 
-                    size={14} 
-                    className="text-gray-400 cursor-help touch-manipulation" 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIsTooltipOpen(!isTooltipOpen);
-                    }}
-                  />
+                  <button
+                    onClick={handleCrownClick}
+                    className="p-0.5 hover:bg-gray-100 rounded-full transition-colors"
+                  >
+                    <Crown className="h-4 w-4 text-yellow-500" />
+                  </button>
                 </TooltipTrigger>
-                <TooltipContent 
-                  side="top" 
-                  className="max-w-[300px] z-[9999] bg-white text-gray-900 border border-gray-200 shadow-lg"
-                  sideOffset={5}
-                  align="start"
-                >
-                  <p className="text-xs">{tooltip}</p>
+                <TooltipContent>
+                  Upgrade to Pro to use this feature
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           )}
         </div>
-        <div className="text-xs text-gray-500">
-          {formatValue(localValue[0])} to {formatValue(localValue[1])}
-        </div>
+        {tooltip && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Info className="h-4 w-4 text-gray-400" />
+              </TooltipTrigger>
+              <TooltipContent>
+                {tooltip}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
       </div>
-      
-      <div className="pt-4 pb-1 px-1">
+      <div className="relative">
         <Slider
           id={id}
           value={sliderValue}
@@ -129,11 +143,12 @@ export function RangeSlider({
           max={max}
           step={step}
           onValueChange={handleSliderChange}
-          className="mb-2"
+          className={`mb-2 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          disabled={disabled}
         />
-        <div className="flex justify-between text-xs text-gray-500 mt-0.5">
-          <span>{`< ${min}`}</span>
-          <span>{`> ${max}`}</span>
+        <div className="flex justify-between text-sm text-gray-600">
+          <span>{formatValue(sliderValue[0])}</span>
+          <span>{formatValue(sliderValue[1])}</span>
         </div>
       </div>
     </div>

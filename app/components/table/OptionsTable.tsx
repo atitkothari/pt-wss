@@ -10,15 +10,22 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { ColumnCustomizer, ColumnDef } from "./ColumnCustomizer";
-import { ArrowUpDown, Star } from "lucide-react";
+import { ArrowUpDown, Crown, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format, parseISO } from "date-fns";
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useToast } from "@/hooks/use-toast";
 import { toast } from 'sonner';
   // Import the defaultVisibleColumns from filterConfig
 import { defaultVisibleColumns as configDefaultVisibleColumns } from '@/app/config/filterConfig';
 import { sendAnalyticsEvent } from "@/app/utils/analytics";
+import { useUserAccess } from "@/app/hooks/useUserAccess";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: "rating", label: "Rating" },
@@ -41,7 +48,10 @@ export const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: "impliedVolatility", label: "IV %" },
 ];
 
-const formatCell = (value: any, columnKey: string): string|any => {
+const formatCell = (value: any, columnKey: string): string|any => {  
+  const { canAccessFeature } = useUserAccess();
+  const router = useRouter();
+
   if (value === undefined || value === null) return '-';
 
   switch (columnKey) {
@@ -115,10 +125,40 @@ const formatCell = (value: any, columnKey: string): string|any => {
             return '';
         }
       };
+
+      if (canAccessFeature()) {
+        return (
+          <span className={`inline-block px-3 py-1.5 rounded-full font-semibold text-sm ${getRatingColor(value)}`}>
+            {value}
+          </span>
+        );
+      }
+
+      const handleCrownClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        router.push('/pricing');
+      };
+
       return (
-        <span className={`inline-block px-3 py-1.5 rounded-full font-semibold text-sm ${getRatingColor(value)}`}>
-          {value}
-        </span>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={handleCrownClick}
+                className="p-0.5 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <Crown className="h-4 w-4 text-yellow-500" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <div className="space-y-1">
+                <p className="font-medium">Upgrade to Pro to see ratings</p>
+                <p className="text-sm text-gray-500">Get access to our proprietary rating system that helps identify the best options opportunities</p>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       );
     
     case 'marketCap':

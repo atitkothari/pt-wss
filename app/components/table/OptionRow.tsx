@@ -3,6 +3,8 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Option } from "@/app/types/option";
 import { format } from "date-fns";
+import { useUserAccess } from "@/app/hooks/useUserAccess";
+import { Crown } from "lucide-react";
 
 interface OptionRowProps {
   option: Option;
@@ -11,6 +13,7 @@ interface OptionRowProps {
 }
 
 export function OptionRow({ option, index, visibleColumns }: OptionRowProps) {
+  const {canAccessFeature} = useUserAccess()
   const formatEarningsDate = (date: string | null) => {    
     if (!date) return 'N/A';
     try {
@@ -89,7 +92,7 @@ export function OptionRow({ option, index, visibleColumns }: OptionRowProps) {
         const ratingColor = getRatingColor(option.rating);
         return <TableCell className="text-right">
           <span className={`inline-block px-2 py-1 rounded-full ${ratingColor}`}>
-            {option.rating ?? 'N/A'}
+            {canAccessFeature()? option.rating ?? 'N/A' : <Crown className="mr-2 h-4 w-4" />}
           </span>
         </TableCell>;
       default:
