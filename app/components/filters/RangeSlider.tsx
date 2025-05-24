@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import { Slider } from "@/components/ui/slider";
 import { Info, Crown } from "lucide-react";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import {
   Tooltip,
   TooltipContent,
@@ -27,7 +27,7 @@ interface RangeSliderProps {
   isExponential?: boolean;
   toExponential?: (linearValue: number) => number;
   fromExponential?: (exponentialValue: number) => number;
-  disabled?:boolean
+  disabled?: boolean;
 }
 
 export function RangeSlider({
@@ -50,12 +50,12 @@ export function RangeSlider({
   isExponential = false,
   toExponential = (val) => val,
   fromExponential = (val) => val,
-  disabled = false
+  disabled = false,
 }: RangeSliderProps) {
   const [localValue, setLocalValue] = useState<[number, number]>(value);
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
   const router = useRouter();
-  
+
   // Update local state when props change
   useEffect(() => {
     setLocalValue(value);
@@ -64,37 +64,37 @@ export function RangeSlider({
   const handleSliderChange = (newValue: number[]) => {
     if (disabled) return;
     let typedValue: [number, number];
-    
+
     if (isExponential) {
       // Convert from linear slider position to exponential value
       typedValue = [toExponential(newValue[0]), toExponential(newValue[1])];
     } else {
       typedValue = [newValue[0], newValue[1]];
     }
-    
+
     setLocalValue(typedValue);
-    
+
     // Handle edge cases for min/max bounds with comparison operators
     const finalValue: [number, number] = [
       Math.abs(typedValue[0] - min) < Number.EPSILON ? min : typedValue[0],
-      Math.abs(typedValue[1] - max) < Number.EPSILON ? max : typedValue[1]
+      Math.abs(typedValue[1] - max) < Number.EPSILON ? max : typedValue[1],
     ];
-    
+
     onChange(finalValue);
   };
-  
+
   // We don't need to debounce here since the parent component (AdvancedFilters)
   // already implements debouncing for all filter changes
-  
+
   // Convert exponential values back to linear for slider position
-  const sliderValue = isExponential 
-    ? [fromExponential(localValue[0]), fromExponential(localValue[1])] 
+  const sliderValue = isExponential
+    ? [fromExponential(localValue[0]), fromExponential(localValue[1])]
     : localValue;
 
   const handleCrownClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    router.push('/pricing');
+    router.push("/pricing");
   };
 
   return (
@@ -128,12 +128,13 @@ export function RangeSlider({
               <TooltipTrigger>
                 <Info className="h-4 w-4 text-gray-400" />
               </TooltipTrigger>
-              <TooltipContent>
-                {tooltip}
-              </TooltipContent>
+              <TooltipContent>{tooltip}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         )}
+      </div>
+      <div className="text-xs text-gray-500 text-right">
+        {formatValue(localValue[0])} to {formatValue(localValue[1])}
       </div>
       <div className="relative">
         <Slider
@@ -143,12 +144,12 @@ export function RangeSlider({
           max={max}
           step={step}
           onValueChange={handleSliderChange}
-          className={`mb-2 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`mb-2 ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
           disabled={disabled}
         />
         <div className="flex justify-between text-sm text-gray-600">
-          <span>{formatValue(sliderValue[0])}</span>
-          <span>{formatValue(sliderValue[1])}</span>
+          <span>{`< ${min}`}</span>
+          <span>{`> ${max}`}</span>
         </div>
       </div>
     </div>

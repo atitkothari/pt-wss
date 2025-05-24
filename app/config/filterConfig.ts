@@ -74,7 +74,9 @@ export const dteFilterConfig = {
   toExponential: (linearValue: number) => {
     const maxValue = 365;
     const normalizedValue = linearValue / maxValue;
-    return Math.round(Math.pow(normalizedValue, dteFilterConfig.exponent) * maxValue);
+    const l = Math.round(Math.pow(normalizedValue, dteFilterConfig.exponent) * maxValue);
+    console.log(l)
+    return l;
   },
   fromExponential: (exponentialValue: number) => {
     const maxValue = 365;
@@ -108,12 +110,12 @@ export const marketCapFilterConfig = {
   toExponential: (linearValue: number) => {
     const maxValue = 1000;
     const normalizedValue = linearValue / maxValue;
-    return Math.round(Math.pow(normalizedValue, dteFilterConfig.exponent) * maxValue);
+    return Math.round(Math.pow(normalizedValue, marketCapFilterConfig.exponent) * maxValue);
   },
   fromExponential: (exponentialValue: number) => {
     const maxValue = 1000;
     const normalizedValue = exponentialValue / maxValue;
-    return Math.round(Math.pow(normalizedValue, 1/dteFilterConfig.exponent) * maxValue);
+    return Math.round(Math.pow(normalizedValue, 1/marketCapFilterConfig.exponent) * maxValue);
   }
 };
 
