@@ -114,43 +114,8 @@ export default function LandingPage() {
           </div>
         </div>
       </div> */}
-
-      {/* Detailed Features Section */}
-      <div className="py-16 md:py-7">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">
-          Blazing Fast Screening of Over 570,000 Option Contracts
-          </h2>
-          <div className="space-y-20">
-            <DetailedFeature
-              title="Covered Call and Cash Secured Put Screener"
-              description="Find the best covered call opportunities with our advanced screening tools. Filter by premium yield, strike price, expiration, earnings, and more. Screen for cash-secured put opportunities that match your risk tolerance and income targets."
-              imageSrc="/Screener.webp"
-              imageAlt="Covered Call and Cash Secured Put Screener"
-            />
-            <DetailedFeature
-              title="Advanced Filters"
-              description="Filter by Delta, Implied Volatility, Days to Expiration, P/E Ratio, Market Cap, and more to find the perfect trade."
-              imageSrc="/AdvancedFilters.webp"
-              imageAlt="Advanced Filters Interface"
-              reverse
-            />
-            <DetailedFeature
-              title="Save and Load Screener"
-              description="Save your favorite screeners and load them anytime. Perfect for recurring strategies and quick access to your preferred setups."
-              imageSrc="/SaveFilters.webp"
-              imageAlt="Save and Load Screener Interface"
-            />
-          </div>
-        </div>
-      </div>
-    {/* Divider */}
-    <div className="w-full px-4 py-7">
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
-      </div>
-
-      {/* Testimonials Section */}
-      <div className="container mx-auto px-4 py-16">
+            {/* Testimonials Section */}
+            <div className="container mx-auto px-4 py-16">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">
           What Our Users Say
         </h2>
@@ -198,6 +163,40 @@ export default function LandingPage() {
             />
           </div>
         </div>
+      </div>
+
+      {/* Detailed Features Section */}
+      <div className="py-16 md:py-7">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">
+          Blazing Fast Screening of Over 570,000 Option Contracts
+          </h2>
+          <div className="space-y-20">
+            <DetailedFeature
+              title="Covered Call and Cash Secured Put Screener"
+              description="Find the best covered call opportunities with our advanced screening tools. Filter by premium yield, strike price, expiration, earnings, and more. Screen for cash-secured put opportunities that match your risk tolerance and income targets."
+              imageSrc="/Screener.webp"
+              imageAlt="Covered Call and Cash Secured Put Screener"
+            />
+            <DetailedFeature
+              title="Advanced Filters"
+              description="Filter by Delta, Implied Volatility, Days to Expiration, P/E Ratio, Market Cap, and more to find the perfect trade."
+              imageSrc="/AdvancedFilters.webp"
+              imageAlt="Advanced Filters Interface"
+              reverse
+            />
+            <DetailedFeature
+              title="Save and Load Screener"
+              description="Save your favorite screeners and load them anytime. Perfect for recurring strategies and quick access to your preferred setups."
+              imageSrc="/SaveFilters.webp"
+              imageAlt="Save and Load Screener Interface"
+            />
+          </div>
+        </div>
+      </div>
+    {/* Divider */}
+    <div className="w-full px-4 py-7">
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
       </div>
 
       <div className="w-full px-4 py-7">
