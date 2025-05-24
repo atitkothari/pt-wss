@@ -148,6 +148,61 @@ export default function LandingPage() {
     <div className="w-full px-4 py-7">
         <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
       </div>
+
+      {/* Testimonials Section */}
+      <div className="container mx-auto px-4 py-16">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">
+          What Our Users Say
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto">
+          <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
+            <img 
+              src="/testimonials/1.webp" 
+              alt="User testimonial 1" 
+              className="w-full h-auto rounded-lg"
+            />
+          </div>
+          <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
+            <img 
+              src="/testimonials/2.webp" 
+              alt="User testimonial 2" 
+              className="w-full h-auto rounded-lg"
+            />
+          </div>
+          <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
+            <img 
+              src="/testimonials/3.webp" 
+              alt="User testimonial 3" 
+              className="w-full h-auto rounded-lg"
+            />
+          </div>
+          <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
+            <img 
+              src="/testimonials/4.webp" 
+              alt="User testimonial 4" 
+              className="w-full h-auto rounded-lg"
+            />
+          </div>
+          <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
+            <img 
+              src="/testimonials/5.webp" 
+              alt="User testimonial 5" 
+              className="w-full h-auto rounded-lg"
+            />
+          </div>
+          <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
+            <img 
+              src="/testimonials/6.webp" 
+              alt="User testimonial 6" 
+              className="w-full h-auto rounded-lg"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="w-full px-4 py-7">
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+      </div>
       {/* How It Works Section */}
       <div className="container mx-auto px-4 py-7 md:py-20">
         <h2 className="text-2xl md:text-4xl font-bold text-center mb-8 md:mb-12 text-gray-800">
@@ -178,6 +233,8 @@ export default function LandingPage() {
 <div className="w-full px-4 py-7">
         <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
       </div>
+
+
       {/* CTA Section */}
       <div className="bg-transparent py-12 md:py-20">
         <div className="container mx-auto px-4 text-center">
