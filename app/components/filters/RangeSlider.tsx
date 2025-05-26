@@ -62,7 +62,10 @@ export function RangeSlider({
   }, [value]);
 
   const handleSliderChange = (newValue: number[]) => {
-    if (disabled) return;
+    if (disabled) {
+      setIsTooltipOpen(true);
+      return;
+    }
     let typedValue: [number, number];
 
     if (isExponential) {
@@ -137,16 +140,32 @@ export function RangeSlider({
         {formatValue(localValue[0])} to {formatValue(localValue[1])}
       </div>
       <div className="relative">
-        <Slider
-          id={id}
-          value={sliderValue}
-          min={min}
-          max={max}
-          step={step}
-          onValueChange={handleSliderChange}
-          className={`mb-2 ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
-          disabled={disabled}
-        />
+        <TooltipProvider>
+          <Tooltip open={isTooltipOpen} onOpenChange={setIsTooltipOpen}>
+            <TooltipTrigger asChild>
+              <div className={`relative ${disabled ? 'cursor-not-allowed' : ''}`}>
+                <Slider
+                  id={id}
+                  value={sliderValue}
+                  min={min}
+                  max={max}
+                  step={step}
+                  onValueChange={handleSliderChange}
+                  className={`mb-2 ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                  disabled={disabled}
+                />
+              </div>
+            </TooltipTrigger>
+            {disabled && (
+              <TooltipContent>
+                <div className="flex items-center gap-2">
+                  <Crown className="h-4 w-4 text-yellow-500" />
+                  <span>Upgrade to Pro to use this feature</span>
+                </div>
+              </TooltipContent>
+            )}
+          </Tooltip>
+        </TooltipProvider>
         <div className="flex justify-between text-sm text-gray-600">
           <span>{`< ${min}`}</span>
           <span>{`> ${max}`}</span>

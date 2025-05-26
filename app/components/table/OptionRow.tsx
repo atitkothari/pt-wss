@@ -91,9 +91,16 @@ export function OptionRow({ option, index, visibleColumns }: OptionRowProps) {
       case 'rating':
         const ratingColor = getRatingColor(option.rating);
         return <TableCell className="text-right">
-          <span className={`inline-block px-2 py-1 rounded-full ${ratingColor}`}>
-            {canAccessFeature()? option.rating ?? 'N/A' : <Crown className="mr-2 h-4 w-4" />}
-          </span>
+          <div className="relative inline-block">
+            <span className={`inline-block px-2 py-1 rounded-full ${ratingColor} ${!canAccessFeature() ? 'blur-sm' : ''}`}>
+              {option.rating ?? 'N/A'}
+            </span>
+            {/* {!canAccessFeature() && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Crown className="h-4 w-4 text-yellow-500" />
+              </div>
+            )} */}
+          </div>
         </TableCell>;
       default:
         return null;

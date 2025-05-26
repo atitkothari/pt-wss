@@ -125,41 +125,37 @@ const formatCell = (value: any, columnKey: string): string|any => {
             return '';
         }
       };
-
-      if (canAccessFeature()) {
+      
         return (
-          <span className={`inline-block px-3 py-1.5 rounded-full font-semibold text-sm ${getRatingColor(value)}`}>
-            {value}
-          </span>
+          <div className="flex items-center gap-1">
+            <span className={`inline-block px-3 py-1.5 rounded-full font-semibold text-sm ${getRatingColor(value)} ${!canAccessFeature() ? 'blur-sm' : ''} `}>
+              {value}
+            </span>
+            {!canAccessFeature() &&(
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      router.push('/pricing');
+                    }}
+                    className="p-0.5 hover:bg-gray-100 rounded-full transition-colors"
+                  >
+                    <Crown className="h-4 w-4 text-yellow-500"/>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <div className="space-y-1">
+                    <p className="font-medium">Upgrade to Pro to see ratings</p>
+                    <p className="text-sm text-gray-500">Get access to our proprietary rating system that helps identify the best options opportunities</p>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>)}
+          </div>
         );
-      }
-
-      const handleCrownClick = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        router.push('/pricing');
-      };
-
-      return (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={handleCrownClick}
-                className="p-0.5 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <Crown className="h-4 w-4 text-yellow-500" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <div className="space-y-1">
-                <p className="font-medium">Upgrade to Pro to see ratings</p>
-                <p className="text-sm text-gray-500">Get access to our proprietary rating system that helps identify the best options opportunities</p>
-              </div>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      );
     
     case 'marketCap':
       if (!value) return '-';
