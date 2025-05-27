@@ -102,29 +102,12 @@ export function RangeSlider({
 
   return (
     <div className={`space-y-2 ${className}`}>
-      <div className="flex justify-between items-center">
+      {/* Same line info and label */}
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-1">
           <label htmlFor={id} className="text-sm font-medium text-gray-700">
             {label}
-          </label>
-          {disabled && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={handleCrownClick}
-                    className="p-0.5 hover:bg-gray-100 rounded-full transition-colors"
-                  >
-                    <Crown className="h-4 w-4 text-yellow-500" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  Upgrade to Pro to use this feature
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-        </div>
+          </label>                 
         {tooltip && (
           <TooltipProvider>
             <Tooltip>
@@ -134,11 +117,13 @@ export function RangeSlider({
               <TooltipContent>{tooltip}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
-        )}
-      </div>
+        )}</div>
+        
       <div className="text-xs text-gray-500 text-right">
         {formatValue(localValue[0])} to {formatValue(localValue[1])}
-      </div>
+      </div>  
+      </div>    
+
       <div className="relative">
         <TooltipProvider>
           <Tooltip open={isTooltipOpen} onOpenChange={setIsTooltipOpen}>
@@ -153,14 +138,24 @@ export function RangeSlider({
                   onValueChange={handleSliderChange}
                   className={`mb-2 ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
                   disabled={disabled}
-                />
-              </div>
+                />  
+                {disabled && (
+                <span className="absolute h-full w-full top-5 left-0 flex items-center justify-center ">
+                <button
+                    onClick={handleCrownClick}
+                    className="p-0.5 hover:bg-gray-100 rounded-full transition-colors flex gap-1"
+                  >
+                    <Crown className="h-4 w-4 text-yellow-500" /> <span className="text-xs">Upgrade to Pro to use this filter</span>                    
+                  </button>
+                  </span>              
+                )}
+              </div>              
             </TooltipTrigger>
             {disabled && (
               <TooltipContent>
                 <div className="flex items-center gap-2">
                   <Crown className="h-4 w-4 text-yellow-500" />
-                  <span>Upgrade to Pro to use this feature</span>
+                  <span>Upgrade to Pro to use this filter</span>
                 </div>
               </TooltipContent>
             )}
