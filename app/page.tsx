@@ -164,6 +164,10 @@ export default function LandingPage() {
           </div>
         </div>
       </div>
+      
+      <div className="w-full px-4 py-7">
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+      </div>
 
       {/* Detailed Features Section */}
       <div className="py-16 md:py-7">
@@ -194,10 +198,7 @@ export default function LandingPage() {
           </div>
         </div>
       </div>
-    {/* Divider */}
-    <div className="w-full px-4 py-7">
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
-      </div>
+    {/* Divider */}    
 
       <div className="w-full px-4 py-7">
         <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>

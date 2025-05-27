@@ -30,6 +30,7 @@ import {
   yieldFilterConfig
 } from "@/app/config/filterConfig";
 import { useUserAccess } from '@/app/hooks/useUserAccess';
+import { MultiStockSelect } from "./MultiStockSelect";
 
 interface AdvancedFiltersProps {
   peRatio: [number, number];
@@ -68,6 +69,9 @@ interface AdvancedFiltersProps {
   isExpanded?: boolean;
   onExpandedChange?: (expanded: boolean) => void;
   disabled?: boolean;
+  excludedStocks: string[];
+  onExcludedStocksChange: (stocks: string[]) => void;
+  symbols: string[];
 }
 
 export function AdvancedFilters({
@@ -106,6 +110,9 @@ export function AdvancedFilters({
   // Add isExpanded props
   isExpanded: controlledIsExpanded,
   onExpandedChange,  
+  excludedStocks,
+  onExcludedStocksChange,
+  symbols,
 }: AdvancedFiltersProps) {
   const [internalIsExpanded, setInternalIsExpanded] = useState(false);
   const { canAccessFeature } = useUserAccess();
@@ -168,11 +175,13 @@ export function AdvancedFilters({
       movingAverage: movingAverageCrossover !== movingAverageCrossoverOptions[0],
       sector: sector !== sectorOptions[0],
       yieldRange: yieldRange[0] !== yieldFilterConfig.defaultMin || 
-                  yieldRange[1] !== yieldFilterConfig.defaultMax
+                  yieldRange[1] !== yieldFilterConfig.defaultMax,
+      excludedStocks: excludedStocks.length > 0,
     };
   }, [
     strikePrice, moneynessRange, minDte, maxDte, deltaFilter, volumeRange,
-    impliedVolatility, peRatio, marketCap, movingAverageCrossover, sector, yieldRange
+    impliedVolatility, peRatio, marketCap, movingAverageCrossover, sector, yieldRange,
+    excludedStocks
   ]);
 
   const hasModifiedFilters = useMemo(() => {
@@ -221,7 +230,8 @@ export function AdvancedFilters({
                   marketCap: 'Market Cap',
                   movingAverage: 'MA',
                   sector: 'Sector',
-                  yieldRange: 'Yield Range'
+                  yieldRange: 'Yield Range',
+                  excludedStocks: 'Excluded Stocks',
                 };
                 return (
                   <Badge 
@@ -442,6 +452,20 @@ export function AdvancedFilters({
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* Exclude Stocks */}
+            <div className="col-span-1">
+              <MultiStockSelect
+                id="input_screener_exclude_symbol"
+                label="Exclude Symbol"
+                selectedStocks={excludedStocks}
+                onChange={onExcludedStocksChange}
+                placeholder="Enter symbols to exclude..."
+                suggestions={symbols}
+                showSuggestions={true}
+                tooltip="Enter stock symbols to exclude from the results"
+              />
             </div>
           </div>
         </div>

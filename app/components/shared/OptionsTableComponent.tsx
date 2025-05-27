@@ -1203,35 +1203,16 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             <div className="flex flex-col gap-2">
               <MultiStockSelect
                 id="input_screener_symbol"
-                label="Search Symbol"
+                label="Symbol"
                 selectedStocks={selectedStocks}
-                onChange={(stocks) => {                  
+                onChange={(stocks) => {
                   setSelectedStocks(stocks);
-                  if (stocks.length === 1) {
-                    setSearchTerm(stocks[0]);
-                  } else {
-                    setSearchTerm(stocks.join(','));
-                  }
-                }}                
-                onInputChange={(inputValue)=>{setSymbolInput(inputValue)}}
+                }}
                 placeholder="Enter symbols..."
                 onKeyPress={handleKeyPress}
                 suggestions={symbols}
                 showSuggestions={true}
-                tooltip="Enter stock symbols (e.g., AAPL, MSFT) to filter options"                
-              />
-              <MultiStockSelect
-                id="input_screener_exclude_symbol"
-                label="Exclude Symbol"
-                selectedStocks={excludedStocks}
-                onChange={(stocks) => {
-                  setExcludedStocks(stocks);
-                }}                
-                placeholder="Enter symbols to exclude..."
-                onKeyPress={handleKeyPress}
-                suggestions={symbols}
-                showSuggestions={true}
-                tooltip="Enter stock symbols to exclude from the results"                
+                tooltip="Enter stock symbols to search for options"
               />
             </div>
           </div>
@@ -1271,10 +1252,9 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             yieldRange={yieldRange}
             onYieldRangeChange={setYieldRange}
             autoSearch={false}
-            onSearch={handleSearch}
-            isExpanded={isAdvancedFiltersExpanded}
-            onExpandedChange={setIsAdvancedFiltersExpanded}
-            // disabled={!canAccessFeature()}
+            excludedStocks={excludedStocks}
+            onExcludedStocksChange={setExcludedStocks}
+            symbols={symbols}
           />
         </div>
 
