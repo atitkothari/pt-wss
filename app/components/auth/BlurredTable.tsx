@@ -185,11 +185,11 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                       ) : (
                         <>
                           <div className="flex items-center gap-1">
-                            {/* <span className="text-xs font-normal line-through">$19.99/month</span>                             */}
-                            <span className="text-base font-normal">$0.99/month for first month</span>                            
+                            <span className="text-xs font-normal line-through">$19.99/month</span>                            
+                            {/* <span className="text-base font-normal">$0.99/month for first month</span>                             */}
                           </div>
                           <span className="text-xs font-semibold">Monthly Plan</span>                          
-                          <span className="text-xs text-yellow-300 mt-1">Use code: MEMORIALDAY</span>
+                          {/* <span className="text-xs text-yellow-300 mt-1">Use code: MEMORIALDAY</span> */}
                         </>
                       )}
                     </Button>
@@ -235,11 +235,11 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                       ) : (
                         <>
                           <div className="flex items-center gap-1">
-                            {/* <span className="text-xs font-normal line-through">$19.99/month</span>                             */}
-                            <span className="text-base font-normal">$0.99/month for first month</span>                            
+                            <span className="text-xs font-normal">$19.99/month</span>                            
+                            {/* <span className="text-base font-normal">$0.99/month for first month</span>                             */}
                           </div>
                           <span className="text-xs font-semibold">Monthly Plan</span>                          
-                          <span className="text-xs text-yellow-300 mt-1">Use code: MEMORIALDAY</span>
+                          {/* <span className="text-xs text-yellow-300 mt-1">Use code: MEMORIALDAY</span> */}
                         </>
                       )}
                     </Button>

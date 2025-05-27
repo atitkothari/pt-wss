@@ -119,7 +119,7 @@ export default function RootLayout({
         <AuthProvider>
           <SubscriptionProvider>
             <main>
-              <AnnouncementBanner 
+              {/* <AnnouncementBanner 
                 id="api-announcement-trial"
                 message="🎉 Get 95% OFF first month! Get it for <s>$19.99</s> $0.99 (Code: MEMORIALDAY)"
                 link={{
@@ -128,7 +128,7 @@ export default function RootLayout({
                 }}
                 analyticsEventName="upgrade_to_pro_banner"
                 className="bg-gradient-to-r from-blue-600 to-blue-500"
-              />
+              /> */}
               {children}
             </main>
             <Toaster />

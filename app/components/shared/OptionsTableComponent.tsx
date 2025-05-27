@@ -1255,6 +1255,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             excludedStocks={excludedStocks}
             onExcludedStocksChange={setExcludedStocks}
             symbols={symbols}
+            isExpanded={isAdvancedFiltersExpanded}
+            onExpandedChange={setIsAdvancedFiltersExpanded}
           />
         </div>
 
