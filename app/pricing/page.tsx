@@ -140,7 +140,7 @@ export default function PricingPage() {
               <span className="bg-green-100 text-green-700 text-xs md:text-sm px-1.5 md:px-2 py-0.5 md:py-1 rounded-full font-medium whitespace-nowrap">
                 Save 17%
               </span>
-            </div>
+            </div>           
           </div>
         </div>
       </div>
@@ -153,7 +153,9 @@ export default function PricingPage() {
               <CardTitle className="text-2xl md:text-3xl font-bold mb-2">Pro Plan</CardTitle>
               {/* <CardDescription className="text-base md:text-lg text-gray-600 mb-4 md:mb-6">
               The yearly plan costs less than one week's covered call premium.
-              </CardDescription> */}
+              </CardDescription> */}              
+          <span className="text-base font-semibold"> Our users make back their yearly subscription cost in one trade.</span>
+
               <div className="flex items-center justify-center gap-1 md:gap-2">
                 {isYearly ? (
                   <>
