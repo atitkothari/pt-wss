@@ -22,7 +22,8 @@ export function useOptionsData(
   maxDelta: number = 1,
   minExpiration: string = '',
   pageName: string = '',
-  excludedSymbols: string[] = []
+  excludedSymbols: string[] = [],
+  probabilityRange?: [number, number]
 ) {
   const [data, setData] = useState<Option[]>([]);
   const [loading, setLoading] = useState(false);
@@ -51,7 +52,8 @@ export function useOptionsData(
     moneynessRange?: [number, number],
     impliedVolatilityRange?: [number, number],
     minSelectedExpiration: string = minExpiration,
-    excludedSymbolsList: string[] = excludedSymbols
+    excludedSymbolsList: string[] = excludedSymbols,
+    probabilityRange?: [number, number]
   ) => {
     setLoading(true);
     try {
@@ -156,6 +158,16 @@ export function useOptionsData(
           field: 'sector', 
           value: `"${sector}"` 
         });
+      }
+
+      // Add probability filter
+      if (probabilityRange) {
+        if (probabilityRange[0] > 0) {
+          filters.push({ operation: 'gte', field: 'probability', value: probabilityRange[0]/100 });
+        }
+        if (probabilityRange[1] < 100) {
+          filters.push({ operation: 'lte', field: 'probability', value: probabilityRange[1]/100 });
+        }
       }
 
       // Get sort params from URL if not provided in sortConfig

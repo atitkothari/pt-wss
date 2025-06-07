@@ -14,6 +14,7 @@ import DebugEnv from "../components/DebugEnv";
 import { sendAnalyticsEvent, AnalyticsEvents } from '../utils/analytics';
 import { useRouter } from "next/navigation";
 import { usePlausibleTracking } from '../hooks/usePlausibleTracking';
+import { StockChips } from '../components/StockChips';
 
 export default function PricingPage() {
   const [isYearly, setIsYearly] = useState(true);  
@@ -145,109 +146,172 @@ export default function PricingPage() {
         </div>
       </div>
 
-      {/* Pricing Card */}
+      {/* Pricing Card and Stock Chips Section */}
       <div className="container mx-auto px-4 pt-8">
-        <div className="max-w-lg mx-auto">
-          <Card className="bg-white border-2 border-blue-100 shadow-lg">
-            <CardHeader className="text-center pb-6 md:pb-8 border-b px-4 md:px-6">
-              <CardTitle className="text-2xl md:text-3xl font-bold mb-2">Pro Plan</CardTitle>
-              {/* <CardDescription className="text-base md:text-lg text-gray-600 mb-4 md:mb-6">
-              The yearly plan costs less than one week's covered call premium.
-              </CardDescription> */}              
-          <span className="text-base font-semibold"> Our users make back their yearly subscription cost in one trade.</span>
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8 items-start">
+          {/* Pricing Card */}
+          <div className="w-full lg:w-1/3">
+            <Card className="bg-white border-2 border-blue-100 shadow-lg">
+              <CardHeader className="text-center pb-6 md:pb-8 border-b px-4 md:px-6">
+                <CardTitle className="text-2xl md:text-3xl font-bold mb-2">Pro Plan</CardTitle>                
 
-              <div className="flex items-center justify-center gap-1 md:gap-2">
-                {isYearly ? (
-                  <>
-                    <span className="text-3xl md:text-4xl font-bold text-gray-900">
-                      $16.50
-                    </span>
-                    <span className="text-gray-600 text-base md:text-lg">
-                      /month
-                    </span>
-                  </>
-                ) : (!user || showDiscount())?
-                (
-                  <>
-                    <div className="flex items-center gap-2">
-                    <span className="text-3xl md:text-4xl font-bold text-gray-900">
-                        $19.99
-                      </span>                      
-                      <span className="text-gray-600 text-base md:text-lg">
-                        /month
-                      </span>
-                    </div>
-                  </>
-                ):(
-                  <>
-                    <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center gap-1 md:gap-2">
+                  {isYearly ? (
+                    <>
                       <span className="text-3xl md:text-4xl font-bold text-gray-900">
-                        $19.99
-                      </span>                                            
+                        $16.50
+                      </span>
                       <span className="text-gray-600 text-base md:text-lg">
                         /month
                       </span>
-                    </div>
+                    </>
+                  ) : (!user || showDiscount())?
+                  (
+                    <>
+                      <div className="flex items-center gap-2">
+                      <span className="text-3xl md:text-4xl font-bold text-gray-900">
+                          $19.99
+                        </span>                      
+                        <span className="text-gray-600 text-base md:text-lg">
+                          /month
+                        </span>
+                      </div>
+                    </>
+                  ):(
+                    <>
+                      <div className="flex items-center gap-2">
+                        <span className="text-3xl md:text-4xl font-bold text-gray-900">
+                          $19.99
+                        </span>                                            
+                        <span className="text-gray-600 text-base md:text-lg">
+                          /month
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </div>
+                {isYearly ? (
+                  <p className="text-green-600 text-xs md:text-sm mt-2">
+                    $198/year
+                  </p>
+                ): <></>}
+              </CardHeader>
+              <CardContent className="pt-6 md:pt-8 px-4 md:px-6">
+                <ul className="space-y-3 md:space-y-4">
+                  {features.map((feature, index) => (
+                    <li key={index} className="flex items-start gap-2 md:gap-3">
+                      {feature.toLowerCase().includes("coming soon") ? (
+                        <Clock className="h-4 w-4 md:h-5 md:w-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+                      ) : (
+                        <Check className="h-4 w-4 md:h-5 md:w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      )}
+                      <span className="text-sm md:text-base text-gray-700">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+              <CardFooter className="flex flex-col gap-3 md:gap-4 pt-6 md:pt-8 px-4 md:px-6">
+                {status === 'active' || status === 'paused' ? (
+                  <Button 
+                    onClick={() => router.push('/manage-subscription')}
+                    className="w-full bg-black text-white flex items-center gap-2"
+                  >
+                    <CreditCard className="h-4 w-4" />
+                    <span>Manage Subscription</span>
+                  </Button>
+                ) : (
+                  <>
+                    <Button 
+                      onClick={handleStartTrial}
+                      disabled={isLoading}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-base md:text-lg py-4 md:py-6 flex items-center justify-center gap-2"
+                    >
+                      {isLoading ? (
+                        <>
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                          <span>Loading...</span>
+                        </>
+                      ) : (
+                        'Upgrade'
+                      )}
+                    </Button>                  
                   </>
                 )}
-              </div>
-              {isYearly ? (
-                <p className="text-green-600 text-xs md:text-sm mt-2">
-                  $198/year
-                </p>
-              ): <></>}
-            </CardHeader>
-            <CardContent className="pt-6 md:pt-8 px-4 md:px-6">
-              <ul className="space-y-3 md:space-y-4">
-                {features.map((feature, index) => (
-                  <li key={index} className="flex items-start gap-2 md:gap-3">
-                    {feature.toLowerCase().includes("coming soon") ? (
-                      <Clock className="h-4 w-4 md:h-5 md:w-5 text-yellow-500 flex-shrink-0 mt-0.5" />
-                    ) : (
-                      <Check className="h-4 w-4 md:h-5 md:w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                    )}
-                    <span className="text-sm md:text-base text-gray-700">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-            <CardFooter className="flex flex-col gap-3 md:gap-4 pt-6 md:pt-8 px-4 md:px-6">
-              {status === 'active' || status === 'paused' ? (
-                <Button 
-                  onClick={() => router.push('/manage-subscription')}
-                  className="w-full bg-black text-white flex items-center gap-2"
+                <Button
+                  onClick={handleContactClick}
+                  size="sm"
+                  variant="ghost"
+                  className="text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 >
-                  <CreditCard className="h-4 w-4" />
-                  <span>Manage Subscription</span>
+                  Have Questions?
                 </Button>
-              ) : (
-                <>
-                  <Button 
-                    onClick={handleStartTrial}
-                    disabled={isLoading}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-base md:text-lg py-4 md:py-6 flex items-center justify-center gap-2"
-                  >
-                    {isLoading ? (
-                      <>
-                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                        <span>Loading...</span>
-                      </>
-                    ) : (
-                      'Upgrade'
-                    )}
-                  </Button>                  
-                </>
-              )}
-              <Button
-                onClick={handleContactClick}
-                size="sm"
-                variant="ghost"
-                className="text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-              >
-                Have Questions?
-              </Button>
-            </CardFooter>
-          </Card>
+              </CardFooter>
+            </Card>
+          </div>
+
+          {/* Stock Chips Section */}
+          <div className="w-full lg:w-2/3">
+            <div className="bg-white rounded-lg p-6 shadow-lg border border-gray-100 h-full">
+              <h2 className="text-xl md:text-2xl font-semibold mb-4">
+                Tool That Pays For Itself
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Our users make back their yearly subscription cost in one trade. These stocks have multiple weekly options <b>contracts(puts) that pay more than the annual subscription.</b> 
+              </p>
+              <StockChips />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Testimonials Section */}
+      <div className="container mx-auto px-4 py-16">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">
+          What Our Users Have To Say
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto">
+          <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
+            <img 
+              src="/testimonials/1.webp" 
+              alt="User testimonial 1" 
+              className="w-full h-auto rounded-lg"
+            />
+          </div>
+          <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
+            <img 
+              src="/testimonials/2.webp" 
+              alt="User testimonial 2" 
+              className="w-full h-auto rounded-lg"
+            />
+          </div>
+          <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
+            <img 
+              src="/testimonials/3.webp" 
+              alt="User testimonial 3" 
+              className="w-full h-auto rounded-lg"
+            />
+          </div>
+          <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
+            <img 
+              src="/testimonials/4.webp" 
+              alt="User testimonial 4" 
+              className="w-full h-auto rounded-lg"
+            />
+          </div>
+          <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
+            <img 
+              src="/testimonials/5.webp" 
+              alt="User testimonial 5" 
+              className="w-full h-auto rounded-lg"
+            />
+          </div>
+          <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
+            <img 
+              src="/testimonials/6.webp" 
+              alt="User testimonial 6" 
+              className="w-full h-auto rounded-lg"
+            />
+          </div>
         </div>
       </div>
 

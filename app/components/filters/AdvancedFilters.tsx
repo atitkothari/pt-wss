@@ -27,7 +27,8 @@ import {
   impliedVolatilityFilterConfig,
   moneynessFilterConfig,
   dteFilterConfig,
-  yieldFilterConfig
+  yieldFilterConfig,
+  probabilityFilterConfig
 } from "@/app/config/filterConfig";
 import { useUserAccess } from '@/app/hooks/useUserAccess';
 import { MultiStockSelect } from "./MultiStockSelect";
@@ -62,6 +63,9 @@ interface AdvancedFiltersProps {
   // Add yield range filter props
   yieldRange: [number, number];
   onYieldRangeChange: (value: [number, number]) => void;
+  // Add probability range filter props
+  probabilityRange: [number, number];
+  onProbabilityRangeChange: (value: [number, number]) => void;
   // Optional prop to trigger search automatically
   autoSearch?: boolean;
   onSearch?: () => void;
@@ -104,6 +108,9 @@ export function AdvancedFilters({
   // Add yield range filter props
   yieldRange,
   onYieldRangeChange,
+  // Add probability range filter props
+  probabilityRange,
+  onProbabilityRangeChange,
   // Auto search props
   autoSearch = true,
   onSearch,
@@ -176,12 +183,14 @@ export function AdvancedFilters({
       sector: sector !== sectorOptions[0],
       yieldRange: yieldRange[0] !== yieldFilterConfig.defaultMin || 
                   yieldRange[1] !== yieldFilterConfig.defaultMax,
+      probabilityRange: probabilityRange[0] !== probabilityFilterConfig.defaultMin || 
+                        probabilityRange[1] !== probabilityFilterConfig.defaultMax,
       excludedStocks: excludedStocks.length > 0,
     };
   }, [
     strikePrice, moneynessRange, minDte, maxDte, deltaFilter, volumeRange,
     impliedVolatility, peRatio, marketCap, movingAverageCrossover, sector, yieldRange,
-    excludedStocks
+    probabilityRange, excludedStocks
   ]);
 
   const hasModifiedFilters = useMemo(() => {
@@ -231,6 +240,7 @@ export function AdvancedFilters({
                   movingAverage: 'MA',
                   sector: 'Sector',
                   yieldRange: 'Yield Range',
+                  probabilityRange: 'Probability of Profit',
                   excludedStocks: 'Excluded Stocks',
                 };
                 return (
@@ -279,6 +289,22 @@ export function AdvancedFilters({
               step={volumeFilterConfig.step}
               tooltip={volumeFilterConfig.tooltip}
               formatValue={(val) => val.toLocaleString()}
+              className="col-span-1"              
+            />
+
+            {/* Probability Range */}
+            <RangeSlider
+              id="input_screener_probability_range"
+              label="Probability of Profit"
+              minValue={probabilityRange[0]}
+              maxValue={probabilityRange[1]}
+              value={probabilityRange}
+              onChange={onProbabilityRangeChange}
+              min={probabilityFilterConfig.min}
+              max={probabilityFilterConfig.max}
+              step={probabilityFilterConfig.step}
+              tooltip={probabilityFilterConfig.tooltip}
+              formatValue={(val) => `${val}%`}
               className="col-span-1"              
             />
 

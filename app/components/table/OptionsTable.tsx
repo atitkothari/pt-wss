@@ -27,7 +27,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-export const DEFAULT_COLUMNS: ColumnDef[] = [
+export const DEFAULT_COLUMNS: ColumnDef[] = [  
   { key: "rating", label: "Rating" },
   { key: "symbol", label: "Symbol" },
   { key: "stockPrice", label: "Stock Price" },
@@ -46,6 +46,7 @@ export const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: "sector", label: "Sector" },
   { key: "earningsDate", label: "Earnings" },
   { key: "impliedVolatility", label: "IV %" },
+  { key: "probability", label: "Probability of Profit %" },
 ];
 
 const formatCell = (value: any, columnKey: string): string|any => {  
@@ -171,6 +172,9 @@ const formatCell = (value: any, columnKey: string): string|any => {
       } else if (marketCapValue >= 1) {
         return `$${marketCapValue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
       }
+    
+    case 'probability':
+      return value ? `${(value * 100).toFixed(1)}%` : 'N/A';
       
     default:
       return String(value);
@@ -204,6 +208,12 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
           <table className="w-full border-collapse text-xs md:text-sm">
             <thead>
               <tr className="border-b">
+                <td className="text-right w-[50px] p-2 md:p-2.5">
+                    <Star 
+                      className="h-4 w-4 text-yellow-400 mx-auto cursor-pointer hover:text-yellow-500 transition-colors" 
+                      onClick={handleStarClick}
+                    />
+                  </td>
                 {visibleColumns.map((column) => {
                   const columnDef = DEFAULT_COLUMNS.find(col => col.key === column);
                   return (
@@ -227,10 +237,17 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
             </thead>
             <tbody>
               {data.map((option, index) => (
+                
                 <tr 
                   key={`${option.symbol}-${option.strike}-${index}`}
                   className="border-b hover:bg-gray-50"
                 >
+                  <td className="text-right w-[50px] p-2 md:p-2.5">
+                    <Star 
+                      className="h-4 w-4 text-yellow-400 mx-auto cursor-pointer hover:text-yellow-500 transition-colors" 
+                      onClick={handleStarClick}
+                    />
+                  </td>
                   {visibleColumns.map((column) => (
                     <td 
                       key={`${column}-${index}`}
@@ -238,13 +255,7 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
                     >
                       {formatCell(option[column as keyof Option], column)}
                     </td>
-                  ))}
-                  <td className="text-right w-[50px] p-2 md:p-2.5">
-                    <Star 
-                      className="h-4 w-4 text-yellow-400 mx-auto cursor-pointer hover:text-yellow-500 transition-colors" 
-                      onClick={handleStarClick}
-                    />
-                  </td>
+                  ))}                  
                 </tr>
               ))}
             </tbody>

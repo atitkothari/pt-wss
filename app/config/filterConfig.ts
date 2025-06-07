@@ -179,7 +179,8 @@ export const defaultVisibleColumns = [
   'yieldPercent',
   'expiration',
   'earningsDate',
-  'impliedVolatility'
+  'impliedVolatility',
+  'probability'
 ];
 
 // All available columns for reference
@@ -201,7 +202,8 @@ export const allColumns = [
   'marketCap', // Market Cap
   'sector', // Sector
   'earningsDate',
-  'impliedVolatility'
+  'impliedVolatility',
+  'probability' // Probability of Profit
 ];
 
 // Implied Volatility Filter Configuration
@@ -212,6 +214,17 @@ export const impliedVolatilityFilterConfig = {
   defaultMax: 200,
   step: 5,
   tooltip: "Implied Volatility percentage range for option contracts"
+};
+
+// Probability of Profit filter configuration
+export const probabilityFilterConfig = {
+  min: 0,
+  max: 100,
+  step: 1,
+  defaultMin: 0,
+  defaultMax: 100,
+  tooltip: "Filter options by their probability of profit percentage",
+  isExponential: false
 };
 
 /**

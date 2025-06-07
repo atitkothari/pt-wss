@@ -84,6 +84,10 @@ export function OptionRow({ option, index, visibleColumns }: OptionRowProps) {
         return <TableCell className="text-right">
           {option.delta?.toFixed(2) ?? 'N/A'}
         </TableCell>;
+      case 'probability':
+        return <TableCell className="text-right">
+          {option.probability ? (option.probability * 100).toFixed(1) : 'N/A'}%          
+        </TableCell>;
       case 'annualizedReturn':
         return option.annualizedReturn 
           ? <TableCell className="text-right">{option.annualizedReturn.toFixed(1)}%</TableCell>

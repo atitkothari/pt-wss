@@ -37,7 +37,8 @@ import {
   movingAverageCrossoverOptions,
   sectorOptions,
   defaultVisibleColumns as configDefaultVisibleColumns,
-  impliedVolatilityFilterConfig
+  impliedVolatilityFilterConfig,
+  probabilityFilterConfig
 } from "@/app/config/filterConfig";
 import { SaveScreenerModal } from "../modals/SaveScreenerModal";
 import { LoadScreenerModal } from "../modals/LoadScreenerModal";
@@ -513,6 +514,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     direction: 'desc' 
   });
   
+  const [probabilityRange, setProbabilityRange] = useState<[number, number]>([
+    probabilityFilterConfig.defaultMin,
+    probabilityFilterConfig.defaultMax
+  ]);
+
   const [activeFilters, setActiveFilters] = useState({
     searchTerm: "",
     yieldRange: [yieldFilterConfig.min, yieldFilterConfig.max] as [number, number],
@@ -528,7 +534,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     moneynessRange: [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax] as [number, number],
     impliedVolatility: [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax] as [number, number],
     deltaFilter: [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax] as [number, number],
-    excludedStocks: ""
+    excludedStocks: "",
+    probabilityOfProfit: [probabilityFilterConfig.defaultMin, probabilityFilterConfig.defaultMax] as [number, number]
   });
 
   const [hasSearched, setHasSearched] = useState(false);
@@ -551,7 +558,9 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     deltaFilterConfig.defaultMin,
     deltaFilterConfig.defaultMax,
     activeFilters.minSelectedExpiration,
-    option === 'call' ? 'covered_call_screener' : 'cash_secured_put_screener'
+    option === 'call' ? 'covered_call_screener' : 'cash_secured_put_screener',
+    excludedStocks,
+    probabilityRange as [number, number] | undefined
   );
 
   // Calculate expiration dates based on minDte and maxDte whenever they change
@@ -615,7 +624,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             moneynessRange,
             impliedVolatility,
             minSelectedExpiration,
-            excludedStocks
+            excludedStocks,
+            probabilityRange as [number, number]
           ).catch(console.error);
           console.log(hasSearched)
           setHasSearched(true);
@@ -710,7 +720,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       moneynessRange,
       impliedVolatility,
       deltaFilter,
-      excludedStocks: excludedStocks.join(',')
+      excludedStocks: excludedStocks.join(','),
+      probabilityOfProfit: probabilityRange
     });
 
     updateURL({
@@ -758,16 +769,16 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       moneynessRange,
       impliedVolatility,
       minSelectedExpiration,
-      excludedStocks
+      excludedStocks,
+      probabilityRange as [number, number]
     ).then(()=>{
-      setFiltersChanged(false); // Reset the filters changed flag when search is performed
+      setFiltersChanged(false);
       console.log("setting set change to false")
     }).catch(console.error);
 
     setCurrentPage(1);
     setSymbolInput('');
     
-    // Close advanced filters on mobile
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
       setIsAdvancedFiltersExpanded(false);
     }
@@ -906,6 +917,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       activeFilters.sector,      
       activeFilters.moneynessRange,
       activeFilters.impliedVolatility,
+      "",
+      activeFilters.excludedStocks.split(","),
+      activeFilters.probabilityOfProfit
+
     ).catch(console.error);
   }, [sortColumn, sortDirection, router, searchParams, activeFilters, currentPage, rowsPerPage, strikeFilter, deltaFilter, fetchData]);  
 
@@ -943,7 +958,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       moneynessRange: [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax] as [number, number],
       impliedVolatility: [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax] as [number, number],
       deltaFilter: [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax] as [number, number],
-      excludedStocks:""
+      excludedStocks:"",
+      probabilityOfProfit:[probabilityFilterConfig.defaultMin, probabilityFilterConfig.defaultMax] as [number, number]
     });
     
     // Reset URL parameters
@@ -1024,7 +1040,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       moneynessRange: screener.filters.moneynessRange || [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax],
       impliedVolatility: screener.filters.impliedVolatility || [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax],
       deltaFilter: screener.filters.deltaFilter || [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax],
-      excludedStocks: screener.filters.excludedStocks?.join(",") || ''
+      excludedStocks: screener.filters.excludedStocks?.join(",") || '',
+      probabilityOfProfit: screener.filters.probabilityOfProfit || [probabilityFilterConfig.defaultMin, probabilityFilterConfig.defaultMax]
     });
 
     // Update individual states
@@ -1251,6 +1268,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             }}
             yieldRange={yieldRange}
             onYieldRangeChange={setYieldRange}
+            probabilityRange={probabilityRange}
+            onProbabilityRangeChange={setProbabilityRange}
             autoSearch={false}
             excludedStocks={excludedStocks}
             onExcludedStocksChange={setExcludedStocks}
