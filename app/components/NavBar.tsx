@@ -228,7 +228,7 @@ export function NavBar() {
                       <span>Saved Screeners</span>
                     </DropdownMenuItem>
                     {!subscriptionStatus && (<DropdownMenuItem onClick={() => router.push('/pricing')} className="cursor-pointer text-gray-700 hover:text-gray-900">
-                      <Crown className="mr-2 h-4 w-4" />
+                      {/* <Crown className="mr-2 h-4 w-4" /> */}
                       <span>Get Pro Plan</span>
                     </DropdownMenuItem>)}
                     {subscriptionStatus && (

@@ -129,13 +129,13 @@ const formatCell = (value: any, columnKey: string): string|any => {
       
         return (
           <div className="flex items-center gap-1">
-            <span className={`inline-block px-3 py-1.5 rounded-full font-semibold text-sm ${getRatingColor(value)} ${!canAccessFeature() ? 'blur-sm' : ''} `}>
+            <span className={`inline-block px-3 py-1.5 rounded-full font-semibold text-sm ${getRatingColor(value)} `}>
               {value}
             </span>
             {!canAccessFeature() &&(
             <TooltipProvider>
               <Tooltip>
-                <TooltipTrigger asChild>
+                {/* <TooltipTrigger asChild>
                   <button
                     onClick={(e) => {
                       e.preventDefault();
@@ -146,7 +146,7 @@ const formatCell = (value: any, columnKey: string): string|any => {
                   >
                     <Crown className="h-4 w-4 text-yellow-500"/>
                   </button>
-                </TooltipTrigger>
+                </TooltipTrigger> */}
                 <TooltipContent>
                   <div className="space-y-1">
                     <p className="font-medium">Upgrade to Pro to see ratings</p>
