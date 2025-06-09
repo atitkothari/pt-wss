@@ -274,39 +274,7 @@ export function AdvancedFilters({
               toExponential={priceFilterConfig.toExponential}
               fromExponential={priceFilterConfig.fromExponential}
               className="col-span-1"              
-            />
-
-            {/* Volume Range */}
-            <RangeSlider
-              id="input_screener_volume_range"
-              label="Volume Range"
-              minValue={volumeRange[0]}
-              maxValue={volumeRange[1]}
-              value={volumeRange}
-              onChange={onVolumeRangeChange}
-              min={volumeFilterConfig.min}
-              max={volumeFilterConfig.max}
-              step={volumeFilterConfig.step}
-              tooltip={volumeFilterConfig.tooltip}
-              formatValue={(val) => val.toLocaleString()}
-              className="col-span-1"              
-            />
-
-            {/* Probability Range */}
-            <RangeSlider
-              id="input_screener_probability_range"
-              label="Probability of Profit"
-              minValue={probabilityRange[0]}
-              maxValue={probabilityRange[1]}
-              value={probabilityRange}
-              onChange={onProbabilityRangeChange}
-              min={probabilityFilterConfig.min}
-              max={probabilityFilterConfig.max}
-              step={probabilityFilterConfig.step}
-              tooltip={probabilityFilterConfig.tooltip}
-              formatValue={(val) => `${val}%`}
-              className="col-span-1"              
-            />
+            />                
 
             {/* Yield Range */}
             <RangeSlider
@@ -325,6 +293,22 @@ export function AdvancedFilters({
               disabled={!canAccessFeature()}
             />
 
+            {/* Delta */}
+            <RangeSlider
+              id="input_screener_delta"
+              label="Delta"
+              value={deltaFilter}
+              minValue={deltaFilter[0]}
+              maxValue={deltaFilter[1]}
+              onChange={onDeltaFilterChange}
+              min={deltaFilterConfig.min}
+              max={deltaFilterConfig.max}
+              step={deltaFilterConfig.step}
+              tooltip={deltaFilterConfig.tooltip}
+              formatValue={(val) => val.toFixed(2)}
+              className="col-span-1"
+              disabled={!canAccessFeature()}
+            />
             {/* Moneyness Range */}
             <RangeSlider
               id="input_screener_moneyness_range"
@@ -362,22 +346,23 @@ export function AdvancedFilters({
               className="col-span-1"              
             />
             
-            {/* Delta */}
-            <RangeSlider
-              id="input_screener_delta"
-              label="Delta"
-              value={deltaFilter}
-              minValue={deltaFilter[0]}
-              maxValue={deltaFilter[1]}
-              onChange={onDeltaFilterChange}
-              min={deltaFilterConfig.min}
-              max={deltaFilterConfig.max}
-              step={deltaFilterConfig.step}
-              tooltip={deltaFilterConfig.tooltip}
-              formatValue={(val) => val.toFixed(2)}
-              className="col-span-1"
-              disabled={!canAccessFeature()}
-            />
+            
+
+              {/* Volume Range */}
+              <RangeSlider
+              id="input_screener_volume_range"
+              label="Volume Range"
+              minValue={volumeRange[0]}
+              maxValue={volumeRange[1]}
+              value={volumeRange}
+              onChange={onVolumeRangeChange}
+              min={volumeFilterConfig.min}
+              max={volumeFilterConfig.max}
+              step={volumeFilterConfig.step}
+              tooltip={volumeFilterConfig.tooltip}
+              formatValue={(val) => val.toLocaleString()}
+              className="col-span-1"              
+            />     
             
             {/* Implied Volatility */}
             <RangeSlider
@@ -394,6 +379,22 @@ export function AdvancedFilters({
               formatValue={(val) => `${val}%`}
               className="col-span-1"
               disabled={!canAccessFeature()}
+            />
+
+             {/* Probability Range */}
+             <RangeSlider
+              id="input_screener_probability_range"
+              label="Probability of Profit"
+              minValue={probabilityRange[0]}
+              maxValue={probabilityRange[1]}
+              value={probabilityRange}
+              onChange={onProbabilityRangeChange}
+              min={probabilityFilterConfig.min}
+              max={probabilityFilterConfig.max}
+              step={probabilityFilterConfig.step}
+              tooltip={probabilityFilterConfig.tooltip}
+              formatValue={(val) => `${val}%`}
+              className="col-span-1"              
             />
             
             {/* P/E Ratio */}
