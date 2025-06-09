@@ -16,7 +16,7 @@ export const LoginOverlay = ({ hasSearched = false }: LoginOverlayProps) => {
     <div className="absolute inset-0 bg-gradient-to-t from-gray-900/95 via-gray-900/60 to-transparent pointer-events-none">
       <div className="absolute bottom-10 left-0 right-0 flex flex-col items-center gap-4 p-8 text-center pointer-events-auto">        
         <p className="text-gray-200 max-w-md">
-          Try the wheel strategy screener with all features. After your trial, continue for just $16.5/month (billed annually).
+          Try the wheel strategy screener with all features. After your trial, continue for just $10/month (billed annually).
         </p>
         <Button
           onClick={() => signInWithGoogle()}

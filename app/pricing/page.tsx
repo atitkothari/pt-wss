@@ -159,7 +159,7 @@ export default function PricingPage() {
                   {isYearly ? (
                     <>
                       <span className="text-3xl md:text-4xl font-bold text-gray-900">
-                        $16.50
+                      <span className="line-through">$19.99</span> $10
                       </span>
                       <span className="text-gray-600 text-base md:text-lg">
                         /month
@@ -181,7 +181,7 @@ export default function PricingPage() {
                     <>
                       <div className="flex items-center gap-2">
                         <span className="text-3xl md:text-4xl font-bold text-gray-900">
-                          $19.99
+                          <span className="line-through">$19.99</span> $10
                         </span>                                            
                         <span className="text-gray-600 text-base md:text-lg">
                           /month
@@ -192,7 +192,7 @@ export default function PricingPage() {
                 </div>
                 {isYearly ? (
                   <p className="text-green-600 text-xs md:text-sm mt-2">
-                    $198/year
+                    <span className="line-through">$240</span> $120/year
                   </p>
                 ): <></>}
               </CardHeader>
