@@ -34,23 +34,9 @@ export const defaultScreeners: SavedScreener[] = [
     updatedAt: new Date().toISOString(),
     isDefault: true
   },
-  // {
-  //   id: 'earnings-next-week-call',
-  //   name: 'Earnings Next Week',
-  //   filters: {
-  //     optionType: 'call',
-  //     minDte: 1,
-  //     maxDte: 7,
-  //     impliedVolatility: [30, 200],
-  //     volumeRange: [100, 1000000]
-  //   },
-  //   createdAt: new Date().toISOString(),
-  //   updatedAt: new Date().toISOString(),
-  //   isDefault: true
-  // },
   {
-    id: 'high-volume-call',
-    name: 'High Volume',
+    id: 'unusual-volume-call',
+    name: 'Unusual Volume',
     filters: {
       optionType: 'call',
       volumeRange: [500, 1000000],
@@ -96,23 +82,9 @@ export const defaultScreeners: SavedScreener[] = [
     updatedAt: new Date().toISOString(),
     isDefault: true
   },
-  // {
-  //   id: 'earnings-next-week-put',
-  //   name: 'Earnings Next Week',
-  //   filters: {
-  //     optionType: 'put',
-  //     minDte: 1,
-  //     maxDte: 7,
-  //     impliedVolatility: [30, 200],
-  //     volumeRange: [100, 1000000]
-  //   },
-  //   createdAt: new Date().toISOString(),
-  //   updatedAt: new Date().toISOString(),
-  //   isDefault: true
-  // },
   {
-    id: 'high-volume-put',
-    name: 'High Volume',
+    id: 'unusual-volume-put',
+    name: 'Unusual Volume',
     filters: {
       optionType: 'put',
       volumeRange: [100, 1000000],
@@ -120,6 +92,102 @@ export const defaultScreeners: SavedScreener[] = [
       deltaFilter:[-0.85,0],
       moneynessRange:[-30,-2],
       maxDte: 30,  
+    },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isDefault: true
+  },
+  // Low Delta Call Screeners
+  {
+    id: 'low-delta-call',
+    name: 'Low Delta Call',
+    filters: {
+      optionType: 'call',
+      deltaFilter: [0.1, 0.3],
+      volumeRange: [100, 1000000],
+      minPrice: 0.5,
+      moneynessRange: [5, 50],
+      maxDte: 45,
+    },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isDefault: true
+  },
+  // Low Delta Put Screeners
+  {
+    id: 'low-delta-put',
+    name: 'Low Delta Put',
+    filters: {
+      optionType: 'put',
+      deltaFilter: [-0.3, -0.1],
+      volumeRange: [100, 1000000],
+      minPrice: 0.5,
+      moneynessRange: [-50, -5],
+      maxDte: 45,
+    },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isDefault: true
+  },
+  // Weekly Options Screeners
+  {
+    id: 'weekly-call',
+    name: 'Weekly Call',
+    filters: {
+      optionType: 'call',
+      minDte: 1,
+      maxDte: 7,
+      volumeRange: [200, 1000000],
+      minPrice: 0.5,
+      deltaFilter: [0.2, 0.5],
+      moneynessRange: [2, 20],
+    },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isDefault: true
+  },
+  {
+    id: 'weekly-put',
+    name: 'Weekly Put',
+    filters: {
+      optionType: 'put',
+      minDte: 1,
+      maxDte: 7,
+      volumeRange: [200, 1000000],
+      minPrice: 0.5,
+      deltaFilter: [-0.5, -0.2],
+      moneynessRange: [-20, -2],
+    },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isDefault: true
+  },
+  // High Probability Trades
+  {
+    id: 'high-prob-call',
+    name: 'High Probability Call',
+    filters: {
+      optionType: 'call',
+      deltaFilter: [0.7, 0.85],
+      volumeRange: [100, 1000000],
+      minPrice: 1,
+      moneynessRange: [-10, 10],
+      maxDte: 30,
+    },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isDefault: true
+  },
+  {
+    id: 'high-prob-put',
+    name: 'High Probability Put',
+    filters: {
+      optionType: 'put',
+      deltaFilter: [-0.85, -0.7],
+      volumeRange: [100, 1000000],
+      minPrice: 1,
+      moneynessRange: [-10, 10],
+      maxDte: 30,
     },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
