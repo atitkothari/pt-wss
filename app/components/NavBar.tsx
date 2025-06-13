@@ -151,14 +151,14 @@ export function NavBar() {
             ))}
 
             {/* Watchlist Button */}
-            <Link
+            {/* <Link
               href="/watchlist"
               className="text-gray-700 hover:text-gray-900 font-medium transition-colors whitespace-nowrap flex items-center gap-1"
               onClick={() => handleNavigation('Watchlist', '/watchlist')}
             >
               <Star className="h-4 w-4" />
               Watchlist              
-            </Link>
+            </Link> */}
 
             {/* Resources Dropdown */}
             <div className="relative">
@@ -280,7 +280,7 @@ export function NavBar() {
                 </Link>
               ))}
               {/* Watchlist Link */}
-              <Link
+              {/* <Link
                 href="/watchlist"
                 className="block text-gray-700 hover:text-gray-900 py-2 transition-colors font-medium flex items-center gap-2"
                 onClick={() => {
@@ -290,7 +290,7 @@ export function NavBar() {
               >
                 <Star className="h-4 w-4" />
                 Watchlist                
-              </Link>
+              </Link> */}
             </div>
 
             {/* Resources Section */}

@@ -207,13 +207,7 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
         <div className="w-full overflow-x-auto">
           <table className="w-full border-collapse text-xs md:text-sm">
             <thead>
-              <tr className="border-b">
-                <td className="text-right w-[50px] p-2 md:p-2.5">
-                    <Star 
-                      className="h-4 w-4 text-yellow-400 mx-auto cursor-pointer hover:text-yellow-500 transition-colors" 
-                      onClick={handleStarClick}
-                    />
-                  </td>
+              <tr className="border-b">                
                 {visibleColumns.map((column) => {
                   const columnDef = DEFAULT_COLUMNS.find(col => col.key === column);
                   return (
@@ -241,13 +235,7 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
                 <tr 
                   key={`${option.symbol}-${option.strike}-${index}`}
                   className="border-b hover:bg-gray-50"
-                >
-                  <td className="text-right w-[50px] p-2 md:p-2.5">
-                    <Star 
-                      className="h-4 w-4 text-yellow-400 mx-auto cursor-pointer hover:text-yellow-500 transition-colors" 
-                      onClick={handleStarClick}
-                    />
-                  </td>
+                >                  
                   {visibleColumns.map((column) => (
                     <td 
                       key={`${column}-${index}`}
