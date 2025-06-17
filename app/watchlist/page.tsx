@@ -9,6 +9,7 @@ import { collection, query, where, onSnapshot, deleteDoc, doc, addDoc, serverTim
 import { format, isPast } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { AuthModal } from '../components/modals/AuthModal';
 
 interface WatchlistItem {
   id: string;
@@ -38,6 +39,7 @@ export default function WatchlistPage() {
   const [loadingWatchlist, setLoadingWatchlist] = useState(true);
   const [loadingOptionData, setLoadingOptionData] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   useEffect(() => {
     console.log("Auth loading:", authLoading, "User:", user);
@@ -305,7 +307,7 @@ export default function WatchlistPage() {
             <p className="text-red-600 text-lg">{error}</p>
             {!user && (
               <Button
-                onClick={() => window.location.href = '/signin'} // Assuming you have a sign-in route
+                onClick={() => setIsAuthModalOpen(true)}
                 className="mt-4 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
               >
                 Sign In
@@ -319,6 +321,7 @@ export default function WatchlistPage() {
           </>
         )}
       </div>
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </PageLayout>
   );
 } 
