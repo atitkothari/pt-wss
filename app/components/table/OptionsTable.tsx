@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Option } from "@/app/types/option";
 import { 
   Table, 
@@ -26,6 +26,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useAuth } from "@/app/context/AuthContext";
+import { db } from "@/app/lib/firebase";
+import { collection, addDoc, serverTimestamp, query, where, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
+import { Timestamp } from 'firebase/firestore';
 
 export const DEFAULT_COLUMNS: ColumnDef[] = [  
   { key: "rating", label: "Rating" },
@@ -181,6 +185,17 @@ const formatCell = (value: any, columnKey: string): string|any => {
   };
 };
 
+interface WatchlistItem {
+  id: string;
+  userId: string;
+  symbol: string;
+  type: 'call' | 'put';
+  strike: number;
+  expiration: string;
+  addedPrice: number;
+  addedDate: Timestamp;
+}
+
 interface OptionsTableProps {
   data: Option[];
   onSort: (field: string) => void;
@@ -192,13 +207,114 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
   const searchParams = useSearchParams();
   const sortColumn = searchParams.get('sortBy');
   const sortDirection = searchParams.get('sortDir');  
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
 
-  const handleStarClick = () => {
-    toast.success("Watchlist feature is coming soon!");
-    sendAnalyticsEvent({
-      event_name: 'watchlist',
-      event_category: 'Feature',
+  const [userWatchlist, setUserWatchlist] = useState<WatchlistItem[]>([]);
+
+  useEffect(() => {
+    if (authLoading || !user) {
+      setUserWatchlist([]);
+      return;
+    }
+
+    const q = query(
+      collection(db, "watchlists"),
+      where("userId", "==", user.uid)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const items: WatchlistItem[] = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as WatchlistItem[];
+      setUserWatchlist(items);
+    }, (e) => {
+      console.error("Error fetching user watchlist in OptionsTable:", e);
     });
+
+    return () => unsubscribe();
+  }, [user, authLoading]);
+
+  const isOptionInWatchlist = (option: Option) => {
+    return userWatchlist.some(item => 
+      item.symbol === option.symbol &&
+      item.type === option.type &&
+      item.strike === option.strike &&
+      item.expiration === option.expiration
+    );
+  };
+
+  const handleStarClick = async (option: Option) => {
+    if (!user) {
+      toast.info("Please sign in to add to your watchlist.", {
+        action: {
+          label: "Sign In",
+          onClick: () => router.push('/signin'), // Assuming you have a sign-in route
+        },
+      });
+      sendAnalyticsEvent({
+        event_name: 'watchlist_add_failed',
+        event_category: 'Watchlist',
+        event_label: 'Not Signed In',
+      });
+      return;
+    }
+
+    const existingItem = userWatchlist.find(item => 
+      item.symbol === option.symbol &&
+      item.type === option.type &&
+      item.strike === option.strike &&
+      item.expiration === option.expiration
+    );
+
+    if (existingItem) {
+      // Item already in watchlist, remove it
+      try {
+        await deleteDoc(doc(db, "watchlists", existingItem.id));
+        toast.success("Option removed from watchlist!");
+        sendAnalyticsEvent({
+          event_name: 'watchlist_remove_success',
+          event_category: 'Watchlist',
+          event_label: `${option.symbol} ${option.type} ${option.strike}`,
+        });
+      } catch (e: any) {
+        console.error("Error removing document: ", e);
+        toast.error("Failed to remove option from watchlist. Please try again.");
+        sendAnalyticsEvent({
+          event_name: 'watchlist_remove_error',
+          event_category: 'Watchlist',
+          event_label: `Error: ${e.message}`,
+        });
+      }
+    } else {
+      // Item not in watchlist, add it
+      try {
+        await addDoc(collection(db, "watchlists"), {
+          userId: user.uid,
+          symbol: option.symbol,
+          type: option.type,
+          strike: option.strike,
+          expiration: option.expiration,
+          addedPrice: option.askPrice,
+          addedDate: serverTimestamp(),
+        });
+        toast.success("Option added to watchlist!");
+        sendAnalyticsEvent({
+          event_name: 'watchlist_add_success',
+          event_category: 'Watchlist',
+          event_label: `${option.symbol} ${option.type} ${option.strike}`,
+        });
+      } catch (e: any) {
+        console.error("Error adding document: ", e);
+        toast.error("Failed to add option to watchlist. Please try again.");
+        sendAnalyticsEvent({
+          event_name: 'watchlist_add_error',
+          event_category: 'Watchlist',
+          event_label: `Error: ${e.message}`,
+        });
+      }
+    }
   };
 
   return (
@@ -207,7 +323,12 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
         <div className="w-full overflow-x-auto">
           <table className="w-full border-collapse text-xs md:text-sm">
             <thead>
-              <tr className="border-b">                
+              <tr className="border-b">
+                <td className="text-right w-[50px] p-2 md:p-2.5">
+                    <Star 
+                      className="h-4 w-4 text-gray-400 mx-auto"
+                    />
+                  </td>             
                 {visibleColumns.map((column) => {
                   const columnDef = DEFAULT_COLUMNS.find(col => col.key === column);
                   return (
@@ -235,7 +356,16 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
                 <tr 
                   key={`${option.symbol}-${option.strike}-${index}`}
                   className="border-b hover:bg-gray-50"
-                >                  
+                >        
+                <td className="text-right w-[50px] p-2 md:p-2.5">
+                <Star 
+                  className={
+                    `h-4 w-4 mx-auto cursor-pointer transition-colors 
+                    ${isOptionInWatchlist(option) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-400 hover:text-yellow-500'}`
+                  }
+                  onClick={() => handleStarClick(option)}
+                />
+              </td>           
                   {visibleColumns.map((column) => (
                     <td 
                       key={`${column}-${index}`}
