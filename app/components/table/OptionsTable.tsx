@@ -272,7 +272,12 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
       // Item already in watchlist, remove it
       try {
         await deleteDoc(doc(db, "watchlists", existingItem.id));
-        toast.success("Option removed from watchlist!");
+        toast.success("Option removed from watchlist!", {
+          action: {
+            label: "View Watchlist",
+            onClick: () => router.push('/watchlist'),
+          },
+        });
         sendAnalyticsEvent({
           event_name: 'watchlist_remove_success',
           event_category: 'Watchlist',
@@ -299,7 +304,12 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
           addedPrice: option.askPrice,
           addedDate: serverTimestamp(),
         });
-        toast.success("Option added to watchlist!");
+        toast.success("Option added to watchlist!", {
+          action: {
+            label: "View Watchlist",
+            onClick: () => router.push('/watchlist'),
+          },
+        });
         sendAnalyticsEvent({
           event_name: 'watchlist_add_success',
           event_category: 'Watchlist',
