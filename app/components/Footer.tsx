@@ -11,6 +11,7 @@ export function Footer() {
     tools: [
       { name: 'Discover', href: '/discover' },
       { name: 'Covered Call Calculator', href: '/covered-call-calculator' },
+      { name: 'Trade Tracker', href: '/trade-tracker' },
       { name: 'Available Stocks', href: '/available-stocks' },
       { name: 'API', href: 'https://rapidapi.com/wheel-strategy-options-wheel-strategy-options-default/api/wheel-options-strategy', external: true },
     ],
