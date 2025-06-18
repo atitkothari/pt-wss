@@ -214,24 +214,24 @@ export default function WatchlistPage() {
   const expiredOptions = watchlistItems.filter(item => isPast(new Date(item.expiration)));
 
   const renderTable = (options: WatchlistItem[], title: string) => (
-    <div className="bg-white rounded-lg border border-gray-200 shadow-sm mb-12">
-      <div className="p-6 border-b border-gray-200">
-        <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
+    <div className="bg-white rounded-lg border border-gray-200 shadow-sm mb-8">
+      <div className="px-4 py-3 border-b border-gray-200">
+        <h2 className="font-semibold text-gray-900">{title}</h2>
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead>
             <tr className="bg-gray-50">
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Symbol</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Strike</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expiry</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Added Price</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Ask Price</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">P/L ($)</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">P/L (%)</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Added Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Symbol</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Strike</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expiry</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Entry</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">P/L</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">%</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Added</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -243,27 +243,33 @@ export default function WatchlistPage() {
 
                 return (
                   <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.symbol}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.type}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.strike.toFixed(2)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{format(new Date(item.expiration), 'yyyy-MM-dd')}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.addedPrice.toFixed(2)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{item.symbol}</td>
+                    <td className="px-3 py-2 whitespace-nowrap text-sm">
+                      <span className={`px-1.5 py-0.5 text-xs font-medium rounded-full ${
+                        item.type === 'call' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      }`}>
+                        {item.type}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${item.strike.toFixed(2)}</td>
+                    <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-500">{format(new Date(item.expiration), 'MMM d')}</td>
+                    <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${item.addedPrice.toFixed(2)}</td>
+                    <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-500">
                       {loading ? <Loader2 className="h-4 w-4 animate-spin inline-block" /> : currentPremium !== null ? `$${currentPremium.toFixed(2)}` : 'N/A'}
                     </td>
-                    <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${profitLossColorClass}`}>
+                    <td className={`px-3 py-2 whitespace-nowrap text-sm font-medium ${profitLossColorClass}`}>
                       {loading ? <Loader2 className="h-4 w-4 animate-spin inline-block" /> : typeof profitLoss === 'number' && !isNaN(profitLoss) ? `$${profitLoss.toFixed(2)}` : 'N/A'}
                     </td>
-                    <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${profitLossColorClass}`}>
-                      {loading ? <Loader2 className="h-4 w-4 animate-spin inline-block" /> : typeof percentageChange === 'number' && !isNaN(percentageChange) ? `${percentageChange.toFixed(2)}%` : 'N/A'}
+                    <td className={`px-3 py-2 whitespace-nowrap text-sm font-medium ${profitLossColorClass}`}>
+                      {loading ? <Loader2 className="h-4 w-4 animate-spin inline-block" /> : typeof percentageChange === 'number' && !isNaN(percentageChange) ? `${percentageChange.toFixed(1)}%` : 'N/A'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{format(item.addedDate.toDate(), 'yyyy-MM-dd')}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-500">{format(item.addedDate.toDate(), 'MMM d')}</td>
+                    <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-500">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => handleRemove(item.id)}
-                        className="text-red-500 hover:text-red-700"
+                        className="text-red-500 hover:text-red-700 -mr-2"
                       >
                         <Trash className="h-4 w-4" />
                       </Button>
@@ -273,7 +279,7 @@ export default function WatchlistPage() {
               })
             ) : (
               <tr>
-                <td colSpan={10} className="px-6 py-4 text-center text-sm text-gray-500">
+                <td colSpan={10} className="px-3 py-4 text-center text-sm text-gray-500">
                   No {title.toLowerCase()} found.
                 </td>
               </tr>
@@ -286,13 +292,17 @@ export default function WatchlistPage() {
 
   return (
     <PageLayout>
-      <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
-            <Star className="h-8 w-8 text-blue-600" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">My Watchlist</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+      <div className="max-w-6xl mx-auto py-4 px-2 sm:px-4 lg:px-6">
+        <div className="flex justify-center gap-3 mb-3">
+          <a href="/discover" className="text-xs text-blue-600 hover:underline font-medium">Discover</a>
+          <span className="text-gray-300">|</span>
+          <a href="/cash-secured-put-screener" className="text-xs text-blue-600 hover:underline font-medium">Cash Secured Put</a>
+          <span className="text-gray-300">|</span>
+          <a href="/covered-call-screener" className="text-xs text-blue-600 hover:underline font-medium">Covered Call Screener</a>
+        </div>
+        <div className="text-center mb-4">          
+          <h1 className="text-lg font-semibold text-gray-900 mb-1">My Watchlist</h1>
+          <p className="text-xs text-gray-500 max-w-xl mx-auto">
             Track and monitor your favorite stocks and options, see real-time performance, and manage your portfolio.
           </p>
         </div>
