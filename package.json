@@ -63,7 +63,7 @@
     "next-auth": "^4.24.11",
     "next-plausible": "^3.12.4",
     "next-themes": "^0.3.0",
-    "pg": "^8.12.0",
+    "pg": "^8.16.0",
     "postcss": "8.4.30",
     "react": "18.2.0",
     "react-cookie-consent": "^9.0.0",
@@ -86,7 +86,7 @@
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.16",
     "@types/jsonwebtoken": "^9.0.9",
-    "@types/pg": "^8.11.6",
+    "@types/pg": "^8.15.4",
     "browserify-zlib": "^0.2.0",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.1",

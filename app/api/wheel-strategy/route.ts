@@ -36,6 +36,16 @@ interface StockSummary {
 
 export async function GET() {
   try {
+    // Calculate date range
+    const today = new Date();
+    const eightDaysLater = new Date(today);
+    eightDaysLater.setDate(today.getDate() + 8);
+    
+    // Format dates as YYYY-MM-DD
+    const formatDate = (date: Date) => {
+      return date.toISOString().split('T')[0];
+    };
+
     const requestBody = {
       filters: [
         {
@@ -56,12 +66,12 @@ export async function GET() {
         {
           operation: "gte",
           field: "expiration",
-          value: "\"2025-06-06\""
+          value: `"${formatDate(today)}"`
         },
         {
           operation: "lte",
           field: "expiration",
-          value: "\"2025-06-13\""
+          value: `"${formatDate(eightDaysLater)}"`
         },
         {
           operation: "gte",
@@ -86,7 +96,7 @@ export async function GET() {
         {
           operation: "gte",
           field: "bidPrice",
-          value: "2"
+          value: "1.2"
         }
       ],
       paging: true,
