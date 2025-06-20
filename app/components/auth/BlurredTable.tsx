@@ -34,7 +34,7 @@ const features = [
   "Newsletter",
   "Early access to new features",
   "Priority support",  
-  "Watchlist",  
+  "Watchlist",   
   "Trade Tracker (Coming Soon)"
 ];
 
