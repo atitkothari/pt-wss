@@ -94,7 +94,8 @@ export default function PricingPage() {
     "Fundamental Filters (P/E Ratio, Market Cap and more)",
     "Column Customization",
     "Mobile Responsive Design",    
-    "Export as CSV and Excel (Coming Soon)"
+    "Watchlist",
+    "Trade Tracker (Coming Soon)"
   ];
 
   return (

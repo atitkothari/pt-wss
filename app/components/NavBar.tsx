@@ -33,7 +33,8 @@ export function NavBar() {
   const navigation = {
     screeners: [
       { name: 'Covered Call Screener', href: '/covered-call-screener', id: 'covered_call_screener' },
-      { name: 'Cash Secured Put Screener', href: '/cash-secured-put-screener', id: 'cash_secured_put_screener' },      
+      { name: 'Cash Secured Put Screener', href: '/cash-secured-put-screener', id: 'cash_secured_put_screener' },   
+      { name: 'Trade Tracker', href: '/trade-tracker', id: 'trade_tracker' },   
     ],
     resources: [
       { name: 'Discover', href: '/discover' },      

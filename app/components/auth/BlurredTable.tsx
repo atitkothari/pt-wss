@@ -34,7 +34,8 @@ const features = [
   "Newsletter",
   "Early access to new features",
   "Priority support",  
-  // "Watchlist (Coming Soon)",  
+  "Watchlist",  
+  "Trade Tracker (Coming Soon)"
 ];
 
 export const BlurredTable = ({ children, className, hasSearched = false }: BlurredTableProps) => {
