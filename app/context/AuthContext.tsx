@@ -126,6 +126,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await sendUserLoginWebhook(result.user.email);
       }
       
+      // Meta Pixel: CompleteRegistration event for Google sign up
+      const isNewUser = (result as any)?._tokenResponse?.isNewUser ?? (result as any)?.additionalUserInfo?.isNewUser;
+      if (isNewUser && typeof window !== 'undefined' && (window as any).fbq) {
+        (window as any).fbq('track', 'CompleteRegistration');
+      }
+      
       sendAnalyticsEvent({
         event_name: AnalyticsEvents.SIGN_IN,
         event_category: 'Auth',
@@ -201,6 +207,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await sendEmailVerification(result.user, {
         url: window.location.origin + '/covered-call-screener',
       });
+      
+      // Meta Pixel: CompleteRegistration event
+      if (typeof window !== 'undefined' && (window as any).fbq) {
+        (window as any).fbq('track', 'CompleteRegistration');
+      }
       
       sendAnalyticsEvent({
         event_name: AnalyticsEvents.SIGN_UP,
