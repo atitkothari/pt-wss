@@ -191,7 +191,7 @@ export default function WatchlistPage() {
     
     const currentPremium = currentData.askprice; // Use askprice as current premium
 
-    const profitLoss = currentPremium - addedPrice;
+    const profitLoss = addedPrice-currentPremium;
     
     let percentageChangeValue: number | null = null;
     if (addedPrice !== 0) {
