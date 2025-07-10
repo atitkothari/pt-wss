@@ -36,6 +36,9 @@ export default function PricingPage() {
   };
 
   const handleStartTrial = async () => {
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', 'InitiateCheckout');
+    }
     try {
       setIsLoading(true);
       if (!user) {
@@ -94,7 +97,8 @@ export default function PricingPage() {
     "Fundamental Filters (P/E Ratio, Market Cap and more)",
     "Column Customization",
     "Mobile Responsive Design",    
-    "Export as CSV and Excel (Coming Soon)"
+    "Watchlist",
+    "Trade Tracker (Coming Soon)"
   ];
 
   return (
