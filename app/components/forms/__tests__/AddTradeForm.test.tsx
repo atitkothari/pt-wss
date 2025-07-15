@@ -64,19 +64,17 @@ describe('AddTradeForm', () => {
     });
 
     await waitFor(() => {
-      // These selects are not implemented with standard select elements
-      // so we can't use getByRole. This is a workaround.
-      fireEvent.click(screen.getByText('Select type'));
+        fireEvent.click(screen.getByText('Select an expiration date'));
     });
     await waitFor(() => {
-      fireEvent.click(screen.getByText('Call'));
+        fireEvent.click(screen.getByText('2024-12-20'));
     });
 
     await waitFor(() => {
-      fireEvent.click(screen.getByText('Select a contract'));
+        fireEvent.click(screen.getByText('Select a strike price'));
     });
     await waitFor(() => {
-      fireEvent.click(screen.getByText('150 call - Exp: 2024-12-20'));
+        fireEvent.click(screen.getByText('150'));
     });
 
     const premiumInput = screen.getByLabelText('Premium');

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/select";
 import { Trade } from '@/app/types/trade';
 import { useSymbols } from '@/app/hooks/useSymbols';
-import { AuthContext } from '@/app/context/AuthContext';
 
 interface AddTradeFormProps {
   onSubmit: (trade: Omit<Trade, 'id' | 'status' | 'openDate' | 'closeDate'>) => void;
@@ -23,11 +22,11 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
   const [symbol, setSymbol] = useState('');
   const [filteredSymbols, setFilteredSymbols] = useState<string[]>([]);
   const [contracts, setContracts] = useState<any[]>([]);
-  const [selectedContract, setSelectedContract] = useState<any>(null);
+  const [selectedExpiration, setSelectedExpiration] = useState<string>('');
+  const [availableStrikePrices, setAvailableStrikePrices] = useState<number[]>([]);
+  const [selectedStrike, setSelectedStrike] = useState<number | null>(null);
   const [premium, setPremium] = useState(0);
   const { symbols: allSymbols } = useSymbols();
-  const { user } = useContext(AuthContext);
-  const userId = user?.uid;
 
   useEffect(() => {
     if (symbol.length > 0) {
@@ -42,23 +41,46 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
   const handleSymbolSelect = async (selectedSymbol: string) => {
     setSymbol(selectedSymbol);
     setFilteredSymbols([]);
-    const response = await fetch(`/api/options?symbol=${selectedSymbol}&userId=${userId}`);
+    const response = await fetch(`/api/options?symbol=${selectedSymbol}`);
     const data = await response.json();
     setContracts(data.options);
   };
 
+  useEffect(() => {
+    if (selectedExpiration) {
+      const strikes = contracts
+        .filter(c => c.expiration === selectedExpiration)
+        .map(c => c.strike);
+      setAvailableStrikePrices([...new Set(strikes)] as number[]);
+    } else {
+      setAvailableStrikePrices([]);
+    }
+  }, [selectedExpiration, contracts]);
+
+  useEffect(() => {
+    if (selectedStrike && selectedExpiration) {
+      const contract = contracts.find(c => c.expiration === selectedExpiration && c.strike === selectedStrike);
+      if (contract) {
+        setPremium(contract.bidPrice * 100);
+      }
+    }
+  }, [selectedStrike, selectedExpiration, contracts]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (selectedContract) {
+    if (selectedStrike && selectedExpiration) {
+        const contract = contracts.find(c => c.expiration === selectedExpiration && c.strike === selectedStrike);
       onSubmit({
         symbol,
-        type: selectedContract.type,
-        strike: selectedContract.strike,
-        expiration: selectedContract.expiration,
+        type: contract.type,
+        strike: selectedStrike,
+        expiration: selectedExpiration,
         premium,
       });
     }
   };
+
+  const expirationDates = [...new Set(contracts.map(c => c.expiration))];
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -88,35 +110,15 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
       {contracts.length > 0 && (
         <>
           <div>
-            <Label>Contract Type</Label>
-            <Select onValueChange={(value) => {
-              const filtered = contracts.filter(c => c.type === value);
-              setContracts(filtered);
-            }}>
+            <Label>Expiration Date</Label>
+            <Select onValueChange={setSelectedExpiration}>
               <SelectTrigger>
-                <SelectValue placeholder="Select type" />
+                <SelectValue placeholder="Select an expiration date" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="call">Call</SelectItem>
-                <SelectItem value="put">Put</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label>Contract</Label>
-            <Select onValueChange={(value) => {
-              const contract = contracts.find(c => c.id === value);
-              setSelectedContract(contract);
-              setPremium(contract.bidPrice * 100);
-            }}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a contract" />
-              </SelectTrigger>
-              <SelectContent>
-                {contracts.map(c => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.strike} {c.type} - Exp: {c.expiration}
+                {expirationDates.map(date => (
+                  <SelectItem key={date as string} value={date as string}>
+                    {date as string}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -125,7 +127,25 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
         </>
       )}
 
-      {selectedContract && (
+      {availableStrikePrices.length > 0 && (
+          <div>
+            <Label>Strike Price</Label>
+            <Select onValueChange={(value) => setSelectedStrike(Number(value))}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a strike price" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableStrikePrices.map(strike => (
+                  <SelectItem key={strike} value={String(strike)}>
+                    {strike}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+      )}
+
+      {selectedStrike && (
         <div>
           <Label htmlFor="premium">Premium</Label>
           <Input
@@ -137,7 +157,7 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
         </div>
       )}
 
-      <Button type="submit" disabled={!selectedContract}>Add Trade</Button>
+      <Button type="submit" disabled={!selectedStrike}>Add Trade</Button>
     </form>
   );
 }
