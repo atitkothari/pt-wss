@@ -314,7 +314,7 @@ export default function WatchlistPage() {
           </div>
         ) : error ? (
           <div className="text-center py-10">
-            <p className="text-red-600 text-lg">{error}</p>
+            <p className="text-lg">{error}</p>
             {!user && (
               <Button
                 onClick={() => setIsAuthModalOpen(true)}
