@@ -19,9 +19,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRef } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AuthModal } from "../components/modals/AuthModal";
 
 export default function TradeTrackerPage() {
-  const { user } = useAuth();
+  const { user,loading: authLoading } = useAuth();
   const [trades, setTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddTradeModalOpen, setIsAddTradeModalOpen] = useState(false);
@@ -34,10 +35,17 @@ export default function TradeTrackerPage() {
   const [editClosingCost, setEditClosingCost] = useState('');
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [tradeToDelete, setTradeToDelete] = useState<Trade | null>(null);
-  const [editStatus, setEditStatus] = useState<'open' | 'closed'>('open');
+  const [editStatus, setEditStatus] = useState<'open' | 'closed'>('open');  
+  const [error, setError] = useState<string | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const fetchTrades = async () => {
-    if (!user) return;
+    console.log("hi")
+    if (!user){
+      setLoading(false)
+       return;
+    }
+    
     setLoading(true);
     try {
       const idToken = await user.getIdToken();
@@ -52,7 +60,7 @@ export default function TradeTrackerPage() {
       }
     } catch (error) {
       console.error('Error fetching trades:', error);
-    } finally {
+    } finally {      
       setLoading(false);
     }
   };
@@ -233,7 +241,18 @@ export default function TradeTrackerPage() {
           <div className="flex justify-center items-center min-h-[200px]">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
           </div>
-        ) : (
+        ) :  !user ? (
+          <div className="text-center py-10">
+            <p className="text-lg">Please sign-in to add trades</p>
+            {!user && (
+              <Button
+                onClick={() => setIsAuthModalOpen(true)}
+                className="mt-4 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Sign In
+              </Button>
+            )}
+          </div>) : (
           <TradesTable
             trades={trades}
             onRequestCloseTrade={handleRequestCloseTrade}
@@ -349,6 +368,7 @@ export default function TradeTrackerPage() {
           </div>
         </DialogContent>
       </Dialog>
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </PageLayout>
   );
 }

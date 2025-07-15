@@ -109,7 +109,7 @@ export function NavBar() {
                 className="flex-shrink-0 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100 flex items-center cursor-pointer hover:bg-blue-100 transition-colors"
               >
                 <div className="text-sm text-blue-700 font-medium whitespace-nowrap">
-                  Trusted by option sellers like you. Join now! 💰
+                  Join now! 💰
                 </div>
               </div>
             )
