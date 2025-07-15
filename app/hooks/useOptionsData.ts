@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { fetchOptionsData } from '../services/api';
 import { Option, OptionType, StrikeFilter } from '../types/option';
-import { parseISO, addDays, format } from 'date-fns';
+import { parseISO, addDays, format, subDays } from 'date-fns';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import { yieldFilterConfig, volumeFilterConfig, priceFilterConfig, moneynessFilterConfig } from '../config/filterConfig';
@@ -71,6 +71,14 @@ export function useOptionsData(
             value: `${searchTerms.join(',')}`
           });
         }
+      }
+
+      if(searchTerms.length>0 && searchTerms[0]==''){      
+        filters.push({ 
+          operation: 'sort', 
+          field: 'lastUpdatedDate', 
+          value: 'desc'
+        });
       }
       if (excludedSymbolsList && excludedSymbolsList.length > 0) {
         if (excludedSymbolsList.length === 1) {
