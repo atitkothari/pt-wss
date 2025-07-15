@@ -452,7 +452,7 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
         open={addModalOpen}
         onClose={() => setAddModalOpen(false)}
         trade={pendingTrade}
-        onConfirm={async (premium) => {
+        onConfirm={async (premium, contracts) => {
           if (!user || !pendingTrade) return;
           try {
             const idToken = await user.getIdToken();
@@ -468,6 +468,7 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
                 strike: pendingTrade.strike,
                 expiration: pendingTrade.expiration,
                 premium: Number(premium),
+                contracts: Number(contracts),
               }),
             });
             if (response.ok) {

@@ -9,22 +9,26 @@ interface AddTradeModalProps {
   open: boolean;
   onClose: () => void;
   trade: Option | null;
-  onConfirm: (premium: number) => void;
+  onConfirm: (premium: number, contracts: number) => void;
 }
 
 export function AddTradeModal({ open, onClose, trade, onConfirm }: AddTradeModalProps) {
   const [premium, setPremium] = useState('');
+  const [contracts, setContracts] = useState('1');
 
   useEffect(() => {
     if (trade) {
       setPremium((trade.premium ?? trade.bidPrice ?? 0).toString());
     }
+    setContracts('1');
   }, [trade]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!trade) return;
-    onConfirm(Number(premium));
+    const numContracts = parseInt(contracts, 10);
+    if (isNaN(numContracts) || numContracts < 1) return;
+    onConfirm(Number(premium), numContracts);
   };
 
   return (
@@ -50,6 +54,18 @@ export function AddTradeModal({ open, onClose, trade, onConfirm }: AddTradeModal
                 step="0.01"
                 value={premium}
                 onChange={e => setPremium(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="contracts">Number of Contracts</Label>
+              <Input
+                id="contracts"
+                type="number"
+                min="1"
+                step="1"
+                value={contracts}
+                onChange={e => setContracts(e.target.value)}
                 required
               />
             </div>

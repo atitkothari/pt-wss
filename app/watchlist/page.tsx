@@ -360,7 +360,7 @@ export default function WatchlistPage() {
         open={addModalOpen}
         onClose={() => setAddModalOpen(false)}
         trade={pendingTrade as any}
-        onConfirm={async (premium) => {
+        onConfirm={async (premium, contracts) => {
           if (!user || !pendingTrade) return;
           try {
             const idToken = await user.getIdToken();
@@ -376,6 +376,7 @@ export default function WatchlistPage() {
                 strike: pendingTrade.strike,
                 expiration: pendingTrade.expiration,
                 premium: Number(premium),
+                contracts: Number(contracts),
               }),
             });
             if (response.ok) {

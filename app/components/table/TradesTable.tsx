@@ -29,13 +29,14 @@ export function TradesTable({ trades, onRequestCloseTrade, onRequestEditTrade, o
             <TableHead>Type</TableHead>
             <TableHead>Strike</TableHead>
             <TableHead>Expiration</TableHead>
-            <TableHead>Premium</TableHead>
+            <TableHead>Contracts</TableHead>
+            <TableHead>Premium (per contract)</TableHead>
             <TableHead>Closing Cost</TableHead>
             <TableHead>Final Premium Collected</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Open Date</TableHead>
             <TableHead>Close Date</TableHead>
-            {/* <TableHead>Actions</TableHead> */}
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -45,6 +46,7 @@ export function TradesTable({ trades, onRequestCloseTrade, onRequestEditTrade, o
               <TableCell>{trade.type}</TableCell>
               <TableCell>${trade.strike.toFixed(2)}</TableCell>
               <TableCell>{format(parseISO(trade.expiration), 'MMM d, yyyy')}</TableCell>
+              <TableCell>{trade.contracts ?? 1}</TableCell>
               <TableCell>
                 {trade.status === 'closed' && typeof trade.closingCost === 'number' && trade.closingCost > 0 ? (
                   <span className="text">${trade.premium.toFixed(2)}</span>
@@ -57,7 +59,7 @@ export function TradesTable({ trades, onRequestCloseTrade, onRequestEditTrade, o
               </TableCell>
               <TableCell>
                 ${(
-                  trade.premium - (typeof trade.closingCost === 'number' ? trade.closingCost : 0)
+                  (trade.premium - (typeof trade.closingCost === 'number' ? trade.closingCost : 0)) * (trade.contracts ?? 1)
                 ).toFixed(2)}
               </TableCell>
               <TableCell>

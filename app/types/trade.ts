@@ -9,4 +9,5 @@ export interface Trade {
   openDate: string;
   closeDate: string | null;
   closingCost?: number; // Amount paid to close the trade
+  contracts?: number; // Number of contracts
 }

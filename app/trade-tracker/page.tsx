@@ -268,7 +268,7 @@ export default function TradeTrackerPage() {
           </DialogHeader>
           <form onSubmit={handleSubmitCloseTrade} className="space-y-4">
             <div>
-              <Label htmlFor="closingCost">How much did you pay to close this trade?</Label>
+              <Label htmlFor="closingCost">How much did you pay to close this trade (per contract)?</Label>
               <Input
                 id="closingCost"
                 type="number"

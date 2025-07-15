@@ -27,6 +27,7 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
   const [availableStrikePrices, setAvailableStrikePrices] = useState<number[]>([]);
   const [selectedStrike, setSelectedStrike] = useState<number | null>(null);
   const [premium, setPremium] = useState(0);
+  const [numContracts, setNumContracts] = useState(1);
   const [selectedType, setSelectedType] = useState<'call' | 'put'>('call');
   const { symbols: allSymbols } = useSymbols();
   const { user } = useAuth();
@@ -105,13 +106,14 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedStrike && selectedExpiration) {
-        const contract = filteredContracts.find(c => c.expiration === selectedExpiration && c.strike === selectedStrike);
+      const contract = filteredContracts.find(c => c.expiration === selectedExpiration && c.strike === selectedStrike);
       onSubmit({
         symbol,
         type: selectedType,
         strike: selectedStrike,
         expiration: selectedExpiration,
         premium,
+        contracts: numContracts,
       });
     }
   };
@@ -197,15 +199,32 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
       )}
 
       {selectedStrike && (
-        <div>
-          <Label htmlFor="premium">Premium</Label>
-          <Input
-            id="premium"
-            type="number"
-            value={premium}
-            onChange={(e) => setPremium(Number(e.target.value))}
-          />
-        </div>
+        <>
+          <div>
+            <Label htmlFor="numContracts">Number of Contracts</Label>
+            <Input
+              id="numContracts"
+              type="number"
+              min="1"
+              step="1"
+              value={numContracts}
+              onChange={e => setNumContracts(Math.max(1, Number(e.target.value)))}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="premium">Premium (per contract)</Label>
+            <Input
+              id="premium"
+              type="number"
+              value={premium}
+              onChange={(e) => setPremium(Number(e.target.value))}
+            />
+          </div>
+          <div className="text-sm text-gray-600">
+            <span className="font-medium">Total Premium:</span> ${(premium * numContracts).toFixed(2)}
+          </div>
+        </>
       )}
 
       <Button type="submit" disabled={!selectedStrike}>Add Trade</Button>
