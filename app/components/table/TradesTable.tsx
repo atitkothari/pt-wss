@@ -14,10 +14,12 @@ import { format, parseISO } from 'date-fns';
 
 interface TradesTableProps {
   trades: Trade[];
-  onCloseTrade: (id: string) => void;
+  onRequestCloseTrade: (trade: Trade) => void;
+  onRequestEditTrade: (trade: Trade) => void;
+  onRequestDeleteTrade: (trade: Trade) => void;
 }
 
-export function TradesTable({ trades, onCloseTrade }: TradesTableProps) {
+export function TradesTable({ trades, onRequestCloseTrade, onRequestEditTrade, onRequestDeleteTrade }: TradesTableProps) {
   return (
     <div className="rounded-md border">
       <Table>
@@ -28,10 +30,12 @@ export function TradesTable({ trades, onCloseTrade }: TradesTableProps) {
             <TableHead>Strike</TableHead>
             <TableHead>Expiration</TableHead>
             <TableHead>Premium</TableHead>
+            <TableHead>Closing Cost</TableHead>
+            <TableHead>Final Premium Collected</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Open Date</TableHead>
             <TableHead>Close Date</TableHead>
-            <TableHead></TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -41,7 +45,21 @@ export function TradesTable({ trades, onCloseTrade }: TradesTableProps) {
               <TableCell>{trade.type}</TableCell>
               <TableCell>${trade.strike.toFixed(2)}</TableCell>
               <TableCell>{format(parseISO(trade.expiration), 'MMM d, yyyy')}</TableCell>
-              <TableCell>${trade.premium.toFixed(2)}</TableCell>
+              <TableCell>
+                {trade.status === 'closed' && typeof trade.closingCost === 'number' && trade.closingCost > 0 ? (
+                  <span className="text">${trade.premium.toFixed(2)}</span>
+                ) : (
+                  <>${trade.premium.toFixed(2)}</>
+                )}
+              </TableCell>
+              <TableCell>
+                {typeof trade.closingCost === 'number' ? `$${trade.closingCost.toFixed(2)}` : '-'}
+              </TableCell>
+              <TableCell>
+                ${(
+                  trade.premium - (typeof trade.closingCost === 'number' ? trade.closingCost : 0)
+                ).toFixed(2)}
+              </TableCell>
               <TableCell>
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                   trade.status === 'open' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
@@ -51,12 +69,30 @@ export function TradesTable({ trades, onCloseTrade }: TradesTableProps) {
               </TableCell>
               <TableCell>{format(parseISO(trade.openDate), 'MMM d, yyyy')}</TableCell>
               <TableCell>{trade.closeDate ? format(parseISO(trade.closeDate), 'MMM d, yyyy') : '-'}</TableCell>
-              <TableCell>
+              <TableCell className="flex gap-2">
                 {trade.status === 'open' && (
-                  <Button variant="outline" size="sm" onClick={() => onCloseTrade(trade.id)}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onRequestCloseTrade(trade)}
+                  >
                     Close
                   </Button>
                 )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onRequestEditTrade(trade)}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => onRequestDeleteTrade(trade)}
+                >
+                  Delete
+                </Button>
               </TableCell>
             </TableRow>
           ))}

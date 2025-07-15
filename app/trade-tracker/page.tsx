@@ -15,12 +15,26 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { AddTradeForm } from "@/app/components/forms/AddTradeForm";
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useRef } from 'react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function TradeTrackerPage() {
   const { user } = useAuth();
   const [trades, setTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddTradeModalOpen, setIsAddTradeModalOpen] = useState(false);
+  const [isCloseTradeModalOpen, setIsCloseTradeModalOpen] = useState(false);
+  const [tradeToClose, setTradeToClose] = useState<Trade | null>(null);
+  const [closingCost, setClosingCost] = useState('');
+  const [isEditTradeModalOpen, setIsEditTradeModalOpen] = useState(false);
+  const [tradeToEdit, setTradeToEdit] = useState<Trade | null>(null);
+  const [editPremium, setEditPremium] = useState('');
+  const [editClosingCost, setEditClosingCost] = useState('');
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [tradeToDelete, setTradeToDelete] = useState<Trade | null>(null);
+  const [editStatus, setEditStatus] = useState<'open' | 'closed'>('open');
 
   const fetchTrades = async () => {
     if (!user) return;
@@ -68,7 +82,7 @@ export default function TradeTrackerPage() {
     }
   };
 
-  const handleCloseTrade = async (id: string) => {
+  const handleCloseTrade = async (id: string, closingCost: number) => {
     if (!user) return;
     try {
       const idToken = await user.getIdToken();
@@ -78,7 +92,7 @@ export default function TradeTrackerPage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${idToken}`,
         },
-        body: JSON.stringify({ id, status: 'closed', closeDate: new Date().toISOString() }),
+        body: JSON.stringify({ id, status: 'closed', closeDate: new Date().toISOString(), closingCost }),
       });
       if (response.ok) {
         fetchTrades();
@@ -88,8 +102,93 @@ export default function TradeTrackerPage() {
     }
   };
 
-  const totalPremiums = trades
-    .reduce((sum, trade) => sum + trade.premium, 0);
+  const handleRequestCloseTrade = (trade: Trade) => {
+    setTradeToClose(trade);
+    setClosingCost('');
+    setIsCloseTradeModalOpen(true);
+  };
+
+  const handleSubmitCloseTrade = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!tradeToClose) return;
+    const cost = parseFloat(closingCost);
+    if (isNaN(cost) || cost < 0) {
+      alert('Please enter a valid non-negative number.');
+      return;
+    }
+    await handleCloseTrade(tradeToClose.id, cost);
+    setIsCloseTradeModalOpen(false);
+    setTradeToClose(null);
+  };
+
+  const handleRequestEditTrade = (trade: Trade) => {
+    setTradeToEdit(trade);
+    setEditPremium(trade.premium.toString());
+    setEditClosingCost(trade.closingCost !== undefined ? trade.closingCost.toString() : '');
+    setEditStatus(trade.status);
+    setIsEditTradeModalOpen(true);
+  };
+
+  const handleStatusChange = (value: string) => {
+    setEditStatus(value as 'open' | 'closed');
+    if (value === 'open') setEditClosingCost('');
+  };
+
+  const handleSubmitEditTrade = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!tradeToEdit) return;
+    const premium = parseFloat(editPremium);
+    const closingCost = editStatus === 'closed' && editClosingCost !== '' ? parseFloat(editClosingCost) : undefined;
+    if (isNaN(premium) || premium < 0) {
+      alert('Please enter a valid non-negative premium.');
+      return;
+    }
+    if (editStatus === 'closed' && (editClosingCost === '' || isNaN(closingCost!) || closingCost! < 0)) {
+      alert('Please enter a valid non-negative closing cost.');
+      return;
+    }
+    if (!user) return;
+    const idToken = await user.getIdToken();
+    await fetch('/api/trades', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${idToken}`,
+      },
+      body: JSON.stringify({
+        id: tradeToEdit.id,
+        premium,
+        closingCost,
+        status: editStatus,
+        closeDate: editStatus === 'closed' ? (tradeToEdit.closeDate || new Date().toISOString()) : null,
+      }),
+    });
+    setIsEditTradeModalOpen(false);
+    setTradeToEdit(null);
+    fetchTrades();
+  };
+
+  const handleRequestDeleteTrade = (trade: Trade) => {
+    setTradeToDelete(trade);
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteTrade = async () => {
+    if (!tradeToDelete || !user) return;
+    const idToken = await user.getIdToken();
+    await fetch(`/api/trades?id=${tradeToDelete.id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${idToken}`,
+      },
+    });
+    setIsDeleteConfirmOpen(false);
+    setTradeToDelete(null);
+    fetchTrades();
+  };
+
+  const totalFinalPremiums = trades
+    .reduce((sum, trade) => sum + (trade.premium - (typeof trade.closingCost === 'number' ? trade.closingCost : 0)), 0);
 
   return (
     <PageLayout>
@@ -123,8 +222,8 @@ export default function TradeTrackerPage() {
             <p className="text-2xl font-semibold">{trades.filter(t => t.status === 'open').length}</p>
           </div>
           <div className="p-4 bg-gray-50 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-500">Total Premiums Received</h3>
-            <p className="text-2xl font-semibold">${totalPremiums.toFixed(2)}</p>
+            <h3 className="text-sm font-medium text-gray-500">Total Final Premiums Collected</h3>
+            <p className="text-2xl font-semibold">${totalFinalPremiums.toFixed(2)}</p>
           </div>
         </div>
       </div>
@@ -135,9 +234,121 @@ export default function TradeTrackerPage() {
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
           </div>
         ) : (
-          <TradesTable trades={trades} onCloseTrade={handleCloseTrade} />
+          <TradesTable
+            trades={trades}
+            onRequestCloseTrade={handleRequestCloseTrade}
+            onRequestEditTrade={handleRequestEditTrade}
+            onRequestDeleteTrade={handleRequestDeleteTrade}
+          />
         )}
       </div>
+      <Dialog open={isCloseTradeModalOpen} onOpenChange={setIsCloseTradeModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Close Trade</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmitCloseTrade} className="space-y-4">
+            <div>
+              <Label htmlFor="closingCost">How much did you pay to close this trade?</Label>
+              <Input
+                id="closingCost"
+                type="number"
+                min="0"
+                step="0.01"
+                value={closingCost}
+                onChange={e => setClosingCost(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button type="button" variant="outline" onClick={() => setIsCloseTradeModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Close Trade</Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isEditTradeModalOpen} onOpenChange={setIsEditTradeModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Trade</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmitEditTrade} className="space-y-4">
+            {tradeToEdit && (
+              <div className="rounded-lg border bg-gray-50 p-4 mb-4 grid grid-cols-2 gap-4 text-sm text-gray-700">
+                <div><span className="font-semibold">Symbol:</span> {tradeToEdit.symbol}</div>
+                <div><span className="font-semibold">Type:</span> {tradeToEdit.type}</div>
+                <div><span className="font-semibold">Strike:</span> ${tradeToEdit.strike.toFixed(2)}</div>
+                <div><span className="font-semibold">Expiration:</span> {tradeToEdit.expiration}</div>
+                <div><span className="font-semibold">Open Date:</span> {tradeToEdit.openDate ? new Date(tradeToEdit.openDate).toLocaleDateString() : '-'}</div>
+                <div><span className="font-semibold">Close Date:</span> {tradeToEdit.closeDate ? new Date(tradeToEdit.closeDate).toLocaleDateString() : '-'}</div>
+              </div>
+            )}
+            <div>
+              <Label htmlFor="editStatus">Status</Label>
+              <Select value={editStatus} onValueChange={handleStatusChange}>
+                <SelectTrigger id="editStatus">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="open">Open</SelectItem>
+                  <SelectItem value="closed">Closed</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="editPremium">Premium</Label>
+              <Input
+                id="editPremium"
+                type="number"
+                min="0"
+                step="0.01"
+                value={editPremium}
+                onChange={e => setEditPremium(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div>
+              <Label htmlFor="editClosingCost">Closing Cost</Label>
+              <Input
+                id="editClosingCost"
+                type="number"
+                min="0"
+                step="0.01"
+                value={editClosingCost}
+                onChange={e => setEditClosingCost(e.target.value)}
+                disabled={editStatus === 'open'}
+                placeholder={editStatus === 'open' ? 'Set status to Closed to enter' : ''}
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button type="button" variant="outline" onClick={() => setIsEditTradeModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Save Changes</Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Trade</DialogTitle>
+          </DialogHeader>
+          <div>Are you sure you want to delete this trade?</div>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button type="button" variant="outline" onClick={() => setIsDeleteConfirmOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="button" variant="destructive" onClick={handleDeleteTrade}>
+              Delete
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </PageLayout>
   );
 }

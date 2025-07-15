@@ -8,4 +8,5 @@ export interface Trade {
   status: 'open' | 'closed';
   openDate: string;
   closeDate: string | null;
+  closingCost?: number; // Amount paid to close the trade
 }
