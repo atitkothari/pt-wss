@@ -10,6 +10,8 @@ import { format, isPast } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { AuthModal } from '../components/modals/AuthModal';
+import { AddTradeModal } from '@/app/components/modals/AddTradeModal';
+import { PlusCircle } from 'lucide-react';
 
 interface WatchlistItem {
   id: string;
@@ -40,6 +42,8 @@ export default function WatchlistPage() {
   const [loadingOptionData, setLoadingOptionData] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [pendingTrade, setPendingTrade] = useState<OptionData | null>(null);
 
   useEffect(() => {
     console.log("Auth loading:", authLoading, "User:", user);
@@ -264,7 +268,27 @@ export default function WatchlistPage() {
                       {loading ? <Loader2 className="h-4 w-4 animate-spin inline-block" /> : typeof percentageChange === 'number' && !isNaN(percentageChange) ? `${percentageChange.toFixed(1)}%` : 'N/A'}
                     </td>
                     <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-500">{format(item.addedDate.toDate(), 'MMM d')}</td>
-                    <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-500 flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setPendingTrade({
+                            symbol: item.symbol,
+                            type: item.type,
+                            strike: item.strike,
+                            expiration: item.expiration,
+                            premium: item.addedPrice*100,
+                            stockprice: null,
+                            askprice: null,
+                          });
+                          setAddModalOpen(true);
+                        }}
+                        className="flex items-center gap-1"
+                      >
+                        <PlusCircle className="h-4 w-4" />
+                        <span className="hidden md:inline">Add Trade</span>
+                      </Button>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -332,6 +356,41 @@ export default function WatchlistPage() {
         )}
       </div>
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      <AddTradeModal
+        open={addModalOpen}
+        onClose={() => setAddModalOpen(false)}
+        trade={pendingTrade as any}
+        onConfirm={async (premium) => {
+          if (!user || !pendingTrade) return;
+          try {
+            const idToken = await user.getIdToken();
+            const response = await fetch('/api/trades', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${idToken}`,
+              },
+              body: JSON.stringify({
+                symbol: pendingTrade.symbol,
+                type: pendingTrade.type,
+                strike: pendingTrade.strike,
+                expiration: pendingTrade.expiration,
+                premium: Number(premium),
+              }),
+            });
+            if (response.ok) {
+              toast.success("Trade added to tracker!");
+              setAddModalOpen(false);
+              setPendingTrade(null);
+            } else {
+              const data = await response.json();
+              toast.error(data.error || "Failed to add trade.");
+            }
+          } catch (e: any) {
+            toast.error("Failed to add trade. Please try again.");
+          }
+        }}
+      />
     </PageLayout>
   );
 } 

@@ -10,7 +10,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { ColumnCustomizer, ColumnDef } from "./ColumnCustomizer";
-import { ArrowUpDown, Crown, Star } from "lucide-react";
+import { ArrowUpDown, Crown, Star, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format, parseISO } from "date-fns";
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -30,6 +30,10 @@ import { useAuth } from "@/app/context/AuthContext";
 import { db } from "@/app/lib/firebase";
 import { collection, addDoc, serverTimestamp, query, where, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { Timestamp } from 'firebase/firestore';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { AddTradeModal } from '@/app/components/modals/AddTradeModal';
 
 export const DEFAULT_COLUMNS: ColumnDef[] = [  
   { key: "rating", label: "Rating" },
@@ -211,6 +215,11 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
   const router = useRouter();
 
   const [userWatchlist, setUserWatchlist] = useState<WatchlistItem[]>([]);
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [pendingTrade, setPendingTrade] = useState<Option | null>(null);
+  const [addPremium, setAddPremium] = useState('');
+  const [addExpiration, setAddExpiration] = useState('');
+  const [addStrike, setAddStrike] = useState('');
 
   useEffect(() => {
     if (authLoading || !user) {
@@ -327,6 +336,46 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
     }
   };
 
+  const handleAddToTradeTracker = (option: Option) => {
+    setPendingTrade(option);
+    setAddPremium((option.premium ?? option.bidPrice ?? 0).toString());
+    setAddExpiration(option.expiration);
+    setAddStrike(option.strike.toString());
+    setAddModalOpen(true);
+  };
+
+  const handleConfirmAddTrade = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !pendingTrade) return;
+    try {
+      const idToken = await user.getIdToken();
+      const response = await fetch('/api/trades', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({
+          symbol: pendingTrade.symbol,
+          type: pendingTrade.type,
+          strike: Number(addStrike),
+          expiration: addExpiration,
+          premium: Number(addPremium),
+        }),
+      });
+      if (response.ok) {
+        toast.success("Trade added to tracker!");
+        setAddModalOpen(false);
+        setPendingTrade(null);
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to add trade.");
+      }
+    } catch (e: any) {
+      toast.error("Failed to add trade. Please try again.");
+    }
+  };
+
   return (
     <div>
       <div className="rounded-md border">
@@ -335,10 +384,8 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
             <thead>
               <tr className="border-b">
                 <td className="text-right w-[50px] p-2 md:p-2.5">
-                    <Star 
-                      className="h-4 w-4 text-gray-400 mx-auto"
-                    />
-                  </td>             
+                  <Star className="h-4 w-4 text-gray-400 mx-auto" />
+                </td>
                 {visibleColumns.map((column) => {
                   const columnDef = DEFAULT_COLUMNS.find(col => col.key === column);
                   return (
@@ -358,24 +405,24 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
                     </th>
                   );
                 })}
+                <th className="text-center p-2 md:p-2.5 font-medium">Add Trade</th>
               </tr>
             </thead>
             <tbody>
               {data.map((option, index) => (
-                
                 <tr 
                   key={`${option.symbol}-${option.strike}-${index}`}
                   className="border-b hover:bg-gray-50"
                 >        
-                <td className="text-right w-[50px] p-2 md:p-2.5">
-                <Star 
-                  className={
-                    `h-4 w-4 mx-auto cursor-pointer transition-colors 
-                    ${isOptionInWatchlist(option) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-400 hover:text-yellow-500'}`
-                  }
-                  onClick={() => handleStarClick(option)}
-                />
-              </td>           
+                  <td className="text-right w-[50px] p-2 md:p-2.5">
+                    <Star 
+                      className={
+                        `h-4 w-4 mx-auto cursor-pointer transition-colors 
+                        ${isOptionInWatchlist(option) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-400 hover:text-yellow-500'}`
+                      }
+                      onClick={() => handleStarClick(option)}
+                    />
+                  </td>
                   {visibleColumns.map((column) => (
                     <td 
                       key={`${column}-${index}`}
@@ -383,13 +430,59 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
                     >
                       {formatCell(option[column as keyof Option], column)}
                     </td>
-                  ))}                  
+                  ))}
+                  <td className="text-center p-2 md:p-2.5">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-1"
+                      onClick={() => handleAddToTradeTracker(option)}
+                    >
+                      <PlusCircle className="h-4 w-4" />
+                      {/* <span className="hidden md:inline">Add Trade</span> */}
+                    </Button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </div>
+      <AddTradeModal
+        open={addModalOpen}
+        onClose={() => setAddModalOpen(false)}
+        trade={pendingTrade}
+        onConfirm={async (premium) => {
+          if (!user || !pendingTrade) return;
+          try {
+            const idToken = await user.getIdToken();
+            const response = await fetch('/api/trades', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${idToken}`,
+              },
+              body: JSON.stringify({
+                symbol: pendingTrade.symbol,
+                type: pendingTrade.type,
+                strike: pendingTrade.strike,
+                expiration: pendingTrade.expiration,
+                premium: Number(premium),
+              }),
+            });
+            if (response.ok) {
+              toast.success("Trade added to tracker!");
+              setAddModalOpen(false);
+              setPendingTrade(null);
+            } else {
+              const data = await response.json();
+              toast.error(data.error || "Failed to add trade.");
+            }
+          } catch (e: any) {
+            toast.error("Failed to add trade. Please try again.");
+          }
+        }}
+      />
     </div>
   );
 }
