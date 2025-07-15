@@ -50,7 +50,7 @@ export const EmailAuthForm = ({ mode, onSuccess, onError }: EmailAuthFormProps) 
       return false;
     }
     // Prevent mailslurp.biz domain
-    if (email.toLowerCase().endsWith('@mailslurp.biz')) {
+    if (email.toLowerCase().endsWith('@mailslurp.biz') || email.toLowerCase().endsWith('@nesopf.com')) {
       return false;
     }
     return true;
