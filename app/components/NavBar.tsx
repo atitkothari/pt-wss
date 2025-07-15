@@ -144,10 +144,13 @@ export function NavBar() {
               <Link
                 key={item.id}
                 href={item.href}
-                className="text-gray-700 hover:text-gray-900 font-medium transition-colors whitespace-nowrap"
+                className="text-gray-700 hover:text-gray-900 font-medium transition-colors whitespace-nowrap flex items-center gap-1"
                 onClick={() => handleNavigation(item.name, item.href)}
               >
                 {item.name}
+                {item.id === 'trade_tracker' && (
+                  <span className="ml-1 px-2 py-0.5 text-xs rounded-full bg-yellow-200 text-yellow-800 font-semibold border border-yellow-300">Beta</span>
+                )}
               </Link>
             ))}
 
@@ -157,7 +160,7 @@ export function NavBar() {
               className="text-gray-700 hover:text-gray-900 font-medium transition-colors whitespace-nowrap flex items-center gap-1"
               onClick={() => handleNavigation('Watchlist', '/watchlist')}
             >
-              <Star className="h-4 w-4" />
+              {/* <Star className="h-4 w-4" /> */}
               Watchlist              
             </Link>
 
@@ -271,13 +274,16 @@ export function NavBar() {
                 <Link
                   key={item.id}
                   href={item.href}
-                  className="block text-gray-700 hover:text-gray-900 py-2 transition-colors font-medium"
+                  className="block text-gray-700 hover:text-gray-900 py-2 transition-colors font-medium flex items-center gap-1"
                   onClick={() => {
                     setIsMenuOpen(false);
                     handleNavigation(item.name, item.href);
                   }}
                 >
                   {item.name}
+                  {item.id === 'trade_tracker' && (
+                    <span className="ml-1 px-2 py-0.5 text-xs rounded-full bg-yellow-200 text-yellow-800 font-semibold border border-yellow-300">Beta</span>
+                  )}
                 </Link>
               ))}
               {/* Watchlist Link */}

@@ -65,3 +65,38 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: 'Failed to update trade' }, { status: 500 });
   }
 }
+
+// DELETE: Delete a trade by ID
+export async function DELETE(request: Request) {
+  try {
+    const idToken = request.headers.get('Authorization')?.split('Bearer ')[1];
+    if (!idToken) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const decodedToken = await getAuth().verifyIdToken(idToken);
+    const userId = decodedToken.uid;
+
+    const url = new URL(request.url);
+    const id = url.searchParams.get('id');
+    if (!id) {
+      return NextResponse.json({ error: 'Trade ID is required' }, { status: 400 });
+    }
+
+    // Optionally, check if the trade belongs to the user before deleting
+    const docRef = adminDb.collection('trades').doc(id);
+    const doc = await docRef.get();
+    if (!doc.exists) {
+      return NextResponse.json({ error: 'Trade not found' }, { status: 404 });
+    }
+    const docData = doc.data();
+    if (!docData || docData.userId !== userId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    await docRef.delete();
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting trade:', error);
+    return NextResponse.json({ error: 'Failed to delete trade' }, { status: 500 });
+  }
+}

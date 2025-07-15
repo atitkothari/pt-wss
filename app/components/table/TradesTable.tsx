@@ -35,7 +35,7 @@ export function TradesTable({ trades, onRequestCloseTrade, onRequestEditTrade, o
             <TableHead>Status</TableHead>
             <TableHead>Open Date</TableHead>
             <TableHead>Close Date</TableHead>
-            <TableHead>Actions</TableHead>
+            {/* <TableHead>Actions</TableHead> */}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -69,7 +69,7 @@ export function TradesTable({ trades, onRequestCloseTrade, onRequestEditTrade, o
               </TableCell>
               <TableCell>{format(parseISO(trade.openDate), 'MMM d, yyyy')}</TableCell>
               <TableCell>{trade.closeDate ? format(parseISO(trade.closeDate), 'MMM d, yyyy') : '-'}</TableCell>
-              <TableCell className="flex gap-2">
+              <TableCell className="flex items-center justify-end gap-2 min-w-[200px]">
                 {trade.status === 'open' && (
                   <Button
                     variant="outline"
