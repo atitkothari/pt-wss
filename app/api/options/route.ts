@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const symbol = searchParams.get('symbol');
+  const userId = searchParams.get('userId');
 
   if (!symbol) {
     return NextResponse.json({ error: 'Symbol is required' }, { status: 400 });
@@ -12,7 +13,7 @@ export async function GET(request: Request) {
     const response = await fetch(`https://api.wheelstrategyoptions.com/wheelstrat/filter`, {
       method: 'POST',
       headers: {
-        'X-token': 'abc',
+        'X-token': 'ABC',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -23,9 +24,10 @@ export async function GET(request: Request) {
             value: `"${symbol}"`
           }
         ],
-        paging: true,
+        paging: false,
         pageNo: 1,
         pageSize: 1000,
+        userId: userId,
       }),
     });
 

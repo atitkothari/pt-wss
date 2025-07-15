@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Trade } from '@/app/types/trade';
 import { useSymbols } from '@/app/hooks/useSymbols';
+import { AuthContext } from '@/app/context/AuthContext';
 
 interface AddTradeFormProps {
   onSubmit: (trade: Omit<Trade, 'id' | 'status' | 'openDate' | 'closeDate'>) => void;
@@ -25,6 +26,8 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
   const [selectedContract, setSelectedContract] = useState<any>(null);
   const [premium, setPremium] = useState(0);
   const { symbols: allSymbols } = useSymbols();
+  const { user } = useContext(AuthContext);
+  const userId = user?.uid;
 
   useEffect(() => {
     if (symbol.length > 0) {
@@ -39,7 +42,7 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
   const handleSymbolSelect = async (selectedSymbol: string) => {
     setSymbol(selectedSymbol);
     setFilteredSymbols([]);
-    const response = await fetch(`/api/options?symbol=${selectedSymbol}`);
+    const response = await fetch(`/api/options?symbol=${selectedSymbol}&userId=${userId}`);
     const data = await response.json();
     setContracts(data.options);
   };
