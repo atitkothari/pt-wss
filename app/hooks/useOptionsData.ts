@@ -72,8 +72,8 @@ export function useOptionsData(
           });
         }
       }
-
-      if(searchTerms.length>0 && searchTerms[0]==''){      
+      console.log("searchTerms", searchTerms);
+      if((searchTerms.length>0 && searchTerms[0]=='') || searchTerms.length==0){      
         filters.push({ 
           operation: 'sort', 
           field: 'lastUpdatedDate', 

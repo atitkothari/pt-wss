@@ -604,6 +604,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           handleSearch();          
         } else {
           // Otherwise, fetch with default values
+          console.log("fetching with default values")
           fetchData(
             selectedStocks, 
             yieldRange[0], 
