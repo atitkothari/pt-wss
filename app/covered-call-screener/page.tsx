@@ -47,12 +47,25 @@ export default function CoveredCallScreenerPage() {
 
   return (
     <PageLayout>
+      {/* Mobile Navigation Bar */}
+      <div className="block md:hidden mb-4 flex items-center justify-center min-h-[20px]">
+        <div className="flex flex-wrap justify-center items-center gap-1 w-full text-center">
+          <Link href="/cash-secured-put-screener" className="text-xs sm:text-sm text-blue-600 hover:underline font-medium px-1 whitespace-nowrap">Cash Secured Put Screener</Link>
+          <span className="text-gray-300">|</span>
+          <Link href="/discover" className="text-xs sm:text-sm text-blue-600 hover:underline font-medium px-1 whitespace-nowrap">Discover</Link>
+          <span className="text-gray-300">|</span>
+          <Link href="/trade-tracker" className="text-xs sm:text-sm text-blue-600 hover:underline font-medium px-1 whitespace-nowrap">Trade Tracker</Link>
+          
+          {/* <span className="text-gray-300">|</span>
+           <Link href="/watchlist" className="text-xs sm:text-sm text-blue-600 hover:underline font-medium px-1 whitespace-nowrap">Watchlist</Link>*/}
+        </div>
+      </div>
       <div className="mb-4">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Covered Call Screener</h1>
           <Link 
             href="/cash-secured-put-screener" 
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+            className="hidden md:block text-blue-600 hover:text-blue-800 text-sm font-medium"
           >
             Switch to Cash Secured Put Screener →
           </Link>
