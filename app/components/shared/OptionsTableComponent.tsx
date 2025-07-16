@@ -603,8 +603,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         if (Array.from(searchParams.entries()).length > 0) {
           handleSearch();          
         } else {
-          // Otherwise, fetch with default values
-          console.log("fetching with default values")
+          // Otherwise, fetch with default values          
           fetchData(
             selectedStocks, 
             yieldRange[0], 
@@ -864,7 +863,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     if (!data || data.length === 0) return null;
     
     const dates = data.map(item => convertUtcToEst(item.lastUpdatedDate));
-    const oldestDate = new Date(Math.min(...dates.map(date => date.getTime())));
+    const oldestDate = new Date(Math.max(...dates.map(date => date.getTime())));
     
     return oldestDate.toLocaleDateString('en-US', {
       year: 'numeric',
