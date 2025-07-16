@@ -98,7 +98,7 @@ export default function PricingPage() {
     "Column Customization",
     "Mobile Responsive Design",    
     "Watchlist",
-    "Trade Tracker (Coming Soon)"
+    "Trade Tracker"
   ];
 
   return (
