@@ -16,7 +16,7 @@ import { useSymbols } from '@/app/hooks/useSymbols';
 import { useAuth } from '@/app/context/AuthContext';
 
 interface AddTradeFormProps {
-  onSubmit: (trade: Omit<Trade, 'id' | 'status' | 'openDate' | 'closeDate'>) => void;
+  onSubmit: (trade: Omit<Trade, 'id' | 'status' | 'openDate' | 'closeDate' | 'optionKey'>) => void;
 }
 
 export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
@@ -114,6 +114,7 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
         expiration: selectedExpiration,
         premium,
         contracts: numContracts,
+        optionKey: contract.optionKey
       });
     }
   };

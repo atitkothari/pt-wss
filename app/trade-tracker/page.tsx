@@ -1,7 +1,7 @@
 'use client';
 
 import { PageLayout } from "@/app/components/PageLayout";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from "@/app/context/AuthContext";
 import { Trade } from '@/app/types/trade';
 import { TradesTable } from '@/app/components/table/TradesTable';
@@ -39,13 +39,13 @@ export default function TradeTrackerPage() {
   const [error, setError] = useState<string | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-  const fetchTrades = async () => {
-    console.log("hi")
-    if (!user){
-      setLoading(false)
-       return;
+  const [prices, setPrices] = useState<{ [key: string]: number }>({});
+  const fetchTrades = useCallback(async () => {
+    if (!user) {
+      setLoading(false);
+      return;
     }
-    
+
     setLoading(true);
     try {
       const idToken = await user.getIdToken();
@@ -57,17 +57,38 @@ export default function TradeTrackerPage() {
       if (response.ok) {
         const data = await response.json();
         setTrades(data);
+        fetchPrices(data, idToken);
       }
     } catch (error) {
       console.error('Error fetching trades:', error);
-    } finally {      
+    } finally {
       setLoading(false);
     }
-  };
+  }, [user, fetchPrices]);
+
+  const fetchPrices = useCallback(async (trades: Trade[], idToken: string) => {
+    const openTrades = trades.filter(trade => trade.status === 'open');
+    if (openTrades.length === 0) return;
+
+    const optionKeys = openTrades.map(trade => trade.optionKey);
+    const response = await fetch(`/api/options/prices`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${idToken}`,
+      },
+      body: JSON.stringify({ optionKeys }),
+    });
+
+    if (response.ok) {
+      const pricesData = await response.json();
+      setPrices(pricesData);
+    }
+  }, []);
 
   useEffect(() => {
     fetchTrades();
-  }, [user]);
+  }, [user, fetchTrades]);
 
   const handleAddTrade = async (trade: Omit<Trade, 'id' | 'status' | 'openDate' | 'closeDate'>) => {
     if (!user) return;
@@ -198,6 +219,16 @@ export default function TradeTrackerPage() {
   const totalFinalPremiums = trades
     .reduce((sum, trade) => sum + (trade.premium - (typeof trade.closingCost === 'number' ? trade.closingCost : 0)), 0);
 
+  const totalUnrealizedGainLoss = trades
+    .filter(trade => trade.status === 'open')
+    .reduce((sum, trade) => {
+      const currentPrice = prices[trade.optionKey];
+      if (currentPrice !== undefined) {
+        return sum + (trade.premium - currentPrice) * (trade.contracts ?? 1);
+      }
+      return sum;
+    }, 0);
+
   return (
     <PageLayout>
       <div className="flex justify-between items-center mb-6">
@@ -220,7 +251,7 @@ export default function TradeTrackerPage() {
 
       <div className="mb-8 p-6 bg-white rounded-lg shadow-sm">
         <h2 className="text-xl font-semibold mb-4">Dashboard</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="p-4 bg-gray-50 rounded-lg">
             <h3 className="text-sm font-medium text-gray-500">Total Trades</h3>
             <p className="text-2xl font-semibold">{trades.length}</p>
@@ -232,6 +263,12 @@ export default function TradeTrackerPage() {
           <div className="p-4 bg-gray-50 rounded-lg">
             <h3 className="text-sm font-medium text-gray-500">Total Final Premiums Collected</h3>
             <p className="text-2xl font-semibold">${totalFinalPremiums.toFixed(2)}</p>
+          </div>
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <h3 className="text-sm font-medium text-gray-500">Unrealized Gain/Loss</h3>
+            <p className={`text-2xl font-semibold ${totalUnrealizedGainLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              ${totalUnrealizedGainLoss.toFixed(2)}
+            </p>
           </div>
         </div>
       </div>
@@ -255,6 +292,7 @@ export default function TradeTrackerPage() {
           </div>) : (
           <TradesTable
             trades={trades}
+            prices={prices}
             onRequestCloseTrade={handleRequestCloseTrade}
             onRequestEditTrade={handleRequestEditTrade}
             onRequestDeleteTrade={handleRequestDeleteTrade}

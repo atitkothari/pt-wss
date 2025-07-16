@@ -33,7 +33,8 @@ export async function POST(request: Request) {
     const userId = decodedToken.uid;
 
     const trade = await request.json();
-    const newTrade = { ...trade, userId, status: 'open', openDate: new Date().toISOString() };
+    const { optionKey, ...tradeData } = trade;
+    const newTrade = { ...tradeData, userId, status: 'open', openDate: new Date().toISOString(), optionKey };
     const docRef = await adminDb.collection('trades').add(newTrade);
 
     return NextResponse.json({ id: docRef.id, ...newTrade });
@@ -57,9 +58,15 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Trade ID is required' }, { status: 400 });
     }
 
-    await adminDb.collection('trades').doc(id).update(trade);
+    // Ensure optionKey is not overwritten if not provided
+    const { optionKey, ...tradeData } = trade;
+    if (optionKey) {
+      tradeData.optionKey = optionKey;
+    }
 
-    return NextResponse.json({ id, ...trade });
+    await adminDb.collection('trades').doc(id).update(tradeData);
+
+    return NextResponse.json({ id, ...tradeData });
   } catch (error) {
     console.error('Error updating trade:', error);
     return NextResponse.json({ error: 'Failed to update trade' }, { status: 500 });
