@@ -55,6 +55,10 @@ export function useOptionsData(
     excludedSymbolsList: string[] = excludedSymbols,
     probabilityRange?: [number, number]
   ) => {
+    // Get sort params from URL if not provided in sortConfig
+    const sortBy = sortConfig?.field || searchParams.get('sortBy');      
+    console.log("sortBy", sortBy);
+    const sortDir = sortConfig?.direction || searchParams.get('sortDir') as 'asc' | 'desc' | null;    
     setLoading(true);
     try {
       const filters: any = [];
@@ -72,14 +76,13 @@ export function useOptionsData(
           });
         }
       }
-      console.log("searchTerms", searchTerms);
-      if((searchTerms.length>0 && searchTerms[0]=='') || searchTerms.length==0){      
-        filters.push({ 
-          operation: 'sort', 
-          field: 'lastUpdatedDate', 
-          value: 'desc'
-        });
-      }
+      // if((searchTerms.length>0 && searchTerms[0]=='') || searchTerms.length==0){      
+      //   filters.push({ 
+      //     operation: 'sort', 
+      //     field: 'lastUpdatedDate', 
+      //     value: 'desc'
+      //   });
+      // }
       if (excludedSymbolsList && excludedSymbolsList.length > 0) {
         if (excludedSymbolsList.length === 1) {
           filters.push({ operation: 'exclude', field: 'symbol', value: `${excludedSymbolsList[0]}` });
@@ -178,9 +181,6 @@ export function useOptionsData(
         }
       }
 
-      // Get sort params from URL if not provided in sortConfig
-      const sortBy = sortConfig?.field || searchParams.get('sortBy');
-      const sortDir = sortConfig?.direction || searchParams.get('sortDir') as 'asc' | 'desc' | null;
 
       const finalSortConfig = sortBy ? {
         field: sortBy,
