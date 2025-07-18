@@ -215,7 +215,7 @@ export default function WatchlistPage() {
   };
 
   const activeOptions = watchlistItems.filter(item => !isPast(new Date(item.expiration)));
-  const expiredOptions = watchlistItems.filter(item => isPast(new Date(item.expiration)));
+  // const expiredOptions = watchlistItems.filter(item => isPast(new Date(item.expiration)));
 
   const renderTable = (options: WatchlistItem[], title: string) => (
     <div className="bg-white rounded-lg border border-gray-200 shadow-sm mb-8">
@@ -247,7 +247,14 @@ export default function WatchlistPage() {
 
                 return (
                   <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{item.symbol}</td>
+                    <td className="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <a
+                        href={item.type === 'call' ? `/covered-call-screener?call_search=${item.symbol}` : `/cash-secured-put-screener?put_search=${item.symbol}`}
+                        className="text-blue-600 hover:underline"
+                      >
+                        {item.symbol}
+                      </a>
+                    </td>
                     <td className="px-3 py-2 whitespace-nowrap text-sm">
                       <span className={`px-1.5 py-0.5 text-xs font-medium rounded-full ${
                         item.type === 'call' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
