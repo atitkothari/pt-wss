@@ -351,7 +351,7 @@ export default function WatchlistPage() {
         ) : (
           <>
             {renderTable(activeOptions, "Active Options")}
-            {renderTable(expiredOptions, "Expired Options")}
+            {/* {renderTable(expiredOptions, "Expired Options")} */}
           </>
         )}
       </div>
