@@ -6,7 +6,7 @@ import { useAuth } from "@/app/context/AuthContext";
 import { Trade } from '@/app/types/trade';
 import { TradesTable } from '@/app/components/table/TradesTable';
 import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Group, List } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -20,6 +20,8 @@ import { Label } from '@/components/ui/label';
 import { useRef } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AuthModal } from "../components/modals/AuthModal";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
 
 export default function TradeTrackerPage() {
   const { user,loading: authLoading } = useAuth();
@@ -38,6 +40,8 @@ export default function TradeTrackerPage() {
   const [editStatus, setEditStatus] = useState<'open' | 'closed'>('open');  
   const [error, setError] = useState<string | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('open');
+  const [groupBySymbol, setGroupBySymbol] = useState(false);
 
   const fetchTrades = async () => {
     console.log("hi")
@@ -198,6 +202,75 @@ export default function TradeTrackerPage() {
   const totalFinalPremiums = trades
     .reduce((sum, trade) => sum + (trade.premium - (typeof trade.closingCost === 'number' ? trade.closingCost : 0)), 0);
 
+  const openTrades = trades.filter(trade => trade.status === 'open');
+  const closedTrades = trades.filter(trade => trade.status === 'closed');
+  
+  const openTradesTotalPremium = openTrades.reduce((sum, trade) => sum + trade.premium, 0);
+  const closedTradesTotalFinalPremium = closedTrades.reduce((sum, trade) => 
+    sum + (trade.premium - (typeof trade.closingCost === 'number' ? trade.closingCost : 0)), 0);
+
+  // Closed trades statistics
+  const profitableTrades = closedTrades.filter(trade => 
+    (trade.premium - (typeof trade.closingCost === 'number' ? trade.closingCost : 0)) > 0
+  );
+  const winRate = closedTrades.length > 0 ? (profitableTrades.length / closedTrades.length) * 100 : 0;
+  const averageProfitPerTrade = closedTrades.length > 0 ? closedTradesTotalFinalPremium / closedTrades.length : 0;
+
+  // Group trades by symbol
+  const groupTradesBySymbol = (trades: Trade[]) => {
+    const grouped = trades.reduce((acc, trade) => {
+      if (!acc[trade.symbol]) {
+        acc[trade.symbol] = [];
+      }
+      acc[trade.symbol].push(trade);
+      return acc;
+    }, {} as Record<string, Trade[]>);
+
+    // Sort symbols alphabetically
+    return Object.entries(grouped)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([symbol, symbolTrades]) => ({
+        symbol,
+        trades: symbolTrades.sort((a, b) => new Date(b.openDate).getTime() - new Date(a.openDate).getTime())
+      }));
+  };
+
+  const openTradesGrouped = groupTradesBySymbol(openTrades);
+  const closedTradesGrouped = groupTradesBySymbol(closedTrades);
+
+  // Calculate symbol statistics
+  const getSymbolStats = (trades: Trade[]) => {
+    const totalPremium = trades.reduce((sum, trade) => sum + trade.premium, 0);
+    const totalFinalPremium = trades.reduce((sum, trade) => 
+      sum + (trade.premium - (typeof trade.closingCost === 'number' ? trade.closingCost : 0)), 0);
+    const openCount = trades.filter(t => t.status === 'open').length;
+    const closedCount = trades.filter(t => t.status === 'closed').length;
+    const profitableTrades = trades.filter(trade => 
+      trade.status === 'closed' && (trade.premium - (typeof trade.closingCost === 'number' ? trade.closingCost : 0)) > 0
+    );
+    const winRate = closedCount > 0 ? (profitableTrades.length / closedCount) * 100 : 0;
+    
+    return {
+      totalPremium,
+      totalFinalPremium,
+      openCount,
+      closedCount,
+      totalCount: trades.length,
+      winRate,
+      isProfitable: totalFinalPremium > 0
+    };
+  };
+
+  // Get all unique symbols for summary
+  const allSymbols = [...new Set(trades.map(trade => trade.symbol))].sort();
+  const symbolSummary = allSymbols.map(symbol => {
+    const symbolTrades = trades.filter(trade => trade.symbol === symbol);
+    return {
+      symbol,
+      ...getSymbolStats(symbolTrades)
+    };
+  });
+
   return (
     <PageLayout>
       <div className="flex justify-between items-center mb-6">
@@ -220,17 +293,23 @@ export default function TradeTrackerPage() {
 
       <div className="mb-8 p-6 bg-white rounded-lg shadow-sm">
         <h2 className="text-xl font-semibold mb-4">Dashboard</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="p-4 bg-gray-50 rounded-lg">
             <h3 className="text-sm font-medium text-gray-500">Total Trades</h3>
             <p className="text-2xl font-semibold">{trades.length}</p>
           </div>
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-500">Open Trades</h3>
-            <p className="text-2xl font-semibold">{trades.filter(t => t.status === 'open').length}</p>
+          <div className="p-4 bg-green-50 rounded-lg">
+            <h3 className="text-sm font-medium text-green-600">Open Trades</h3>
+            <p className="text-2xl font-semibold text-green-700">{openTrades.length}</p>
+            <p className="text-sm text-green-600">${openTradesTotalPremium.toFixed(2)} potential</p>
+          </div>
+          <div className="p-4 bg-blue-50 rounded-lg">
+            <h3 className="text-sm font-medium text-blue-600">Closed Trades</h3>
+            <p className="text-2xl font-semibold text-blue-700">{closedTrades.length}</p>
+            <p className="text-sm text-blue-600">${closedTradesTotalFinalPremium.toFixed(2)} collected</p>
           </div>
           <div className="p-4 bg-gray-50 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-500">Total Final Premiums Collected</h3>
+            <h3 className="text-sm font-medium text-gray-500">Total Final Premiums</h3>
             <p className="text-2xl font-semibold">${totalFinalPremiums.toFixed(2)}</p>
           </div>
         </div>
@@ -241,7 +320,7 @@ export default function TradeTrackerPage() {
           <div className="flex justify-center items-center min-h-[200px]">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
           </div>
-        ) :  !user ? (
+        ) : !user ? (
           <div className="text-center py-10">
             <p className="text-lg">Please sign-in to add trades</p>
             {!user && (
@@ -252,13 +331,154 @@ export default function TradeTrackerPage() {
                 Sign In
               </Button>
             )}
-          </div>) : (
-          <TradesTable
-            trades={trades}
-            onRequestCloseTrade={handleRequestCloseTrade}
-            onRequestEditTrade={handleRequestEditTrade}
-            onRequestDeleteTrade={handleRequestDeleteTrade}
-          />
+          </div>
+        ) : (
+          <>
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center gap-2">
+                <Group className="h-4 w-4" />
+                <span className="text-sm font-medium">Group by Symbol</span>
+                <Switch
+                  checked={groupBySymbol}
+                  onCheckedChange={setGroupBySymbol}
+                />
+              </div>
+            </div>
+            
+            {groupBySymbol && (
+              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Symbol Summary</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {symbolSummary.map(({ symbol, totalCount, openCount, closedCount, totalFinalPremium, winRate, isProfitable }) => (
+                    <div key={symbol} className="p-3 bg-white rounded-lg border">
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-semibold text-gray-900">{symbol}</h4>
+                        <span className={`text-sm font-medium ${isProfitable ? 'text-green-600' : 'text-red-600'}`}>
+                          ${totalFinalPremium.toFixed(2)}
+                        </span>
+                      </div>
+                      <div className="text-xs text-gray-600 space-y-1">
+                        <div className="flex justify-between">
+                          <span>Total Trades:</span>
+                          <span>{totalCount}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Open:</span>
+                          <span className="text-green-600">{openCount}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Closed:</span>
+                          <span className="text-blue-600">{closedCount}</span>
+                        </div>
+                        {closedCount > 0 && (
+                          <div className="flex justify-between">
+                            <span>Win Rate:</span>
+                            <span className={winRate >= 50 ? 'text-green-600' : 'text-red-600'}>
+                              {winRate.toFixed(1)}%
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="open" className="flex items-center gap-2">
+                  Open Trades ({openTrades.length})
+                </TabsTrigger>
+                <TabsTrigger value="closed" className="flex items-center gap-2">
+                  Closed Trades ({closedTrades.length})
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="open" className="mt-6">
+                {openTrades.length === 0 ? (
+                  <div className="text-center py-10">
+                    <p className="text-gray-500">No open trades yet. Add your first trade to get started!</p>
+                  </div>
+                ) : groupBySymbol ? (
+                  <div className="space-y-6">
+                    {openTradesGrouped.map(({ symbol, trades }) => {
+                      const stats = getSymbolStats(trades);
+                      return (
+                        <div key={symbol} className="border rounded-lg overflow-hidden">
+                          <div className="bg-gray-50 px-4 py-3 border-b">
+                            <div className="flex justify-between items-center">
+                              <h3 className="text-lg font-semibold text-gray-900">{symbol}</h3>
+                              <div className="flex gap-4 text-sm">
+                                <span className="text-gray-600">Trades: {stats.totalCount}</span>
+                                <span className="text-green-600">Potential: ${stats.totalPremium.toFixed(2)}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <TradesTable
+                            trades={trades}
+                            onRequestCloseTrade={handleRequestCloseTrade}
+                            onRequestEditTrade={handleRequestEditTrade}
+                            onRequestDeleteTrade={handleRequestDeleteTrade}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <TradesTable
+                    trades={openTrades}
+                    onRequestCloseTrade={handleRequestCloseTrade}
+                    onRequestEditTrade={handleRequestEditTrade}
+                    onRequestDeleteTrade={handleRequestDeleteTrade}
+                  />
+                )}
+              </TabsContent>
+              
+              <TabsContent value="closed" className="mt-6">
+                {closedTrades.length === 0 ? (
+                  <div className="text-center py-10">
+                    <p className="text-gray-500">No closed trades yet. Close some trades to see them here!</p>
+                  </div>
+                ) : groupBySymbol ? (
+                  <div className="space-y-6">
+                    {closedTradesGrouped.map(({ symbol, trades }) => {
+                      const stats = getSymbolStats(trades);
+                      const isProfitable = stats.totalFinalPremium > 0;
+                      return (
+                        <div key={symbol} className="border rounded-lg overflow-hidden">
+                          <div className="bg-blue-50 px-4 py-3 border-b">
+                            <div className="flex justify-between items-center">
+                              <h3 className="text-lg font-semibold text-blue-900">{symbol}</h3>
+                              <div className="flex gap-4 text-sm">
+                                <span className="text-blue-600">Trades: {stats.totalCount}</span>
+                                <span className={`font-medium ${isProfitable ? 'text-green-600' : 'text-red-600'}`}>
+                                  Total: ${stats.totalFinalPremium.toFixed(2)}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <TradesTable
+                            trades={trades}
+                            onRequestCloseTrade={handleRequestCloseTrade}
+                            onRequestEditTrade={handleRequestEditTrade}
+                            onRequestDeleteTrade={handleRequestDeleteTrade}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <TradesTable
+                    trades={closedTrades}
+                    onRequestCloseTrade={handleRequestCloseTrade}
+                    onRequestEditTrade={handleRequestEditTrade}
+                    onRequestDeleteTrade={handleRequestDeleteTrade}
+                  />
+                )}
+              </TabsContent>
+            </Tabs>
+          </>
         )}
       </div>
       <Dialog open={isCloseTradeModalOpen} onOpenChange={setIsCloseTradeModalOpen}>
@@ -372,3 +592,4 @@ export default function TradeTrackerPage() {
     </PageLayout>
   );
 }
+
