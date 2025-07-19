@@ -450,6 +450,7 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
                   <td className="text-center p-2 md:p-2.5">
                     <ShareButton
                       elementToCapture={() => rowRefs[index].current}
+                      option={option}
                       className="flex items-center gap-1"
                     />
                   </td>
