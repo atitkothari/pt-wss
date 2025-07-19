@@ -8,6 +8,40 @@ import { useSearchParams } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import { yieldFilterConfig, volumeFilterConfig, priceFilterConfig, moneynessFilterConfig } from '../config/filterConfig';
 
+// Function to fetch current option price by optionKey
+export const fetchOptionPrice = async (optionKey: number): Promise<{ askPrice: number; bidPrice: number, stockprice:number } | null> => {
+  try {
+    const response = await fetch(`/api/options-key?optionKey=${optionKey}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return {
+      askPrice: Number(data.askprice)*100 || 0,
+      bidPrice: Number(data.bidprice)*100 || 0,
+      stockprice: data.stockprice
+    };
+  } catch (error) {
+    console.error('Error fetching option price:', error);
+    return null;
+  }
+};
+
+// Function to calculate unrealized P/L for a trade
+export const calculateUnrealizedPL = (
+  tradePremium: number,
+  currentPrice: number,
+  contracts: number = 1,
+  tradeType: 'call' | 'put'
+): number => {
+  // For sold options (covered calls, cash secured puts), unrealized P/L is:
+  // Premium received - Current market value of the option
+  const currentValue = currentPrice * contracts;
+  const unrealizedPL = tradePremium - currentValue;
+  
+  return unrealizedPL;
+};
+
 export function useOptionsData(
   symbols: string[] = [],
   minYield: number = 0,

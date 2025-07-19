@@ -6,7 +6,7 @@ import { useAuth } from "@/app/context/AuthContext";
 import { Trade } from '@/app/types/trade';
 import { TradesTable } from '@/app/components/table/TradesTable';
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Group, List } from "lucide-react";
+import { PlusCircle, Group, List, RefreshCw } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -22,11 +22,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { AuthModal } from "../components/modals/AuthModal";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
+import { fetchOptionPrice, calculateUnrealizedPL } from "@/app/hooks/useOptionsData";
+
+interface TradeWithUnrealizedPL extends Trade {
+  unrealizedPL?: number;
+  currentPrice?: number;
+  unrealizedPLPercent?: number;
+  currentStockPrice?:number;
+}
 
 export default function TradeTrackerPage() {
   const { user,loading: authLoading } = useAuth();
-  const [trades, setTrades] = useState<Trade[]>([]);
+  const [trades, setTrades] = useState<TradeWithUnrealizedPL[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingPrices, setLoadingPrices] = useState(false);
   const [isAddTradeModalOpen, setIsAddTradeModalOpen] = useState(false);
   const [isCloseTradeModalOpen, setIsCloseTradeModalOpen] = useState(false);
   const [tradeToClose, setTradeToClose] = useState<Trade | null>(null);
@@ -44,7 +53,6 @@ export default function TradeTrackerPage() {
   const [groupBySymbol, setGroupBySymbol] = useState(false);
 
   const fetchTrades = async () => {
-    console.log("hi")
     if (!user){
       setLoading(false)
        return;
@@ -69,9 +77,63 @@ export default function TradeTrackerPage() {
     }
   };
 
+  // Fetch current prices for open trades to calculate unrealized P/L
+  const fetchCurrentPrices = async () => {
+    if (!user) return;
+    
+    setLoadingPrices(true);
+    try {
+      const openTradesWithOptionKey = trades.filter(trade => 
+        trade.status === 'open' && trade.optionKey
+      );
+
+      const updatedTrades = await Promise.all(
+        trades.map(async (trade) => {
+          if (trade.status === 'open' && trade.optionKey) {
+            const priceData = await fetchOptionPrice(trade.optionKey);
+            if (priceData) {
+              console.log(priceData)
+              const currentPrice = priceData.askPrice; // Use ask price for unrealized P/L
+              const currentStockPrice = priceData.stockprice;
+              const unrealizedPL = calculateUnrealizedPL(
+                trade.premium,
+                currentPrice,
+                trade.contracts || 1,
+                trade.type
+              );
+              const unrealizedPLPercent = (unrealizedPL / trade.premium) * 100;
+              
+              return {
+                ...trade,
+                currentPrice,
+                unrealizedPL,
+                unrealizedPLPercent,
+                currentStockPrice
+              };
+            }
+          }
+          return trade;
+        })
+      );
+
+      setTrades(updatedTrades);
+    } catch (error) {
+      console.error('Error fetching current prices:', error);
+    } finally {
+      setLoadingPrices(false);
+    }
+  };
+
   useEffect(() => {
     fetchTrades();
   }, [user]);
+
+  // Fetch prices when trades change
+  useEffect(() => {
+    if (trades.length > 0) {
+      fetchCurrentPrices();
+    }
+  }, [trades.length]);
 
   const handleAddTrade = async (trade: Omit<Trade, 'id' | 'status' | 'openDate' | 'closeDate'>) => {
     if (!user) return;
@@ -209,6 +271,10 @@ export default function TradeTrackerPage() {
   const closedTradesTotalFinalPremium = closedTrades.reduce((sum, trade) => 
     sum + (trade.premium - (typeof trade.closingCost === 'number' ? trade.closingCost : 0)), 0);
 
+  // Calculate unrealized P/L for open trades
+  const totalUnrealizedPL = openTrades.reduce((sum, trade) => sum + (trade.unrealizedPL || 0), 0);
+  const totalUnrealizedPLPercent = openTradesTotalPremium > 0 ? (totalUnrealizedPL / openTradesTotalPremium) * 100 : 0;
+
   // Closed trades statistics
   const profitableTrades = closedTrades.filter(trade => 
     (trade.premium - (typeof trade.closingCost === 'number' ? trade.closingCost : 0)) > 0
@@ -239,7 +305,7 @@ export default function TradeTrackerPage() {
   const closedTradesGrouped = groupTradesBySymbol(closedTrades);
 
   // Calculate symbol statistics
-  const getSymbolStats = (trades: Trade[]) => {
+  const getSymbolStats = (trades: TradeWithUnrealizedPL[]) => {
     const totalPremium = trades.reduce((sum, trade) => sum + trade.premium, 0);
     const totalFinalPremium = trades.reduce((sum, trade) => 
       sum + (trade.premium - (typeof trade.closingCost === 'number' ? trade.closingCost : 0)), 0);
@@ -250,6 +316,10 @@ export default function TradeTrackerPage() {
     );
     const winRate = closedCount > 0 ? (profitableTrades.length / closedCount) * 100 : 0;
     
+    // Calculate unrealized P/L for open trades
+    const openTrades = trades.filter(t => t.status === 'open');
+    const totalUnrealizedPL = openTrades.reduce((sum, trade) => sum + (trade.unrealizedPL || 0), 0);
+    
     return {
       totalPremium,
       totalFinalPremium,
@@ -257,7 +327,8 @@ export default function TradeTrackerPage() {
       closedCount,
       totalCount: trades.length,
       winRate,
-      isProfitable: totalFinalPremium > 0
+      isProfitable: totalFinalPremium > 0,
+      totalUnrealizedPL
     };
   };
 
@@ -293,7 +364,7 @@ export default function TradeTrackerPage() {
 
       <div className="mb-8 p-6 bg-white rounded-lg shadow-sm">
         <h2 className="text-xl font-semibold mb-4">Dashboard</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="p-4 bg-gray-50 rounded-lg">
             <h3 className="text-sm font-medium text-gray-500">Total Trades</h3>
             <p className="text-2xl font-semibold">{trades.length}</p>
@@ -307,6 +378,15 @@ export default function TradeTrackerPage() {
             <h3 className="text-sm font-medium text-blue-600">Closed Trades</h3>
             <p className="text-2xl font-semibold text-blue-700">{closedTrades.length}</p>
             <p className="text-sm text-blue-600">${closedTradesTotalFinalPremium.toFixed(2)} collected</p>
+          </div>
+          <div className="p-4 bg-yellow-50 rounded-lg">
+            <h3 className="text-sm font-medium text-yellow-600">Unrealized P/L</h3>
+            <p className={`text-2xl font-semibold ${totalUnrealizedPL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              ${totalUnrealizedPL.toFixed(2)}
+            </p>
+            <p className={`text-sm ${totalUnrealizedPLPercent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {totalUnrealizedPLPercent.toFixed(1)}%
+            </p>
           </div>
           <div className="p-4 bg-gray-50 rounded-lg">
             <h3 className="text-sm font-medium text-gray-500">Total Final Premiums</h3>
@@ -343,19 +423,36 @@ export default function TradeTrackerPage() {
                   onCheckedChange={setGroupBySymbol}
                 />
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={fetchCurrentPrices}
+                disabled={loadingPrices}
+                className="flex items-center gap-2"
+              >
+                <RefreshCw className={`h-4 w-4 ${loadingPrices ? 'animate-spin' : ''}`} />
+                Refresh Prices
+              </Button>
             </div>
             
-            {/* {groupBySymbol && (
+            {groupBySymbol && (
               <div className="mb-6 p-4 bg-gray-50 rounded-lg">
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">Symbol Summary</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {symbolSummary.map(({ symbol, totalCount, openCount, closedCount, totalFinalPremium, winRate, isProfitable }) => (
+                  {symbolSummary.map(({ symbol, totalCount, openCount, closedCount, totalFinalPremium, totalUnrealizedPL, winRate, isProfitable }) => (
                     <div key={symbol} className="p-3 bg-white rounded-lg border">
                       <div className="flex justify-between items-start mb-2">
                         <h4 className="font-semibold text-gray-900">{symbol}</h4>
-                        <span className={`text-sm font-medium ${isProfitable ? 'text-green-600' : 'text-red-600'}`}>
-                          ${totalFinalPremium.toFixed(2)}
-                        </span>
+                        <div className="text-right">
+                          <div className={`text-sm font-medium ${isProfitable ? 'text-green-600' : 'text-red-600'}`}>
+                            ${totalFinalPremium.toFixed(2)}
+                          </div>
+                          {totalUnrealizedPL !== undefined && totalUnrealizedPL !== 0 && (
+                            <div className={`text-xs ${totalUnrealizedPL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              Unrealized: ${totalUnrealizedPL.toFixed(2)}
+                            </div>
+                          )}
+                        </div>
                       </div>
                       <div className="text-xs text-gray-600 space-y-1">
                         <div className="flex justify-between">
@@ -383,7 +480,7 @@ export default function TradeTrackerPage() {
                   ))}
                 </div>
               </div>
-            )} */}
+            )}
             
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2">
@@ -412,6 +509,11 @@ export default function TradeTrackerPage() {
                               <div className="flex gap-4 text-sm">
                                 <span className="text-gray-600">Trades: {stats.totalCount}</span>
                                 <span className="text-green-600">Potential: ${stats.totalPremium.toFixed(2)}</span>
+                                {stats.totalUnrealizedPL !== undefined && stats.totalUnrealizedPL !== 0 && (
+                                  <span className={`font-medium ${stats.totalUnrealizedPL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                    Unrealized: ${stats.totalUnrealizedPL.toFixed(2)}
+                                  </span>
+                                )}
                               </div>
                             </div>
                           </div>

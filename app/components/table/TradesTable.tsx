@@ -13,8 +13,15 @@ import { Button } from '@/components/ui/button';
 import { format, parseISO } from 'date-fns';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 
+interface TradeWithUnrealizedPL extends Trade {
+  unrealizedPL?: number;
+  currentPrice?: number;
+  unrealizedPLPercent?: number;
+  currentStockPrice?:number;
+}
+
 interface TradesTableProps {
-  trades: Trade[];
+  trades: TradeWithUnrealizedPL[];
   onRequestCloseTrade: (trade: Trade) => void;
   onRequestEditTrade: (trade: Trade) => void;
   onRequestDeleteTrade: (trade: Trade) => void;
@@ -31,15 +38,18 @@ export function TradesTable({ trades, onRequestCloseTrade, onRequestEditTrade, o
             <TableHead>Symbol</TableHead>
             <TableHead>Type</TableHead>
             <TableHead>Strike</TableHead>
-            <TableHead>Expiration</TableHead>
-            <TableHead>Contracts</TableHead>
+            <TableHead>Stock Price</TableHead>
             <TableHead>Premium (per contract)</TableHead>
+            {!isClosedTradesTable && <TableHead>Current Premium</TableHead>}
+            {!isClosedTradesTable && <TableHead>Unrealized P/L</TableHead>}
             {isClosedTradesTable && <TableHead>Closing Cost</TableHead>}
             <TableHead>
               {isClosedTradesTable ? 'Final Premium Collected' : 'Potential Premium'}
             </TableHead>
             {isClosedTradesTable && <TableHead>Profit/Loss</TableHead>}
             <TableHead>Status</TableHead>
+            <TableHead>Expiration</TableHead>
+            <TableHead>Contracts</TableHead>
             <TableHead>Open Date</TableHead>
             {isClosedTradesTable && <TableHead>Close Date</TableHead>}
             <TableHead>Actions</TableHead>
@@ -56,9 +66,40 @@ export function TradesTable({ trades, onRequestCloseTrade, onRequestEditTrade, o
                 <TableCell className="font-medium">{trade.symbol}</TableCell>
                 <TableCell>{trade.type}</TableCell>
                 <TableCell>${trade.strike.toFixed(2)}</TableCell>
-                <TableCell>{format(parseISO(trade.expiration), 'MMM d, yyyy')}</TableCell>
-                <TableCell>{trade.contracts ?? 1}</TableCell>
+                {trade.currentStockPrice?(<TableCell>${trade.currentStockPrice.toFixed(2)}</TableCell>):<TableCell>-</TableCell>}
                 <TableCell>${trade.premium.toFixed(2)}</TableCell>
+                {!isClosedTradesTable && (
+                  <TableCell>
+                    {trade.currentPrice !== undefined ? (
+                      <span className="font-medium">${trade.currentPrice.toFixed(2)}</span>
+                    ) : (
+                      <span className="text-gray-400">Loading...</span>
+                    )}
+                  </TableCell>
+                )}
+                {!isClosedTradesTable && (
+                  <TableCell>
+                    {trade.unrealizedPL !== undefined ? (
+                      <div className="flex items-center gap-1">
+                        {trade.unrealizedPL >= 0 ? (
+                          <TrendingUp className="h-4 w-4 text-green-600" />
+                        ) : (
+                          <TrendingDown className="h-4 w-4 text-red-600" />
+                        )}
+                        <span className={`font-medium ${trade.unrealizedPL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          ${trade.unrealizedPL.toFixed(2)}
+                        </span>
+                        {trade.unrealizedPLPercent !== undefined && (
+                          <span className={`text-xs ${trade.unrealizedPLPercent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            ({trade.unrealizedPLPercent.toFixed(1)}%)
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </TableCell>
+                )}
                 {isClosedTradesTable && (
                   <TableCell>
                     {typeof trade.closingCost === 'number' ? `$${trade.closingCost.toFixed(2)}` : '-'}
@@ -96,9 +137,11 @@ export function TradesTable({ trades, onRequestCloseTrade, onRequestEditTrade, o
                     {trade.status}
                   </span>
                 </TableCell>
-                <TableCell>{format(parseISO(trade.openDate), 'MMM d, yyyy')}</TableCell>
+                <TableCell>{format(parseISO(trade.expiration), 'MM-dd-yy')}</TableCell>
+                <TableCell>{trade.contracts ?? 1}</TableCell>
+                <TableCell>{format(parseISO(trade.openDate), 'MM-dd-yy')}</TableCell>
                 {isClosedTradesTable && (
-                  <TableCell>{trade.closeDate ? format(parseISO(trade.closeDate), 'MMM d, yyyy') : '-'}</TableCell>
+                  <TableCell>{trade.closeDate ? format(parseISO(trade.closeDate), 'MM-dd-yy') : '-'}</TableCell>
                 )}
                 <TableCell className="flex items-center justify-end gap-2 min-w-[200px]">
                   {trade.status === 'open' && (

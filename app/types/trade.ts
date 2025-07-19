@@ -10,4 +10,5 @@ export interface Trade {
   closeDate: string | null;
   closingCost?: number; // Amount paid to close the trade
   contracts?: number; // Number of contracts
+  optionKey?: number; // Option key for fetching current market data
 }
