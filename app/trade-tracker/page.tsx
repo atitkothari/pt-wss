@@ -345,7 +345,7 @@ export default function TradeTrackerPage() {
               </div>
             </div>
             
-            {groupBySymbol && (
+            {/* {groupBySymbol && (
               <div className="mb-6 p-4 bg-gray-50 rounded-lg">
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">Symbol Summary</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -383,7 +383,7 @@ export default function TradeTrackerPage() {
                   ))}
                 </div>
               </div>
-            )}
+            )} */}
             
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2">

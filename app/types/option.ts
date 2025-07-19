@@ -21,6 +21,7 @@ export interface Option {
   movingAverageCrossover?: string; // Moving average crossover status
   rating?: string; // Rating field (A+, A, A-, B+, etc.)
   probability: number;
+  optionKey:number;
 }
 
 export type OptionType = 'call' | 'put';

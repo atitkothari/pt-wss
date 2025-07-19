@@ -198,6 +198,7 @@ interface WatchlistItem {
   expiration: string;
   addedPrice: number;
   addedDate: Timestamp;
+  optionKey?:string;
 }
 
 interface OptionsTableProps {
@@ -306,6 +307,7 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
       try {
         await addDoc(collection(db, "watchlists"), {
           userId: user.uid,
+          optionKey: option.optionKey,
           symbol: option.symbol,
           type: option.type,
           strike: option.strike,
@@ -469,6 +471,7 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
                 expiration: pendingTrade.expiration,
                 premium: Number(premium),
                 contracts: Number(contracts),
+                optionKey: pendingTrade.optionKey
               }),
             });
             if (response.ok) {

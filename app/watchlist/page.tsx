@@ -22,6 +22,7 @@ interface WatchlistItem {
   expiration: string;
   addedPrice: number;
   addedDate: Timestamp;
+  optionKey?: string;
 }
 
 interface OptionData {
@@ -32,6 +33,7 @@ interface OptionData {
   stockprice: number | null;
   premium: number | null;
   askprice: number | null;
+  optionKey: string | null;
 }
 
 export default function WatchlistPage() {
@@ -80,6 +82,7 @@ export default function WatchlistPage() {
           expiration: parsedExpiration,
           addedPrice: parsedAddedPrice,
           addedDate: data.addedDate,
+          optionKey: data.optionKey
         };
       });
       console.log("Watchlist items from Firebase:", items);
@@ -110,7 +113,7 @@ export default function WatchlistPage() {
         }
 
         console.log(`Attempting to fetch data for: ${key}`);
-        const promise = fetch(`/api/watchlist-data?symbol=${item.symbol}&expiration=${item.expiration}&strike=${item.strike}&type=${item.type}`)
+        const promise = fetch(`/api/watchlist-data?symbol=${item.symbol}&expiration=${item.expiration}&strike=${item.strike}&type=${item.type}&optionKey=${item.optionKey}`)
           .then(res => {
             console.log(`Response status for ${key}:`, res.status);
             if (!res.ok) {
@@ -133,6 +136,7 @@ export default function WatchlistPage() {
               stockprice: validatedStockPrice,
               premium: validatedPremium,
               askprice: validatedAskPrice,
+              optionKey: data.optionKey
             });
           })
           .catch((e: Error) => {
@@ -146,6 +150,7 @@ export default function WatchlistPage() {
               stockprice: null,
               premium: null,
               askprice: null,
+              optionKey: item.optionKey??null
             });
           });
         fetchPromises.push(promise);
@@ -281,13 +286,14 @@ export default function WatchlistPage() {
                         size="sm"
                         onClick={() => {
                           setPendingTrade({
-                            symbol: item.symbol,
+                            symbol: item.symbol,                            
                             type: item.type,
                             strike: item.strike,
                             expiration: item.expiration,
                             premium: item.addedPrice*100,
                             stockprice: null,
                             askprice: null,
+                            optionKey:item.optionKey??null,
                           });
                           setAddModalOpen(true);
                         }}
@@ -384,6 +390,7 @@ export default function WatchlistPage() {
                 expiration: pendingTrade.expiration,
                 premium: Number(premium),
                 contracts: Number(contracts),
+                optionKey: pendingTrade.optionKey
               }),
             });
             if (response.ok) {
