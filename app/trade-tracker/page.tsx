@@ -46,7 +46,8 @@ export default function TradeTrackerPage() {
   const [editClosingCost, setEditClosingCost] = useState('');
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [tradeToDelete, setTradeToDelete] = useState<Trade | null>(null);
-  const [editStatus, setEditStatus] = useState<'open' | 'closed'>('open');  
+  const [editStatus, setEditStatus] = useState<'open' | 'closed' | 'assigned' | 'expired'>('open');
+  const [closeType, setCloseType] = useState<'buy-to-close' | 'expired' | 'assigned'>('buy-to-close');  
   const [error, setError] = useState<string | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('open');
@@ -156,17 +157,32 @@ export default function TradeTrackerPage() {
     }
   };
 
-  const handleCloseTrade = async (id: string, closingCost: number) => {
+  const handleCloseTrade = async (id: string, closingCost: number, closeType: 'buy-to-close' | 'expired' | 'assigned') => {
     if (!user) return;
     try {
       const idToken = await user.getIdToken();
+      
+      // Map close type to status
+      let status = 'closed';
+      if (closeType === 'assigned') {
+        status = 'assigned';
+      } else if (closeType === 'expired') {
+        status = 'expired';
+      }
+      
       const response = await fetch('/api/trades', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${idToken}`,
         },
-        body: JSON.stringify({ id, status: 'closed', closeDate: new Date().toISOString(), closingCost }),
+        body: JSON.stringify({ 
+          id, 
+          status, 
+          closeDate: new Date().toISOString(), 
+          closingCost,
+          closeType 
+        }),
       });
       if (response.ok) {
         fetchTrades();
@@ -179,18 +195,25 @@ export default function TradeTrackerPage() {
   const handleRequestCloseTrade = (trade: Trade) => {
     setTradeToClose(trade);
     setClosingCost('');
+    setCloseType('buy-to-close');
     setIsCloseTradeModalOpen(true);
   };
 
   const handleSubmitCloseTrade = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!tradeToClose) return;
-    const cost = parseFloat(closingCost);
-    if (isNaN(cost) || cost < 0) {
-      alert('Please enter a valid non-negative number.');
-      return;
+    
+    let cost = 0;
+    if (closeType === 'buy-to-close') {
+      const parsedCost = parseFloat(closingCost);
+      if (isNaN(parsedCost) || parsedCost < 0) {
+        alert('Please enter a valid non-negative number for closing cost.');
+        return;
+      }
+      cost = parsedCost;
     }
-    await handleCloseTrade(tradeToClose.id, cost);
+    
+    await handleCloseTrade(tradeToClose.id, cost, closeType);
     setIsCloseTradeModalOpen(false);
     setTradeToClose(null);
   };
@@ -204,7 +227,7 @@ export default function TradeTrackerPage() {
   };
 
   const handleStatusChange = (value: string) => {
-    setEditStatus(value as 'open' | 'closed');
+    setEditStatus(value as 'open' | 'closed' | 'assigned' | 'expired');
     if (value === 'open') setEditClosingCost('');
   };
 
@@ -212,7 +235,7 @@ export default function TradeTrackerPage() {
     e.preventDefault();
     if (!tradeToEdit) return;
     const premium = parseFloat(editPremium);
-    const closingCost = editStatus === 'closed' && editClosingCost !== '' ? parseFloat(editClosingCost) : undefined;
+    const closingCost = editStatus === 'closed' && editClosingCost !== '' ? parseFloat(editClosingCost) : 0;
     if (isNaN(premium) || premium < 0) {
       alert('Please enter a valid non-negative premium.');
       return;
@@ -234,7 +257,7 @@ export default function TradeTrackerPage() {
         premium,
         closingCost,
         status: editStatus,
-        closeDate: editStatus === 'closed' ? (tradeToEdit.closeDate || new Date().toISOString()) : null,
+        closeDate: tradeToEdit.closeDate || new Date().toISOString()
       }),
     });
     setIsEditTradeModalOpen(false);
@@ -265,7 +288,10 @@ export default function TradeTrackerPage() {
     .reduce((sum, trade) => sum + (trade.premium - (typeof trade.closingCost === 'number' ? trade.closingCost : 0)), 0);
 
   const openTrades = trades.filter(trade => trade.status === 'open');
-  const closedTrades = trades.filter(trade => trade.status === 'closed');
+  const closedTrades = trades.filter(trade => trade.status === 'closed' || trade.status === 'assigned' || trade.status === 'expired');
+  const closedOnlyTrades = trades.filter(trade => trade.status === 'closed');
+  const assignedTrades = trades.filter(trade => trade.status === 'assigned');
+  const expiredTrades = trades.filter(trade => trade.status === 'expired');
   
   const openTradesTotalPremium = openTrades.reduce((sum, trade) => sum + trade.premium, 0);
   const closedTradesTotalFinalPremium = closedTrades.reduce((sum, trade) => 
@@ -310,9 +336,9 @@ export default function TradeTrackerPage() {
     const totalFinalPremium = trades.reduce((sum, trade) => 
       sum + (trade.premium - (typeof trade.closingCost === 'number' ? trade.closingCost : 0)), 0);
     const openCount = trades.filter(t => t.status === 'open').length;
-    const closedCount = trades.filter(t => t.status === 'closed').length;
+    const closedCount = trades.filter(t => t.status === 'closed' || t.status === 'assigned' || t.status === 'expired').length;
     const profitableTrades = trades.filter(trade => 
-      trade.status === 'closed' && (trade.premium - (typeof trade.closingCost === 'number' ? trade.closingCost : 0)) > 0
+      (trade.status === 'closed' || trade.status === 'assigned' || trade.status === 'expired') && (trade.premium - (typeof trade.closingCost === 'number' ? trade.closingCost : 0)) > 0
     );
     const winRate = closedCount > 0 ? (profitableTrades.length / closedCount) * 100 : 0;
     
@@ -344,11 +370,11 @@ export default function TradeTrackerPage() {
 
   return (
     <PageLayout>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Trade Tracker</h1>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+        <h1 className="text-xl sm:text-2xl font-bold">Trade Tracker</h1>
         <Dialog open={isAddTradeModalOpen} onOpenChange={setIsAddTradeModalOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button size="sm" className="w-full sm:w-auto">
               <PlusCircle className="mr-2 h-4 w-4" />
               Add New Trade
             </Button>
@@ -362,40 +388,44 @@ export default function TradeTrackerPage() {
         </Dialog>
       </div>
 
-      <div className="mb-8 p-6 bg-white rounded-lg shadow-sm">
-        <h2 className="text-xl font-semibold mb-4">Dashboard</h2>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-500">Total Trades</h3>
-            <p className="text-2xl font-semibold">{trades.length}</p>
+      <div className="mb-6 p-4 bg-white rounded-lg shadow-sm">
+        <h2 className="text-lg font-semibold mb-3">Dashboard</h2>
+        <div className="grid grid-cols-2 md:grid-cols-7 gap-3">
+          <div className="p-3 bg-gray-50 rounded-lg">
+            <h3 className="text-xs font-medium text-gray-500">Total Trades</h3>
+            <p className="text-xl font-semibold">{trades.length}</p>
           </div>
-          <div className="p-4 bg-green-50 rounded-lg">
-            <h3 className="text-sm font-medium text-green-600">Open Trades</h3>
-            <p className="text-2xl font-semibold text-green-700">{openTrades.length}</p>
-            <p className="text-sm text-green-600">${openTradesTotalPremium.toFixed(2)} potential</p>
+          <div className="p-3 bg-green-50 rounded-lg">
+            <h3 className="text-xs font-medium text-green-600">Open Trades</h3>
+            <p className="text-xl font-semibold text-green-700">{openTrades.length}</p>
+            
           </div>
-          <div className="p-4 bg-blue-50 rounded-lg">
-            <h3 className="text-sm font-medium text-blue-600">Closed Trades</h3>
-            <p className="text-2xl font-semibold text-blue-700">{closedTrades.length}</p>
-            <p className="text-sm text-blue-600">${closedTradesTotalFinalPremium.toFixed(2)} collected</p>
+          <div className="p-3 bg-blue-50 rounded-lg">
+            <h3 className="text-xs font-medium text-blue-600">Closed Trades</h3>
+            <p className="text-xl font-semibold text-blue-700">{closedOnlyTrades.length}</p>            
           </div>
-          <div className="p-4 bg-yellow-50 rounded-lg">
-            <h3 className="text-sm font-medium text-yellow-600">Unrealized P/L</h3>
-            <p className={`text-2xl font-semibold ${totalUnrealizedPL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+          <div className="p-3 bg-purple-50 rounded-lg">
+            <h3 className="text-xs font-medium text-purple-600">Assigned Trades</h3>
+            <p className="text-xl font-semibold text-purple-700">{assignedTrades.length}</p>            
+          </div>
+          <div className="p-3 bg-orange-50 rounded-lg">
+            <h3 className="text-xs font-medium text-orange-600">Expired Trades</h3>
+            <p className="text-xl font-semibold text-orange-700">{expiredTrades.length}</p>            
+          </div>
+          <div className="p-3 bg-yellow-50 rounded-lg">
+            <h3 className="text-xs font-medium text-yellow-600">Unrealized P/L</h3>
+            <p className={`text-xl font-semibold ${totalUnrealizedPL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               ${totalUnrealizedPL.toFixed(2)}
-            </p>
-            <p className={`text-sm ${totalUnrealizedPLPercent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {totalUnrealizedPLPercent.toFixed(1)}%
-            </p>
+            </p>           
           </div>
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-500">Total Final Premiums</h3>
-            <p className="text-2xl font-semibold">${totalFinalPremiums.toFixed(2)}</p>
+          <div className="p-3 bg-gray-50 rounded-lg col-span-2 md:col-span-1">
+            <h3 className="text-xs font-medium text-gray-500">Total Premiums Collected</h3>
+            <p className="text-xl font-semibold">${totalFinalPremiums.toFixed(2)}</p>
           </div>
         </div>
       </div>
 
-      <div className="bg-white p-4 rounded-lg shadow-sm">
+      <div className="bg-white p-3 rounded-lg shadow-sm">
         {loading ? (
           <div className="flex justify-center items-center min-h-[200px]">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
@@ -414,7 +444,7 @@ export default function TradeTrackerPage() {
           </div>
         ) : (
           <>
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center mb-3">
               <div className="flex items-center gap-2">
                 <Group className="h-4 w-4" />
                 <span className="text-sm font-medium">Group by Symbol</span>
@@ -423,22 +453,12 @@ export default function TradeTrackerPage() {
                   onCheckedChange={setGroupBySymbol}
                 />
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={fetchCurrentPrices}
-                disabled={loadingPrices}
-                className="flex items-center gap-2"
-              >
-                <RefreshCw className={`h-4 w-4 ${loadingPrices ? 'animate-spin' : ''}`} />
-                Refresh Prices
-              </Button>
             </div>
             
             {groupBySymbol && (
-              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Symbol Summary</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                <h3 className="text-base font-semibold text-gray-900 mb-3">Symbol Summary</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {symbolSummary.map(({ symbol, totalCount, openCount, closedCount, totalFinalPremium, totalUnrealizedPL, winRate, isProfitable }) => (
                     <div key={symbol} className="p-3 bg-white rounded-lg border">
                       <div className="flex justify-between items-start mb-2">
@@ -449,14 +469,14 @@ export default function TradeTrackerPage() {
                           </div>
                           {totalUnrealizedPL !== undefined && totalUnrealizedPL !== 0 && (
                             <div className={`text-xs ${totalUnrealizedPL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              Unrealized: ${totalUnrealizedPL.toFixed(2)}
+                              ${totalUnrealizedPL.toFixed(2)}
                             </div>
                           )}
                         </div>
                       </div>
                       <div className="text-xs text-gray-600 space-y-1">
                         <div className="flex justify-between">
-                          <span>Total Trades:</span>
+                          <span>Total:</span>
                           <span>{totalCount}</span>
                         </div>
                         <div className="flex justify-between">
@@ -492,26 +512,26 @@ export default function TradeTrackerPage() {
                 </TabsTrigger>
               </TabsList>
               
-              <TabsContent value="open" className="mt-6">
+              <TabsContent value="open" className="mt-4">
                 {openTrades.length === 0 ? (
-                  <div className="text-center py-10">
-                    <p className="text-gray-500">No open trades yet. Add your first trade to get started!</p>
+                  <div className="text-center py-6">
+                    <p className="text-gray-500 text-sm">No open trades yet. Add your first trade to get started!</p>
                   </div>
                 ) : groupBySymbol ? (
-                  <div className="space-y-6">
+                  <div className="space-y-4">
                     {openTradesGrouped.map(({ symbol, trades }) => {
                       const stats = getSymbolStats(trades);
                       return (
                         <div key={symbol} className="border rounded-lg overflow-hidden">
-                          <div className="bg-gray-50 px-4 py-3 border-b">
-                            <div className="flex justify-between items-center">
-                              <h3 className="text-lg font-semibold text-gray-900">{symbol}</h3>
-                              <div className="flex gap-4 text-sm">
+                          <div className="bg-gray-50 px-3 py-2 border-b">
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                              <h3 className="text-base font-semibold text-gray-900">{symbol}</h3>
+                              <div className="flex flex-wrap gap-2 text-xs sm:text-sm">
                                 <span className="text-gray-600">Trades: {stats.totalCount}</span>
-                                <span className="text-green-600">Potential: ${stats.totalPremium.toFixed(2)}</span>
+                                <span className="text-green-600">${stats.totalPremium.toFixed(2)}</span>
                                 {stats.totalUnrealizedPL !== undefined && stats.totalUnrealizedPL !== 0 && (
                                   <span className={`font-medium ${stats.totalUnrealizedPL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                    Unrealized: ${stats.totalUnrealizedPL.toFixed(2)}
+                                    ${stats.totalUnrealizedPL.toFixed(2)}
                                   </span>
                                 )}
                               </div>
@@ -537,25 +557,25 @@ export default function TradeTrackerPage() {
                 )}
               </TabsContent>
               
-              <TabsContent value="closed" className="mt-6">
+              <TabsContent value="closed" className="mt-4">
                 {closedTrades.length === 0 ? (
-                  <div className="text-center py-10">
-                    <p className="text-gray-500">No closed trades yet. Close some trades to see them here!</p>
+                  <div className="text-center py-6">
+                    <p className="text-gray-500 text-sm">No closed trades yet. Close some trades to see them here!</p>
                   </div>
                 ) : groupBySymbol ? (
-                  <div className="space-y-6">
+                  <div className="space-y-4">
                     {closedTradesGrouped.map(({ symbol, trades }) => {
                       const stats = getSymbolStats(trades);
                       const isProfitable = stats.totalFinalPremium > 0;
                       return (
                         <div key={symbol} className="border rounded-lg overflow-hidden">
-                          <div className="bg-blue-50 px-4 py-3 border-b">
-                            <div className="flex justify-between items-center">
-                              <h3 className="text-lg font-semibold text-blue-900">{symbol}</h3>
-                              <div className="flex gap-4 text-sm">
+                          <div className="bg-blue-50 px-3 py-2 border-b">
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                              <h3 className="text-base font-semibold text-blue-900">{symbol}</h3>
+                              <div className="flex flex-wrap gap-2 text-xs sm:text-sm">
                                 <span className="text-blue-600">Trades: {stats.totalCount}</span>
                                 <span className={`font-medium ${isProfitable ? 'text-green-600' : 'text-red-600'}`}>
-                                  Total: ${stats.totalFinalPremium.toFixed(2)}
+                                  ${stats.totalFinalPremium.toFixed(2)}
                                 </span>
                               </div>
                             </div>
@@ -590,17 +610,32 @@ export default function TradeTrackerPage() {
           </DialogHeader>
           <form onSubmit={handleSubmitCloseTrade} className="space-y-4">
             <div>
-              <Label htmlFor="closingCost">How much did you pay to close this trade (per contract)?</Label>
-              <Input
-                id="closingCost"
-                type="number"
-                min="0"
-                step="0.01"
-                value={closingCost}
-                onChange={e => setClosingCost(e.target.value)}
-                autoFocus
-              />
+              <Label htmlFor="closeType">How did you close this trade?</Label>
+              <Select value={closeType} onValueChange={(value: 'buy-to-close' | 'expired' | 'assigned') => setCloseType(value)}>
+                <SelectTrigger id="closeType">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="buy-to-close">Buy to Close</SelectItem>
+                  <SelectItem value="expired">Expired</SelectItem>
+                  <SelectItem value="assigned">Assigned</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
+            {closeType === 'buy-to-close' && (
+              <div>
+                <Label htmlFor="closingCost">How much did you pay to close this trade (per contract)?</Label>
+                <Input
+                  id="closingCost"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={closingCost}
+                  onChange={e => setClosingCost(e.target.value)}
+                  autoFocus
+                />
+              </div>
+            )}
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" onClick={() => setIsCloseTradeModalOpen(false)}>
                 Cancel
@@ -636,6 +671,8 @@ export default function TradeTrackerPage() {
                 <SelectContent>
                   <SelectItem value="open">Open</SelectItem>
                   <SelectItem value="closed">Closed</SelectItem>
+                  <SelectItem value="assigned">Assigned</SelectItem>
+                  <SelectItem value="expired">Expired</SelectItem>
                 </SelectContent>
               </Select>
             </div>
