@@ -34,6 +34,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AddTradeModal } from '@/app/components/modals/AddTradeModal';
+import { ShareButton } from './ShareButton';
+import { createRef, RefObject } from 'react';
 
 export const DEFAULT_COLUMNS: ColumnDef[] = [  
   { key: "rating", label: "Rating" },
@@ -57,10 +59,7 @@ export const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: "probability", label: "Probability of Profit %" },
 ];
 
-const formatCell = (value: any, columnKey: string): string|any => {  
-  const { canAccessFeature } = useUserAccess();
-  const router = useRouter();
-
+const formatCell = (value: any, columnKey: string, canAccessFeature: boolean, router: any): string|any => {
   if (value === undefined || value === null) return '-';
 
   switch (columnKey) {
@@ -214,6 +213,7 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
   const sortDirection = searchParams.get('sortDir');  
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const { canAccessFeature } = useUserAccess();
 
   const [userWatchlist, setUserWatchlist] = useState<WatchlistItem[]>([]);
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -221,6 +221,7 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
   const [addPremium, setAddPremium] = useState('');
   const [addExpiration, setAddExpiration] = useState('');
   const [addStrike, setAddStrike] = useState('');
+  const rowRefs: RefObject<HTMLTableRowElement>[] = data.map(() => createRef<HTMLTableRowElement>());
 
   useEffect(() => {
     if (authLoading || !user) {
@@ -408,6 +409,7 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
                   );
                 })}
                 <th className="text-center p-2 md:p-2.5 font-medium">Add Trade</th>
+                <th className="text-center p-2 md:p-2.5 font-medium">Share</th>
               </tr>
             </thead>
             <tbody>
@@ -415,6 +417,7 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
                 <tr 
                   key={`${option.symbol}-${option.strike}-${index}`}
                   className="border-b hover:bg-gray-50"
+                  ref={rowRefs[index]}
                 >        
                   <td className="text-right w-[50px] p-2 md:p-2.5">
                     <Star 
@@ -430,7 +433,7 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
                       key={`${column}-${index}`}
                       className="p-2 md:p-2.5 whitespace-nowrap"
                     >
-                      {formatCell(option[column as keyof Option], column)}
+                      {formatCell(option[column as keyof Option], column, canAccessFeature(), router)}
                     </td>
                   ))}
                   <td className="text-center p-2 md:p-2.5">
@@ -443,6 +446,12 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
                       <PlusCircle className="h-4 w-4" />
                       {/* <span className="hidden md:inline">Add Trade</span> */}
                     </Button>
+                  </td>
+                  <td className="text-center p-2 md:p-2.5">
+                    <ShareButton
+                      elementToCapture={() => rowRefs[index].current}
+                      className="flex items-center gap-1"
+                    />
                   </td>
                 </tr>
               ))}
