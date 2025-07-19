@@ -139,7 +139,7 @@ const formatCell = (value: any, columnKey: string, canAccessFeature: boolean, ro
             <span className={`inline-block px-3 py-1.5 rounded-full font-semibold text-sm ${getRatingColor(value)} `}>
               {value}
             </span>
-            {!canAccessFeature() &&(
+            {!canAccessFeature &&(
             <TooltipProvider>
               <Tooltip>
                 {/* <TooltipTrigger asChild>
