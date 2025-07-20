@@ -43,7 +43,7 @@ export function ShareButton({ elementToCapture, className, option }: ShareButton
       const ctx = newCanvas.getContext('2d');
 
       if (ctx) {
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = '#FAF1E6';
         ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
 
         ctx.fillStyle = '#000000';
@@ -73,7 +73,7 @@ export function ShareButton({ elementToCapture, className, option }: ShareButton
         ctx.font = '18px Arial';
 
         const col1X = padding * 2;
-        const col2X = newCanvas.width / 2 +  (padding * 2);
+        const col2X = newCanvas.width / 2 + padding;
         let startY = headerHeight + padding;
         const lineHeight = 25;
 
@@ -92,9 +92,15 @@ export function ShareButton({ elementToCapture, className, option }: ShareButton
           `Earnings Date : ${option.earningsDate}`,
         ];
 
+        // // Draw background rectangle
+        // const bgColor = '#E4EFE7';
+        // ctx.fillStyle = bgColor;
+        // ctx.fillRect(padding, headerHeight + 10, newCanvas.width - (padding * 2), lineHeight * 8);
         variables.forEach((variable, index) => {
           const x = index % 2 === 0 ? col1X : col2X;
           const y = startY + Math.floor(index / 2) * lineHeight;
+          // Draw text
+          ctx.fillStyle = '#000000'; // Text color
           ctx.fillText(variable, x, y);
         });
 
