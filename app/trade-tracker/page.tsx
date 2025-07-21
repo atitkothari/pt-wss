@@ -102,6 +102,7 @@ export default function TradeTrackerPage() {
                 trade.contracts || 1,
                 trade.type
               );
+              console.log(trade)
               const unrealizedPLPercent = (unrealizedPL / trade.premium) * 100;
               
               return {

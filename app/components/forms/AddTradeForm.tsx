@@ -27,6 +27,7 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
   const [availableStrikePrices, setAvailableStrikePrices] = useState<number[]>([]);
   const [selectedStrike, setSelectedStrike] = useState<number | null>(null);
   const [premium, setPremium] = useState(0);
+  const [optionKey, setOptionKey] = useState(undefined);
   const [numContracts, setNumContracts] = useState(1);
   const [selectedType, setSelectedType] = useState<'call' | 'put'>('call');
   const { symbols: allSymbols } = useSymbols();
@@ -95,11 +96,14 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
       const contract = contracts.find(c => c.expiration === selectedExpiration && c.strike === selectedStrike && c.type === selectedType);
       if (contract) {
         setPremium(contract.bidPrice * 100);
+        setOptionKey(contract.optionKey)
       } else {
         setPremium(0);
+        setOptionKey(undefined)
       }
     } else {
       setPremium(0);
+      setOptionKey(undefined)
     }
   }, [selectedStrike, selectedExpiration, contracts, selectedType]);
 
@@ -114,6 +118,7 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
         expiration: selectedExpiration,
         premium,
         contracts: numContracts,
+        optionKey: optionKey
       });
     }
   };

@@ -36,8 +36,8 @@ export const calculateUnrealizedPL = (
 ): number => {
   // For sold options (covered calls, cash secured puts), unrealized P/L is:
   // Premium received - Current market value of the option
-  const currentValue = currentPrice * contracts;
-  const unrealizedPL = tradePremium - currentValue;
+  const currentValue = currentPrice;
+  const unrealizedPL = (tradePremium - currentValue)*contracts;
   
   return unrealizedPL;
 };
