@@ -115,19 +115,36 @@ export function ShareButton({ elementToCapture, className, option }: ShareButton
       newCanvas.toBlob(async (blob) => {
         if (blob) {
           try {
-            if (navigator.share) {
+             // Attempt to copy to clipboard
+             if (navigator.clipboard && navigator.clipboard.write) {
+              await navigator.clipboard.write([
+                new ClipboardItem({
+                  'image/png': blob,
+                }),
+              ]);
+              toast.success('Image copied to clipboard!');
+            } else if (navigator.share) { // Fallback to Web Share API
               const file = new File([blob], 'option-trade.png', { type: 'image/png' });
               await navigator.share({
                 title: 'Check out this option trade!',
                 text: 'I found this interesting option trade on wheelstrategyoptions.com',
                 files: [file],
               });
-            } else {
+            } else { // Fallback to saving the file
               saveAs(blob, 'option-trade.png');
+              toast.success('Image saved as option-trade.png');
             }
           } catch (error) {
-            console.error('Error sharing:', error);
-            saveAs(blob, 'option-trade.png');
+            console.error('Error sharing or copying image:', error);
+            toast.error('Could not share or copy image.');
+            // Fallback to saving the file if clipboard copy failed
+            try {
+                 saveAs(blob, 'option-trade.png');
+                 toast.success('Image saved as option-trade.png');
+            } catch (saveError) {
+                 console.error('Error saving image as fallback:', saveError);
+                 toast.error('Could not save image.');
+            }
           }
         }
         setIsSharing(false);
