@@ -14,6 +14,8 @@ import { ClarityAnalytics } from './components/ClarityAnalytics';
 import { CookieConsentBanner } from '@/components/CookieConsent';
 import { hasAcceptedAnalytics } from '@/lib/cookiePreferences';
 import Script from 'next/script';
+import { Suspense } from "react";
+import { ProAnnouncementBanner } from "./components/ProAnnouncementBanner";
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -136,17 +138,9 @@ export default function RootLayout({
         <AuthProvider>
           <SubscriptionProvider>
             <main>
-              <AnnouncementBanner 
-                id="fifty-percent-off-announcement-trial"
-                message="🎉 Get 50% OFF first month! Get it for <s>$19.99</s> $9.99 (Code: 50OFF)"
-                link={{
-                  text: "Upgrade to Pro",
-                  href: "/pricing"
-                }}
-                analyticsEventName="upgrade_to_pro_banner"
-                className="bg-gradient-to-r from-blue-600 to-blue-500"
-                countdownDate={new Date("2025-07-27")}
-              />
+              <Suspense fallback={null}>
+                <ProAnnouncementBanner />
+              </Suspense>
               {children}
             </main>
             <Toaster />
