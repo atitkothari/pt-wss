@@ -136,16 +136,17 @@ export default function RootLayout({
         <AuthProvider>
           <SubscriptionProvider>
             <main>
-              {/* <AnnouncementBanner 
-                id="api-announcement-trial"
-                message="🎉 Get 95% OFF first month! Get it for <s>$19.99</s> $0.99 (Code: MEMORIALDAY)"
+              <AnnouncementBanner 
+                id="fifty-percent-off-announcement-trial"
+                message="🎉 Get 50% OFF first month! Get it for <s>$19.99</s> $9.99 (Code: 50OFF)"
                 link={{
                   text: "Upgrade to Pro",
                   href: "/pricing"
                 }}
                 analyticsEventName="upgrade_to_pro_banner"
                 className="bg-gradient-to-r from-blue-600 to-blue-500"
-              /> */}
+                countdownDate={new Date("2025-07-27")}
+              />
               {children}
             </main>
             <Toaster />

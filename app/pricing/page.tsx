@@ -174,7 +174,7 @@ export default function PricingPage() {
                     <>
                       <div className="flex items-center gap-2">
                       <span className="text-3xl md:text-4xl font-bold text-gray-900">
-                          $19.99
+                          <span className="line-through">$19.99</span> $9.99
                         </span>                      
                         <span className="text-gray-600 text-base md:text-lg">
                           /month
@@ -198,7 +198,11 @@ export default function PricingPage() {
                   <p className="text-green-600 text-xs md:text-sm mt-2">
                     <span className="line-through">$240</span> $198/year
                   </p>
-                ): <></>}
+                ): <>
+                <p className="text-green-600 text-xs md:text-sm mt-2">
+                    Use code: 50OFF
+                  </p>
+                </>}
               </CardHeader>
               <CardContent className="pt-6 md:pt-8 px-4 md:px-6">
                 <ul className="space-y-3 md:space-y-4">

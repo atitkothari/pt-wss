@@ -36,11 +36,11 @@ export function AnnouncementBanner({
 
   // Calculate the actual countdown date based on trial status
   const getCountdownDate = () => {
-    if (status === 'trialing' && user?.metadata?.creationTime) {
-      // Trial end date is 5 days from creation, so countdown to 4 days from creation
-      const creationDate = new Date(user.metadata.creationTime);
-      return addDays(creationDate, 4); // Trial end - 1 day
-    }
+    // if (status === 'trialing' && user?.metadata?.creationTime) {
+    //   // Trial end date is 5 days from creation, so countdown to 4 days from creation
+    //   const creationDate = new Date(user.metadata.creationTime);
+    //   return addDays(creationDate, 4); // Trial end - 1 day
+    // }
     return countdownDate; // Fall back to prop if not in trial
   };
 
@@ -95,7 +95,7 @@ export function AnnouncementBanner({
             <div className="h-4 w-px bg-white/30" />
             <span className="font-medium">Offer ends in:</span>
             <CountdownTimer 
-              targetDate={new Date("2025-06-01")}
+              targetDate={new Date(actualCountdownDate)}
               onComplete={handleDismiss}
             />
           </div>
