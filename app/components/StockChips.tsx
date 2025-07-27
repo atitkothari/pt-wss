@@ -51,26 +51,6 @@ export function StockChips() {
     fetchStocks();
   }, []);
 
-  const handleStartTrial = async () => {
-    try {
-      setIsLoading(true);
-      if (!user) {
-        return;
-      }
-
-      if (!user.emailVerified) {
-        alert("Please verify your email first!");
-        return;
-      }
-
-      await createCheckoutSession(true);
-    } catch (error) {
-      console.error('Error starting trial:', error);
-      alert('Something went wrong. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   if (loading) {
     return (

@@ -30,7 +30,7 @@ const getStripe = () => {
   return stripePromise;
 };
 
-export async function createCheckoutSession(isYearly: boolean = true) {
+export async function createCheckoutSession(isYearly: boolean = true, isLimitedTime: boolean = false) {
   try {
     // Get current Firebase user
     const currentUser = auth.currentUser;
@@ -43,7 +43,8 @@ export async function createCheckoutSession(isYearly: boolean = true) {
     const body = { 
       userId: currentUser.uid,
       email: currentUser.email,
-      isYearly: isYearly,      
+      isYearly: isYearly,
+      isLimitedTime: isLimitedTime,
     }
     
     console.log('Creating checkout session with body:', body);

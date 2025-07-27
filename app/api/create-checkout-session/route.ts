@@ -14,10 +14,16 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 // Get these from environment variables in production
 const MONTHLY_PRICE_ID = process.env.STRIPE_MONTHLY_PRICE_ID;
 const YEARLY_PRICE_ID = process.env.STRIPE_YEARLY_PRICE_ID;
+const MONTHLY_PRICE_ID_LT = process.env.STRIPE_MONTHLY_PRICE_ID_LT;
+const YEARLY_PRICE_ID_LT = process.env.STRIPE_YEARLY_PRICE_ID_LT;
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL;
 
 if (!MONTHLY_PRICE_ID || !YEARLY_PRICE_ID) {
   throw new Error('Stripe price IDs are not set in environment variables');
+}
+
+if (!MONTHLY_PRICE_ID_LT || !YEARLY_PRICE_ID_LT) {
+  throw new Error('Stripe limited time price IDs are not set in environment variables');
 }
 
 if (!APP_URL) {
@@ -31,7 +37,7 @@ export async function POST(req: Request) {
     
     // Get user info from request body since we're only using Firebase Auth
     const body = await req.json();
-    const { userId, email: userEmail, isYearly } = body;
+    const { userId, email: userEmail, isYearly, isLimitedTime } = body;
     
     console.log('Request body:', { userId, userEmail, isYearly });
     
@@ -100,11 +106,19 @@ export async function POST(req: Request) {
     
     try {
       // Use predefined price IDs from environment variables if available
-      let priceId = isYearly ? YEARLY_PRICE_ID : MONTHLY_PRICE_ID;
-      
-      if (!priceId) {
-        console.error("Price ID not found for subscription type:", isYearly ? 'yearly' : 'monthly');
-        return new NextResponse('Internal server error - Price configuration missing', { status: 500 });
+      let priceId;
+      if (isLimitedTime) {
+        priceId = isYearly ? YEARLY_PRICE_ID_LT : MONTHLY_PRICE_ID_LT;
+        if (!priceId) {
+          console.error("Limited time price ID not found for subscription type:", isYearly ? 'yearly' : 'monthly');
+          return new NextResponse('Internal server error - Limited time price configuration missing', { status: 500 });
+        }
+      } else {
+        priceId = isYearly ? YEARLY_PRICE_ID : MONTHLY_PRICE_ID;
+        if (!priceId) {
+          console.error("Price ID not found for subscription type:", isYearly ? 'yearly' : 'monthly');
+          return new NextResponse('Internal server error - Price configuration missing', { status: 500 });
+        }
       }
 
       console.log('Creating checkout session with price ID:', priceId);

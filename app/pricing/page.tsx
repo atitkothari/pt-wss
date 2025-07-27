@@ -15,15 +15,27 @@ import { sendAnalyticsEvent, AnalyticsEvents } from '../utils/analytics';
 import { useRouter } from "next/navigation";
 import { usePlausibleTracking } from '../hooks/usePlausibleTracking';
 import { StockChips } from '../components/StockChips';
+import { pricingInfo } from "../config/pricingInfo";
 
 export default function PricingPage() {
   const [isYearly, setIsYearly] = useState(true);  
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);  
+  const [visitCount, setVisitCount] = useState(0);
+  const [isLimitedTime, setIsLimitedTime] = useState(false);
   const { user } = useAuth();
-  const { status, showDiscount } = useUserAccess();
+  const { status } = useUserAccess();
   const router = useRouter();
   const { trackPricingEvent } = usePlausibleTracking();  
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const count = parseInt(localStorage.getItem('pricingPageVisitCount') || '0', 10) + 1;
+      localStorage.setItem('pricingPageVisitCount', count.toString());
+      setVisitCount(count);
+      setIsLimitedTime(count > 2);
+    }
+  }, []);
 
   const handleBillingToggle = (isYearly: boolean) => {
     setIsYearly(isYearly);
@@ -51,16 +63,13 @@ export default function PricingPage() {
         return;
       }
 
-      // If user is not in trial and not active, start checkout
-      // if (status === 'needs_subscription') {
-        sendAnalyticsEvent({
-          event_name: AnalyticsEvents.PRICING_START_TRIAL_CLICK,
-          event_category: 'Pricing',
-          event_label: isYearly ? 'Yearly' : 'Monthly'
-        });
-        trackPricingEvent('start_trial');
-        await createCheckoutSession(isYearly);
-      // }
+      sendAnalyticsEvent({
+        event_name: AnalyticsEvents.PRICING_START_TRIAL_CLICK,
+        event_category: 'Pricing',
+        event_label: isYearly ? 'Yearly' : 'Monthly'
+      });
+      trackPricingEvent('start_trial');
+      await createCheckoutSession(isYearly, isLimitedTime);
     } catch (error) {
       console.error('Error starting trial:', error);
       alert('Something went wrong. Please try again.');
@@ -163,30 +172,18 @@ export default function PricingPage() {
                   {isYearly ? (
                     <>
                       <span className="text-3xl md:text-4xl font-bold text-gray-900">
-                      <span className="line-through">$19.99</span> $16.50
+                        <span className="line-through">{isLimitedTime ? pricingInfo.limitedTime.yearly.lineThrough : pricingInfo.regular.yearly.lineThrough}</span> {isLimitedTime ? pricingInfo.limitedTime.yearly.priceStr : pricingInfo.regular.yearly.priceStr}
                       </span>
                       <span className="text-gray-600 text-base md:text-lg">
                         /month
                       </span>
                     </>
-                  ) : (!user || showDiscount())?
-                  (
-                    <>
-                      <div className="flex items-center gap-2">
-                      <span className="text-3xl md:text-4xl font-bold text-gray-900">
-                          <span className="line-through">$19.99</span> $9.99
-                        </span>                      
-                        <span className="text-gray-600 text-base md:text-lg">
-                          /month
-                        </span>
-                      </div>
-                    </>
-                  ):(
+                  ) : (
                     <>
                       <div className="flex items-center gap-2">
                         <span className="text-3xl md:text-4xl font-bold text-gray-900">
-                          <span className="line-through">$19.99</span> $16.50
-                        </span>                                            
+                          <span className="line-through">{isLimitedTime ? pricingInfo.limitedTime.monthly.lineThrough : pricingInfo.regular.monthly.lineThrough}</span> {isLimitedTime ? pricingInfo.limitedTime.monthly.priceStr : pricingInfo.regular.monthly.priceStr}
+                        </span>                      
                         <span className="text-gray-600 text-base md:text-lg">
                           /month
                         </span>
@@ -196,13 +193,14 @@ export default function PricingPage() {
                 </div>
                 {isYearly ? (
                   <p className="text-green-600 text-xs md:text-sm mt-2">
-                    <span className="line-through">$240</span> $198/year
+                    <span className="line-through">{isLimitedTime ? pricingInfo.limitedTime.yearly.lineThroughYear : pricingInfo.regular.yearly.lineThroughYear}</span> {isLimitedTime ? pricingInfo.limitedTime.yearly.yearlyEquivalentStr : pricingInfo.regular.yearly.yearlyEquivalentStr}
                   </p>
-                ): <>
-                <p className="text-green-600 text-xs md:text-sm mt-2">
-                    Use code: 50OFF
+                ): null}
+                {isLimitedTime && (
+                  <p className="text-red-600 text-xs md:text-sm mt-2 font-semibold">
+                    Limited time offer! Discounted price available for a short period.
                   </p>
-                </>}
+                )}
               </CardHeader>
               <CardContent className="pt-6 md:pt-8 px-4 md:px-6">
                 <ul className="space-y-3 md:space-y-4">

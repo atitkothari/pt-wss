@@ -4,7 +4,7 @@ import { useUserAccess } from "@/app/hooks/useUserAccess";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Mail, Check, ExternalLink, CreditCard } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AuthModal } from "../modals/AuthModal";
 import { createCheckoutSession } from "@/app/lib/stripe";
 import Link from "next/link";
@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { sendAnalyticsEvent, AnalyticsEvents } from "@/app/utils/analytics";
+import { pricingInfo } from "@/app/config/pricingInfo";
 
 interface BlurredTableProps {
   children: React.ReactNode;
@@ -44,6 +45,16 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isUpgrading, setIsUpgrading] = useState(false);
   const router = useRouter();
+  const [visitCount, setVisitCount] = useState(0);
+  const [isLimitedTime, setIsLimitedTime] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const count = parseInt(localStorage.getItem('pricingPageVisitCount') || '0', 10);
+      setVisitCount(count);
+      setIsLimitedTime(count > 2);
+    }
+  }, []);
 
   const shouldBlur = hasSearched || (status !== 'trialing' && status !== 'active' && status !== 'incomplete_expired');
 
@@ -56,7 +67,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
         event_label: isYearly ? 'Yearly' : 'Monthly',
         plan_type: isYearly ? 'yearly' : 'monthly'
       });
-      await createCheckoutSession(isYearly);
+      await createCheckoutSession(isYearly, isLimitedTime);
     } catch (error) {
       console.error('Failed to create checkout session:', error);
     } finally {
@@ -186,11 +197,9 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                       ) : (
                         <>
                           <div className="flex items-center gap-1">
-                            <span className="text-xs font-normal line-through">$19.99/month</span>                            
-                            {/* <span className="text-base font-normal">$0.99/month for first month</span>                             */}
+                            <span className="text-xs font-normal">{isLimitedTime ? pricingInfo.limitedTime.monthly.priceStr : pricingInfo.regular.monthly.priceStr}/month</span>                                                        
                           </div>
                           <span className="text-xs font-semibold">Monthly Plan</span>                          
-                          <span className="text-xs text-yellow-300 mt-1">Use code: 50OFF</span>
                         </>
                       )}
                     </Button>
@@ -207,7 +216,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                         </div>
                       ) : (
                         <>
-                          <span className="text-base font-normal">$16.50/month</span>
+                          <span className="text-base font-normal">{isLimitedTime ? pricingInfo.limitedTime.yearly.priceStr : pricingInfo.regular.yearly.priceStr}/month</span>
                           <span className="text-xs font-semibold">Yearly Plan</span>                          
                           {/* <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 20%</span> */}
                         </>
@@ -236,11 +245,9 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                       ) : (
                         <>
                           <div className="flex items-center gap-1">
-                            <span className="text-xs font-normal line-through">$19.99/month</span>                            
-                            <span className="text-base font-normal">$9.99/month for first month</span>                            
+                            <span className="text-xs font-normal">{isLimitedTime ? pricingInfo.limitedTime.monthly.priceStr : pricingInfo.regular.monthly.priceStr}/month</span>                            
                           </div>
                           <span className="text-xs font-semibold">Monthly Plan</span>                          
-                          <span className="text-xs text-yellow-300 mt-1">Use code: 50OFF</span>
                         </>
                       )}
                     </Button>
@@ -257,7 +264,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                         </div>
                       ) : (
                         <>
-                          <span className="text-base font-normal">$16.50/month</span>
+                          <span className="text-base font-normal">{isLimitedTime ? pricingInfo.limitedTime.yearly.priceStr : pricingInfo.regular.yearly.priceStr}/month</span>
                           <span className="text-xs font-semibold">Yearly Plan</span>                          
                           {/* <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 20%</span> */}
                         </>

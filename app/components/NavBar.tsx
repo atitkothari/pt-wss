@@ -92,7 +92,7 @@ export function NavBar() {
                 }}
                 className="flex-shrink-0 bg-green-50 px-3 py-1.5 rounded-full border border-green-100 flex items-center">
                 <div className="text-sm text-black-700 font-medium whitespace-nowrap flex items-center gap-1">
-                 Go Pro for $16.50 <Crown className="h-4 w-4 text-yellow-500" />
+                 Go Pro <Crown className="h-4 w-4 text-yellow-500" />
                 </div>
               </div>)
             )        
@@ -121,7 +121,7 @@ export function NavBar() {
               }}
               className="flex-shrink-0 bg-green-50 px-3 py-1.5 rounded-full border border-green-100 flex items-center">
               <div className="text-sm text-black-700 font-medium whitespace-nowrap flex items-center gap-1">
-                Go Pro for $16.50 <Crown className="h-4 w-4 text-yellow-500" />
+                Go Pro <Crown className="h-4 w-4 text-yellow-500" />
               </div>
             </div>)
             :<></>}
