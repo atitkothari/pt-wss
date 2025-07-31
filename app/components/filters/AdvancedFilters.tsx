@@ -202,30 +202,31 @@ export function AdvancedFilters({
   }, [modifiedFilters]);
 
   return (
-    <div className="w-full border rounded-md p-2 mb-3 transition-all hover:border-gray-400">
+    <div className="w-full border border-blue-300 rounded-md p-2 mb-3 transition-all hover:border-blue-400 bg-gradient-to-r from-blue-50 to-indigo-50 shadow-sm">
       <div className="flex justify-between items-center mb-1">
         <Button
           variant="ghost"
-          className="flex-1 flex justify-between items-center p-0 h-auto"
+          className="flex-1 flex justify-between items-center p-0 h-auto hover:bg-blue-100/50"
           onClick={() => setIsExpanded(!isExpanded)}          
         >
           <div className="flex items-center gap-2">
-            <span className="text-lg font-semibold text-primary">Advanced Filters</span>
+            <span className="text-lg font-semibold text-blue-700">Advanced Filters</span>
             {hasModifiedFilters && !isExpanded && (
-              <Badge variant="secondary" className="bg-blue-500 text-white px-2 py-0.5 text-xs">
+              <Badge variant="secondary" className="bg-blue-600 text-white px-2 py-0.5 text-xs font-medium">
                 {getModifiedCount} active
               </Badge>
             )}
           </div>
-          {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+          {isExpanded ? <ChevronUp size={18} className="text-blue-600" /> : <ChevronDown size={18} className="text-blue-600" />}
         </Button>
       </div>
 
       {isExpanded && (
-        <div className="space-y-3 mt-2 animate-in fade-in-50 duration-300">
+        <div className="space-y-3 mt-2 animate-in fade-in-50 duration-300 border-t border-blue-200 pt-3">
           {/* Modified Filters Summary */}
           {hasModifiedFilters && (
-            <div className="flex flex-wrap gap-2 mb-3">
+            <div className="flex flex-wrap gap-2 mb-3 p-2 bg-blue-100/50 rounded-md border border-blue-200">
+              <div className="w-full text-xs font-medium text-blue-700 mb-1">Active Filters:</div>
               {Object.entries(modifiedFilters).map(([key, isModified]) => {
                 if (!isModified) return null;
                 const filterNames: { [key: string]: string } = {
@@ -247,7 +248,7 @@ export function AdvancedFilters({
                   <Badge 
                     key={key}
                     variant="outline" 
-                    className="bg-blue-100 text-blue-800 text-xs"
+                    className="bg-blue-200 text-blue-800 border-blue-300 text-xs font-medium"
                   >
                     {filterNames[key]}
                   </Badge>
@@ -256,7 +257,7 @@ export function AdvancedFilters({
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3 p-2 bg-blue-50/50 rounded-md">
             {/* Strike Price Range */}
             <RangeSlider
               id="input_screener_price_range"

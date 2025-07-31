@@ -875,6 +875,93 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     });
   };
 
+  const getActiveFilterSummary = () => {
+    const activeFilterList: string[] = [];
+
+    // Check search term
+    if (searchTerm && searchTerm.trim() !== '') {
+      activeFilterList.push(`Symbols: ${searchTerm}`);
+    }
+
+    // Check yield range
+    if (yieldRange[0] !== yieldFilterConfig.defaultMin || 
+        yieldRange[1] !== yieldFilterConfig.defaultMax) {
+      activeFilterList.push(`Yield: ${yieldRange[0]}% - ${yieldRange[1]}%`);
+    }
+
+    // Check price range
+    if (minPrice !== priceFilterConfig.defaultMin || 
+        maxPrice !== priceFilterConfig.defaultMax) {
+      activeFilterList.push(`Price: $${minPrice} - $${maxPrice}`);
+    }
+
+    // Check volume range
+    if (volumeRange[0] !== volumeFilterConfig.min || 
+        volumeRange[1] !== volumeFilterConfig.max) {
+      activeFilterList.push(`Volume: ${volumeRange[0]} - ${volumeRange[1]}`);
+    }
+
+    // Check delta range
+    if (deltaFilter[0] !== deltaFilterConfig.defaultMin || 
+        deltaFilter[1] !== deltaFilterConfig.defaultMax) {
+      activeFilterList.push(`Delta: ${deltaFilter[0]} - ${deltaFilter[1]}`);
+    }
+
+    // Check expiration dates
+    if (selectedExpiration || minSelectedExpiration) {
+      const expirationText = [];
+      if (minSelectedExpiration) {
+        expirationText.push(`From: ${minSelectedExpiration}`);
+      }
+      if (selectedExpiration) {
+        expirationText.push(`To: ${selectedExpiration}`);
+      }
+      activeFilterList.push(`Expiration: ${expirationText.join(', ')}`);
+    }
+
+    // Check P/E ratio
+    if (peRatio[0] !== peRatioFilterConfig.defaultMin || 
+        peRatio[1] !== peRatioFilterConfig.defaultMax) {
+      activeFilterList.push(`P/E: ${peRatio[0]} - ${peRatio[1]}`);
+    }
+
+    // Check market cap
+    if (marketCap[0] !== marketCapFilterConfig.defaultMin || 
+        marketCap[1] !== marketCapFilterConfig.defaultMax) {
+      activeFilterList.push(`Market Cap: ${marketCap[0]}B - ${marketCap[1]}B`);
+    }
+
+    // Check sector
+    if (sector && sector !== sectorOptions[0]) {
+      activeFilterList.push(`Sector: ${sector}`);
+    }
+
+    // Check moneyness range
+    if (moneynessRange[0] !== moneynessFilterConfig.defaultMin || 
+        moneynessRange[1] !== moneynessFilterConfig.defaultMax) {
+      activeFilterList.push(`Moneyness: ${moneynessRange[0]}% - ${moneynessRange[1]}%`);
+    }
+
+    // Check implied volatility
+    if (impliedVolatility[0] !== impliedVolatilityFilterConfig.defaultMin || 
+        impliedVolatility[1] !== impliedVolatilityFilterConfig.defaultMax) {
+      activeFilterList.push(`IV: ${impliedVolatility[0]}% - ${impliedVolatility[1]}%`);
+    }
+
+    // Check excluded stocks
+    if (excludedStocks.length > 0) {
+      activeFilterList.push(`Excluded: ${excludedStocks.join(', ')}`);
+    }
+
+    // Check probability of profit
+    if (probabilityRange[0] !== probabilityFilterConfig.defaultMin || 
+        probabilityRange[1] !== probabilityFilterConfig.defaultMax) {
+      activeFilterList.push(`Probability: ${probabilityRange[0]}% - ${probabilityRange[1]}%`);
+    }
+
+    return activeFilterList;
+  };
+
   // Get current sort parameters from URL
   const sortColumn = searchParams.get('sortBy') || '';
   const sortDirection = searchParams.get('sortDir') || 'asc';
@@ -1393,7 +1480,22 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         ) : data.length === 0 ? (
           <div className="absolute inset-0 flex flex-col items-center text-gray-600 gap-2">
             <div>No results match your filter criteria</div>
-            <div className="text-sm text-gray-500">Try broadening your search filters</div>
+            <div className="text-sm text-red-500 font-medium">Try broadening your search filters</div>
+            {(() => {
+              const activeFilterSummary = getActiveFilterSummary();
+              return activeFilterSummary.length > 0 ? (
+                <div className="mt-2 text-xs text-gray-400 max-w-md text-center">
+                  <div className="font-medium mb-1">Active filters:</div>
+                  <div className="flex flex-wrap gap-1 justify-center">
+                    {activeFilterSummary.map((filter, index) => (
+                      <span key={index} className="bg-gray-100 px-2 py-1 rounded text-gray-600">
+                        {filter}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : null;
+            })()}
           </div>
         ) : (
           <div className="h-full flex flex-col">          
