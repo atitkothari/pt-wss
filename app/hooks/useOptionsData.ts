@@ -9,7 +9,7 @@ import { useAuth } from '../context/AuthContext';
 import { yieldFilterConfig, volumeFilterConfig, priceFilterConfig, moneynessFilterConfig } from '../config/filterConfig';
 
 // Function to fetch current option price by optionKey
-export const fetchOptionPrice = async (optionKey: number): Promise<{ askPrice: number; bidPrice: number, stockprice:number } | null> => {
+export const fetchOptionPrice = async (optionKey: string): Promise<{ askPrice: number; bidPrice: number, stockprice:number } | null> => {
   try {
     const response = await fetch(`/api/options-key?optionKey=${optionKey}`);
     if (!response.ok) {
