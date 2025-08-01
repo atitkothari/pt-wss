@@ -43,6 +43,7 @@ export const EmailAuthForm = ({ mode, onSuccess, onError }: EmailAuthFormProps) 
     hasNumber: false,
     hasSpecialChar: false
   });
+  const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -70,6 +71,12 @@ export const EmailAuthForm = ({ mode, onSuccess, onError }: EmailAuthFormProps) 
     const newPassword = e.target.value;
     setPassword(newPassword);
     setPasswordValidation(validatePassword(newPassword));
+    
+    // Hide password requirements if all requirements are met
+    const newValidation = validatePassword(newPassword);
+    if (Object.values(newValidation).every(Boolean)) {
+      setShowPasswordRequirements(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -103,6 +110,7 @@ export const EmailAuthForm = ({ mode, onSuccess, onError }: EmailAuthFormProps) 
 
         const isPasswordValid = Object.values(passwordValidation).every(Boolean);
         if (!isPasswordValid) {
+          setShowPasswordRequirements(true);
           throw new Error('Password does not meet all requirements');
         }
       }
@@ -128,6 +136,7 @@ export const EmailAuthForm = ({ mode, onSuccess, onError }: EmailAuthFormProps) 
 
       // Only call onSuccess if we have a valid user
       if (authResult?.user) {
+        setShowPasswordRequirements(false);
         onSuccess?.();
       } else {
         throw new Error(`${mode === 'signin' ? 'Sign in' : 'Sign up'} failed. Please try again.`);
@@ -255,29 +264,31 @@ export const EmailAuthForm = ({ mode, onSuccess, onError }: EmailAuthFormProps) 
             />
           </div>
 
-          <div className="rounded-lg border p-4 space-y-2 bg-gray-50">
-            <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
-              <Info className="h-4 w-4" />
-              Password Requirements
+          {showPasswordRequirements && (
+            <div className="rounded-lg border p-4 space-y-2 bg-gray-50">
+              <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                <Info className="h-4 w-4" />
+                Password Requirements
+              </div>
+              <ul className="text-sm space-y-1.5">
+                <li className={`flex items-center gap-2 ${passwordValidation.minLength ? 'text-green-600' : 'text-gray-500'}`}>
+                  • At least 8 characters
+                </li>
+                <li className={`flex items-center gap-2 ${passwordValidation.hasUpperCase ? 'text-green-600' : 'text-gray-500'}`}>
+                  • One uppercase letter
+                </li>
+                <li className={`flex items-center gap-2 ${passwordValidation.hasLowerCase ? 'text-green-600' : 'text-gray-500'}`}>
+                  • One lowercase letter
+                </li>
+                <li className={`flex items-center gap-2 ${passwordValidation.hasNumber ? 'text-green-600' : 'text-gray-500'}`}>
+                  • One number
+                </li>
+                <li className={`flex items-center gap-2 ${passwordValidation.hasSpecialChar ? 'text-green-600' : 'text-gray-500'}`}>
+                  • One special character
+                </li>
+              </ul>
             </div>
-            <ul className="text-sm space-y-1.5">
-              <li className={`flex items-center gap-2 ${passwordValidation.minLength ? 'text-green-600' : 'text-gray-500'}`}>
-                • At least 8 characters
-              </li>
-              <li className={`flex items-center gap-2 ${passwordValidation.hasUpperCase ? 'text-green-600' : 'text-gray-500'}`}>
-                • One uppercase letter
-              </li>
-              <li className={`flex items-center gap-2 ${passwordValidation.hasLowerCase ? 'text-green-600' : 'text-gray-500'}`}>
-                • One lowercase letter
-              </li>
-              <li className={`flex items-center gap-2 ${passwordValidation.hasNumber ? 'text-green-600' : 'text-gray-500'}`}>
-                • One number
-              </li>
-              <li className={`flex items-center gap-2 ${passwordValidation.hasSpecialChar ? 'text-green-600' : 'text-gray-500'}`}>
-                • One special character
-              </li>
-            </ul>
-          </div>
+          )}
 
           <div className="flex items-start space-x-2 p-4 border rounded-lg bg-gray-50">
             <div className="flex items-center h-5">
@@ -291,7 +302,7 @@ export const EmailAuthForm = ({ mode, onSuccess, onError }: EmailAuthFormProps) 
             </div>
             <div className="ml-2">
               <label htmlFor="marketingConsent" className="text-sm text-gray-700">
-              Yes, I'd like to get early access to new features, product updates, wheel strategy tips and exclusive offers
+              Yes, I'd like to get wheel strategy tips and coupon codes.
               </label>
             </div>
           </div>
