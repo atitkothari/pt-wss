@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { usePlausibleTracking } from '../hooks/usePlausibleTracking';
 import { StockChips } from '../components/StockChips';
 import { pricingInfo } from "../config/pricingInfo";
+import { fetchOptionsData } from "../services/api";
 
 export default function PricingPage() {
   const [isYearly, setIsYearly] = useState(true);  
@@ -23,7 +24,7 @@ export default function PricingPage() {
   const [isLoading, setIsLoading] = useState(false);  
   const [visitCount, setVisitCount] = useState(0);
   const [isLimitedTime, setIsLimitedTime] = useState(false);
-  const { user } = useAuth();
+  const { user, userId } = useAuth();
   const { status } = useUserAccess();
   const router = useRouter();
   const { trackPricingEvent } = usePlausibleTracking();  
@@ -35,6 +36,11 @@ export default function PricingPage() {
       setVisitCount(count);
       setIsLimitedTime(count > 1);
     }
+
+    const reportPricingPage = async ()=>{      
+      await fetchOptionsData([], undefined, undefined, undefined, undefined, undefined, userId, 'pricing_page');
+    }
+    reportPricingPage();
   }, []);
 
   const handleBillingToggle = (isYearly: boolean) => {
