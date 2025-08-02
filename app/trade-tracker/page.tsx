@@ -373,20 +373,27 @@ export default function TradeTrackerPage() {
     <PageLayout>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
         <h1 className="text-xl sm:text-2xl font-bold">Trade Tracker</h1>
-        <Dialog open={isAddTradeModalOpen} onOpenChange={setIsAddTradeModalOpen}>
-          <DialogTrigger asChild>
-            <Button size="sm" className="w-full sm:w-auto">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Add New Trade
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New Trade</DialogTitle>
-            </DialogHeader>
-            <AddTradeForm onSubmit={handleAddTrade} />
-          </DialogContent>
-        </Dialog>
+        <div className="flex flex-col items-center">
+          <Dialog open={isAddTradeModalOpen} onOpenChange={setIsAddTradeModalOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" className="w-full sm:w-auto" disabled={!user}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Add New Trade
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New Trade</DialogTitle>
+              </DialogHeader>
+              <AddTradeForm onSubmit={handleAddTrade} />
+            </DialogContent>
+          </Dialog>
+          {!user && (
+            <div className="text-sm text-red-600 text-center mt-2">
+              Please sign in to add trades
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="mb-6 p-4 bg-white rounded-lg shadow-sm">
