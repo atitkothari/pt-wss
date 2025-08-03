@@ -1,5 +1,8 @@
-import { createCanvas } from 'canvas';
+import { createCanvas, registerFont } from 'canvas';
 import { NextRequest } from 'next/server';
+
+//register font Arial from public/fonts/Arial.ttf
+registerFont('public/fonts/Arial.ttf', { family: 'Arial' });
 
 export const runtime = 'nodejs';
 
