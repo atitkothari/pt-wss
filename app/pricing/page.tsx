@@ -34,7 +34,7 @@ export default function PricingPage() {
       const count = parseInt(localStorage.getItem('pricingPageVisitCount') || '0', 10) + 1;
       localStorage.setItem('pricingPageVisitCount', count.toString());
       setVisitCount(count);
-      setIsLimitedTime(count > 1);
+      setIsLimitedTime(count > 2);
     }
 
     const reportPricingPage = async ()=>{      
@@ -188,7 +188,7 @@ export default function PricingPage() {
                     <>
                       <div className="flex items-center gap-2">
                         <span className="text-3xl md:text-4xl font-bold text-gray-900">
-                          <span className="line-through">{isLimitedTime ? pricingInfo.limitedTime.monthly.lineThrough : pricingInfo.regular.monthly.lineThrough}</span> {isLimitedTime ? pricingInfo.limitedTime.monthly.priceStr : pricingInfo.regular.monthly.priceStr}
+                          {isLimitedTime && <span className="line-through">{pricingInfo.limitedTime.monthly.lineThrough}</span>} {isLimitedTime ? pricingInfo.limitedTime.monthly.priceStr : pricingInfo.regular.monthly.priceStr}
                         </span>                      
                         <span className="text-gray-600 text-base md:text-lg">
                           /month
