@@ -34,7 +34,7 @@ export default function PricingPage() {
       const count = parseInt(localStorage.getItem('pricingPageVisitCount') || '0', 10) + 1;
       localStorage.setItem('pricingPageVisitCount', count.toString());
       setVisitCount(count);
-      setIsLimitedTime(count > 2);
+      setIsLimitedTime(count > 1);
     }
 
     const reportPricingPage = async ()=>{      
