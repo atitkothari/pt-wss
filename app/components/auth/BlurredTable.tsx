@@ -46,17 +46,18 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
   const [isUpgrading, setIsUpgrading] = useState(false);
   const router = useRouter();
   const [visitCount, setVisitCount] = useState(0);
-  const [isLimitedTime, setIsLimitedTime] = useState(false);
+  const [isLimitedTime, setIsLimitedTime] = useState(false);  
+
+  const shouldBlur = hasSearched || (status !== 'trialing' && status !== 'active' && status !== 'incomplete_expired');
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const count = parseInt(localStorage.getItem('pricingPageVisitCount') || '0', 10);
+    if (typeof window !== 'undefined') {      
+      const count = parseInt(localStorage.getItem('pricingPageVisitCount') || '0', 10) + 1;
+      localStorage.setItem('pricingPageVisitCount', count.toString());
       setVisitCount(count);
       setIsLimitedTime(count > 1);
     }
-  }, []);
-
-  const shouldBlur = hasSearched || (status !== 'trialing' && status !== 'active' && status !== 'incomplete_expired');
+  }, []);  
 
   const handleUpgrade = async (isYearly: boolean = true) => {
     try {
