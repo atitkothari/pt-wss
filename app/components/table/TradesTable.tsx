@@ -37,24 +37,28 @@ export function TradesTable({ trades, onRequestCloseTrade, onRequestEditTrade, o
           <TableRow>
             <TableHead className="w-[70px] text-xs sm:text-sm">Symbol</TableHead>
             {!isClosedTradesTable &&<TableHead className="w-[70px] text-xs sm:text-sm">Current Price</TableHead>}
-            <TableHead className="w-[70px] text-xs sm:text-sm">Premium Collected</TableHead>
+            <TableHead className="w-[50px] text-xs sm:text-sm">Qty</TableHead>
+            {!isClosedTradesTable && <TableHead className="w-[70px] text-xs sm:text-sm">Contract price when bought</TableHead>}
             {!isClosedTradesTable && <TableHead className="w-[80px] text-xs sm:text-sm">Current Contract Price</TableHead>}
-            {!isClosedTradesTable && <TableHead className="w-[80px] text-xs sm:text-sm">P/L</TableHead>}
+            {/* {!isClosedTradesTable && <TableHead className="w-[80px] text-xs sm:text-sm">P/L</TableHead>} */}
+            {isClosedTradesTable && <TableHead className="w-[70px] text-xs sm:text-sm">Premium Collected</TableHead>}
             {isClosedTradesTable && <TableHead className="w-[70px] text-xs sm:text-sm">Close Cost</TableHead>}
-            {isClosedTradesTable?<TableHead className="w-[80px] text-xs sm:text-sm">
-              {isClosedTradesTable ? 'Final' : 'Potential'}
-            </TableHead>:<></>}
-            {isClosedTradesTable && <TableHead className="w-[60px] text-xs sm:text-sm">P/L</TableHead>}
+            <TableHead className="w-[80px] text-xs sm:text-sm">
+              P/L
+            </TableHead>
+            {!isClosedTradesTable && <TableHead className="w-[70px] text-xs sm:text-sm">Premium Collected</TableHead>}
+
+            {/* {isClosedTradesTable && <TableHead className="w-[60px] text-xs sm:text-sm">P/L</TableHead>} */}
             <TableHead className="w-[60px] text-xs sm:text-sm">Status</TableHead>
             <TableHead className="w-[60px] text-xs sm:text-sm">Exp</TableHead>
             {isClosedTradesTable && <TableHead className="w-[60px] text-xs sm:text-sm">Closed On</TableHead>}
-            <TableHead className="w-[50px] text-xs sm:text-sm">Qty</TableHead>
+            
             <TableHead className="w-[100px] text-xs sm:text-sm">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {trades.map((trade) => {
-            const finalPremium = trade.premium - (typeof trade.closingCost === 'number' ? trade.closingCost : 0);
+            const finalPremium = (trade.premium - (typeof trade.closingCost === 'number' ? trade.closingCost : 0));
             const totalFinalPremium = finalPremium * (trade.contracts ?? 1);
             const isProfitable = finalPremium > 0;
             
@@ -62,7 +66,9 @@ export function TradesTable({ trades, onRequestCloseTrade, onRequestEditTrade, o
               <TableRow key={trade.id} className="hover:bg-gray-50">
                 <TableCell className="font-medium text-xs sm:text-sm">{trade.symbol} (${trade.strike.toFixed(2)}{trade.type=="call"?"C":"P"})</TableCell>                                
                 {!isClosedTradesTable &&<TableCell className="text-xs sm:text-sm">${trade.currentStockPrice??'-'}</TableCell>}
-                <TableCell className="text-xs sm:text-sm">${trade.premium.toFixed(2)}</TableCell>
+                <TableCell className="text-xs sm:text-sm">{trade.contracts ?? 1}</TableCell>
+                {isClosedTradesTable && <TableCell className="text-xs sm:text-sm">${(trade.premium*(trade.contracts??1)).toFixed(2)}</TableCell>}
+                {!isClosedTradesTable && <TableCell className="text-xs sm:text-sm">${trade.premium.toFixed(2)}</TableCell>}
                 {!isClosedTradesTable && (
                   <TableCell className="text-xs sm:text-sm">
                     {trade.currentPrice !== undefined ? (
@@ -71,7 +77,7 @@ export function TradesTable({ trades, onRequestCloseTrade, onRequestEditTrade, o
                       <span className="text-gray-400">-</span>
                     )}
                   </TableCell>
-                )}
+                )}                
                 {!isClosedTradesTable && (
                   <TableCell className="text-xs sm:text-sm">
                     {trade.unrealizedPL !== undefined ? (
@@ -90,9 +96,10 @@ export function TradesTable({ trades, onRequestCloseTrade, onRequestEditTrade, o
                     )}
                   </TableCell>
                 )}
+                {!isClosedTradesTable && <TableCell className="text-xs sm:text-sm">${(trade.premium*(trade.contracts??1)).toFixed(2)}</TableCell>}
                 {isClosedTradesTable && (
                   <TableCell className="text-xs sm:text-sm">
-                    {typeof trade.closingCost === 'number' ? `$${trade.closingCost.toFixed(2)}` : '-'}
+                    {typeof trade.closingCost === 'number' ? `$${(trade.closingCost*(trade.contracts??1)).toFixed(2)}` : '-'}
                   </TableCell>
                 )}
                 {isClosedTradesTable && (<TableCell className="text-xs sm:text-sm">
@@ -104,7 +111,7 @@ export function TradesTable({ trades, onRequestCloseTrade, onRequestEditTrade, o
                     ${totalFinalPremium.toFixed(2)}
                   </span>
                 </TableCell>)}
-                {isClosedTradesTable && (
+                 {/* {isClosedTradesTable && ( 
                   <TableCell className="text-xs sm:text-sm">
                     <div className="flex items-center gap-1">
                       {isProfitable ? (
@@ -119,7 +126,7 @@ export function TradesTable({ trades, onRequestCloseTrade, onRequestEditTrade, o
                       </span>
                     </div>
                   </TableCell>
-                )}
+                )} */}
                 <TableCell>
                   <span className={`px-1.5 py-0.5 rounded-full text-xs font-medium ${
                     trade.status === 'open' 
@@ -135,7 +142,6 @@ export function TradesTable({ trades, onRequestCloseTrade, onRequestEditTrade, o
                 </TableCell>
                 <TableCell className="text-xs sm:text-sm">{format(parseISO(trade.expiration), 'MM/dd')}</TableCell>
                 {isClosedTradesTable && trade.closeDate && <TableCell className="text-xs sm:text-sm">{format(parseISO(trade.closeDate), 'MM/dd')}</TableCell>}
-                <TableCell className="text-xs sm:text-sm">{trade.contracts ?? 1}</TableCell>
                 <TableCell className="flex items-center gap-1">
                   {trade.status === 'open' && (
                     <Button

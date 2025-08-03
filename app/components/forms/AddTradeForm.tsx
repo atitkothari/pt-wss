@@ -320,10 +320,10 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
             <Input
               id="numContracts"
               type="number"
-              min="1"
+              min="0"
               step="1"
               value={numContracts}
-              onChange={e => setNumContracts(Math.max(1, Number(e.target.value)))}
+              onChange={e => setNumContracts(Math.max(0, Number(e.target.value)))}
               required
             />
           </div>

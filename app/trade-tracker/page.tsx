@@ -286,7 +286,7 @@ export default function TradeTrackerPage() {
   };
 
   const totalFinalPremiums = trades
-    .reduce((sum, trade) => sum + (trade.premium - (typeof trade.closingCost === 'number' ? trade.closingCost : 0)), 0);
+    .reduce((sum, trade) => sum + (trade.premium*(trade.contracts??1) - (typeof trade.closingCost === 'number' ? trade.closingCost*(trade.contracts??1) : 0)), 0);
 
   const openTrades = trades.filter(trade => trade.status === 'open');
   const closedTrades = trades.filter(trade => trade.status === 'closed' || trade.status === 'assigned' || trade.status === 'expired');
@@ -294,9 +294,9 @@ export default function TradeTrackerPage() {
   const assignedTrades = trades.filter(trade => trade.status === 'assigned');
   const expiredTrades = trades.filter(trade => trade.status === 'expired');
   
-  const openTradesTotalPremium = openTrades.reduce((sum, trade) => sum + trade.premium, 0);
+  const openTradesTotalPremium = openTrades.reduce((sum, trade) => sum + trade.premium*(trade.contracts??1), 0);
   const closedTradesTotalFinalPremium = closedTrades.reduce((sum, trade) => 
-    sum + (trade.premium - (typeof trade.closingCost === 'number' ? trade.closingCost : 0)), 0);
+    sum + (trade.premium*(trade.contracts??1) - (typeof trade.closingCost === 'number' ? trade.closingCost*(trade.contracts??1) : 0)), 0);
 
   // Calculate unrealized P/L for open trades
   const totalUnrealizedPL = openTrades.reduce((sum, trade) => sum + (trade.unrealizedPL || 0), 0);
@@ -304,7 +304,7 @@ export default function TradeTrackerPage() {
 
   // Closed trades statistics
   const profitableTrades = closedTrades.filter(trade => 
-    (trade.premium - (typeof trade.closingCost === 'number' ? trade.closingCost : 0)) > 0
+    (trade.premium*(trade.contracts??1) - (typeof trade.closingCost === 'number' ? trade.closingCost*(trade.contracts??1) : 0)) > 0
   );
   const winRate = closedTrades.length > 0 ? (profitableTrades.length / closedTrades.length) * 100 : 0;
   const averageProfitPerTrade = closedTrades.length > 0 ? closedTradesTotalFinalPremium / closedTrades.length : 0;
@@ -333,9 +333,9 @@ export default function TradeTrackerPage() {
 
   // Calculate symbol statistics
   const getSymbolStats = (trades: TradeWithUnrealizedPL[]) => {
-    const totalPremium = trades.reduce((sum, trade) => sum + trade.premium, 0);
+    const totalPremium = trades.reduce((sum, trade) => sum + trade.premium*(trade.contracts??1), 0);
     const totalFinalPremium = trades.reduce((sum, trade) => 
-      sum + (trade.premium - (typeof trade.closingCost === 'number' ? trade.closingCost : 0)), 0);
+      sum + (trade.premium*(trade.contracts??1) - (typeof trade.closingCost === 'number' ? trade.closingCost*(trade.contracts??1) : 0)), 0);
     const openCount = trades.filter(t => t.status === 'open').length;
     const closedCount = trades.filter(t => t.status === 'closed' || t.status === 'assigned' || t.status === 'expired').length;
     const profitableTrades = trades.filter(trade => 
