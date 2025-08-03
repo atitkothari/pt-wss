@@ -156,37 +156,60 @@ export function ShareButton({ elementToCapture, className, option }: ShareButton
       newCanvas.toBlob(async (blob) => {
         if (blob) {
           try {
-            // Always download the image with option key as filename
-            const filename = `${option.optionKey}.png`;
-            saveAs(blob, filename);
-            toast.success(`Image saved as ${filename}`);
+            // Check if mobile device
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             
-            // Also attempt to copy to clipboard
-            if (navigator.clipboard && navigator.clipboard.write) {
-              await navigator.clipboard.write([
-                new ClipboardItem({
-                  'image/png': blob,
-                }),
-              ]);
-              toast.success('Image also copied to clipboard!');
-            } else if (navigator.share) { // Fallback to Web Share API
-              const file = new File([blob], filename, { type: 'image/png' });
-              await navigator.share({
-                title: 'Check out this option trade!',
-                text: 'I found this interesting option trade on wheelstrategyoptions.com',
-                files: [file],
-              });
+            if (isMobile) {
+              // On mobile, use Web Share API as primary method
+              if (navigator.share) {
+                const file = new File([blob], `${option.optionKey}.png`, { type: 'image/png' });
+                await navigator.share({
+                  title: 'Check out this option trade!',
+                  text: 'I found this interesting option trade on wheelstrategyoptions.com',
+                  files: [file],
+                });
+              } else if (navigator.clipboard && navigator.clipboard.write) {
+                // Fallback to clipboard if Web Share API not available
+                await navigator.clipboard.write([
+                  new ClipboardItem({
+                    'image/png': blob,
+                  }),
+                ]);
+                toast.success('Image copied to clipboard!');
+              } else {
+                // Final fallback - download the file
+                const filename = `${option.optionKey}.png`;
+                saveAs(blob, filename);
+                toast.success(`Image saved as ${filename}`);
+              }
+            } else {
+              // On desktop, download the image with option key as filename
+              const filename = `${option.optionKey}.png`;
+              saveAs(blob, filename);
+              toast.success(`Image saved as ${filename}`);
+              
+              // Also attempt to copy to clipboard
+              if (navigator.clipboard && navigator.clipboard.write) {
+                await navigator.clipboard.write([
+                  new ClipboardItem({
+                    'image/png': blob,
+                  }),
+                ]);
+                toast.success('Image also copied to clipboard!');
+              }
             }
           } catch (error) {
             console.error('Error sharing or copying image:', error);
             toast.error('Could not share or copy image.');
-            // Fallback to saving the file if clipboard copy failed
-            try {
-                 saveAs(blob, `${option.optionKey}.png`);
-                 toast.success(`Image saved as ${option.optionKey}.png`);
-            } catch (saveError) {
-                 console.error('Error saving image as fallback:', saveError);
-                 toast.error('Could not save image.');
+            // Fallback to saving the file if clipboard copy failed (desktop only)
+            if (!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+              try {
+                saveAs(blob, `${option.optionKey}.png`);
+                toast.success(`Image saved as ${option.optionKey}.png`);
+              } catch (saveError) {
+                console.error('Error saving image as fallback:', saveError);
+                toast.error('Could not save image.');
+              }
             }
           }
         }
