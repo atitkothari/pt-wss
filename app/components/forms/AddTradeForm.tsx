@@ -33,7 +33,7 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
   const [showStrikeDropdown, setShowStrikeDropdown] = useState(false);
   const [premium, setPremium] = useState(0);
   const [optionKey, setOptionKey] = useState<string | undefined>(undefined);
-  const [numContracts, setNumContracts] = useState(1);
+  const [numContracts, setNumContracts] = useState<number | ''>(1);
   const [selectedType, setSelectedType] = useState<'call' | 'put'>('call');
   const { symbols: allSymbols } = useSymbols();
   const { user } = useAuth();
@@ -171,7 +171,7 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
           strike: currentStrike,
           expiration: currentExpiration,
           premium,
-          contracts: numContracts,
+          contracts: typeof numContracts === 'number' ? numContracts : 1,
           optionKey: optionKey
         });
       }
@@ -320,10 +320,20 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
             <Input
               id="numContracts"
               type="number"
-              min="0"
+              min="1"
               step="1"
               value={numContracts}
-              onChange={e => setNumContracts(Math.max(0, Number(e.target.value)))}
+              onChange={e => {
+                const value = e.target.value;
+                if (value === '') {
+                  setNumContracts('');
+                } else {
+                  const num = parseInt(value);
+                  if (!isNaN(num) && num > 0) {
+                    setNumContracts(num);
+                  }
+                }
+              }}
               required
             />
           </div>
@@ -337,12 +347,12 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
             />
           </div>
           <div className="text-sm text-gray-600">
-            <span className="font-medium">Total Premium:</span> ${(premium * numContracts).toFixed(2)}
+            <span className="font-medium">Total Premium:</span> ${(premium * (typeof numContracts === 'number' ? numContracts : 0)).toFixed(2)}
           </div>
         </>
       )}
 
-      <Button type="submit" disabled={!((selectedStrike && selectedStrike > 0) || (manualStrike && parseFloat(manualStrike) > 0)) || !(selectedExpiration || manualExpiration)}>Add Trade</Button>
+      <Button type="submit" disabled={!((selectedStrike && selectedStrike > 0) || (manualStrike && parseFloat(manualStrike) > 0)) || !(selectedExpiration || manualExpiration) || typeof numContracts !== 'number' || numContracts < 1}>Add Trade</Button>
     </form>
   );
 }
