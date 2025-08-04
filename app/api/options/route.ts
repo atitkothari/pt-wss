@@ -26,7 +26,7 @@ export async function GET(request: Request) {
         paging: true,
         pageNo: 1,
         pageSize: 1000,
-        userId: userId,
+        userId: "h1Mob0LGGnXOYziKQYNENMJqOb73",
       }),
     });
 
