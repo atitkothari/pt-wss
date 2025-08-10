@@ -93,7 +93,7 @@ export default function TradeTrackerPage() {
           if (trade.status === 'open' && trade.optionKey) {
             const priceData = await fetchOptionPrice(trade.optionKey);
             if (priceData) {
-              console.log(priceData)
+          
               const currentPrice = priceData.askPrice; // Use ask price for unrealized P/L
               const currentStockPrice = priceData.stockprice;
               const unrealizedPL = calculateUnrealizedPL(
@@ -102,7 +102,7 @@ export default function TradeTrackerPage() {
                 trade.contracts || 1,
                 trade.type
               );
-              console.log(trade)
+      
               const unrealizedPLPercent = (unrealizedPL / trade.premium) * 100;
               
               return {

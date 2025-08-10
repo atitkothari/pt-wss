@@ -27,7 +27,7 @@ function initializeFirebaseAdmin() {
         databaseURL: `https://${process.env.FIREBASE_PROJECT_ID}.firebaseio.com`,
       });
       
-      console.log('Firebase Admin initialized successfully');
+  
       return app;
     } catch (error) {
       console.error('Firebase Admin initialization error:', error);

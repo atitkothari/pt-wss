@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
 
     const client = await pool.connect();    
     if(optionKey!=="undefined"){
-      console.log("fetching using optionKey")
+  
       const query = `
       SELECT *
       FROM wheel_options

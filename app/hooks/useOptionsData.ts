@@ -43,22 +43,42 @@ export const calculateUnrealizedPL = (
 };
 
 export function useOptionsData(
-  symbols: string[] = [],
-  minYield: number = 0,
-  maxYield: number = 10,
-  minPrice: number = 0,
-  maxPrice: number = 1000,
-  minVol: number = 0,
-  maxVol: number = 10000,
-  expiration: string = '',
-  option: OptionType = 'call',
-  minDelta: number = -1,
-  maxDelta: number = 1,
-  minExpiration: string = '',
-  pageName: string = '',
-  excludedSymbols: string[] = [],
-  probabilityRange?: [number, number]
+  options: {
+    symbols?: string[];
+    minYield?: number;
+    maxYield?: number;
+    minPrice?: number;
+    maxPrice?: number;
+    minVol?: number;
+    maxVol?: number;
+    expiration?: string;
+    option?: OptionType;
+    minDelta?: number;
+    maxDelta?: number;
+    minExpiration?: string;
+    pageName?: string;
+    excludedSymbols?: string[];
+    probabilityRange?: [number, number];
+  } = {}
 ) {
+  const {
+    symbols = [],
+    minYield = 0,
+    maxYield = 10,
+    minPrice = 0,
+    maxPrice = 1000,
+    minVol = 0,
+    maxVol = 10000,
+    expiration = '',
+    option = 'call',
+    minDelta = -1,
+    maxDelta = 1,
+    minExpiration = '',
+    pageName = '',
+    excludedSymbols = [],
+    probabilityRange
+  } = options;
+
   const [data, setData] = useState<Option[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,31 +87,57 @@ export function useOptionsData(
   const { userId } = useAuth(); // Get userId from auth context
 
   const fetchData = async (
-    searchTerms: string[] = symbols,
-    minYieldVal: number = minYield,
-    maxYieldVal: number = maxYield,
-    minPriceVal: number = minPrice,
-    maxPriceVal: number = maxPrice,
-    minVolVal: number = minVol,
-    maxVolVal: number = maxVol,
-    selectedExpiration: string = expiration,
-    pageNo: number = 1,
-    pageSize: number = 50,
-    sortConfig?: { field: keyof Option; direction: 'asc' | 'desc' | null },
-    strikeFilter?: StrikeFilter,
-    deltaRange?: [number, number],
-    peRatio?: [number, number],
-    marketCap?: [number, number],    
-    sector?: string,
-    moneynessRange?: [number, number],
-    impliedVolatilityRange?: [number, number],
-    minSelectedExpiration: string = minExpiration,
-    excludedSymbolsList: string[] = excludedSymbols,
-    probabilityRange?: [number, number]
+    fetchOptions: {
+      searchTerms?: string[];
+      minYield?: number;
+      maxYield?: number;
+      minPrice?: number;
+      maxPrice?: number;
+      minVol?: number;
+      maxVol?: number;
+      selectedExpiration?: string;
+      pageNo?: number;
+      pageSize?: number;
+      sortConfig?: { field: keyof Option; direction: 'asc' | 'desc' | null };
+      strikeFilter?: StrikeFilter;
+      deltaRange?: [number, number];
+      peRatio?: [number, number];
+      marketCap?: [number, number];
+      sector?: string;
+      moneynessRange?: [number, number];
+      impliedVolatilityRange?: [number, number];
+      minSelectedExpiration?: string;
+      excludedSymbols?: string[];
+      probabilityRange?: [number, number];
+    } = {}
   ) => {
+    const {
+      searchTerms = symbols,
+      minYield: minYieldVal = minYield,
+      maxYield: maxYieldVal = maxYield,
+      minPrice: minPriceVal = minPrice,
+      maxPrice: maxPriceVal = maxPrice,
+      minVol: minVolVal = minVol,
+      maxVol: maxVolVal = maxVol,
+      selectedExpiration = expiration,
+      pageNo = 1,
+      pageSize = 50,
+      sortConfig,
+      strikeFilter,
+      deltaRange,
+      peRatio,
+      marketCap,
+      sector,
+      moneynessRange,
+      impliedVolatilityRange,
+      minSelectedExpiration = minExpiration,
+      excludedSymbols: excludedSymbolsList = excludedSymbols,
+      probabilityRange: fetchProbabilityRange = probabilityRange
+    } = fetchOptions;
+
     // Get sort params from URL if not provided in sortConfig
     const sortBy = sortConfig?.field || searchParams.get('sortBy');      
-    console.log("sortBy", sortBy);
+
     const sortDir = sortConfig?.direction || searchParams.get('sortDir') as 'asc' | 'desc' | null;    
     setLoading(true);
     try {
@@ -148,6 +194,7 @@ export function useOptionsData(
       }
       
       if(selectedExpiration === "") {
+        console.log("selectedExpiration is empty");
         filters.push({ operation: 'gte', field: 'expiration', value: `"${format(new Date(), 'yyyy-MM-dd')}"` });
       } else if (selectedExpiration) {
         // If minSelectedExpiration is provided, use it as the lower bound
@@ -206,12 +253,12 @@ export function useOptionsData(
       }
 
       // Add probability filter
-      if (probabilityRange) {
-        if (probabilityRange[0] > 0) {
-          filters.push({ operation: 'gte', field: 'probability', value: probabilityRange[0]/100 });
+      if (fetchProbabilityRange) {
+        if (fetchProbabilityRange[0] > 0) {
+          filters.push({ operation: 'gte', field: 'probability', value: fetchProbabilityRange[0]/100 });
         }
-        if (probabilityRange[1] < 100) {
-          filters.push({ operation: 'lte', field: 'probability', value: probabilityRange[1]/100 });
+        if (fetchProbabilityRange[1] < 100) {
+          filters.push({ operation: 'lte', field: 'probability', value: fetchProbabilityRange[1]/100 });
         }
       }
 

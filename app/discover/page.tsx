@@ -249,7 +249,7 @@ export default function TrendingPage() {
   };
 
   const renderStockList = (stocks: StockData[], valueKey: keyof StockData, label: string, optionType:'call'|'put') => {
-        console.log(stocks);
+    
     // Generate the appropriate URL parameters based on the list type
     let optionsUrl = optionType === 'call' ? '/covered-call-screener?' : '/cash-secured-put-screener?';    
     

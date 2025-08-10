@@ -16,8 +16,8 @@ export default function CoveredCallScreenerPage() {
   const hasSearched = Object.keys(Object.fromEntries(searchParams.entries())).length > 0;
   const {status} = useUserAccess();
   useEffect(()=>{
-    console.log("user staus: ",status)
-,[]  })
+    // User status effect
+  },[])
   // Redirect from old URLs
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());

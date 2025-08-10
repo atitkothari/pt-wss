@@ -7,7 +7,7 @@ let stripePromise: Promise<any> | null = null;
 
 const getStripe = () => {
   if (typeof window === 'undefined') {
-    console.log('Running on server side, returning null');
+
     return null;
   }
 
@@ -21,7 +21,7 @@ const getStripe = () => {
   if (!stripePromise) {
     try {
       stripePromise = loadStripe(publishableKey);
-      console.log('Stripe initialized successfully');
+  
     } catch (error) {
       console.error('Error initializing Stripe:', error);
       throw error;
@@ -47,7 +47,7 @@ export async function createCheckoutSession(isYearly: boolean = true, isLimitedT
       isLimitedTime: isLimitedTime,
     }
     
-    console.log('Creating checkout session with body:', body);
+
     
     const response = await fetch('/api/create-checkout-session', {
       method: 'POST',
@@ -76,7 +76,7 @@ export async function createCheckoutSession(isYearly: boolean = true, isLimitedT
       throw new Error('Stripe failed to initialize');
     }
 
-    console.log('Redirecting to checkout...');
+
     const { error } = await stripe.redirectToCheckout({ sessionId });
     if (error) {
       console.error('Stripe redirect error:', error);

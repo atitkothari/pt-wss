@@ -507,8 +507,25 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     }
   }, [impliedVolatility, option]);
   
-  const [selectedExpiration, setSelectedExpiration] = useState(searchParams.get(getParamKey('max_expiration')) || "");
-  const [minSelectedExpiration, setMinSelectedExpiration] = useState(searchParams.get(getParamKey('min_expiration')) || "");
+  const [selectedExpiration, setSelectedExpiration] = useState(() => {
+    return getInitialValue<string>(getParamKey('max_expiration'), `${option}_maxExpiration`, "");
+  });
+  const [minSelectedExpiration, setMinSelectedExpiration] = useState(() => {
+    return getInitialValue<string>(getParamKey('min_expiration'), `${option}_minExpiration`, "");
+  });
+  
+  // Save expiration parameters to localStorage whenever they change
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`${option}_maxExpiration`, JSON.stringify(selectedExpiration));
+    }
+  }, [selectedExpiration, option]);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`${option}_minExpiration`, JSON.stringify(minSelectedExpiration));
+    }
+  }, [minSelectedExpiration, option]);
   const [sortConfig, setSortConfig] = useState<{ field: keyof Option; direction: 'asc' | 'desc' | null }>({ 
     field: "yieldPercent", 
     direction: 'desc' 
@@ -545,23 +562,23 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   );
   const rowsPerPage = 50;
 
-  const { data, loading, error, totalCount, fetchData } = useOptionsData(
-    activeFilters.searchTerm.split(","),
-    activeFilters.yieldRange[0],
-    activeFilters.yieldRange[1],
-    activeFilters.minPrice,
-    activeFilters.maxPrice,
-    activeFilters.volumeRange[0],
-    activeFilters.volumeRange[1],
-    activeFilters.selectedExpiration,
+  const { data, loading, error, totalCount, fetchData } = useOptionsData({
+    symbols: activeFilters.searchTerm.split(","),
+    minYield: activeFilters.yieldRange[0],
+    maxYield: activeFilters.yieldRange[1],
+    minPrice: activeFilters.minPrice,
+    maxPrice: activeFilters.maxPrice,
+    minVol: activeFilters.volumeRange[0],
+    maxVol: activeFilters.volumeRange[1],
+    expiration: activeFilters.selectedExpiration,
     option,
-    deltaFilterConfig.defaultMin,
-    deltaFilterConfig.defaultMax,
-    activeFilters.minSelectedExpiration,
-    option === 'call' ? 'covered_call_screener' : 'cash_secured_put_screener',
-    excludedStocks,
-    probabilityRange as [number, number] | undefined
-  );
+    minDelta: deltaFilterConfig.defaultMin,
+    maxDelta: deltaFilterConfig.defaultMax,
+    minExpiration: activeFilters.minSelectedExpiration,
+    pageName: option === 'call' ? 'covered_call_screener' : 'cash_secured_put_screener',
+    excludedSymbols: excludedStocks,
+    probabilityRange: probabilityRange as [number, number] | undefined
+  });
 
   // Calculate expiration dates based on minDte and maxDte whenever they change
   useEffect(() => {
@@ -600,34 +617,33 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       // Use a small timeout to prevent immediate API call on page load
       const timer = setTimeout(() => {
         // If URL has parameters, use those for search
-        if (Array.from(searchParams.entries()).length > 0) {
+        if (Array.from(searchParams.entries()).length > 0) {          
           handleSearch();          
         } else {
-          // Otherwise, fetch with default values          
-          fetchData(
-            selectedStocks, 
-            yieldRange[0], 
-            yieldRange[1],
-            minPrice, 
-            maxPrice, 
-            volumeRange[0],
-            volumeRange[1], 
+          // Otherwise, fetch with default values             
+          fetchData({
+            searchTerms: selectedStocks,
+            minYield: yieldRange[0],
+            maxYield: yieldRange[1],
+            minPrice,
+            maxPrice,
+            minVol: volumeRange[0],
+            maxVol: volumeRange[1],
             selectedExpiration,
-            1,
-            rowsPerPage,
-            sortConfig.direction ? sortConfig : undefined,
-            undefined,
-            deltaFilter,
+            pageNo: 1,
+            pageSize: rowsPerPage,
+            sortConfig: sortConfig.direction ? sortConfig : undefined,
+            deltaRange: deltaFilter,
             peRatio,
-            marketCap,            
+            marketCap,
             sector,
             moneynessRange,
-            impliedVolatility,
+            impliedVolatilityRange: impliedVolatility,
             minSelectedExpiration,
-            excludedStocks,
-            probabilityRange as [number, number]
-          ).catch(console.error);
-          console.log(hasSearched)
+            excludedSymbols: excludedStocks,
+            probabilityRange: probabilityRange as [number, number]
+          }).catch(console.error);
+      
           setHasSearched(true);
           setFiltersChanged(false)
         }
@@ -749,31 +765,30 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       sector: sector,            
     });
         
-    fetchData(
-      [...selectedStocks, symbolInput], 
-      yieldRange[0], 
-      yieldRange[1],
-      minPrice, 
-      maxPrice, 
-      volumeRange[0],
-      volumeRange[1], 
+    fetchData({
+      searchTerms: [...selectedStocks, symbolInput],
+      minYield: yieldRange[0],
+      maxYield: yieldRange[1],
+      minPrice,
+      maxPrice,
+      minVol: volumeRange[0],
+      maxVol: volumeRange[1],
       selectedExpiration,
-      1,
-      rowsPerPage,
-      sortConfig.direction ? sortConfig : undefined,
-      undefined,
-      deltaFilter,
+      pageNo: 1,
+      pageSize: rowsPerPage,
+      sortConfig: sortConfig.direction ? sortConfig : undefined,
+      deltaRange: deltaFilter,
       peRatio,
-      marketCap,      
+      marketCap,
       sector,
       moneynessRange,
-      impliedVolatility,
+      impliedVolatilityRange: impliedVolatility,
       minSelectedExpiration,
-      excludedStocks,
-      probabilityRange as [number, number]
-    ).then(()=>{
+      excludedSymbols: excludedStocks,
+      probabilityRange: probabilityRange as [number, number]
+    }).then(()=>{
       setFiltersChanged(false);
-      console.log("setting set change to false")
+      
     }).catch(console.error);
 
     setCurrentPage(1);
@@ -985,30 +1000,28 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
 
     // Fetch new data with updated sort configuration
-    fetchData(
-      activeFilters.searchTerm.split(","),
-      activeFilters.yieldRange[0],
-      activeFilters.yieldRange[1],
-      activeFilters.minPrice,
-      activeFilters.maxPrice,
-      activeFilters.volumeRange[0],
-      activeFilters.volumeRange[1],
-      activeFilters.selectedExpiration,
-      currentPage,
-      rowsPerPage,
-      { field: columnId as keyof Option, direction: newSortDir },
-      strikeFilter !== 'ALL' ? strikeFilter : undefined,
-      deltaFilter,
-      activeFilters.peRatio,
-      activeFilters.marketCap,      
-      activeFilters.sector,      
-      activeFilters.moneynessRange,
-      activeFilters.impliedVolatility,
-      "",
-      activeFilters.excludedStocks.split(","),
-      activeFilters.probabilityOfProfit
-
-    ).catch(console.error);
+    fetchData({
+      searchTerms: activeFilters.searchTerm.split(","),
+      minYield: activeFilters.yieldRange[0],
+      maxYield: activeFilters.yieldRange[1],
+      minPrice: activeFilters.minPrice,
+      maxPrice: activeFilters.maxPrice,
+      minVol: activeFilters.volumeRange[0],
+      maxVol: activeFilters.volumeRange[1],
+      selectedExpiration: activeFilters.selectedExpiration,
+      pageNo: currentPage,
+      pageSize: rowsPerPage,
+      sortConfig: { field: columnId as keyof Option, direction: newSortDir },
+      strikeFilter: strikeFilter !== 'ALL' ? strikeFilter : undefined,
+      deltaRange: deltaFilter,
+      peRatio: activeFilters.peRatio,
+      marketCap: activeFilters.marketCap,
+      sector: activeFilters.sector,
+      moneynessRange: activeFilters.moneynessRange,
+      impliedVolatilityRange: activeFilters.impliedVolatility,
+      excludedSymbols: activeFilters.excludedStocks.split(","),
+      probabilityRange: activeFilters.probabilityOfProfit
+    }).catch(console.error);
   }, [sortColumn, sortDirection, router, searchParams, activeFilters, currentPage, rowsPerPage, strikeFilter, deltaFilter, fetchData]);  
 
   const handleReset = () => {
@@ -1073,7 +1086,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         filters: JSON.stringify(screener.filters),
         is_alerting: screener.emailNotifications?.enabled??false
       };
-      console.log(JSON.stringify(screener.filters))
+      
       // Save to backend
       await screenerService.saveFilter(payload);
       
@@ -1519,27 +1532,27 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                     const prevPage = Math.max(1, currentPage - 1);
                     setCurrentPage(prevPage);
                     setActiveFilters(prev => ({ ...prev, pageNo: prevPage }));
-                    fetchData(
-                      activeFilters.searchTerm.split(","),
-                      activeFilters.yieldRange[0],
-                      activeFilters.yieldRange[1],
-                      activeFilters.minPrice,
-                      activeFilters.maxPrice,
-                      activeFilters.volumeRange[0],
-                      activeFilters.volumeRange[1],
-                      activeFilters.selectedExpiration,
-                      prevPage,
-                      rowsPerPage,
-                      sortConfig.direction ? sortConfig : undefined,
-                      strikeFilter !== 'ALL' ? strikeFilter : undefined,
-                      deltaFilter,
-                      activeFilters.peRatio,
-                      activeFilters.marketCap,                      
-                      activeFilters.sector,
-                      activeFilters.moneynessRange,
-                      activeFilters.impliedVolatility,
-                      activeFilters.minSelectedExpiration                    
-                    ).catch(console.error); 
+                    fetchData({
+                      searchTerms: activeFilters.searchTerm.split(","),
+                      minYield: activeFilters.yieldRange[0],
+                      maxYield: activeFilters.yieldRange[1],
+                      minPrice: activeFilters.minPrice,
+                      maxPrice: activeFilters.maxPrice,
+                      minVol: activeFilters.volumeRange[0],
+                      maxVol: activeFilters.volumeRange[1],
+                      selectedExpiration: activeFilters.selectedExpiration,
+                      pageNo: prevPage,
+                      pageSize: rowsPerPage,
+                      sortConfig: sortConfig.direction ? sortConfig : undefined,
+                      strikeFilter: strikeFilter !== 'ALL' ? strikeFilter : undefined,
+                      deltaRange: deltaFilter,
+                      peRatio: activeFilters.peRatio,
+                      marketCap: activeFilters.marketCap,
+                      sector: activeFilters.sector,
+                      moneynessRange: activeFilters.moneynessRange,
+                      impliedVolatilityRange: activeFilters.impliedVolatility,
+                      minSelectedExpiration: activeFilters.minSelectedExpiration
+                    }).catch(console.error); 
                   }}
                   disabled={currentPage === 1}
                   variant="outline"
@@ -1553,27 +1566,27 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                     const nextPage = currentPage + 1;
                     setCurrentPage(nextPage);
                     setActiveFilters(prev => ({ ...prev, pageNo: nextPage }));
-                    fetchData(
-                      activeFilters.searchTerm.split(","),
-                      activeFilters.yieldRange[0],
-                      activeFilters.yieldRange[1],
-                      activeFilters.minPrice,
-                      activeFilters.maxPrice,
-                      activeFilters.volumeRange[0],
-                      activeFilters.volumeRange[1],
-                      activeFilters.selectedExpiration,
-                      nextPage,
-                      rowsPerPage,
-                      sortConfig.direction ? sortConfig : undefined,
-                      strikeFilter !== 'ALL' ? strikeFilter : undefined,
-                      deltaFilter,
-                      activeFilters.peRatio,
-                      activeFilters.marketCap,                      
-                      activeFilters.sector,
-                      activeFilters.moneynessRange,
-                      activeFilters.impliedVolatility,
-                      activeFilters.minSelectedExpiration    
-                    ).catch(console.error);
+                    fetchData({
+                      searchTerms: activeFilters.searchTerm.split(","),
+                      minYield: activeFilters.yieldRange[0],
+                      maxYield: activeFilters.yieldRange[1],
+                      minPrice: activeFilters.minPrice,
+                      maxPrice: activeFilters.maxPrice,
+                      minVol: activeFilters.volumeRange[0],
+                      maxVol: activeFilters.volumeRange[1],
+                      selectedExpiration: activeFilters.selectedExpiration,
+                      pageNo: nextPage,
+                      pageSize: rowsPerPage,
+                      sortConfig: sortConfig.direction ? sortConfig : undefined,
+                      strikeFilter: strikeFilter !== 'ALL' ? strikeFilter : undefined,
+                      deltaRange: deltaFilter,
+                      peRatio: activeFilters.peRatio,
+                      marketCap: activeFilters.marketCap,
+                      sector: activeFilters.sector,
+                      moneynessRange: activeFilters.moneynessRange,
+                      impliedVolatilityRange: activeFilters.impliedVolatility,
+                      minSelectedExpiration: activeFilters.minSelectedExpiration
+                    }).catch(console.error);
                   }}
                   disabled={currentPage * rowsPerPage >= totalCount}
                   variant="outline"

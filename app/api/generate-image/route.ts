@@ -119,20 +119,20 @@ export async function POST(req: NextRequest) {
   drawDataRow('Earnings Date', option.earningsDate, contentStartY + lineHeight * 5, false, '#374151', '#111827', false, false, 30, 34, true);
 
   // === Footer ===
-  const footerHeight = 150;
-  ctx.fillStyle = '#f3f4f6';
-  ctx.fillRect(0, height - footerHeight, width, footerHeight);
-  ctx.strokeStyle = '#d1d5db';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(0, height - footerHeight);
-  ctx.lineTo(width, height - footerHeight);
-  ctx.stroke();
+  // const footerHeight = 150;
+  // ctx.fillStyle = '#f3f4f6';
+  // ctx.fillRect(0, height - footerHeight, width, footerHeight);
+  // ctx.strokeStyle = '#d1d5db';
+  // ctx.lineWidth = 2;
+  // ctx.beginPath();
+  // ctx.moveTo(0, height - footerHeight);
+  // ctx.lineTo(width, height - footerHeight);
+  // ctx.stroke();
 
-  ctx.fillStyle = '#3b82f6';
-  ctx.textAlign = 'center';
-  ctx.font = '32px Arial';
-  ctx.fillText('wheelstrategyoptions.com', width / 2, height - 80);
+  // ctx.fillStyle = '#3b82f6';
+  // ctx.textAlign = 'center';
+  // ctx.font = '32px Arial';
+  // ctx.fillText('wheelstrategyoptions.com', width / 2, height - 80);
 
   // === Send PNG Response ===
   const buffer = canvas.toBuffer('image/png');

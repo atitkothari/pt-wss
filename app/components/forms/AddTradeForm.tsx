@@ -91,7 +91,7 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
 
   const handleSymbolSelect = async (selectedSymbol: string) => {    
     setSymbol(selectedSymbol);
-    console.log('selectedSymbol', selectedSymbol);
+
     setFilteredSymbols([]);
     setShowSymbolDropdown(false);
     // Reset all fields when symbol is selected
@@ -140,14 +140,14 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
             setOptionKey(contract.optionKey);
           } else {
             const generatedKey = generateOptionKey(symbol, currentExpiration, selectedType, currentStrike);
-            console.log('Generated option key:', generatedKey);
+      
             setOptionKey(generatedKey);
           }
         } else {
           setPremium(0);
           // Generate option key even when no contract is found
           const generatedKey = generateOptionKey(symbol, currentExpiration, selectedType, currentStrike);
-          console.log('Generated option key (no contract):', generatedKey);
+  
           setOptionKey(generatedKey);
         }
       }

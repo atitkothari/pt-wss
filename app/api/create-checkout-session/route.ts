@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { userId, email: userEmail, isYearly, isLimitedTime } = body;
     
-    console.log('Request body:', { userId, userEmail, isYearly });
+
     
     if (!userId) {
       console.error("No user ID provided in request");
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     const customerDoc = await customerRef.get();
     
     if (!customerDoc.exists) {
-      console.log("Customer document not found in Firebase for userId:", userId, "Creating new customer document...");
+      
       // Create a new customer document with an empty stripeId
       await customerRef.set({
         stripeId: null, // Initialize with null
@@ -59,11 +59,11 @@ export async function POST(req: Request) {
         email: userEmail,
         createdAt: new Date().toISOString(),
       });
-      console.log("Created new customer document for userId:", userId);
+      
     }
 
     let stripeId = customerDoc.exists ? customerDoc.data()?.stripeId : null;
-    console.log('Found Stripe customer ID:', stripeId);
+    
 
     // If stripeId doesn't exist or if the customer doesn't exist in Stripe, create a new Stripe customer
     if (!stripeId) {
@@ -78,7 +78,6 @@ export async function POST(req: Request) {
         await customerRef.update({
           stripeId: stripeId,
         });
-        console.log('Created new Stripe customer and updated Firestore');
       } catch (error) {
         console.error('Stripe error details:', error);
         return new NextResponse(`Stripe error: ${error instanceof Error ? error.message : 'Unknown error'}`, { status: 500 });
@@ -87,9 +86,8 @@ export async function POST(req: Request) {
       // Verify if the customer exists in Stripe
       try {
         await stripe.customers.retrieve(stripeId);
-        console.log('Verified existing Stripe customer');
       } catch (error) {
-        console.log('Stripe customer not found, creating new one');
+        // Stripe customer not found, creating new one
         // Create a new Stripe customer
         const stripeCustomer = await stripe.customers.create({
           email: userEmail,
@@ -100,7 +98,6 @@ export async function POST(req: Request) {
         await customerRef.update({
           stripeId: stripeId,
         });
-        console.log('Created new Stripe customer and updated Firestore');
       }
     }
     
@@ -121,7 +118,7 @@ export async function POST(req: Request) {
         }
       }
 
-      console.log('Creating checkout session with price ID:', priceId);
+
 
       // Create checkout session
       const checkoutSession = await stripe.checkout.sessions.create({
@@ -141,7 +138,7 @@ export async function POST(req: Request) {
         },
       });
 
-      console.log('Checkout session created successfully:', checkoutSession.id);
+
       return NextResponse.json({ sessionId: checkoutSession.id });
     } catch (error) {
       console.error('Stripe error details:', error);

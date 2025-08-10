@@ -107,7 +107,7 @@ export default function SavedScreenersPage() {
 
       // Show success message
       // You might want to add a toast notification here
-      console.log('Screener deleted successfully');
+
     } catch (error) {
       console.error('Error deleting screener:', error);
       // You might want to add a toast notification here to show the error to the user

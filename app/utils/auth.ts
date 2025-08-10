@@ -13,7 +13,7 @@ export function generateAuthToken(): string {
   const secretKey = process.env.NEXT_PUBLIC_API_SECRET_KEY || '';
   if (!secretKey) {
     // throw new Error('API_SECRET_KEY is not defined in environment variables');
-    console.log('API_SECRET_KEY is not defined in environment variables')
+
   }
   return calculateHash(epoch, secretKey);
 } 

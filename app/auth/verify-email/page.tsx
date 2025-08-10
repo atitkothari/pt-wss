@@ -17,10 +17,10 @@ export default function VerifyEmail() {
         const mode = hashParams.get('mode');
         const oobCode = hashParams.get('oobCode');
 
-        console.log('Verification params:', { mode, oobCode }); // Debug log
+    
 
         if (!oobCode || mode !== 'verifyEmail') {
-          console.log('Invalid params:', { mode, oobCode }); // Debug log
+          
           setStatus('error');
           setError('Invalid verification link. Please request a new verification email.');
           return;
@@ -28,7 +28,7 @@ export default function VerifyEmail() {
 
         // Apply the verification code
         await applyActionCode(auth, oobCode);
-        console.log('Email verified successfully'); // Debug log
+        
         setStatus('success');
       } catch (error) {
         console.error('Verification error:', error); // Debug log

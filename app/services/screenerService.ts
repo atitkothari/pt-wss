@@ -38,7 +38,7 @@ export const screenerService = {
         filters: payload.filters,
         is_alerting: payload.is_alerting
       };
-      console.log(formattedPayload)
+  
       const response = await axios.post(`${API_BASE_URL}/wheelstrat/saveFilter`, payload);
       return response.data;
     } catch (error) {
@@ -73,9 +73,7 @@ export const screenerService = {
 
   deleteFilter: async (filter_id: string) => {
     try {
-      console.log('Attempting to delete filter with ID:', filter_id);
       const response = await axios.get(`${API_BASE_URL}/wheelstrat/deleteFilter?filter_id=${filter_id}`);
-      console.log('Delete filter response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error deleting filter:', error);

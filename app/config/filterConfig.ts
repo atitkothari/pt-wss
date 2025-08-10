@@ -75,7 +75,7 @@ export const dteFilterConfig = {
     const maxValue = 365;
     const normalizedValue = linearValue / maxValue;
     const l = Math.round(Math.pow(normalizedValue, dteFilterConfig.exponent) * maxValue);
-    console.log(l)
+
     return l;
   },
   fromExponential: (exponentialValue: number) => {

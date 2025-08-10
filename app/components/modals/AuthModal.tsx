@@ -80,11 +80,11 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signin' }: AuthModal
       
       // For new sign-ins, we want to send them to pricing if they don't have a subscription
       const checkStatusAndRedirect = () => {
-        console.log(`Checking status (attempt ${retryCount + 1}): Current status = ${status}, Loading = ${loading}`);
+
         
         // If we're no longer loading, we can proceed
         if (!loading) {
-          console.log('Final status check:', status);
+  
           onClose();   
           return;     
         }

@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     // }
 
-    console.log('Starting auto-close expired trades process...');
+  
     
     // Get current date in YYYY-MM-DD format
     const today = new Date().toISOString().split('T')[0];
@@ -22,14 +22,14 @@ export async function POST(request: Request) {
       .get();
 
     if (expiredTradesSnapshot.empty) {
-      console.log('No expired trades found');
+
       return NextResponse.json({ 
         message: 'No expired trades found',
         closedCount: 0 
       });
     }
 
-    console.log(`Found ${expiredTradesSnapshot.size} expired trades to close`);
+    
 
     // Batch update all expired trades
     const batch = adminDb.batch();
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
     // Commit the batch update
     await batch.commit();
 
-    console.log(`Successfully closed ${closedTrades.length} expired trades`);
+    
 
     return NextResponse.json({
       message: `Successfully closed ${closedTrades.length} expired trades`,
@@ -86,7 +86,7 @@ export async function POST(request: Request) {
 // GET endpoint to check for expired trades without closing them
 export async function GET(request: Request) {
   try {
-    console.log('Checking for expired trades...');
+
     
     // Get current date in YYYY-MM-DD format
     const today = new Date().toISOString().split('T')[0];
@@ -112,7 +112,7 @@ export async function GET(request: Request) {
       };
     });
 
-    console.log(`Found ${expiredTrades.length} expired trades`);
+    
 
     return NextResponse.json({
       message: `Found ${expiredTrades.length} expired trades`,

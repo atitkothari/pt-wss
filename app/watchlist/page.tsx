@@ -48,7 +48,7 @@ export default function WatchlistPage() {
   const [pendingTrade, setPendingTrade] = useState<OptionData | null>(null);
 
   useEffect(() => {
-    console.log("Auth loading:", authLoading, "User:", user);
+
     if (authLoading) return;
 
     if (!user) {
@@ -85,7 +85,7 @@ export default function WatchlistPage() {
           optionKey: data.optionKey
         };
       });
-      console.log("Watchlist items from Firebase:", items);
+      
       setWatchlistItems(items);
       setLoadingWatchlist(false);
       setError(null); 
@@ -99,7 +99,7 @@ export default function WatchlistPage() {
   }, [user, authLoading]);
 
   useEffect(() => {
-    console.log("Fetching option data - watchlistItems length:", watchlistItems.length, "loadingWatchlist:", loadingWatchlist);
+    
     const fetchLatestOptionData = async () => {
       setLoadingOptionData(true);
       const newFetchedData = new Map<string, OptionData>();
@@ -108,21 +108,21 @@ export default function WatchlistPage() {
       for (const item of watchlistItems) {
         const key = `${item.symbol}-${item.expiration}-${item.strike}-${item.type}`;
         if (fetchedOptionData.has(key)) {
-          console.log(`Skipping fetch for ${key} (already fetched)`);
+
           continue;
         }
 
-        console.log(`Attempting to fetch data for: ${key}`);
+        
         const promise = fetch(`/api/watchlist-data?symbol=${item.symbol}&expiration=${item.expiration}&strike=${item.strike}&type=${item.type}&optionKey=${item.optionKey}`)
           .then(res => {
-            console.log(`Response status for ${key}:`, res.status);
+
             if (!res.ok) {
               return res.json().then(err => { throw new Error(err.error || `HTTP error! status: ${res.status}`); });
             }
             return res.json();
           })
           .then(data => {
-            console.log(`Raw fetched data for ${key}:`, data);
+
             // Explicitly validate premium and stockprice before setting
             const validatedPremium = typeof data.premium === 'number' && !isNaN(data.premium) ? data.premium : null;
             const validatedStockPrice = typeof data.stockprice === 'number' && !isNaN(data.stockprice) ? data.stockprice : null;
@@ -157,7 +157,7 @@ export default function WatchlistPage() {
       }
 
       await Promise.all(fetchPromises);
-      console.log("All fetches completed. New fetched data:", newFetchedData);
+      
       setFetchedOptionData(prev => new Map([...prev, ...newFetchedData]));
       setLoadingOptionData(false);
     };
@@ -165,10 +165,10 @@ export default function WatchlistPage() {
     if (watchlistItems.length > 0) {
       fetchLatestOptionData();
     } else if (!loadingWatchlist) {
-      console.log("Watchlist empty or loading complete, setting loadingOptionData to false");
+      
       setLoadingOptionData(false);
     }
-    console.log("Current fetchedOptionData map size:", fetchedOptionData.size);
+    
   }, [watchlistItems, loadingWatchlist]);
 
   const handleRemove = async (id: string) => {
@@ -209,7 +209,7 @@ export default function WatchlistPage() {
       percentageChangeValue = 0; 
     }
     
-    console.log(`Debug for ${item.symbol}: addedPrice=${addedPrice}, currentPremium=${currentPremium}, profitLoss=${profitLoss}, percentageChangeValue=${percentageChangeValue}`);
+    
 
     return {
       currentPremium,
