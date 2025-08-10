@@ -59,6 +59,7 @@ export function useOptionsData(
     pageName?: string;
     excludedSymbols?: string[];
     probabilityRange?: [number, number];
+    annualizedReturnRange?: [number, number];
   } = {}
 ) {
   const {
@@ -76,7 +77,8 @@ export function useOptionsData(
     minExpiration = '',
     pageName = '',
     excludedSymbols = [],
-    probabilityRange
+    probabilityRange,
+    annualizedReturnRange
   } = options;
 
   const [data, setData] = useState<Option[]>([]);
@@ -109,6 +111,7 @@ export function useOptionsData(
       minSelectedExpiration?: string;
       excludedSymbols?: string[];
       probabilityRange?: [number, number];
+      annualizedReturnRange?: [number, number];
     } = {}
   ) => {
     const {
@@ -132,7 +135,8 @@ export function useOptionsData(
       impliedVolatilityRange,
       minSelectedExpiration = minExpiration,
       excludedSymbols: excludedSymbolsList = excludedSymbols,
-      probabilityRange: fetchProbabilityRange = probabilityRange
+      probabilityRange: fetchProbabilityRange = probabilityRange,
+      annualizedReturnRange
     } = fetchOptions;
 
     // Get sort params from URL if not provided in sortConfig
@@ -142,8 +146,9 @@ export function useOptionsData(
     setLoading(true);
     try {
       const filters: any = [];
-      if(option) {
-        filters.push({ operation: 'eq', field: 'type', value: `"${option}"` });
+      // Add option type filter
+      if (option) {
+        filters.push({ operation: 'eq', field: 'optionType', value: `"${option}"` });
       }
       if (searchTerms && searchTerms.length > 0) {
         if (searchTerms.length === 1) {
@@ -212,9 +217,9 @@ export function useOptionsData(
       // Add moneyness range filters
       if (moneynessRange) {
         if(moneynessRange[0] > moneynessFilterConfig.min)
-          filters.push({ operation: 'gte', field: 'strikeFilter', value: moneynessRange[0]/100 });
+          filters.push({ operation: 'strikeFilter', field: option, value: moneynessRange[0]/100 });
         if(moneynessRange[1] < moneynessFilterConfig.max)
-        filters.push({ operation: 'lte', field: 'strikeFilter', value: moneynessRange[1]/100 });
+        filters.push({ operation: 'strikeFilter', field: option, value: moneynessRange[1]/100 });
       }
       
       // Add implied volatility filters
@@ -259,6 +264,16 @@ export function useOptionsData(
         }
         if (fetchProbabilityRange[1] < 100) {
           filters.push({ operation: 'lte', field: 'probability', value: fetchProbabilityRange[1]/100 });
+        }
+      }
+
+      // Add annualized return filter
+      if (annualizedReturnRange) {
+        if (annualizedReturnRange[0] > 0) {
+          filters.push({ operation: 'gte', field: 'annualizedReturn', value: annualizedReturnRange[0] });
+        }
+        if (annualizedReturnRange[1] < 1000) {
+          filters.push({ operation: 'lte', field: 'annualizedReturn', value: annualizedReturnRange[1] });
         }
       }
 

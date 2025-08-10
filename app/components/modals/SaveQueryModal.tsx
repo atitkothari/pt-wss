@@ -22,6 +22,7 @@ import {
 import { toast } from "sonner";
 import { saveQuery } from "@/app/services/queryService";
 import { format } from "date-fns";
+import { addDays } from "date-fns";
 
 interface SaveQueryModalProps {
   isOpen: boolean;
@@ -45,11 +46,14 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
   const formatFilterData = (query: any) => {
     const filterData = [];
 
-    filterData.push({
-      operation: "eq",
-      field: "type",
-      value: `"${query.option}"`
-    });
+    // Add option type filter
+    if (query.option) {
+      filterData.push({
+        operation: "eq",
+        field: "optionType",
+        value: `"${query.option}"`
+      });
+    }
 
     filterData.push({
       operation: "eq",
@@ -106,8 +110,12 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
       filterData.push({
         operation: "strikeFilter",
         field: query.option,
-        //value: [query.moneynessRange[0] / 100, query.moneynessRange[1] / 100]
         value: query.moneynessRange[0]/100
+      });
+      filterData.push({
+        operation: "strikeFilter",
+        field: query.option,
+        value: query.moneynessRange[1]/100
       });
     }
     
@@ -197,6 +205,111 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
       }
     }
 
+    // Add Days to Expiration filter
+    if (query.minDte !== undefined || query.maxDte !== undefined) {
+      if (query.minDte !== undefined && query.minDte > 0) {
+        // Convert DTE to actual date
+        const minDate = addDays(new Date(), query.minDte);
+        const minFormattedDate = format(minDate, 'yyyy-MM-dd');
+        filterData.push({
+          operation: "gte",
+          field: "expiration",
+          value: `"${minFormattedDate}"`
+        });
+      }
+      if (query.maxDte !== undefined && query.maxDte < 365) {
+        // Convert DTE to actual date
+        const maxDate = addDays(new Date(), query.maxDte);
+        const maxFormattedDate = format(maxDate, 'yyyy-MM-dd');
+        filterData.push({
+          operation: "lte",
+          field: "expiration",
+          value: `"${maxFormattedDate}"`
+        });
+      }
+    }
+
+    // Add Yield Range filter
+    if (query.yieldRange) {
+      if (query.yieldRange[0] > 0) {
+        filterData.push({
+          operation: "gte",
+          field: "yieldPercent",
+          value: query.yieldRange[0]
+        });
+      }
+      if (query.yieldRange[1] < 10) {
+        filterData.push({
+          operation: "lte",
+          field: "yieldPercent",
+          value: query.yieldRange[1]
+        });
+      }
+    }
+
+    // Add Volume Range filter
+    if (query.volumeRange) {
+      if (query.volumeRange[0] > 0) {
+        filterData.push({
+          operation: "gte",
+          field: "volume",
+          value: query.volumeRange[0]
+        });
+      }
+      if (query.volumeRange[1] < 1000) {
+        filterData.push({
+          operation: "lte",
+          field: "volume",
+          value: query.volumeRange[1]
+        });
+      }
+    }
+
+    // Add Probability Range filter
+    if (query.probabilityRange) {
+      if (query.probabilityRange[0] > 0) {
+        filterData.push({
+          operation: "gte",
+          field: "probability",
+          value: query.probabilityRange[0]
+        });
+      }
+      if (query.probabilityRange[1] < 100) {
+        filterData.push({
+          operation: "lte",
+          field: "probability",
+          value: query.probabilityRange[1]
+        });
+      }
+    }
+
+    // Add Annualized Return filter
+    if (query.annualizedReturn) {
+      if (query.annualizedReturn[0] > 0) {
+        filterData.push({
+          operation: "gte",
+          field: "annualizedReturn",
+          value: query.annualizedReturn[0]
+        });
+      }
+      if (query.annualizedReturn[1] < 1000) {
+        filterData.push({
+          operation: "lte",
+          field: "annualizedReturn",
+          value: query.annualizedReturn[1]
+        });
+      }
+    }
+
+    // Add Excluded Stocks filter
+    if (query.excludedStocks && query.excludedStocks.length > 0) {
+      filterData.push({
+        operation: "exclude",
+        field: "symbol",
+        value: query.excludedStocks.join(',')
+      });
+    }
+
     return filterData;
   };
 
@@ -274,6 +387,81 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
     
     if (query.movingAverageCrossover && query.movingAverageCrossover !== 'Any') {
       displayItems.push(`Moving Average: ${query.movingAverageCrossover}`);
+    }
+
+    // Add Days to Expiration filter display
+    if (query.minDte !== undefined || query.maxDte !== undefined) {
+      const dteText = [];
+      if (query.minDte !== undefined && query.minDte > 0) {
+        dteText.push(`Min: ${query.minDte} days`);
+      }
+      if (query.maxDte !== undefined && query.maxDte < 365) {
+        dteText.push(`Max: ${query.maxDte} days`);
+      }
+      if (dteText.length > 0) {
+        displayItems.push(`Days to Expiration: ${dteText.join(', ')}`);
+      }
+    }
+
+    // Add Yield Range filter display
+    if (query.yieldRange && (query.yieldRange[0] > 0 || query.yieldRange[1] < 10)) {
+      const yieldText = [];
+      if (query.yieldRange[0] > 0) {
+        yieldText.push(`Min: ${query.yieldRange[0]}%`);
+      }
+      if (query.yieldRange[1] < 10) {
+        yieldText.push(`Max: ${query.yieldRange[1]}%`);
+      }
+      if (yieldText.length > 0) {
+        displayItems.push(`Yield Range: ${yieldText.join(', ')}`);
+      }
+    }
+
+    // Add Volume Range filter display
+    if (query.volumeRange && (query.volumeRange[0] > 0 || query.volumeRange[1] < 1000)) {
+      const volumeText = [];
+      if (query.volumeRange[0] > 0) {
+        volumeText.push(`Min: ${query.volumeRange[0]}`);
+      }
+      if (query.volumeRange[1] < 1000) {
+        volumeText.push(`Max: ${query.volumeRange[1]}`);
+      }
+      if (volumeText.length > 0) {
+        displayItems.push(`Volume Range: ${volumeText.join(', ')}`);
+      }
+    }
+
+    // Add Probability Range filter display
+    if (query.probabilityRange && (query.probabilityRange[0] > 0 || query.probabilityRange[1] < 100)) {
+      const probText = [];
+      if (query.probabilityRange[0] > 0) {
+        probText.push(`Min: ${query.probabilityRange[0]}%`);
+      }
+      if (query.probabilityRange[1] < 100) {
+        probText.push(`Max: ${query.probabilityRange[1]}%`);
+      }
+      if (probText.length > 0) {
+        displayItems.push(`Probability: ${probText.join(', ')}`);
+      }
+    }
+
+    // Add Annualized Return filter display
+    if (query.annualizedReturn && (query.annualizedReturn[0] > 0 || query.annualizedReturn[1] < 1000)) {
+      const annualizedText = [];
+      if (query.annualizedReturn[0] > 0) {
+        annualizedText.push(`Min: ${query.annualizedReturn[0]}%`);
+      }
+      if (query.annualizedReturn[1] < 1000) {
+        annualizedText.push(`Max: ${query.annualizedReturn[1]}%`);
+      }
+      if (annualizedText.length > 0) {
+        displayItems.push(`Annualized Return: ${annualizedText.join(', ')}`);
+      }
+    }
+
+    // Add Excluded Stocks filter display
+    if (query.excludedStocks && query.excludedStocks.length > 0) {
+      displayItems.push(`Excluded Stocks: ${query.excludedStocks.join(', ')}`);
     }
     
     return displayItems;

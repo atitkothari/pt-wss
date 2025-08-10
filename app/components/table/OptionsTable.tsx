@@ -2,15 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Option } from "@/app/types/option";
-import { 
-  Table, 
-  TableHeader, 
-  TableHead,
-  TableBody,
-  TableRow 
-} from "@/components/ui/table";
-import { ColumnCustomizer, ColumnDef } from "./ColumnCustomizer";
-import { ArrowUpDown, Crown, Star, PlusCircle } from "lucide-react";
+import { ColumnDef } from "./ColumnCustomizer";
+import { Star, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format, parseISO } from "date-fns";
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -30,9 +23,6 @@ import { useAuth } from "@/app/context/AuthContext";
 import { db } from "@/app/lib/firebase";
 import { collection, addDoc, serverTimestamp, query, where, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { Timestamp } from 'firebase/firestore';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { AddTradeModal } from '@/app/components/modals/AddTradeModal';
 import { ShareButton } from './ShareButton';
 import { createRef, RefObject } from 'react';
@@ -53,7 +43,7 @@ export const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: "openInterest", label: "Open Interest" },
   { key: "peRatio", label: "P/E Ratio" },
   { key: "marketCap", label: "Market Cap" },
-  { key: "sector", label: "Sector" },
+  // { key: "sector", label: "Sector" },  
   { key: "earningsDate", label: "Earnings" },
   { key: "impliedVolatility", label: "IV %" },
   { key: "probability", label: "Probability of Profit %" },

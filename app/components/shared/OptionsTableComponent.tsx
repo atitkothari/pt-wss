@@ -38,7 +38,8 @@ import {
   sectorOptions,
   defaultVisibleColumns as configDefaultVisibleColumns,
   impliedVolatilityFilterConfig,
-  probabilityFilterConfig
+  probabilityFilterConfig,
+  annualizedReturnFilterConfig
 } from "@/app/config/filterConfig";
 import { SaveScreenerModal } from "../modals/SaveScreenerModal";
 import { LoadScreenerModal } from "../modals/LoadScreenerModal";
@@ -343,31 +344,15 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   });
   
   const [marketCap, setMarketCap] = useState<[number, number]>(() => {
-    const minMarketCapParam = getParamKey('min_market_cap');
-    const maxMarketCapParam = getParamKey('max_market_cap');
+    const paramKey = getParamKey('marketCap');
     const localStorageKey = `${option}_marketCap`;
-    
-    // Check URL params first
-    const minFromUrl = searchParams.get(minMarketCapParam);
-    const maxFromUrl = searchParams.get(maxMarketCapParam);
-    if (minFromUrl !== null && maxFromUrl !== null) {
-      return [Number(minFromUrl), Number(maxFromUrl)];
-    }
-    
-    // Then check localStorage
-    if (typeof window !== 'undefined') {
-      const storedValue = localStorage.getItem(localStorageKey);
-      if (storedValue) {
-        try {
-          return JSON.parse(storedValue) as [number, number];
-        } catch (e) {
-          console.error(`Error parsing localStorage value for ${localStorageKey}:`, e);
-        }
-      }
-    }
-    
-    // Default values
-    return [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax];
+    return getInitialValue<[number, number]>(paramKey, localStorageKey, [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax]);
+  });
+
+  const [annualizedReturn, setAnnualizedReturn] = useState<[number, number]>(() => {
+    const paramKey = getParamKey('annualizedReturn');
+    const localStorageKey = `${option}_annualizedReturn`;
+    return getInitialValue<[number, number]>(paramKey, localStorageKey, [annualizedReturnFilterConfig.defaultMin, annualizedReturnFilterConfig.defaultMax]);
   });
   
   const [movingAverageCrossover, setMovingAverageCrossover] = useState(() => {
@@ -482,6 +467,12 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       localStorage.setItem(`${option}_marketCap`, JSON.stringify(marketCap));
     }
   }, [marketCap, option]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`${option}_annualizedReturn`, JSON.stringify(annualizedReturn));
+    }
+  }, [annualizedReturn, option]);
   
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -552,7 +543,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     impliedVolatility: [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax] as [number, number],
     deltaFilter: [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax] as [number, number],
     excludedStocks: "",
-    probabilityOfProfit: [probabilityFilterConfig.defaultMin, probabilityFilterConfig.defaultMax] as [number, number]
+    probabilityOfProfit: [probabilityFilterConfig.defaultMin, probabilityFilterConfig.defaultMax] as [number, number],
+    annualizedReturn: [annualizedReturnFilterConfig.defaultMin, annualizedReturnFilterConfig.defaultMax] as [number, number]
   });
 
   const [hasSearched, setHasSearched] = useState(false);
@@ -577,7 +569,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     minExpiration: activeFilters.minSelectedExpiration,
     pageName: option === 'call' ? 'covered_call_screener' : 'cash_secured_put_screener',
     excludedSymbols: excludedStocks,
-    probabilityRange: probabilityRange as [number, number] | undefined
+    probabilityRange: probabilityRange as [number, number] | undefined,
+    annualizedReturnRange: activeFilters.annualizedReturn as [number, number] | undefined
   });
 
   // Calculate expiration dates based on minDte and maxDte whenever they change
@@ -686,7 +679,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       impliedVolatility[1] !== activeFilters.impliedVolatility[1] || 
       moneynessRange[0] !== activeFilters.moneynessRange[0] ||
       moneynessRange[1] !== activeFilters.moneynessRange[1] ||
-      activeFilters.excludedStocks !== excludedStocks.join(',');
+      activeFilters.excludedStocks !== excludedStocks.join(',') ||
+      activeFilters.annualizedReturn[0] !== annualizedReturn[0] ||
+      activeFilters.annualizedReturn[1] !== annualizedReturn[1] ||
+      probabilityRange[0] !== activeFilters.probabilityOfProfit[0] || 
+      probabilityRange[1] !== activeFilters.probabilityOfProfit[1];
     
     if (hasChanged) {      
       setFiltersChanged(true);
@@ -706,7 +703,9 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     moneynessRange,
     impliedVolatility,
     activeFilters,
-    excludedStocks
+    excludedStocks,
+    annualizedReturn,
+    probabilityRange
   ]);
   
   const[symbolInput, setSymbolInput] = useState('')
@@ -737,7 +736,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       impliedVolatility,
       deltaFilter,
       excludedStocks: excludedStocks.join(','),
-      probabilityOfProfit: probabilityRange
+      probabilityOfProfit: probabilityRange,
+      annualizedReturn: annualizedReturn
     });
 
     updateURL({
@@ -763,6 +763,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       min_iv: impliedVolatility[0],
       max_iv: impliedVolatility[1],      
       sector: sector,            
+      annualized_return: annualizedReturn.join(',')
     });
         
     fetchData({
@@ -785,7 +786,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       impliedVolatilityRange: impliedVolatility,
       minSelectedExpiration,
       excludedSymbols: excludedStocks,
-      probabilityRange: probabilityRange as [number, number]
+      probabilityRange: probabilityRange as [number, number],
+      annualizedReturnRange: annualizedReturn as [number, number]
     }).then(()=>{
       setFiltersChanged(false);
       
@@ -811,7 +813,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       const savedColumns = localStorage.getItem('visibleColumns');
       if (savedColumns) {
         try {
-          return JSON.parse(savedColumns);
+          console.log("savedColumns", savedColumns);
+          //remove sector from savedColumns
+          const columns = JSON.parse(savedColumns);
+          return columns.filter((column: string) => column !== 'sector');
         } catch (e) {
           console.error('Error parsing localStorage value for visibleColumns:', e);
         }
@@ -863,6 +868,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     option,
     strikePrice: [minPrice, maxPrice],
     impliedVolatility,
+    annualizedReturn: annualizedReturn
   });
 
   // const [dte, setDte] = useState(Number(searchParams.get(getParamKey('dte'))) || 30);
@@ -901,25 +907,37 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     // Check yield range
     if (yieldRange[0] !== yieldFilterConfig.defaultMin || 
         yieldRange[1] !== yieldFilterConfig.defaultMax) {
-      activeFilterList.push(`Yield: ${yieldRange[0]}% - ${yieldRange[1]}%`);
+      const yieldText = yieldRange[1] === yieldFilterConfig.defaultMax 
+        ? `at least ${yieldRange[0]}%`
+        : `${yieldRange[0]}% to ${yieldRange[1]}%`;
+      activeFilterList.push(`Yield: ${yieldText}`);
     }
 
     // Check price range
     if (minPrice !== priceFilterConfig.defaultMin || 
         maxPrice !== priceFilterConfig.defaultMax) {
-      activeFilterList.push(`Price: $${minPrice} - $${maxPrice}`);
+      const priceText = maxPrice === priceFilterConfig.defaultMax 
+        ? `at least $${minPrice}`
+        : `$${minPrice} to $${maxPrice}`;
+      activeFilterList.push(`Price: ${priceText}`);
     }
 
     // Check volume range
     if (volumeRange[0] !== volumeFilterConfig.min || 
         volumeRange[1] !== volumeFilterConfig.max) {
-      activeFilterList.push(`Volume: ${volumeRange[0]} - ${volumeRange[1]}`);
+      const volumeText = volumeRange[1] === volumeFilterConfig.max 
+        ? `at least ${volumeRange[0].toLocaleString()}`
+        : `${volumeRange[0].toLocaleString()} to ${volumeRange[1].toLocaleString()}`;
+      activeFilterList.push(`Volume: ${volumeText}`);
     }
 
     // Check delta range
     if (deltaFilter[0] !== deltaFilterConfig.defaultMin || 
         deltaFilter[1] !== deltaFilterConfig.defaultMax) {
-      activeFilterList.push(`Delta: ${deltaFilter[0]} - ${deltaFilter[1]}`);
+      const deltaText = deltaFilter[1] === deltaFilterConfig.defaultMax 
+        ? `at least ${deltaFilter[0]}`
+        : `${deltaFilter[0]} to ${deltaFilter[1]}`;
+      activeFilterList.push(`Delta: ${deltaText}`);
     }
 
     // Check expiration dates
@@ -937,41 +955,65 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     // Check P/E ratio
     if (peRatio[0] !== peRatioFilterConfig.defaultMin || 
         peRatio[1] !== peRatioFilterConfig.defaultMax) {
-      activeFilterList.push(`P/E: ${peRatio[0]} - ${peRatio[1]}`);
+      const peText = peRatio[1] === peRatioFilterConfig.defaultMax 
+        ? `at least ${peRatio[0]}`
+        : `${peRatio[0]} to ${peRatio[1]}`;
+      activeFilterList.push(`P/E: ${peText}`);
     }
 
     // Check market cap
     if (marketCap[0] !== marketCapFilterConfig.defaultMin || 
         marketCap[1] !== marketCapFilterConfig.defaultMax) {
-      activeFilterList.push(`Market Cap: ${marketCap[0]}B - ${marketCap[1]}B`);
+      const marketCapText = marketCap[1] === marketCapFilterConfig.defaultMax 
+        ? `at least $${marketCap[0]}B`
+        : `$${marketCap[0]}B to $${marketCap[1]}B`;
+      activeFilterList.push(`Market Cap: ${marketCapText}`);
     }
 
     // Check sector
-    if (sector && sector !== sectorOptions[0]) {
-      activeFilterList.push(`Sector: ${sector}`);
-    }
+    // if (sector && sector !== sectorOptions[0]) {
+    //   activeFilterList.push(`Sector: ${sector}`);
+    // }
 
     // Check moneyness range
     if (moneynessRange[0] !== moneynessFilterConfig.defaultMin || 
         moneynessRange[1] !== moneynessFilterConfig.defaultMax) {
-      activeFilterList.push(`Moneyness: ${moneynessRange[0]}% - ${moneynessRange[1]}%`);
+      const moneynessText = moneynessRange[1] === moneynessFilterConfig.defaultMax 
+        ? `at least ${moneynessRange[0]}%`
+        : `${moneynessRange[0]}% to ${moneynessRange[1]}%`;
+      activeFilterList.push(`Strike Filter: ${moneynessText}`);
     }
 
     // Check implied volatility
     if (impliedVolatility[0] !== impliedVolatilityFilterConfig.defaultMin || 
         impliedVolatility[1] !== impliedVolatilityFilterConfig.defaultMax) {
-      activeFilterList.push(`IV: ${impliedVolatility[0]}% - ${impliedVolatility[1]}%`);
+      const ivText = impliedVolatility[1] === impliedVolatilityFilterConfig.defaultMax 
+        ? `at least ${impliedVolatility[0]}%`
+        : `${impliedVolatility[0]}% to ${impliedVolatility[1]}%`;
+      activeFilterList.push(`IV: ${ivText}`);
+    }
+
+    // Check probability range
+    if (probabilityRange[0] !== probabilityFilterConfig.defaultMin || 
+        probabilityRange[1] !== probabilityFilterConfig.defaultMax) {
+      const probText = probabilityRange[1] === probabilityFilterConfig.defaultMax 
+        ? `at least ${probabilityRange[0]}%`
+        : `${probabilityRange[0]}% to ${probabilityRange[1]}%`;
+      activeFilterList.push(`Probability: ${probText}`);
+    }
+
+    // Check annualized return
+    if (annualizedReturn[0] !== annualizedReturnFilterConfig.defaultMin || 
+        annualizedReturn[1] !== annualizedReturnFilterConfig.defaultMax) {
+      const annualizedText = annualizedReturn[1] === annualizedReturnFilterConfig.defaultMax 
+        ? `at least ${annualizedReturn[0]}%`
+        : `${annualizedReturn[0]}% to ${annualizedReturn[1]}%`;
+      activeFilterList.push(`Annualized Return: ${annualizedText}`);
     }
 
     // Check excluded stocks
     if (excludedStocks.length > 0) {
       activeFilterList.push(`Excluded: ${excludedStocks.join(', ')}`);
-    }
-
-    // Check probability of profit
-    if (probabilityRange[0] !== probabilityFilterConfig.defaultMin || 
-        probabilityRange[1] !== probabilityFilterConfig.defaultMax) {
-      activeFilterList.push(`Probability: ${probabilityRange[0]}% - ${probabilityRange[1]}%`);
     }
 
     return activeFilterList;
@@ -1020,7 +1062,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       moneynessRange: activeFilters.moneynessRange,
       impliedVolatilityRange: activeFilters.impliedVolatility,
       excludedSymbols: activeFilters.excludedStocks.split(","),
-      probabilityRange: activeFilters.probabilityOfProfit
+      probabilityRange: activeFilters.probabilityOfProfit,
+      annualizedReturnRange: activeFilters.annualizedReturn
     }).catch(console.error);
   }, [sortColumn, sortDirection, router, searchParams, activeFilters, currentPage, rowsPerPage, strikeFilter, deltaFilter, fetchData]);  
 
@@ -1038,6 +1081,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     setImpliedVolatility([impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax]);
     setPeRatio([peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax]);
     setMarketCap([marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax]);
+    setAnnualizedReturn([annualizedReturnFilterConfig.defaultMin, annualizedReturnFilterConfig.defaultMax]);
     setMovingAverageCrossover(movingAverageCrossoverOptions[0]);
     setSector(sectorOptions[0]);
     setMoneynessRange([moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax]);
@@ -1059,7 +1103,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       impliedVolatility: [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax] as [number, number],
       deltaFilter: [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax] as [number, number],
       excludedStocks:"",
-      probabilityOfProfit:[probabilityFilterConfig.defaultMin, probabilityFilterConfig.defaultMax] as [number, number]
+      probabilityOfProfit:[probabilityFilterConfig.defaultMin, probabilityFilterConfig.defaultMax] as [number, number],
+      annualizedReturn: [annualizedReturnFilterConfig.defaultMin, annualizedReturnFilterConfig.defaultMax] as [number, number]
     });
     
     // Reset URL parameters
@@ -1141,7 +1186,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       impliedVolatility: screener.filters.impliedVolatility || [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax],
       deltaFilter: screener.filters.deltaFilter || [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax],
       excludedStocks: screener.filters.excludedStocks?.join(",") || '',
-      probabilityOfProfit: screener.filters.probabilityOfProfit || [probabilityFilterConfig.defaultMin, probabilityFilterConfig.defaultMax]
+      probabilityOfProfit: screener.filters.probabilityOfProfit || [probabilityFilterConfig.defaultMin, probabilityFilterConfig.defaultMax],
+      annualizedReturn: screener.filters.annualizedReturn || [annualizedReturnFilterConfig.defaultMin, annualizedReturnFilterConfig.defaultMax]
     });
 
     // Update individual states
@@ -1158,6 +1204,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     setImpliedVolatility(screener.filters.impliedVolatility || [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax]);
     setPeRatio(screener.filters.peRatio || [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax]);
     setMarketCap(screener.filters.marketCap || [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax]);
+    setAnnualizedReturn(screener.filters.annualizedReturn || [annualizedReturnFilterConfig.defaultMin, annualizedReturnFilterConfig.defaultMax]);
     setMoneynessRange(screener.filters.moneynessRange || [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax]);
     setSector(Array.isArray(screener.filters.sector) ? screener.filters.sector[0] : (screener.filters.sector || sectorOptions[0]));    
   };
@@ -1376,6 +1423,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             symbols={symbols}
             isExpanded={isAdvancedFiltersExpanded}
             onExpandedChange={setIsAdvancedFiltersExpanded}
+            annualizedReturn={annualizedReturn}
+            onAnnualizedReturnChange={setAnnualizedReturn}
           />
         </div>
 
@@ -1551,7 +1600,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                       sector: activeFilters.sector,
                       moneynessRange: activeFilters.moneynessRange,
                       impliedVolatilityRange: activeFilters.impliedVolatility,
-                      minSelectedExpiration: activeFilters.minSelectedExpiration
+                      minSelectedExpiration: activeFilters.minSelectedExpiration,
+                      annualizedReturnRange: activeFilters.annualizedReturn
                     }).catch(console.error); 
                   }}
                   disabled={currentPage === 1}
@@ -1585,7 +1635,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                       sector: activeFilters.sector,
                       moneynessRange: activeFilters.moneynessRange,
                       impliedVolatilityRange: activeFilters.impliedVolatility,
-                      minSelectedExpiration: activeFilters.minSelectedExpiration
+                      minSelectedExpiration: activeFilters.minSelectedExpiration,
+                      annualizedReturnRange: activeFilters.annualizedReturn
                     }).catch(console.error);
                   }}
                   disabled={currentPage * rowsPerPage >= totalCount}
@@ -1649,7 +1700,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             movingAverageCrossover,
             sector,
             moneynessRange,
-            excludedStocks
+            excludedStocks,
+            annualizedReturn: annualizedReturn
           }}
         />
       )}

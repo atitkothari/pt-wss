@@ -21,7 +21,8 @@ export interface SavedScreener {
     movingAverageCrossover?: string[];
     sector?: string[];
     excludedStocks?: string[];
-    probabilityOfProfit?: [number, number]
+    probabilityOfProfit?: [number, number];
+    annualizedReturn?: [number, number];
   };
   emailNotifications?: {
     enabled: boolean;

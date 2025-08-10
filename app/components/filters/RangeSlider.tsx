@@ -120,7 +120,7 @@ export function RangeSlider({
         )}</div>
         
       <div className="text-xs text-gray-500 text-right">
-        {formatValue(localValue[0])} to {formatValue(localValue[1])}
+        {localValue[0] === min ? `< ${formatValue(localValue[0])}` : formatValue(localValue[0])} to {localValue[1] === max ? `> ${formatValue(localValue[1])}` : formatValue(localValue[1])}       
       </div>  
       </div>    
 
@@ -162,8 +162,8 @@ export function RangeSlider({
           </Tooltip>
         </TooltipProvider>
         <div className="flex justify-between text-sm text-gray-600">
-          <span>{`< ${min}`}</span>
-          <span>{`> ${max}`}</span>
+          <span title="No lower bound - shows all values below this threshold">{`< ${min}`}</span>
+          <span title="No upper bound - shows all values above this threshold">{`> ${max}`}</span>
         </div>
       </div>
     </div>

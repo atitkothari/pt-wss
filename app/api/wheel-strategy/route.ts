@@ -50,7 +50,7 @@ export async function GET() {
       filters: [
         {
           operation: "eq",
-          field: "type",
+          field: "optionType",
           value: "\"put\""
         },
         {

@@ -28,7 +28,8 @@ import {
   moneynessFilterConfig,
   dteFilterConfig,
   yieldFilterConfig,
-  probabilityFilterConfig
+  probabilityFilterConfig,
+  annualizedReturnFilterConfig
 } from "@/app/config/filterConfig";
 import { useUserAccess } from '@/app/hooks/useUserAccess';
 import { MultiStockSelect } from "./MultiStockSelect";
@@ -66,6 +67,9 @@ interface AdvancedFiltersProps {
   // Add probability range filter props
   probabilityRange: [number, number];
   onProbabilityRangeChange: (value: [number, number]) => void;
+  // Add annualized return filter props
+  annualizedReturn: [number, number];
+  onAnnualizedReturnChange: (value: [number, number]) => void;
   // Optional prop to trigger search automatically
   autoSearch?: boolean;
   onSearch?: () => void;
@@ -111,6 +115,9 @@ export function AdvancedFilters({
   // Add probability range filter props
   probabilityRange,
   onProbabilityRangeChange,
+  // Add annualized return filter props
+  annualizedReturn,
+  onAnnualizedReturnChange,
   // Auto search props
   autoSearch = true,
   onSearch,
@@ -185,12 +192,14 @@ export function AdvancedFilters({
                   yieldRange[1] !== yieldFilterConfig.defaultMax,
       probabilityRange: probabilityRange[0] !== probabilityFilterConfig.defaultMin || 
                         probabilityRange[1] !== probabilityFilterConfig.defaultMax,
+      annualizedReturn: annualizedReturn[0] !== annualizedReturnFilterConfig.defaultMin || 
+                         annualizedReturn[1] !== annualizedReturnFilterConfig.defaultMax,
       excludedStocks: excludedStocks.length > 0,
     };
   }, [
     strikePrice, moneynessRange, minDte, maxDte, deltaFilter, volumeRange,
     impliedVolatility, peRatio, marketCap, movingAverageCrossover, sector, yieldRange,
-    probabilityRange, excludedStocks
+    probabilityRange, annualizedReturn, excludedStocks
   ]);
 
   const hasModifiedFilters = useMemo(() => {
@@ -239,9 +248,10 @@ export function AdvancedFilters({
                   peRatio: 'P/E',
                   marketCap: 'Market Cap',
                   movingAverage: 'MA',
-                  sector: 'Sector',
+                  // sector: 'Sector',
                   yieldRange: 'Yield Range',
                   probabilityRange: 'Probability of Profit',
+                  annualizedReturn: 'Annualized Return',
                   excludedStocks: 'Excluded Stocks',
                 };
                 return (
@@ -290,6 +300,26 @@ export function AdvancedFilters({
               step={yieldFilterConfig.step}
               tooltip={yieldFilterConfig.tooltip}
               formatValue={(val) => `${val}%`}
+              className="col-span-1"
+              disabled={!canAccessFeature()}
+            />
+
+            {/* Annualized Return */}
+            <RangeSlider
+              id="input_screener_annualized_return"
+              label="Annualized Return %"
+              minValue={annualizedReturn[0]}
+              maxValue={annualizedReturn[1]}
+              value={annualizedReturn}
+              onChange={onAnnualizedReturnChange}
+              min={annualizedReturnFilterConfig.min}
+              max={annualizedReturnFilterConfig.max}
+              step={annualizedReturnFilterConfig.step}
+              tooltip={annualizedReturnFilterConfig.tooltip}
+              formatValue={(val) => `${val}%`}
+              isExponential={annualizedReturnFilterConfig.isExponential}
+              toExponential={annualizedReturnFilterConfig.toExponential}
+              fromExponential={annualizedReturnFilterConfig.fromExponential}
               className="col-span-1"
               disabled={!canAccessFeature()}
             />
@@ -415,55 +445,27 @@ export function AdvancedFilters({
             />
 
             {/* Market Cap */}
-            <div className="relative col-span-1">
-              <label className="block text-sm font-medium mb-1">Market Cap</label>
-              <Select 
-                value={marketCap.join('-')} 
-                onValueChange={(value) => {
-                  const [min, max] = value.split('-').map(Number);
-                  onMarketCapChange([min, max]);
-                }}
-              >
-                <SelectTrigger id="input_screener_market_cap" className="h-10">
-                  <SelectValue placeholder="Select Market Cap Range" />
-                </SelectTrigger>
-                <SelectContent>
-                  {marketCapCategories.map((category, index) => {
-                    let value;
-                    switch(index) {
-                      case 0: // All Market Caps
-                        value = `${marketCapFilterConfig.defaultMin}-${marketCapFilterConfig.defaultMax}`;
-                        break;
-                      case 1: // Mega Cap (>$200B)
-                        value = `200-${marketCapFilterConfig.defaultMax}`;
-                        break;
-                      case 2: // Large Cap ($10B-$200B)
-                        value = '10-200';
-                        break;
-                      case 3: // Mid Cap ($2B-$10B)
-                        value = '2-10';
-                        break;
-                      case 4: // Small Cap ($300M-$2B)
-                        value = '0.3-2';
-                        break;
-                      case 5: // Micro Cap (<$300M)
-                        value = `${marketCapFilterConfig.defaultMin}-0.3`;
-                        break;
-                      default:
-                        value = `${marketCapFilterConfig.defaultMin}-${marketCapFilterConfig.defaultMax}`;
-                    }
-                    return (
-                      <SelectItem key={category} value={value}>
-                        {category}
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
-            </div>
+            <RangeSlider
+              id="input_screener_market_cap"
+              label="Market Cap (Billions)"
+              minValue={marketCap[0]}
+              maxValue={marketCap[1]}
+              value={marketCap}
+              onChange={onMarketCapChange}
+              min={marketCapFilterConfig.min}
+              max={marketCapFilterConfig.max}
+              step={marketCapFilterConfig.step}
+              tooltip={marketCapFilterConfig.tooltip}
+              formatValue={(val) => `$${val}B`}
+              isExponential={marketCapFilterConfig.isExponential}
+              toExponential={marketCapFilterConfig.toExponential}
+              fromExponential={marketCapFilterConfig.fromExponential}
+              className="col-span-1"
+              disabled={!canAccessFeature()}
+            />
 
             {/* Sector */}
-            <div className="col-span-1">
+            {/* <div className="col-span-1">
               <label className="block text-sm font-medium mb-1">Sector</label>
               <Select 
                 value={sector} 
@@ -480,7 +482,7 @@ export function AdvancedFilters({
                   ))}
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
 
             {/* Exclude Stocks */}
             <div className="col-span-1">

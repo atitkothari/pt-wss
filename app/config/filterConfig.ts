@@ -119,6 +119,30 @@ export const marketCapFilterConfig = {
   }
 };
 
+// Annualized Return Filter Configuration
+export const annualizedReturnFilterConfig = {
+  min: 0,
+  max: 1000,
+  defaultMin: 0,
+  defaultMax: 1000,
+  step: 10,
+  tooltip: "Annualized return percentage for option contracts",
+  // Exponential scale parameters
+  isExponential: true,
+  exponent: 3, // Power for exponential scaling
+  // Helper functions for exponential scaling
+  toExponential: (linearValue: number) => {
+    const maxValue = 1000;
+    const normalizedValue = linearValue / maxValue;
+    return Math.round(Math.pow(normalizedValue, annualizedReturnFilterConfig.exponent) * maxValue);
+  },
+  fromExponential: (exponentialValue: number) => {
+    const maxValue = 1000;
+    const normalizedValue = exponentialValue / maxValue;
+    return Math.round(Math.pow(normalizedValue, 1/annualizedReturnFilterConfig.exponent) * maxValue);
+  }
+};
+
 // Moneyness Range Filter Configuration
 export const moneynessFilterConfig = {
   min: -30,
@@ -200,7 +224,7 @@ export const allColumns = [
   'openInterest', // Open Interest
   'peRatio', // P/E Ratio
   'marketCap', // Market Cap
-  'sector', // Sector
+  // 'sector', // Sector
   'earningsDate',
   'impliedVolatility',
   'probability' // Probability of Profit
@@ -259,6 +283,9 @@ export const setDefaultFilterValues = (optionType: 'call' | 'put') => {
 
   // Market Cap filter
   localStorage.setItem(`${optionType}_marketCap`, JSON.stringify([marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax]));
+
+  // Annualized Return filter
+  localStorage.setItem(`${optionType}_annualizedReturn`, JSON.stringify([annualizedReturnFilterConfig.defaultMin, annualizedReturnFilterConfig.defaultMax]));
 
   // Moneyness filter
   localStorage.setItem(`${optionType}_moneynessRange`, JSON.stringify([moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax]));

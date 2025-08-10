@@ -70,7 +70,7 @@ export default function CoveredCallCalculatorPage() {
       const minVol = 10;
       const filters = [
         { operation: 'eq', field: 'symbol', value: `"${inputSymbol}"` },
-        { operation: 'eq', field: 'type', value: '"call"' },
+        { operation: 'eq', field: 'optionType', value: '"call"' },
         { operation: 'gte', field: 'expiration', value: `"${format(today, 'yyyy-MM-dd')}"` },
         { operation: 'lte', field: 'expiration', value: `"${format(sixMonthsLater, 'yyyy-MM-dd')}"` },
         { operation: 'gt', field: 'volume', value: minVol },        
