@@ -29,7 +29,7 @@ export function ColumnCustomizer({ columns, visibleColumns, onColumnToggle }: Co
           <Settings2 className="h-4 w-4 mr-2" />          
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[200px]">
+      <DropdownMenuContent align="end" className="w-[200px] max-h-[300px] overflow-y-auto">
         {columns.map((column) => (
           <DropdownMenuCheckboxItem
             key={column.key}
