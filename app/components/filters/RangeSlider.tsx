@@ -42,8 +42,8 @@ export function RangeSlider({
   max = 100,
   tooltip,
   formatValue = (val) => {
-    if (Math.abs(val - min) < Number.EPSILON) return `< ${val}`;
-    if (Math.abs(val - max) < Number.EPSILON) return `> ${val}`;
+    // if (Math.abs(val - min) < Number.EPSILON) return `< ${val}`;
+    // if (Math.abs(val - max) < Number.EPSILON) return `> ${val}`;
     return val.toString();
   },
   className = "",
