@@ -217,9 +217,9 @@ export function useOptionsData(
       // Add moneyness range filters
       if (moneynessRange) {
         if(moneynessRange[0] > moneynessFilterConfig.min)
-          filters.push({ operation: 'strikeFilter', field: option, value: moneynessRange[0]/100 });
+          filters.push({ operation: 'gte', field: 'strikeFilter', value: moneynessRange[0]/100 });
         if(moneynessRange[1] < moneynessFilterConfig.max)
-        filters.push({ operation: 'strikeFilter', field: option, value: moneynessRange[1]/100 });
+          filters.push({ operation: 'lte', field: 'strikeFilter', value: moneynessRange[1]/100 });
       }
       
       // Add implied volatility filters
