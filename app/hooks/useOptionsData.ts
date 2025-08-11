@@ -148,7 +148,7 @@ export function useOptionsData(
       const filters: any = [];
       // Add option type filter
       if (option) {
-        filters.push({ operation: 'eq', field: 'optionType', value: `"${option}"` });
+        filters.push({ operation: 'eq', field: 'type', value: `"${option}"` });
       }
       if (searchTerms && searchTerms.length > 0) {
         if (searchTerms.length === 1) {

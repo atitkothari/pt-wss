@@ -50,7 +50,7 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
     if (query.option) {
       filterData.push({
         operation: "eq",
-        field: "optionType",
+        field: "type",
         value: `"${query.option}"`
       });
     }
