@@ -33,6 +33,8 @@ import {
 } from "@/app/config/filterConfig";
 import { useUserAccess } from '@/app/hooks/useUserAccess';
 import { MultiStockSelect } from "./MultiStockSelect";
+import { usePlausibleTracker } from '@/app/utils/plausible';
+import { PlausibleEvents } from '@/app/utils/plausible';
 
 interface AdvancedFiltersProps {
   peRatio: [number, number];
@@ -130,6 +132,7 @@ export function AdvancedFilters({
 }: AdvancedFiltersProps) {
   const [internalIsExpanded, setInternalIsExpanded] = useState(false);
   const { canAccessFeature } = useUserAccess();
+  const { trackEvent } = usePlausibleTracker();
   // Use controlled or uncontrolled state
   const isExpanded = controlledIsExpanded ?? internalIsExpanded;
   const setIsExpanded = (value: boolean) => {
@@ -276,6 +279,9 @@ export function AdvancedFilters({
               maxValue={strikePrice[1]}
               value={strikePrice}
               onChange={onStrikePriceChange}
+              onValueCommit={(value) => {
+                trackEvent(PlausibleEvents.FilterChange, { filter: 'strikePrice', value });
+              }}
               min={priceFilterConfig.min}
               max={priceFilterConfig.max}
               step={priceFilterConfig.step}
@@ -295,6 +301,9 @@ export function AdvancedFilters({
               maxValue={yieldRange[1]}
               value={yieldRange}
               onChange={onYieldRangeChange}
+              onValueCommit={(value) => {
+                trackEvent(PlausibleEvents.FilterChange, { filter: 'yieldRange', value });
+              }}
               min={yieldFilterConfig.min}
               max={yieldFilterConfig.max}
               step={yieldFilterConfig.step}
@@ -312,6 +321,9 @@ export function AdvancedFilters({
               maxValue={annualizedReturn[1]}
               value={annualizedReturn}
               onChange={onAnnualizedReturnChange}
+              onValueCommit={(value) => {
+                trackEvent(PlausibleEvents.FilterChange, { filter: 'annualizedReturn', value });
+              }}
               min={annualizedReturnFilterConfig.min}
               max={annualizedReturnFilterConfig.max}
               step={annualizedReturnFilterConfig.step}
@@ -332,6 +344,9 @@ export function AdvancedFilters({
               minValue={deltaFilter[0]}
               maxValue={deltaFilter[1]}
               onChange={onDeltaFilterChange}
+              onValueCommit={(value) => {
+                trackEvent(PlausibleEvents.FilterChange, { filter: 'deltaFilter', value });
+              }}
               min={deltaFilterConfig.min}
               max={deltaFilterConfig.max}
               step={deltaFilterConfig.step}
@@ -348,6 +363,9 @@ export function AdvancedFilters({
               maxValue={moneynessRange[1]}
               value={moneynessRange}
               onChange={onMoneynessRangeChange}
+              onValueCommit={(value) => {
+                trackEvent(PlausibleEvents.FilterChange, { filter: 'moneynessRange', value });
+              }}
               min={moneynessFilterConfig.min}
               max={moneynessFilterConfig.max}
               step={moneynessFilterConfig.step}
@@ -365,6 +383,9 @@ export function AdvancedFilters({
               value={[minDte, maxDte]}
               onChange={(value) => {
                 onDteChange(value);
+              }}
+              onValueCommit={(value) => {
+                trackEvent(PlausibleEvents.FilterChange, { filter: 'dte', value });
               }}
               min={dteFilterConfig.min}
               max={dteFilterConfig.max}
@@ -387,6 +408,9 @@ export function AdvancedFilters({
               maxValue={volumeRange[1]}
               value={volumeRange}
               onChange={onVolumeRangeChange}
+              onValueCommit={(value) => {
+                trackEvent(PlausibleEvents.FilterChange, { filter: 'volumeRange', value });
+              }}
               min={volumeFilterConfig.min}
               max={volumeFilterConfig.max}
               step={volumeFilterConfig.step}
@@ -403,6 +427,9 @@ export function AdvancedFilters({
               minValue={impliedVolatility[0]}
               maxValue={impliedVolatility[1]}
               onChange={onImpliedVolatilityChange}
+              onValueCommit={(value) => {
+                trackEvent(PlausibleEvents.FilterChange, { filter: 'impliedVolatility', value });
+              }}
               min={impliedVolatilityFilterConfig.min}
               max={impliedVolatilityFilterConfig.max}
               step={impliedVolatilityFilterConfig.step}
@@ -420,6 +447,9 @@ export function AdvancedFilters({
               maxValue={probabilityRange[1]}
               value={probabilityRange}
               onChange={onProbabilityRangeChange}
+              onValueCommit={(value) => {
+                trackEvent(PlausibleEvents.FilterChange, { filter: 'probabilityRange', value });
+              }}
               min={probabilityFilterConfig.min}
               max={probabilityFilterConfig.max}
               step={probabilityFilterConfig.step}
@@ -436,6 +466,9 @@ export function AdvancedFilters({
               minValue={peRatio[0]}
               maxValue={peRatio[1]}
               onChange={onPeRatioChange}
+              onValueCommit={(value) => {
+                trackEvent(PlausibleEvents.FilterChange, { filter: 'peRatio', value });
+              }}
               min={peRatioFilterConfig.min}
               max={peRatioFilterConfig.max}
               step={peRatioFilterConfig.step}
@@ -452,6 +485,9 @@ export function AdvancedFilters({
               maxValue={marketCap[1]}
               value={marketCap}
               onChange={onMarketCapChange}
+              onValueCommit={(value) => {
+                trackEvent(PlausibleEvents.FilterChange, { filter: 'marketCap', value });
+              }}
               min={marketCapFilterConfig.min}
               max={marketCapFilterConfig.max}
               step={marketCapFilterConfig.step}
@@ -490,7 +526,10 @@ export function AdvancedFilters({
                 id="input_screener_exclude_symbol"
                 label="Exclude Symbol"
                 selectedStocks={excludedStocks}
-                onChange={onExcludedStocksChange}
+                onChange={(value) => {
+                  onExcludedStocksChange(value);
+                  // trackEvent(PlausibleEvents.FilterChange, { filter: 'excludedStocks', value });
+                }}
                 placeholder="Enter symbols to exclude..."
                 suggestions={symbols}
                 showSuggestions={true}

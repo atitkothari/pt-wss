@@ -50,7 +50,7 @@ import { ColumnCustomizer } from "../table/ColumnCustomizer";
 import { screenerService } from "@/app/services/screenerService";
 import { useUserAccess } from "@/app/hooks/useUserAccess";
 import { toast } from 'sonner';
-import { usePlausibleTracking } from '@/app/hooks/usePlausibleTracking';
+import { PlausibleEvents, usePlausibleTracker } from '@/app/utils/plausible';
 import { sendAnalyticsEvent, AnalyticsEvents } from '@/app/utils/analytics';
 
 interface Filter {
@@ -96,7 +96,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const { symbols } = useSymbols();
   const { user, userId } = useAuth();
   const [savedScreeners, setSavedScreeners] = useState<SavedScreener[]>([]);
-  const { trackAuthEvent } = usePlausibleTracking();
+  const { trackEvent } = usePlausibleTracker();
   const { canAccessFeature } = useUserAccess();
 
   const {status} = useUserAccess()
@@ -602,49 +602,6 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     router.push(`?${params.toString()}`);
   };
 
-  useEffect(() => {
-    // Auto fetch data on initial load regardless of URL parameters
-    if (!isFromCache) {
-      // Set isFromCache first to prevent multiple API calls
-      setIsFromCache(true);
-      // Use a small timeout to prevent immediate API call on page load
-      const timer = setTimeout(() => {
-        // If URL has parameters, use those for search
-        if (Array.from(searchParams.entries()).length > 0) {          
-          handleSearch();          
-        } else {
-          // Otherwise, fetch with default values             
-          fetchData({
-            searchTerms: selectedStocks,
-            minYield: yieldRange[0],
-            maxYield: yieldRange[1],
-            minPrice,
-            maxPrice,
-            minVol: volumeRange[0],
-            maxVol: volumeRange[1],
-            selectedExpiration,
-            pageNo: 1,
-            pageSize: rowsPerPage,
-            sortConfig: sortConfig.direction ? sortConfig : undefined,
-            deltaRange: deltaFilter,
-            peRatio,
-            marketCap,
-            sector,
-            moneynessRange,
-            impliedVolatilityRange: impliedVolatility,
-            minSelectedExpiration,
-            excludedSymbols: excludedStocks,
-            probabilityRange: probabilityRange as [number, number]
-          }).catch(console.error);
-      
-          setHasSearched(true);
-          setFiltersChanged(false)
-        }
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, []);
-  
 
   const [isFromCache, setIsFromCache] = useState(false);
   const [filtersChanged, setFiltersChanged] = useState(false);
@@ -712,7 +669,23 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   
   const [isAdvancedFiltersExpanded, setIsAdvancedFiltersExpanded] = useState(false);
 
-  const handleSearch = () => {
+  const handleSearch = useCallback(() => {
+    trackEvent(PlausibleEvents.ScreenerSearch, {
+      symbols: selectedStocks.join(','),
+      excluded: excludedStocks.join(','),
+      yield: yieldRange,
+      price: [minPrice, maxPrice],
+      volume: volumeRange,
+      delta: deltaFilter,
+      dte: [minDte, maxDte],
+      iv: impliedVolatility,
+      pe: peRatio,
+      marketCap: marketCap,
+      annualizedReturn: annualizedReturn,
+      maCrossover: movingAverageCrossover,
+      sector: sector,
+      moneyness: moneynessRange,
+    });
     setHasSearched(true);
     setIsFromCache(false);    
     
@@ -799,7 +772,52 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
       setIsAdvancedFiltersExpanded(false);
     }
-  };
+  }, [trackEvent, selectedStocks, excludedStocks, yieldRange, minPrice, maxPrice, volumeRange, deltaFilter, minDte, maxDte, impliedVolatility, peRatio, marketCap, annualizedReturn, movingAverageCrossover, sector, moneynessRange, searchCount, updateURL, fetchData, symbolInput, sortConfig, probabilityRange, minSelectedExpiration, selectedExpiration]);
+
+  useEffect(() => {
+    // Auto fetch data on initial load regardless of URL parameters
+    if (!isFromCache) {
+      // Set isFromCache first to prevent multiple API calls
+      setIsFromCache(true);
+      // Use a small timeout to prevent immediate API call on page load
+      const timer = setTimeout(() => {
+        // If URL has parameters, use those for search
+        if (Array.from(searchParams.entries()).length > 0) {          
+          handleSearch();          
+        } else {
+          // Otherwise, fetch with default values             
+          fetchData({
+            searchTerms: selectedStocks,
+            minYield: yieldRange[0],
+            maxYield: yieldRange[1],
+            minPrice,
+            maxPrice,
+            minVol: volumeRange[0],
+            maxVol: volumeRange[1],
+            selectedExpiration,
+            pageNo: 1,
+            pageSize: rowsPerPage,
+            sortConfig: sortConfig.direction ? sortConfig : undefined,
+            deltaRange: deltaFilter,
+            peRatio,
+            marketCap,
+            sector,
+            moneynessRange,
+            impliedVolatilityRange: impliedVolatility,
+            minSelectedExpiration,
+            excludedSymbols: excludedStocks,
+            probabilityRange: probabilityRange as [number, number]
+          }).catch(console.error);
+      
+          setHasSearched(true);
+          setFiltersChanged(false)
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isFromCache, searchParams, handleSearch, fetchData, selectedStocks, yieldRange, minPrice, maxPrice, volumeRange, selectedExpiration, sortConfig, deltaFilter, peRatio, marketCap, sector, moneynessRange, impliedVolatility, minSelectedExpiration, excludedStocks, probabilityRange, annualizedReturn]);
+  
+
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -827,6 +845,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   });
 
   const handleColumnToggle = (columnKey: string) => {
+    trackEvent(PlausibleEvents.ColumnToggle, {
+      column: columnKey,
+      visible: !visibleColumns.includes(columnKey),
+    });
     setVisibleColumns(current => {
       let newColumns;
       if (current.includes(columnKey)) {
@@ -1027,6 +1049,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const handleSortURL = useCallback((columnId: string) => {     
     const params = new URLSearchParams(searchParams.toString());    
     
+    trackEvent(PlausibleEvents.Sort, {
+      column: columnId,
+      direction: sortDirection === 'asc' ? 'desc' : 'asc',
+    });
     let newSortDir: 'asc' | 'desc';
     if (sortColumn === columnId) {
       // Toggle direction if clicking same column
@@ -1065,9 +1091,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       probabilityRange: activeFilters.probabilityOfProfit,
       annualizedReturnRange: activeFilters.annualizedReturn
     }).catch(console.error);
-  }, [sortColumn, sortDirection, router, searchParams, activeFilters, currentPage, rowsPerPage, strikeFilter, deltaFilter, fetchData]);  
+  }, [sortColumn, sortDirection, router, searchParams, activeFilters, currentPage, rowsPerPage, strikeFilter, deltaFilter, fetchData, trackEvent]);
 
   const handleReset = () => {
+    trackEvent(PlausibleEvents.ResetFilters);
     setSelectedStocks([]);
     setExcludedStocks([]);
     setSearchTerm('');
@@ -1224,6 +1251,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     const url = window.location.href;
     navigator.clipboard.writeText(url).then(() => {
       toast.success('URL copied to clipboard!');
+      trackEvent(PlausibleEvents.Share, {
+        url: url,
+        option: option,
+      });
       sendAnalyticsEvent({
         event_name: 'share_screener',
         event_category: 'Screener',
@@ -1233,9 +1264,6 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       toast.error('Failed to copy URL');
     });
   };
-
-  // Move error check here, after all hooks are declared
-  if (error) return <div className="text-red-500 p-4">{error}</div>;
 
   const [showColumnSelector, setShowColumnSelector] = useState(false);
 
@@ -1275,6 +1303,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
     loadSavedScreeners();
   }, [userId, user?.email]);
+
+  if (error) return <div className="text-red-500 p-4">{error}</div>;
 
   return (
     <div className="w-full">      
@@ -1386,45 +1416,75 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         <div className="mt-4">
           <AdvancedFilters
             peRatio={peRatio}
-            onPeRatioChange={setPeRatio}
+            onPeRatioChange={(value) => {
+              setPeRatio(value);
+            }}
             marketCap={marketCap}
-            onMarketCapChange={setMarketCap}
+            onMarketCapChange={(value) => {
+              setMarketCap(value);
+            }}
             movingAverageCrossover={movingAverageCrossover}
-            onMovingAverageCrossoverChange={setMovingAverageCrossover}
+            onMovingAverageCrossoverChange={(value) => {
+              setMovingAverageCrossover(value);
+            }}
             sector={sector}
-            onSectorChange={setSector}
+            onSectorChange={(value) => {
+              setSector(value);
+            }}
             deltaFilter={deltaFilter}
-            onDeltaFilterChange={setDeltaFilter}
+            onDeltaFilterChange={(value) => {
+              setDeltaFilter(value);
+            }}
             volumeRange={volumeRange}
-            onVolumeRangeChange={setVolumeRange}
+            onVolumeRangeChange={(value) => {
+              // trackEvent(PlausibleEvents.FilterChange, { filter: 'volumeRange', value });
+              setVolumeRange(value);
+            }}
             handleKeyPress={handleKeyPress}
             strikePrice={[minPrice, maxPrice]}
-            onStrikePriceChange={([min, max]) => {              
+            onStrikePriceChange={([min, max]) => {
+              // trackEvent(PlausibleEvents.FilterChange, { filter: 'strikePrice', value: [min, max] });
               setMinPrice(min);
               setMaxPrice(max);
             }}
             impliedVolatility={impliedVolatility}
-            onImpliedVolatilityChange={setImpliedVolatility}
+            onImpliedVolatilityChange={(value) => {
+              // trackEvent(PlausibleEvents.FilterChange, { filter: 'impliedVolatility', value });
+              setImpliedVolatility(value);
+            }}
             moneynessRange={moneynessRange}
-            onMoneynessRangeChange={setMoneynessRange}
+            onMoneynessRangeChange={(value) => {
+              // trackEvent(PlausibleEvents.FilterChange, { filter: 'moneynessRange', value });
+              setMoneynessRange(value);
+            }}
             minDte={minDte}
             maxDte={maxDte}
-            onDteChange={([min, max]) => {              
+            onDteChange={([min, max]) => {
+              // trackEvent(PlausibleEvents.FilterChange, { filter: 'dte', value: [min, max] });
               setMinDte(min);
               setMaxDte(max);
             }}
             yieldRange={yieldRange}
-            onYieldRangeChange={setYieldRange}
+            onYieldRangeChange={(value) => {
+              // trackEvent(PlausibleEvents.FilterChange, { filter: 'yieldRange', value });
+              setYieldRange(value);
+            }}
             probabilityRange={probabilityRange}
-            onProbabilityRangeChange={setProbabilityRange}
+            onProbabilityRangeChange={(value) => {
+              setProbabilityRange(value);
+            }}
             autoSearch={false}
             excludedStocks={excludedStocks}
-            onExcludedStocksChange={setExcludedStocks}
+            onExcludedStocksChange={(value) => {
+              setExcludedStocks(value);
+            }}
             symbols={symbols}
             isExpanded={isAdvancedFiltersExpanded}
             onExpandedChange={setIsAdvancedFiltersExpanded}
             annualizedReturn={annualizedReturn}
-            onAnnualizedReturnChange={setAnnualizedReturn}
+            onAnnualizedReturnChange={(value) => {
+              setAnnualizedReturn(value);
+            }}
           />
         </div>
 
@@ -1579,6 +1639,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                 <Button 
                   onClick={() => {
                     const prevPage = Math.max(1, currentPage - 1);
+                    trackEvent(PlausibleEvents.Paginate, {
+                      direction: 'previous',
+                      page: prevPage,
+                    });
                     setCurrentPage(prevPage);
                     setActiveFilters(prev => ({ ...prev, pageNo: prevPage }));
                     fetchData({
@@ -1614,6 +1678,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                 <Button
                   onClick={() => {
                     const nextPage = currentPage + 1;
+                    trackEvent(PlausibleEvents.Paginate, {
+                      direction: 'next',
+                      page: nextPage,
+                    });
                     setCurrentPage(nextPage);
                     setActiveFilters(prev => ({ ...prev, pageNo: nextPage }));
                     fetchData({

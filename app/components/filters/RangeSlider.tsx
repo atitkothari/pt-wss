@@ -18,6 +18,7 @@ interface RangeSliderProps {
   maxValue: number;
   value: [number, number];
   onChange: (value: [number, number]) => void;
+  onValueCommit?: (value: [number, number]) => void;
   step?: number;
   min?: number;
   max?: number;
@@ -25,8 +26,8 @@ interface RangeSliderProps {
   formatValue?: (value: number) => string;
   className?: string;
   isExponential?: boolean;
-  toExponential?: (linearValue: number) => number;
-  fromExponential?: (exponentialValue: number) => number;
+  toExponential?: (val: number) => number;
+  fromExponential?: (val: number) => number;
   disabled?: boolean;
 }
 
@@ -37,6 +38,7 @@ export function RangeSlider({
   maxValue,
   value,
   onChange,
+  onValueCommit,
   step = 0.1,
   min = 0,
   max = 100,
@@ -84,6 +86,30 @@ export function RangeSlider({
     ];
 
     onChange(finalValue);
+  };
+
+  const handleSliderCommit = (newValue: number[]) => {
+    if (disabled) return;
+    
+    let typedValue: [number, number];
+
+    if (isExponential) {
+      // Convert from linear slider position to exponential value
+      typedValue = [toExponential(newValue[0]), toExponential(newValue[1])];
+    } else {
+      typedValue = [newValue[0], newValue[1]];
+    }
+
+    // Handle edge cases for min/max bounds with comparison operators
+    const finalValue: [number, number] = [
+      Math.abs(typedValue[0] - min) < Number.EPSILON ? min : typedValue[0],
+      Math.abs(typedValue[1] - max) < Number.EPSILON ? max : typedValue[1],
+    ];
+
+    // Call onValueCommit when user finishes dragging
+    if (onValueCommit) {
+      onValueCommit(finalValue);
+    }
   };
 
   // We don't need to debounce here since the parent component (AdvancedFilters)
@@ -136,6 +162,7 @@ export function RangeSlider({
                   max={max}
                   step={step}
                   onValueChange={handleSliderChange}
+                  onValueCommit={handleSliderCommit}
                   className={`mb-2 ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
                   disabled={disabled}
                 />  

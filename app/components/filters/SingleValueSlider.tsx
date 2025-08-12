@@ -15,6 +15,7 @@ interface SingleValueSliderProps {
   label: string;
   value: number;
   onChange: (value: number) => void;
+  onValueCommit?: (value: number) => void;
   step?: number;
   min?: number;
   max?: number;
@@ -28,6 +29,7 @@ export function SingleValueSlider({
   label,
   value,
   onChange,
+  onValueCommit,
   step = 0.1,
   min = 0,
   max = 100,
@@ -51,6 +53,14 @@ export function SingleValueSlider({
     const singleValue = newValue[0];
     setLocalValue(singleValue);
     onChange(singleValue);
+  };
+
+  const handleSliderCommit = (newValue: number[]) => {
+    const singleValue = newValue[0];
+    // Call onValueCommit when user finishes dragging
+    if (onValueCommit) {
+      onValueCommit(singleValue);
+    }
   };
 
   return (
@@ -96,6 +106,7 @@ export function SingleValueSlider({
           max={max}
           step={step}
           onValueChange={handleSliderChange}
+          onValueCommit={handleSliderCommit}
           className="mb-2"
         />
         <div className="flex justify-between text-xs text-gray-500 mt-0.5">

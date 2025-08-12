@@ -13,7 +13,7 @@ import { useUserAccess } from "@/app/hooks/useUserAccess";
 import DebugEnv from "../components/DebugEnv";
 import { sendAnalyticsEvent, AnalyticsEvents } from '../utils/analytics';
 import { useRouter } from "next/navigation";
-import { usePlausibleTracking } from '../hooks/usePlausibleTracking';
+import { PlausibleEvents, usePlausibleTracker } from '@/app/utils/plausible';
 import { StockChips } from '../components/StockChips';
 import { pricingInfo } from "../config/pricingInfo";
 import { fetchOptionsData } from "../services/api";
@@ -27,7 +27,7 @@ export default function PricingPage() {
   const { user, userId } = useAuth();
   const { status } = useUserAccess();
   const router = useRouter();
-  const { trackPricingEvent } = usePlausibleTracking();  
+  const { trackEvent } = usePlausibleTracker();
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -50,7 +50,11 @@ export default function PricingPage() {
       event_category: 'Pricing',
       event_label: isYearly ? 'Yearly' : 'Monthly'
     });
-    trackPricingEvent('billing_toggle', { isYearly });
+    if (isYearly) {
+      trackEvent(PlausibleEvents.PricingYearlyClick, { isYearly });
+    } else {
+      trackEvent(PlausibleEvents.PricingMonthlyClick, { isYearly });
+    }
   };
 
   const handleStartTrial = async () => {
@@ -74,7 +78,7 @@ export default function PricingPage() {
         event_category: 'Pricing',
         event_label: isYearly ? 'Yearly' : 'Monthly'
       });
-      trackPricingEvent('start_trial');
+      trackEvent(PlausibleEvents.PricingStartTrialClick);
       await createCheckoutSession(isYearly, isLimitedTime);
     } catch (error) {
       console.error('Error starting trial:', error);
@@ -96,7 +100,7 @@ export default function PricingPage() {
       event_category: 'Contact',
       event_label: 'Pricing Page'
     });
-    trackPricingEvent('contact');
+    trackEvent(PlausibleEvents.ContactClick);
     window.location.href = 'mailto:reply@wheelstrategyoptions.com';
   };
 

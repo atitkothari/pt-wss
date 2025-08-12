@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/app/context/AuthContext";
 import { useState } from "react";
-import { usePlausibleTracking } from '@/app/hooks/usePlausibleTracking';
+import { PlausibleEvents, usePlausibleTracker } from '@/app/utils/plausible';
 
 interface LoginButtonProps {
   onClose: () => void;
@@ -11,14 +11,14 @@ interface LoginButtonProps {
 
 export const LoginButton = ({ onClose }: LoginButtonProps) => {
   const { signInWithGoogle, loading } = useAuth();
-  const { trackAuthEvent } = usePlausibleTracking();
+  const { trackEvent } = usePlausibleTracker();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleClick = async () => {
     setIsLoading(true);
     try {
       await signInWithGoogle();
-      trackAuthEvent('sign_in', 'google');
+      trackEvent(PlausibleEvents.SignIn, { method: 'google' });
       onClose();
     } catch (error) {
       console.error('Google sign-in error:', error);
