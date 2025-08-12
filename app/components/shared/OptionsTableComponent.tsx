@@ -602,49 +602,6 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     router.push(`?${params.toString()}`);
   };
 
-  useEffect(() => {
-    // Auto fetch data on initial load regardless of URL parameters
-    if (!isFromCache) {
-      // Set isFromCache first to prevent multiple API calls
-      setIsFromCache(true);
-      // Use a small timeout to prevent immediate API call on page load
-      const timer = setTimeout(() => {
-        // If URL has parameters, use those for search
-        if (Array.from(searchParams.entries()).length > 0) {          
-          handleSearch();          
-        } else {
-          // Otherwise, fetch with default values             
-          fetchData({
-            searchTerms: selectedStocks,
-            minYield: yieldRange[0],
-            maxYield: yieldRange[1],
-            minPrice,
-            maxPrice,
-            minVol: volumeRange[0],
-            maxVol: volumeRange[1],
-            selectedExpiration,
-            pageNo: 1,
-            pageSize: rowsPerPage,
-            sortConfig: sortConfig.direction ? sortConfig : undefined,
-            deltaRange: deltaFilter,
-            peRatio,
-            marketCap,
-            sector,
-            moneynessRange,
-            impliedVolatilityRange: impliedVolatility,
-            minSelectedExpiration,
-            excludedSymbols: excludedStocks,
-            probabilityRange: probabilityRange as [number, number]
-          }).catch(console.error);
-      
-          setHasSearched(true);
-          setFiltersChanged(false)
-        }
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [isFromCache, searchParams, handleSearch, fetchData, selectedStocks, yieldRange, minPrice, maxPrice, volumeRange, selectedExpiration, sortConfig, deltaFilter, peRatio, marketCap, sector, moneynessRange, impliedVolatility, minSelectedExpiration, excludedStocks, probabilityRange, annualizedReturn]);
-  
 
   const [isFromCache, setIsFromCache] = useState(false);
   const [filtersChanged, setFiltersChanged] = useState(false);
@@ -816,6 +773,51 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       setIsAdvancedFiltersExpanded(false);
     }
   }, [trackEvent, selectedStocks, excludedStocks, yieldRange, minPrice, maxPrice, volumeRange, deltaFilter, minDte, maxDte, impliedVolatility, peRatio, marketCap, annualizedReturn, movingAverageCrossover, sector, moneynessRange, searchCount, updateURL, fetchData, symbolInput, sortConfig, probabilityRange, minSelectedExpiration, selectedExpiration]);
+
+  useEffect(() => {
+    // Auto fetch data on initial load regardless of URL parameters
+    if (!isFromCache) {
+      // Set isFromCache first to prevent multiple API calls
+      setIsFromCache(true);
+      // Use a small timeout to prevent immediate API call on page load
+      const timer = setTimeout(() => {
+        // If URL has parameters, use those for search
+        if (Array.from(searchParams.entries()).length > 0) {          
+          handleSearch();          
+        } else {
+          // Otherwise, fetch with default values             
+          fetchData({
+            searchTerms: selectedStocks,
+            minYield: yieldRange[0],
+            maxYield: yieldRange[1],
+            minPrice,
+            maxPrice,
+            minVol: volumeRange[0],
+            maxVol: volumeRange[1],
+            selectedExpiration,
+            pageNo: 1,
+            pageSize: rowsPerPage,
+            sortConfig: sortConfig.direction ? sortConfig : undefined,
+            deltaRange: deltaFilter,
+            peRatio,
+            marketCap,
+            sector,
+            moneynessRange,
+            impliedVolatilityRange: impliedVolatility,
+            minSelectedExpiration,
+            excludedSymbols: excludedStocks,
+            probabilityRange: probabilityRange as [number, number]
+          }).catch(console.error);
+      
+          setHasSearched(true);
+          setFiltersChanged(false)
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isFromCache, searchParams, handleSearch, fetchData, selectedStocks, yieldRange, minPrice, maxPrice, volumeRange, selectedExpiration, sortConfig, deltaFilter, peRatio, marketCap, sector, moneynessRange, impliedVolatility, minSelectedExpiration, excludedStocks, probabilityRange, annualizedReturn]);
+  
+
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -1415,72 +1417,65 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           <AdvancedFilters
             peRatio={peRatio}
             onPeRatioChange={(value) => {
-              trackEvent(PlausibleEvents.FilterChange, { filter: 'peRatio', value });
               setPeRatio(value);
             }}
             marketCap={marketCap}
             onMarketCapChange={(value) => {
-              trackEvent(PlausibleEvents.FilterChange, { filter: 'marketCap', value });
               setMarketCap(value);
             }}
             movingAverageCrossover={movingAverageCrossover}
             onMovingAverageCrossoverChange={(value) => {
-              trackEvent(PlausibleEvents.FilterChange, { filter: 'movingAverageCrossover', value });
               setMovingAverageCrossover(value);
             }}
             sector={sector}
             onSectorChange={(value) => {
-              trackEvent(PlausibleEvents.FilterChange, { filter: 'sector', value });
               setSector(value);
             }}
             deltaFilter={deltaFilter}
             onDeltaFilterChange={(value) => {
-              trackEvent(PlausibleEvents.FilterChange, { filter: 'deltaFilter', value });
               setDeltaFilter(value);
             }}
             volumeRange={volumeRange}
             onVolumeRangeChange={(value) => {
-              trackEvent(PlausibleEvents.FilterChange, { filter: 'volumeRange', value });
+              // trackEvent(PlausibleEvents.FilterChange, { filter: 'volumeRange', value });
               setVolumeRange(value);
             }}
             handleKeyPress={handleKeyPress}
             strikePrice={[minPrice, maxPrice]}
             onStrikePriceChange={([min, max]) => {
-              trackEvent(PlausibleEvents.FilterChange, { filter: 'strikePrice', value: [min, max] });
+              // trackEvent(PlausibleEvents.FilterChange, { filter: 'strikePrice', value: [min, max] });
               setMinPrice(min);
               setMaxPrice(max);
             }}
             impliedVolatility={impliedVolatility}
             onImpliedVolatilityChange={(value) => {
-              trackEvent(PlausibleEvents.FilterChange, { filter: 'impliedVolatility', value });
+              // trackEvent(PlausibleEvents.FilterChange, { filter: 'impliedVolatility', value });
               setImpliedVolatility(value);
             }}
             moneynessRange={moneynessRange}
             onMoneynessRangeChange={(value) => {
-              trackEvent(PlausibleEvents.FilterChange, { filter: 'moneynessRange', value });
+              // trackEvent(PlausibleEvents.FilterChange, { filter: 'moneynessRange', value });
               setMoneynessRange(value);
             }}
             minDte={minDte}
             maxDte={maxDte}
             onDteChange={([min, max]) => {
-              trackEvent(PlausibleEvents.FilterChange, { filter: 'dte', value: [min, max] });
+              // trackEvent(PlausibleEvents.FilterChange, { filter: 'dte', value: [min, max] });
               setMinDte(min);
               setMaxDte(max);
             }}
             yieldRange={yieldRange}
             onYieldRangeChange={(value) => {
-              trackEvent(PlausibleEvents.FilterChange, { filter: 'yieldRange', value });
+              // trackEvent(PlausibleEvents.FilterChange, { filter: 'yieldRange', value });
               setYieldRange(value);
             }}
             probabilityRange={probabilityRange}
             onProbabilityRangeChange={(value) => {
-              trackEvent(PlausibleEvents.FilterChange, { filter: 'probabilityRange', value });
               setProbabilityRange(value);
             }}
             autoSearch={false}
             excludedStocks={excludedStocks}
             onExcludedStocksChange={(value) => {
-              trackEvent(PlausibleEvents.FilterChange, { filter: 'excludedStocks', value });
               setExcludedStocks(value);
             }}
             symbols={symbols}
@@ -1488,7 +1483,6 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             onExpandedChange={setIsAdvancedFiltersExpanded}
             annualizedReturn={annualizedReturn}
             onAnnualizedReturnChange={(value) => {
-              trackEvent(PlausibleEvents.FilterChange, { filter: 'annualizedReturn', value });
               setAnnualizedReturn(value);
             }}
           />
