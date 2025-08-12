@@ -41,6 +41,10 @@ export enum PlausibleEvents {
   AddTrade = 'Add Trade',
   EditTrade = 'Edit Trade',
   DeleteTrade = 'Delete Trade',
+  ResetFilters = 'Reset Filters',
+  Share = 'Share',
+  Sort = 'Sort',
+  Paginate = 'Paginate',
 }
 
 import { usePlausible } from 'next-plausible';
