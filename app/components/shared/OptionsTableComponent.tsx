@@ -50,7 +50,7 @@ import { ColumnCustomizer } from "../table/ColumnCustomizer";
 import { screenerService } from "@/app/services/screenerService";
 import { useUserAccess } from "@/app/hooks/useUserAccess";
 import { toast } from 'sonner';
-import { usePlausibleTracking } from '@/app/hooks/usePlausibleTracking';
+import { PlausibleEvents, usePlausibleTracker } from '@/app/utils/plausible';
 import { sendAnalyticsEvent, AnalyticsEvents } from '@/app/utils/analytics';
 
 interface Filter {
@@ -96,7 +96,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const { symbols } = useSymbols();
   const { user, userId } = useAuth();
   const [savedScreeners, setSavedScreeners] = useState<SavedScreener[]>([]);
-  const { trackAuthEvent } = usePlausibleTracking();
+  const { trackEvent } = usePlausibleTracker();
   const { canAccessFeature } = useUserAccess();
 
   const {status} = useUserAccess()

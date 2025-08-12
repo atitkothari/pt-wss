@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Search } from 'lucide-react';
 import { useAuth } from "../context/AuthContext";
 import { BlurredTable } from "../components/auth/BlurredTable";
-import { usePlausibleTracking } from '@/app/hooks/usePlausibleTracking';
+import { PlausibleEvents, usePlausibleTracker } from '@/app/utils/plausible';
 
 interface CalculatorResult {
   expiration: string;
@@ -22,7 +22,7 @@ interface CalculatorResult {
 }
 
 export default function CoveredCallCalculatorPage() {
-  const { trackCalculatorEvent } = usePlausibleTracking();
+  const { trackEvent } = usePlausibleTracker();
   // Input state (what user types)
   const [inputSymbol, setInputSymbol] = useState<string>('');
   const [searchedSymbol, setSearchedSymbol] = useState<string>('');
@@ -216,7 +216,7 @@ export default function CoveredCallCalculatorPage() {
       setResults(calculatedResults);
       setSearchedSymbol(inputSymbol)
 
-      trackCalculatorEvent('calculate', {
+      trackEvent(PlausibleEvents.CalculatorUse, {
         symbol: inputSymbol,
         shares: inputShares,
         // strikePrice: strikePrice,
