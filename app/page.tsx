@@ -2,25 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { 
-  Search, 
-  BarChart2, 
-  DollarSign, 
-  Clock, 
-  Target, 
-  Filter, 
-  LineChart,
-  ArrowRight,
-  Save,
-  BellRing,
-  TrendingUp,
-  Shield,
-  Zap,
-  ChartSpline,
-  Star,
-  User,
-  Mail
-} from "lucide-react";
 import { Footer } from "./components/Footer";
 import { PageLayout } from "./components/PageLayout";
 import { motion, AnimatePresence } from "framer-motion";
@@ -48,7 +29,7 @@ function TestimonialsCarousel() {
   };
 
   return (
-    <div className="relative max-w-4xl mx-auto">
+    <div className="relative max-w-4xl">
       {/* Carousel Container */}
       <div className="relative overflow-hidden rounded-xl">
         <AnimatePresence mode="wait">
@@ -93,7 +74,7 @@ function TestimonialsCarousel() {
       </motion.button>
 
       {/* Dots Indicator */}
-      <div className="flex justify-center mt-6 space-x-2">
+      <div className="flex justify-start mt-6 space-x-2">
         {testimonials.map((_, index) => (
           <motion.button
             key={index}
@@ -116,10 +97,10 @@ export default function LandingPage() {
       
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-6 md:py-8">
-        <div className="grid lg:grid-cols-10 gap-6 lg:gap-8 items-center">
+        <div className="grid lg:grid-cols-12 gap-6 lg:gap-4 items-center">
           {/* Left side - Copy */}
           <motion.div 
-            className="text-center lg:text-left pr-0 lg:pr-8 lg:col-span-7 order-2 lg:order-1"
+            className="text-left lg:text-left pr-0 lg:pr-8 lg:col-span-7 order-2 lg:order-1"
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
@@ -136,19 +117,17 @@ export default function LandingPage() {
 
           {/* Right side - Hero Image */}
           <motion.div 
-            className="mt-0 lg:mt-0 w-full lg:w-full lg:col-span-3 lg:ml-auto h-full flex items-center order-1 lg:order-2"
+            className="mt-0 lg:mt-0 w-full lg:w-full lg:col-span-4 lg:ml-auto h-full flex items-center order-1 lg:order-2"
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
           >
-            <div className="w-full">
-              <div className="bg-gradient-to-r from-orange-400 to-orange-600 p-1 rounded-lg">
-                <div className="bg-white p-2 sm:p-4 rounded-lg">
-                  <div className="w-full h-48 sm:h-64 bg-gray-200 rounded flex items-center justify-center">
-                    <span className="text-gray-500 text-sm sm:text-base">Hero Screenshot Placeholder</span>
-                  </div>
-                </div>
-              </div>
+            <div className="w-full">                              
+                  <img 
+                    src="/v3_hero.jpeg" 
+                    alt="Wheel Strategy Options Hero" 
+                    className="w-full h-auto rounded-lg object-cover"
+                  />                
             </div>
           </motion.div>
         </div>
@@ -162,9 +141,9 @@ export default function LandingPage() {
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
       >
-        <div className="text-center max-w-4xl mx-auto">
+        <div className="text-left max-w-4xl">
           <motion.h2 
-            className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-800 px-2"
+            className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-800"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -173,7 +152,7 @@ export default function LandingPage() {
             Secure Consistent Monthly Premiums Income with Unrivaled Speed and Precision.
           </motion.h2>
           <motion.div
-            className="flex justify-center"
+            className="flex justify-start"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -181,13 +160,13 @@ export default function LandingPage() {
           >
             <Link href="/options">
               <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 lg:px-10 py-6 sm:py-7 md:py-8 lg:py-9 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto flex flex-col">
-                <div className="text-center font-bold leading-tight">Experience Instant Screening!</div>
-                <div className="text-center text-xs sm:text-sm leading-tight">(No Credit Card Needed to Try)</div>
+                <div className="text-left font-bold leading-tight">Experience Instant Screening!</div>
+                <div className="text-left text-xs sm:text-sm leading-tight">(No Credit Card Needed to Try)</div>
               </Button>
             </Link>
           </motion.div>
           <motion.p 
-            className="text-base sm:text-lg md:text-xl text-gray-600 mt-4 md:mt-6 leading-relaxed text-center lg:text-left px-2"
+            className="text-base sm:text-lg md:text-xl text-gray-600 mt-4 md:mt-6 leading-relaxed text-left lg:text-left px-2"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
@@ -234,10 +213,12 @@ export default function LandingPage() {
             Pinpoint the Most Profitable Covered Calls & CSPs with Confidence.
           </motion.p>
         </div>
-        <div className="max-w-4xl mx-auto px-2">
-          <div className="w-full h-48 sm:h-64 bg-gray-200 rounded-lg flex items-center justify-center">
-            <span className="text-gray-500 text-sm sm:text-base">Precision Tools Screenshot Placeholder</span>
-          </div>
+        <div className="max-w-4xl px-2">
+          <img 
+            src="/v3_predictable_income.jpeg" 
+            alt="Precision Tools for Predictable Profits" 
+            className="w-full h-auto rounded-lg object-cover"
+          />
         </div>
       </motion.div>
 
@@ -269,10 +250,13 @@ export default function LandingPage() {
             Hyper-Target Trades with Precision Filters (Delta, IV, P/E & many many more).
           </motion.p>
         </div>
-        <div className="max-w-4xl mx-auto px-2">
-          <div className="w-full h-48 sm:h-64 bg-gray-200 rounded-lg flex items-center justify-center">
-            <span className="text-gray-500 text-sm sm:text-base">Filtering Interface Screenshot Placeholder</span>
-          </div>
+        <div className="max-w-4xl px-2">
+        <img 
+            src="/v3_find_trades.jpeg" 
+            alt="Find Trades that Match Your Setup" 
+            className="w-full h-auto rounded-lg object-cover"
+          />
+   
         </div>
       </motion.div>
 
@@ -304,10 +288,12 @@ export default function LandingPage() {
             Lock in your most profitable screeners. And even get fresh results delivered straight to your inbox.
           </motion.p>
         </div>
-        <div className="max-w-md mx-auto px-2">
-          <div className="w-full h-48 sm:h-64 bg-gray-200 rounded-lg flex items-center justify-center">
-            <span className="text-gray-500 text-sm sm:text-base">Save Screener Interface Placeholder</span>
-          </div>
+        <div className="max-w-md px-2">
+          <img 
+            src="/v3_never_lose.jpeg" 
+            alt="Never Lose Your Winning Setup" 
+            className="w-full h-auto rounded-lg object-cover"
+          />
         </div>
       </motion.div>
 
@@ -339,10 +325,12 @@ export default function LandingPage() {
             Analyze Performance, Optimize for Profit & Maximize Your Wheel Cycle.
           </motion.p>
         </div>
-        <div className="max-w-md mx-auto px-2">
-          <div className="w-full h-48 sm:h-64 bg-gray-200 rounded-lg flex items-center justify-center">
-            <span className="text-gray-500 text-sm sm:text-base">Trade Tracking Interface Placeholder</span>
-          </div>
+        <div className="max-w-md px-2">
+          <img 
+            src="/v3_track_every.jpeg" 
+            alt="Track Every Trade" 
+            className="w-full h-auto rounded-lg object-cover"
+          />
         </div>
       </motion.div>
 
@@ -354,7 +342,7 @@ export default function LandingPage() {
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
       >
-        <div className="text-center px-2">
+        <div className="text-left px-2">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -363,7 +351,7 @@ export default function LandingPage() {
           >
             <Link href="/options">
               <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 lg:px-10 py-6 sm:py-7 md:py-8 lg:py-9 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto whitespace-normal">
-                <div className="text-center font-bold leading-tight">Try ALL Wheel Strategy Options Features FREE for 5 Days!</div>
+                <div className="text-left font-bold leading-tight">Try ALL Wheel Strategy Options Features FREE for 5 Days!</div>
               </Button>
             </Link>
           </motion.div>
@@ -388,7 +376,7 @@ export default function LandingPage() {
         viewport={{ once: true }}
       >
         <motion.h2 
-          className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 md:mb-12 text-gray-800 px-2"
+          className="text-2xl sm:text-3xl md:text-4xl font-bold text-left mb-8 md:mb-12 text-gray-800 px-2"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
@@ -407,7 +395,7 @@ export default function LandingPage() {
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
       >
-        <div className="text-center lg:text-left max-w-4xl mx-auto px-2">
+        <div className="text-center lg:text-left max-w-4xl">
           <motion.h2 
             className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-gray-800"
             initial={{ opacity: 0, y: 20 }}
@@ -455,7 +443,7 @@ export default function LandingPage() {
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
       >
-        <div className="text-center px-2">
+        <div className="text-left px-2">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -466,7 +454,7 @@ export default function LandingPage() {
           >
             <Link href="/options">
               <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-5 md:py-6 lg:py-7 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 font-bold w-full sm:w-auto whitespace-normal">
-                <div className="text-center font-bold leading-tight">Reclaim Your Time. Reclaim Your Profits.<br />Try NOW!</div>
+                <div className="text-left font-bold leading-tight">Reclaim Your Time. Reclaim Your Profits.<br />Try NOW!</div>
               </Button>
             </Link>
           </motion.div>
