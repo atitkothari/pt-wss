@@ -100,7 +100,7 @@ export default function LandingPage() {
         <div className="grid lg:grid-cols-12 gap-6 lg:gap-4 items-center">
           {/* Left side - Copy */}
           <motion.div 
-            className="text-left lg:text-left pr-0 lg:pr-8 lg:col-span-7 order-2 lg:order-1"
+            className="text-left lg:text-left pr-0 lg:pr-8 lg:col-span-7 order-1 lg:order-1"
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
@@ -117,7 +117,7 @@ export default function LandingPage() {
 
           {/* Right side - Hero Image */}
           <motion.div 
-            className="mt-0 lg:mt-0 w-full lg:w-full lg:col-span-4 lg:ml-auto h-full flex items-center order-1 lg:order-2"
+            className="mt-0 lg:mt-0 w-full lg:w-full lg:col-span-4 lg:ml-auto h-full flex items-center order-2 lg:order-2"
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
@@ -143,7 +143,7 @@ export default function LandingPage() {
       >
         <div className="text-left max-w-4xl">
           <motion.h2 
-            className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-800"
+            className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-800 text-left"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -166,7 +166,7 @@ export default function LandingPage() {
             </Link>
           </motion.div>
           <motion.p 
-            className="text-base sm:text-lg md:text-xl text-gray-600 mt-4 md:mt-6 leading-relaxed text-left lg:text-left px-2"
+            className="text-base sm:text-lg md:text-xl text-gray-600 mt-4 md:mt-6 leading-relaxed text-left lg:text-left"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
@@ -184,7 +184,7 @@ export default function LandingPage() {
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
       >
-        <div className="text-center lg:text-left mb-8 md:mb-12 px-2">
+        <div className="text-left mb-8 md:mb-12 px-2">
           <motion.h2 
             className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-gray-800"
             initial={{ opacity: 0, y: 20 }}
@@ -230,7 +230,7 @@ export default function LandingPage() {
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
       >
-        <div className="text-center lg:text-left mb-8 md:mb-12 px-2">
+        <div className="text-left mb-8 md:mb-12 px-2">
           <motion.h2 
             className="text-lg sm:text-xl md:text-2xl font-semibold mb-2 text-yellow-600"
             initial={{ opacity: 0, y: 20 }}
@@ -268,7 +268,7 @@ export default function LandingPage() {
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
       >
-        <div className="text-center lg:text-left mb-8 md:mb-12 px-2">
+        <div className="text-left mb-8 md:mb-12 px-2">
           <motion.h2 
             className="text-xl sm:text-2xl md:text-3xl font-semibold mb-2 text-yellow-600"
             initial={{ opacity: 0, y: 20 }}
@@ -305,7 +305,7 @@ export default function LandingPage() {
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
       >
-        <div className="text-center lg:text-left mb-8 md:mb-12 px-2">
+        <div className="text-left mb-8 md:mb-12 px-2">
           <motion.h2 
             className="text-xl sm:text-2xl md:text-3xl font-semibold mb-2 text-yellow-600"
             initial={{ opacity: 0, y: 20 }}
@@ -395,7 +395,7 @@ export default function LandingPage() {
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
       >
-        <div className="text-center lg:text-left max-w-4xl">
+        <div className="text-left max-w-4xl">
           <motion.h2 
             className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-gray-800"
             initial={{ opacity: 0, y: 20 }}
