@@ -3,15 +3,14 @@
 import Script from 'next/script';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
-import { hasAcceptedAnalytics, hasAcceptedMarketing } from '@/lib/cookiePreferences';
+import { hasAcceptedAnalytics } from '@/lib/cookiePreferences';
 
 export function GoogleAnalytics() {
   const [hasConsent, setHasConsent] = useState(false);
 
   useEffect(() => {
     const analyticsConsent = hasAcceptedAnalytics();
-    const marketingConsent = hasAcceptedMarketing();
-    setHasConsent(analyticsConsent || marketingConsent);
+    setHasConsent(analyticsConsent);
   }, []);
 
   // Only render scripts in production and if user has given consent

@@ -1,7 +1,6 @@
 export type CookiePreferences = {
   necessary: boolean;
   analytics: boolean;
-  marketing: boolean;
   timestamp: string;
 };
 
@@ -10,7 +9,6 @@ export const getCookiePreferences = (): CookiePreferences => {
     return {
       necessary: true,
       analytics: true,
-      marketing: false,
       timestamp: new Date().toISOString()
     };
   }
@@ -20,7 +18,6 @@ export const getCookiePreferences = (): CookiePreferences => {
     return {
       necessary: true,
       analytics: true,
-      marketing: false,
       timestamp: new Date().toISOString()
     };
   }
@@ -31,9 +28,4 @@ export const getCookiePreferences = (): CookiePreferences => {
 export const hasAcceptedAnalytics = (): boolean => {
   const preferences = getCookiePreferences();
   return preferences.analytics;
-};
-
-export const hasAcceptedMarketing = (): boolean => {
-  const preferences = getCookiePreferences();
-  return preferences.marketing;
 }; 

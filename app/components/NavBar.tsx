@@ -8,6 +8,7 @@ import { useAuth } from "@/app/context/AuthContext";
 import { useSubscription } from "@/app/context/SubscriptionContext";
 import { sendAnalyticsEvent, AnalyticsEvents } from '../utils/analytics';
 import { AuthModal } from './modals/AuthModal';
+import { useMarketingConsentContext } from '@/app/context/MarketingConsentContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +29,7 @@ export function NavBar() {
   const { user, loading: authLoading, logout } = useAuth();
   const { subscriptionStatus } = useSubscription();
   const { status, getRemainingTrialDays } = useUserAccess();
+  const { openModal: openMarketingModal } = useMarketingConsentContext();
   const router = useRouter();
   
   const navigation = {
@@ -231,6 +233,10 @@ export function NavBar() {
                     <DropdownMenuItem onClick={() => router.push('/saved-screeners')} className="cursor-pointer text-gray-700 hover:text-gray-900">
                       <Save className="mr-2 h-4 w-4" />
                       <span>Saved Screeners</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={openMarketingModal} className="cursor-pointer text-gray-700 hover:text-gray-900">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Marketing Email Preferences</span>
                     </DropdownMenuItem>
                     {!subscriptionStatus && (<DropdownMenuItem onClick={() => router.push('/pricing')} className="cursor-pointer text-gray-700 hover:text-gray-900">
                       {/* <Crown className="mr-2 h-4 w-4" /> */}

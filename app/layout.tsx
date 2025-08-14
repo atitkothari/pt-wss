@@ -6,7 +6,8 @@ import { GoogleAnalytics } from './components/GoogleAnalytics';
 import { AuthProvider } from './context/AuthContext';
 import { SubscriptionProvider } from './context/SubscriptionContext';
 import InstallPWA from './components/InstallPWA';
-import { MarketingConsentPopup } from './components/auth/MarketingConsentPopup';
+import { MarketingConsentModal } from './components/auth/MarketingConsentModal';
+import { MarketingConsentProvider } from './context/MarketingConsentContext';
 import { AnnouncementBanner } from './components/AnnouncementBanner';
 import { sendAnalyticsEvent } from './utils/analytics';
 import PlausibleProvider from 'next-plausible';
@@ -137,16 +138,18 @@ export default function RootLayout({
         )}
         <AuthProvider>
           <SubscriptionProvider>
-            <main>
-              <Suspense fallback={null}>
-                <ProAnnouncementBanner />
-              </Suspense>
-              {children}
-            </main>
-            <Toaster />
-            <InstallPWA />
-            {/* <MarketingConsentPopup /> */}
-            <CookieConsentBanner />
+            <MarketingConsentProvider>
+              <main>
+                <Suspense fallback={null}>
+                  <ProAnnouncementBanner />
+                </Suspense>
+                {children}
+              </main>
+              <Toaster />
+              <InstallPWA />
+              <MarketingConsentModal autoShow={true} />
+              <CookieConsentBanner />
+            </MarketingConsentProvider>
           </SubscriptionProvider>
         </AuthProvider>
         {hasAcceptedAnalytics() && (
