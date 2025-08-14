@@ -9,12 +9,15 @@ import { Button } from '@/components/ui/button';
 export function CookieConsentBanner() {
   const [showDetails, setShowDetails] = useState(false);
   const [showBanner, setShowBanner] = useState(true);
+  const [showCustomizePopup, setShowCustomizePopup] = useState(false);
+  const [analyticsEnabled, setAnalyticsEnabled] = useState(true);
 
   // Show banner for all users
   if (!showBanner) return null;
 
   return (
-    <CookieConsent
+    <>
+      <CookieConsent
       location="bottom"
       buttonText="Accept All"
       cookieName="cookie-consent"
@@ -42,7 +45,7 @@ export function CookieConsentBanner() {
       }}
       expires={150}
       enableDeclineButton
-      declineButtonText="Necessary Only"
+      declineButtonText="Customize"
       declineButtonStyle={{
         background: 'transparent',
         color: 'white',
@@ -60,14 +63,11 @@ export function CookieConsentBanner() {
           analytics: true,
           timestamp: new Date().toISOString()
         }));
+        setShowBanner(false);
       }}
       onDecline={() => {
-        // Accept only necessary cookies
-        localStorage.setItem('cookie-preferences', JSON.stringify({
-          necessary: true,
-          analytics: false,
-          timestamp: new Date().toISOString()
-        }));
+        // Show customize popup
+        setShowCustomizePopup(true);
       }}
     >
       <div className="flex flex-col gap-1 w-full md:w-auto">
@@ -113,5 +113,81 @@ export function CookieConsentBanner() {
         )}
       </div>
     </CookieConsent>
-  );
-} 
+
+    {/* Customize Cookie Preferences Popup */}
+    {showCustomizePopup && (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Cookie Preferences</h2>
+          
+          <div className="space-y-4 mb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-medium text-gray-900">Necessary Cookies</h3>
+                <p className="text-sm text-gray-600">Required for the website to function properly</p>
+              </div>
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={true}
+                  disabled
+                  className="h-4 w-4 text-blue-600 rounded border-gray-300"
+                />
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-medium text-gray-900">Analytics Cookies</h3>
+                <p className="text-sm text-gray-600">Help us understand how visitors use our website</p>
+              </div>
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={analyticsEnabled}
+                  onChange={(e) => setAnalyticsEnabled(e.target.checked)}
+                  className="h-4 w-4 text-blue-600 rounded border-gray-300"
+                />
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex gap-3">
+            <button
+              onClick={() => {
+                // Accept all cookies
+                localStorage.setItem('cookie-preferences', JSON.stringify({
+                  necessary: true,
+                  analytics: true,
+                  timestamp: new Date().toISOString()
+                }));
+                setShowCustomizePopup(false);
+                setShowBanner(false);
+              }}
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md font-medium transition-colors"
+            >
+              Accept All
+            </button>
+            
+            <button
+              onClick={() => {
+                // Save custom preferences
+                localStorage.setItem('cookie-preferences', JSON.stringify({
+                  necessary: true,
+                  analytics: analyticsEnabled,
+                  timestamp: new Date().toISOString()
+                }));
+                setShowCustomizePopup(false);
+                setShowBanner(false);
+              }}
+              className="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-md font-medium transition-colors"
+            >
+              Save Preferences
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+  </>
+);
+}
