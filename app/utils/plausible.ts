@@ -29,6 +29,7 @@ export enum PlausibleEvents {
   PricingMonthlyClick = 'Pricing Monthly Click',
   PricingYearlyClick = 'Pricing Yearly Click',
   PricingStartTrialClick = 'Pricing Start Trial Click',
+  PaidConversion = 'Paid Conversion',
 
   // Error events
   Error = 'Error',

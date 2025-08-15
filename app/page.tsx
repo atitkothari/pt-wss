@@ -22,6 +22,7 @@ import { Footer } from "./components/Footer";
 import { PageLayout } from "./components/PageLayout";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
+import { useCheckoutConversion } from "./hooks/useCheckoutConversion";
 
 function TestimonialsCarousel() {
   const testimonials = [1, 2, 3, 4, 5, 6];
@@ -108,6 +109,9 @@ function TestimonialsCarousel() {
 }
 
 export default function LandingPage() {
+  // Handle checkout conversion tracking
+  useCheckoutConversion();
+
   return (
     <PageLayout className="bg-gradient-to-br from-gray-100 via-blue-50 to-amber-50 text-gray-900 min-h-screen">            
       

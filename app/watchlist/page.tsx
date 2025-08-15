@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { AuthModal } from '../components/modals/AuthModal';
 import { AddTradeModal } from '@/app/components/modals/AddTradeModal';
 import { PlusCircle } from 'lucide-react';
+import { useCheckoutConversion } from "../hooks/useCheckoutConversion";
 
 interface WatchlistItem {
   id: string;
@@ -37,6 +38,9 @@ interface OptionData {
 }
 
 export default function WatchlistPage() {
+  // Handle checkout conversion tracking
+  useCheckoutConversion();
+
   const { user, loading: authLoading } = useAuth();
   const [watchlistItems, setWatchlistItems] = useState<WatchlistItem[]>([]);
   const [fetchedOptionData, setFetchedOptionData] = useState<Map<string, OptionData>>(new Map());

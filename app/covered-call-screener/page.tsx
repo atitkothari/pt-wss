@@ -8,6 +8,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { useUserAccess } from "../hooks/useUserAccess";
+import { useCheckoutConversion } from "../hooks/useCheckoutConversion";
 
 export default function CoveredCallScreenerPage() {
   const { loading } = useAuth();
@@ -15,9 +16,14 @@ export default function CoveredCallScreenerPage() {
   const router = useRouter();
   const hasSearched = Object.keys(Object.fromEntries(searchParams.entries())).length > 0;
   const {status} = useUserAccess();
+  
+  // Handle checkout conversion tracking
+  useCheckoutConversion();
+
   useEffect(()=>{
     // User status effect
   },[])
+
   // Redirect from old URLs
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());

@@ -18,6 +18,7 @@ import {
   dteFilterConfig
 } from "../config/filterConfig";
 import { sendAnalyticsEvent, AnalyticsEvents } from '../utils/analytics';
+import { useCheckoutConversion } from "../hooks/useCheckoutConversion";
 
 interface StockData {
   symbol: string;
@@ -45,6 +46,9 @@ const tabConfig: Record<TabType, { label: string; icon: string }> = {
 };
 
 export default function TrendingPage() {
+  // Handle checkout conversion tracking
+  useCheckoutConversion();
+
   // Covered Call stocks
   const [highIVStocks, setHighIVStocks] = useState<StockData[]>([]);
   const [earningsStocks, setEarningsStocks] = useState<StockData[]>([]);
@@ -604,6 +608,7 @@ export default function TrendingPage() {
             </div>
           </div>
         </div>
+        <Footer />
       </div>
     );
   };

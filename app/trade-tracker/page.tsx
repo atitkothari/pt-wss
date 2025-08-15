@@ -23,6 +23,7 @@ import { AuthModal } from "../components/modals/AuthModal";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { fetchOptionPrice, calculateUnrealizedPL } from "@/app/hooks/useOptionsData";
+import { useCheckoutConversion } from "../hooks/useCheckoutConversion";
 
 interface TradeWithUnrealizedPL extends Trade {
   unrealizedPL?: number;
@@ -32,6 +33,9 @@ interface TradeWithUnrealizedPL extends Trade {
 }
 
 export default function TradeTrackerPage() {
+  // Handle checkout conversion tracking
+  useCheckoutConversion();
+
   const { user,loading: authLoading } = useAuth();
   const [trades, setTrades] = useState<TradeWithUnrealizedPL[]>([]);
   const [loading, setLoading] = useState(true);

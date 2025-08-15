@@ -7,12 +7,16 @@ import { useAuth } from "../context/AuthContext";
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
+import { useCheckoutConversion } from "../hooks/useCheckoutConversion";
 
 export default function CashSecuredPutScreenerPage() {
   const { loading } = useAuth();
   const searchParams = useSearchParams();
   const router = useRouter();
   const hasSearched = Object.keys(Object.fromEntries(searchParams.entries())).length > 0;
+
+  // Handle checkout conversion tracking
+  useCheckoutConversion();
 
   // Redirect from old URLs
   useEffect(() => {
