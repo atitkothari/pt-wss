@@ -24,6 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { fetchOptionPrice, calculateUnrealizedPL } from "@/app/hooks/useOptionsData";
 import { useCheckoutConversion } from "../hooks/useCheckoutConversion";
+import PremiumChart from "../components/PremiumChart";
 
 interface TradeWithUnrealizedPL extends Trade {
   unrealizedPL?: number;
@@ -614,6 +615,9 @@ export default function TradeTrackerPage() {
             </Tabs>
           </>
         )}
+      </div>
+      <div className="mt-6">
+        <PremiumChart trades={trades} />
       </div>
       <Dialog open={isCloseTradeModalOpen} onOpenChange={setIsCloseTradeModalOpen}>
         <DialogContent>
