@@ -163,7 +163,7 @@ export default function RootLayout({
               (function(w,d,t,u,n,a,m){w['MauticTrackingObject']=n;
                   w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)},a=d.createElement(t),
                   m=d.getElementsByTagName(t)[0];a.async=1;a.src=u;m.parentNode.insertBefore(a,m)
-              })(window,document,'script','http://mautic-jkkk408cw4gcswsgo8k84k8o.194.195.92.250.sslip.io/mtc.js','mt');
+              })(window,document,'script','https://mautic.wheelstrategyoptions.com/mtc.js','mt');
 
               mt('send', 'pageview');
             `}
