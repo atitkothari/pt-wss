@@ -49,6 +49,7 @@ export const AnalyticsEvents = {
   
   // Pricing events
   PRICING_MONTHLY_CLICK: 'pricing_monthly_click',
+  PRICING_QUARTERLY_CLICK: 'pricing_quarterly_click',
   PRICING_YEARLY_CLICK: 'pricing_yearly_click',
   PRICING_START_TRIAL_CLICK: 'pricing_start_trial_click',
   

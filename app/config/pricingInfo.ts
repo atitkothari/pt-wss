@@ -6,6 +6,11 @@ export const pricingInfo = {
       priceStr: "$19.99",
       lineThrough: "$19.99",
     },
+    quarterly: {
+      price: 11.99,
+      priceStr: "$11.99",
+      lineThrough: "$19.99",      
+    },
     yearly: {
       price: 16.50,
       priceStr: "$16.50",
@@ -20,6 +25,11 @@ export const pricingInfo = {
       price: 14.99,
       priceStr: "$14.99",
       lineThrough: "$19.99",
+    },
+    quarterly: {
+      price: 11.99,
+      priceStr: "$11.99",
+      lineThrough: "$19.99",      
     },
     yearly: {
       price: 8.33,

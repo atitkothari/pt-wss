@@ -30,7 +30,7 @@ const getStripe = () => {
   return stripePromise;
 };
 
-export async function createCheckoutSession(isYearly: boolean = true, isLimitedTime: boolean = false) {
+export async function createCheckoutSession(billingCycle: 'monthly' | 'quarterly' | 'yearly' = 'yearly', isLimitedTime: boolean = false) {
   try {
     // Get current Firebase user
     const currentUser = auth.currentUser;
@@ -43,7 +43,7 @@ export async function createCheckoutSession(isYearly: boolean = true, isLimitedT
     const body = { 
       userId: currentUser.uid,
       email: currentUser.email,
-      isYearly: isYearly,
+      billingCycle: billingCycle,
       isLimitedTime: isLimitedTime,
     }
     

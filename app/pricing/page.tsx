@@ -19,7 +19,7 @@ import { pricingInfo } from "../config/pricingInfo";
 import { fetchOptionsData } from "../services/api";
 
 export default function PricingPage() {
-  const [isYearly, setIsYearly] = useState(true);  
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'quarterly' | 'yearly'>('yearly');  
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);  
   const [visitCount, setVisitCount] = useState(0);
@@ -43,17 +43,21 @@ export default function PricingPage() {
     reportPricingPage();
   }, []);
 
-  const handleBillingToggle = (isYearly: boolean) => {
-    setIsYearly(isYearly);
+  const handleBillingToggle = (cycle: 'monthly' | 'quarterly' | 'yearly') => {
+    setBillingCycle(cycle);
     sendAnalyticsEvent({
-      event_name: isYearly ? AnalyticsEvents.PRICING_YEARLY_CLICK : AnalyticsEvents.PRICING_MONTHLY_CLICK,
+      event_name: cycle === 'yearly' ? AnalyticsEvents.PRICING_YEARLY_CLICK : 
+                  cycle === 'quarterly' ? AnalyticsEvents.PRICING_QUARTERLY_CLICK : 
+                  AnalyticsEvents.PRICING_MONTHLY_CLICK,
       event_category: 'Pricing',
-      event_label: isYearly ? 'Yearly' : 'Monthly'
+      event_label: cycle === 'yearly' ? 'Yearly' : cycle === 'quarterly' ? 'Quarterly' : 'Monthly'
     });
-    if (isYearly) {
-      trackEvent(PlausibleEvents.PricingYearlyClick, { isYearly });
+    if (cycle === 'yearly') {
+      trackEvent(PlausibleEvents.PricingYearlyClick, { billingCycle: 'yearly' });
+    } else if (cycle === 'quarterly') {
+      trackEvent(PlausibleEvents.PricingQuarterlyClick, { billingCycle: 'quarterly' });
     } else {
-      trackEvent(PlausibleEvents.PricingMonthlyClick, { isYearly });
+      trackEvent(PlausibleEvents.PricingMonthlyClick, { billingCycle: 'monthly' });
     }
   };
 
@@ -76,10 +80,10 @@ export default function PricingPage() {
       sendAnalyticsEvent({
         event_name: AnalyticsEvents.PRICING_START_TRIAL_CLICK,
         event_category: 'Pricing',
-        event_label: isYearly ? 'Yearly' : 'Monthly'
+        event_label: billingCycle === 'yearly' ? 'Yearly' : billingCycle === 'quarterly' ? 'Quarterly' : 'Monthly'
       });
       trackEvent(PlausibleEvents.PricingStartTrialClick);
-      await createCheckoutSession(isYearly, isLimitedTime);
+      await createCheckoutSession(billingCycle, isLimitedTime);
     } catch (error) {
       console.error('Error starting trial:', error);
       alert('Something went wrong. Please try again.');
@@ -120,6 +124,74 @@ export default function PricingPage() {
     "Trade Tracker"
   ];
 
+  const getBillingCycleLabel = (cycle: 'monthly' | 'quarterly' | 'yearly') => {
+    switch (cycle) {
+      case 'monthly': return '/month';
+      case 'quarterly': return '/month';
+      case 'yearly': return '/month';
+      default: return '/month';
+    }
+  };
+
+  const getBillingCyclePeriod = (cycle: 'monthly' | 'quarterly' | 'yearly') => {
+    switch (cycle) {
+      case 'monthly': return 'month';
+      case 'quarterly': return 'quarter';
+      case 'yearly': return 'month';
+      default: return 'month';
+    }
+  };
+
+  const getPriceDisplay = (cycle: 'monthly' | 'quarterly' | 'yearly') => {
+    if (cycle === 'quarterly') {
+      return (
+        <>
+          <span className="text-3xl md:text-4xl font-bold text-gray-900">
+            <span className="line-through">{isLimitedTime ? pricingInfo.limitedTime.quarterly.lineThrough : pricingInfo.regular.quarterly.lineThrough}</span> {isLimitedTime ? pricingInfo.limitedTime.quarterly.priceStr : pricingInfo.regular.quarterly.priceStr}
+          </span>
+          <span className="text-gray-600 text-base md:text-lg">
+            /month
+          </span>
+        </>
+      );
+    } else if (cycle === 'yearly') {
+      return (
+        <>
+          <span className="text-3xl md:text-4xl font-bold text-gray-900">
+            <span className="line-through">{isLimitedTime ? pricingInfo.limitedTime.yearly.lineThrough : pricingInfo.regular.yearly.lineThrough}</span> {isLimitedTime ? pricingInfo.limitedTime.yearly.priceStr : pricingInfo.regular.yearly.priceStr}
+          </span>
+          <span className="text-gray-600 text-base md:text-lg">
+            /month
+          </span>
+        </>
+      );
+    } else {
+      return (
+        <>
+          <div className="flex items-center gap-2">
+            <span className="text-3xl md:text-4xl font-bold text-gray-900">
+              {isLimitedTime && <span className="line-through">{pricingInfo.limitedTime.monthly.lineThrough}</span>} {isLimitedTime ? pricingInfo.limitedTime.monthly.priceStr : pricingInfo.regular.monthly.priceStr}
+            </span>                      
+            <span className="text-gray-600 text-base md:text-lg">
+              /month
+            </span>
+          </div>
+        </>
+      );
+    }
+  };
+
+  const getYearlyEquivalent = (cycle: 'monthly' | 'quarterly' | 'yearly') => {
+    if (cycle === 'yearly') {
+      return (
+        <p className="text-green-600 text-xs md:text-sm mt-2">
+          <span className="line-through">{isLimitedTime ? pricingInfo.limitedTime.yearly.lineThroughYear : pricingInfo.regular.yearly.lineThroughYear}</span> {isLimitedTime ? pricingInfo.limitedTime.yearly.yearlyEquivalentStr : pricingInfo.regular.yearly.yearlyEquivalentStr}
+        </p>
+      );
+    }
+    return null;
+  };
+
   return (
     <PageLayout className="bg-white text-gray-900">
       <AuthModal 
@@ -140,31 +212,43 @@ export default function PricingPage() {
           </p>
 
           {/* Billing Toggle */}
-          <div className="flex items-center justify-center gap-3 md:gap-4">
-            <span className={`text-base md:text-lg ${!isYearly ? 'text-blue-600 font-semibold' : 'text-gray-600'}`}>
-              Monthly
-            </span>
+          <div className="flex items-center justify-center gap-3 md:gap-4 mb-6">
             <button
-              onClick={() => {
-                handleBillingToggle(!isYearly);
-              }}
-              className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              style={{ backgroundColor: isYearly ? '#3B82F6' : '#E5E7EB' }}
+              onClick={() => handleBillingToggle('monthly')}
+              className={`px-4 py-2 rounded-lg text-sm md:text-base font-medium transition-colors ${
+                billingCycle === 'monthly' 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
             >
-              <span
-                className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
-                  isYearly ? 'translate-x-6' : 'translate-x-1'
-                }`}
-              />
+              Monthly
             </button>
-            <div className="flex items-center gap-1.5 md:gap-2">
-              <span className={`text-base md:text-lg ${isYearly ? 'text-blue-600 font-semibold' : 'text-gray-600'}`}>
-                Yearly
-              </span>
-              <span className="bg-green-100 text-green-700 text-xs md:text-sm px-1.5 md:px-2 py-0.5 md:py-1 rounded-full font-medium whitespace-nowrap">
-                Save 17%
-              </span>
-            </div>           
+            <button
+              onClick={() => handleBillingToggle('quarterly')}
+              className={`px-4 py-2 rounded-lg text-sm md:text-base font-medium transition-colors ${
+                billingCycle === 'quarterly' 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Quarterly
+              {/* <span className="ml-2 bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full font-medium">
+                Save 45%
+              </span> */}
+            </button>
+            <button
+              onClick={() => handleBillingToggle('yearly')}
+              className={`px-4 py-2 rounded-lg text-sm md:text-base font-medium transition-colors ${
+                billingCycle === 'yearly' 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Yearly
+              {/* <span className="ml-2 bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full font-medium">
+                Save 55%
+              </span> */}
+            </button>
           </div>
         </div>
       </div>
@@ -179,33 +263,9 @@ export default function PricingPage() {
                 <CardTitle className="text-2xl md:text-3xl font-bold mb-2">Pro Plan</CardTitle>                
 
                 <div className="flex items-center justify-center gap-1 md:gap-2">
-                  {isYearly ? (
-                    <>
-                      <span className="text-3xl md:text-4xl font-bold text-gray-900">
-                        <span className="line-through">{isLimitedTime ? pricingInfo.limitedTime.yearly.lineThrough : pricingInfo.regular.yearly.lineThrough}</span> {isLimitedTime ? pricingInfo.limitedTime.yearly.priceStr : pricingInfo.regular.yearly.priceStr}
-                      </span>
-                      <span className="text-gray-600 text-base md:text-lg">
-                        /month
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <div className="flex items-center gap-2">
-                        <span className="text-3xl md:text-4xl font-bold text-gray-900">
-                          {isLimitedTime && <span className="line-through">{pricingInfo.limitedTime.monthly.lineThrough}</span>} {isLimitedTime ? pricingInfo.limitedTime.monthly.priceStr : pricingInfo.regular.monthly.priceStr}
-                        </span>                      
-                        <span className="text-gray-600 text-base md:text-lg">
-                          /month
-                        </span>
-                      </div>
-                    </>
-                  )}
+                  {getPriceDisplay(billingCycle)}
                 </div>
-                {isYearly ? (
-                  <p className="text-green-600 text-xs md:text-sm mt-2">
-                    <span className="line-through">{isLimitedTime ? pricingInfo.limitedTime.yearly.lineThroughYear : pricingInfo.regular.yearly.lineThroughYear}</span> {isLimitedTime ? pricingInfo.limitedTime.yearly.yearlyEquivalentStr : pricingInfo.regular.yearly.yearlyEquivalentStr}
-                  </p>
-                ): null}
+                {getYearlyEquivalent(billingCycle)}
                 {isLimitedTime && (
                   <p className="text-red-600 text-xs md:text-sm mt-2 font-semibold">
                     Limited time offer! Discounted price available for a short period.

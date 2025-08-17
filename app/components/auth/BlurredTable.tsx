@@ -59,16 +59,18 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
     }
   }, []);  
 
-  const handleUpgrade = async (isYearly: boolean = true) => {
+  const handleUpgrade = async (billingCycle: 'monthly' | 'quarterly' | 'yearly' = 'yearly') => {
     try {
       setIsUpgrading(true);
       sendAnalyticsEvent({
-        event_name: isYearly ? AnalyticsEvents.PRICING_YEARLY_CLICK : AnalyticsEvents.PRICING_MONTHLY_CLICK,
+        event_name: billingCycle === 'yearly' ? AnalyticsEvents.PRICING_YEARLY_CLICK : 
+                    billingCycle === 'quarterly' ? AnalyticsEvents.PRICING_QUARTERLY_CLICK : 
+                    AnalyticsEvents.PRICING_MONTHLY_CLICK,
         event_category: 'Pricing',
-        event_label: isYearly ? 'Yearly' : 'Monthly',
-        plan_type: isYearly ? 'yearly' : 'monthly'
+        event_label: billingCycle === 'yearly' ? 'Yearly' : billingCycle === 'quarterly' ? 'Quarterly' : 'Monthly',
+        plan_type: billingCycle
       });
-      await createCheckoutSession(isYearly, isLimitedTime);
+      await createCheckoutSession(billingCycle, isLimitedTime);
     } catch (error) {
       console.error('Failed to create checkout session:', error);
     } finally {
@@ -184,56 +186,8 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                     Your subscription has ended. Please choose a subscription plan.
                   </h2>
                   <div className="flex flex-col sm:flex-row gap-3 mt-2">
-                    <Button
-                      onClick={() => handleUpgrade(false)}
-                      size="lg"
-                      disabled={isUpgrading}
-                      className="bg-gray-900 hover:bg-gray-800 text-white border-0 shadow-md flex flex-col py-4 h-auto disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {isUpgrading ? (
-                        <div className="flex items-center justify-center gap-2">
-                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                          <span>Loading...</span>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="flex items-center gap-1">
-                            <span className="text-xs font-normal">{isLimitedTime ? pricingInfo.limitedTime.monthly.priceStr : pricingInfo.regular.monthly.priceStr}/month</span>                                                        
-                          </div>
-                          <span className="text-xs font-semibold">Monthly Plan</span>                          
-                        </>
-                      )}
-                    </Button>
-                    <Button
-                      onClick={() => handleUpgrade(true)}
-                      size="lg"
-                      disabled={isUpgrading}
-                      className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white border-0 relative shadow-md flex flex-col py-4 h-auto disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {isUpgrading ? (
-                        <div className="flex items-center justify-center gap-2">
-                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                          <span>Loading...</span>
-                        </div>
-                      ) : (
-                        <>
-                          <span className="text-base font-normal">{isLimitedTime ? pricingInfo.limitedTime.yearly.priceStr : pricingInfo.regular.yearly.priceStr}/month</span>
-                          <span className="text-xs font-semibold">Yearly Plan</span>                          
-                          {/* <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 20%</span> */}
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </>
-              ) : (                
-                <>
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 px-4 py-2 rounded-md text-center">
-                  Welcome back! Your trial has ended. Please choose a subscription plan.
-                  </h2>
-                  <span className="text-base font-semibold"> Our users make back their yearly subscription cost in one trade.</span>
-                  <div className="flex flex-col sm:flex-row gap-3 mt-2">
-                    <Button
-                      onClick={() => handleUpgrade(false)}
+                                        <Button
+                      onClick={() => handleUpgrade('monthly')}
                       size="lg"
                       disabled={isUpgrading}
                       className="bg-gray-900 hover:bg-gray-800 text-white border-0 shadow-md flex flex-col py-4 h-auto disabled:opacity-50 disabled:cursor-not-allowed"
@@ -253,7 +207,26 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                       )}
                     </Button>
                     <Button
-                      onClick={() => handleUpgrade(true)}
+                      onClick={() => handleUpgrade('quarterly')}
+                      size="lg"
+                      disabled={isUpgrading}
+                      className="bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white border-0 relative shadow-md flex flex-col py-4 h-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isUpgrading ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                          <span>Loading...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <span className="text-base font-normal">{isLimitedTime ? pricingInfo.limitedTime.quarterly.priceStr : pricingInfo.regular.quarterly.priceStr}/month</span>
+                          <span className="text-xs font-semibold">Quarterly Plan</span>                          
+                          {/* <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 35%</span> */}
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      onClick={() => handleUpgrade('yearly')}
                       size="lg"
                       disabled={isUpgrading}
                       className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white border-0 relative shadow-md flex flex-col py-4 h-auto disabled:opacity-50 disabled:cursor-not-allowed"
@@ -267,7 +240,74 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                         <>
                           <span className="text-base font-normal">{isLimitedTime ? pricingInfo.limitedTime.yearly.priceStr : pricingInfo.regular.yearly.priceStr}/month</span>
                           <span className="text-xs font-semibold">Yearly Plan</span>                          
-                          {/* <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 20%</span> */}
+                          {/* <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 45%</span> */}
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </>
+              ) : (                
+                <>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 px-4 py-2 rounded-md text-center">
+                  Welcome back! Your trial has ended. Please choose a subscription plan.
+                  </h2>
+                  <span className="text-base font-semibold"> Our users make back their yearly subscription cost in one trade.</span>
+                  <div className="flex flex-col sm:flex-row gap-3 mt-2">
+                    <Button
+                      onClick={() => handleUpgrade('monthly')}
+                      size="lg"
+                      disabled={isUpgrading}
+                      className="bg-gray-900 hover:bg-gray-800 text-white border-0 shadow-md flex flex-col py-4 h-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isUpgrading ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                          <span>Loading...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs font-normal">{isLimitedTime ? pricingInfo.limitedTime.monthly.priceStr : pricingInfo.regular.monthly.priceStr}/month</span>                            
+                          </div>
+                          <span className="text-xs font-semibold">Monthly Plan</span>                          
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      onClick={() => handleUpgrade('quarterly')}
+                      size="lg"
+                      disabled={isUpgrading}
+                      className="bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white border-0 relative shadow-md flex flex-col py-4 h-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isUpgrading ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                          <span>Loading...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <span className="text-base font-normal">{isLimitedTime ? pricingInfo.limitedTime.quarterly.priceStr : pricingInfo.regular.quarterly.priceStr}/month</span>
+                          <span className="text-xs font-semibold">Quarterly Plan</span>                          
+                          {/* <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 45%</span> */}
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      onClick={() => handleUpgrade('yearly')}
+                      size="lg"
+                      disabled={isUpgrading}
+                      className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white border-0 relative shadow-md flex flex-col py-4 h-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isUpgrading ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                          <span>Loading...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <span className="text-base font-normal">{isLimitedTime ? pricingInfo.limitedTime.yearly.priceStr : pricingInfo.regular.yearly.priceStr}/month</span>
+                          <span className="text-xs font-semibold">Yearly Plan</span>                          
+                          {/* <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 55%</span> */}
                         </>
                       )}
                     </Button>

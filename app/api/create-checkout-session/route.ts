@@ -13,16 +13,18 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 
 // Get these from environment variables in production
 const MONTHLY_PRICE_ID = process.env.STRIPE_MONTHLY_PRICE_ID;
+const QUARTERLY_PRICE_ID = process.env.STRIPE_QUARTERLY_PRICE_ID;
 const YEARLY_PRICE_ID = process.env.STRIPE_YEARLY_PRICE_ID;
 const MONTHLY_PRICE_ID_LT = process.env.STRIPE_MONTHLY_PRICE_ID_LT;
+const QUARTERLY_PRICE_ID_LT = process.env.STRIPE_QUARTERLY_PRICE_ID_LT;
 const YEARLY_PRICE_ID_LT = process.env.STRIPE_YEARLY_PRICE_ID_LT;
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL;
 
-if (!MONTHLY_PRICE_ID || !YEARLY_PRICE_ID) {
+if (!MONTHLY_PRICE_ID || !QUARTERLY_PRICE_ID || !YEARLY_PRICE_ID) {
   throw new Error('Stripe price IDs are not set in environment variables');
 }
 
-if (!MONTHLY_PRICE_ID_LT || !YEARLY_PRICE_ID_LT) {
+if (!MONTHLY_PRICE_ID_LT || !QUARTERLY_PRICE_ID_LT || !YEARLY_PRICE_ID_LT) {
   throw new Error('Stripe limited time price IDs are not set in environment variables');
 }
 
@@ -37,7 +39,7 @@ export async function POST(req: Request) {
     
     // Get user info from request body since we're only using Firebase Auth
     const body = await req.json();
-    const { userId, email: userEmail, isYearly, isLimitedTime } = body;
+    const { userId, email: userEmail, billingCycle, isLimitedTime } = body;
     
 
     
@@ -105,15 +107,27 @@ export async function POST(req: Request) {
       // Use predefined price IDs from environment variables if available
       let priceId;
       if (isLimitedTime) {
-        priceId = isYearly ? YEARLY_PRICE_ID_LT : MONTHLY_PRICE_ID_LT;
+        if (billingCycle === 'monthly') {
+          priceId = MONTHLY_PRICE_ID_LT;
+        } else if (billingCycle === 'quarterly') {
+          priceId = QUARTERLY_PRICE_ID_LT;
+        } else {
+          priceId = YEARLY_PRICE_ID_LT;
+        }
         if (!priceId) {
-          console.error("Limited time price ID not found for subscription type:", isYearly ? 'yearly' : 'monthly');
+          console.error("Limited time price ID not found for subscription type:", billingCycle);
           return new NextResponse('Internal server error - Limited time price configuration missing', { status: 500 });
         }
       } else {
-        priceId = isYearly ? YEARLY_PRICE_ID : MONTHLY_PRICE_ID;
+        if (billingCycle === 'monthly') {
+          priceId = MONTHLY_PRICE_ID;
+        } else if (billingCycle === 'quarterly') {
+          priceId = QUARTERLY_PRICE_ID;
+        } else {
+          priceId = YEARLY_PRICE_ID;
+        }
         if (!priceId) {
-          console.error("Price ID not found for subscription type:", isYearly ? 'yearly' : 'monthly');
+          console.error("Price ID not found for subscription type:", billingCycle);
           return new NextResponse('Internal server error - Price configuration missing', { status: 500 });
         }
       }
