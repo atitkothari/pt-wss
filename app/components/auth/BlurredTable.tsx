@@ -200,7 +200,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                       ) : (
                         <>
                           <div className="flex items-center gap-1">
-                            <span className="text-xs font-normal">{isLimitedTime ? pricingInfo.limitedTime.monthly.priceStr : pricingInfo.regular.monthly.priceStr}/month</span>                            
+                            <span className="text-base font-semibold">{isLimitedTime ? pricingInfo.limitedTime.monthly.priceStr : pricingInfo.regular.monthly.priceStr}/month</span>                            
                           </div>
                           <span className="text-xs font-semibold">Monthly Plan</span>                          
                         </>
@@ -219,7 +219,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                         </div>
                       ) : (
                         <>
-                          <span className="text-base font-normal">{isLimitedTime ? pricingInfo.limitedTime.quarterly.priceStr : pricingInfo.regular.quarterly.priceStr}/month</span>
+                          <span className="text-base font-semibold">{isLimitedTime ? pricingInfo.limitedTime.quarterly.priceStr : pricingInfo.regular.quarterly.priceStr}/month</span>
                           <span className="text-xs font-semibold">Quarterly Plan</span>                          
                           {/* <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 35%</span> */}
                         </>
@@ -240,7 +240,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                         <>
                           <span className="text-base font-normal">{isLimitedTime ? pricingInfo.limitedTime.yearly.priceStr : pricingInfo.regular.yearly.priceStr}/month</span>
                           <span className="text-xs font-semibold">Yearly Plan</span>                          
-                          {/* <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 45%</span> */}
+                          <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Most Popular</span>
                         </>
                       )}
                     </Button>
@@ -267,7 +267,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                       ) : (
                         <>
                           <div className="flex items-center gap-1">
-                            <span className="text-xs font-normal">{isLimitedTime ? pricingInfo.limitedTime.monthly.priceStr : pricingInfo.regular.monthly.priceStr}/month</span>                            
+                            <span className="text-base font-normal">{isLimitedTime ? pricingInfo.limitedTime.monthly.priceStr : pricingInfo.regular.monthly.priceStr}/month</span>                            
                           </div>
                           <span className="text-xs font-semibold">Monthly Plan</span>                          
                         </>
@@ -307,7 +307,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
                         <>
                           <span className="text-base font-normal">{isLimitedTime ? pricingInfo.limitedTime.yearly.priceStr : pricingInfo.regular.yearly.priceStr}/month</span>
                           <span className="text-xs font-semibold">Yearly Plan</span>                          
-                          {/* <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Save 55%</span> */}
+                          <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">Most Popular</span>
                         </>
                       )}
                     </Button>
