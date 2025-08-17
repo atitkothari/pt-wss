@@ -518,7 +518,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     }
   }, [minSelectedExpiration, option]);
   const [sortConfig, setSortConfig] = useState<{ field: keyof Option; direction: 'asc' | 'desc' | null }>({ 
-    field: "yieldPercent", 
+    field: "volume", 
     direction: 'desc' 
   });
   
