@@ -65,10 +65,12 @@ export function ShareButton({ elementToCapture, className, option }: ShareButton
         ctx.fillText(title, newCanvas.width / 2, 150);
 
         // Expiration date
-        const expirationDate = new Date(option.expiration).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        const expirationDate = new Date(option.expiration);
+        expirationDate.setDate(expirationDate.getDate()+1);
+        const expirationDateStr = expirationDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
         ctx.font = '36px Arial';
         ctx.fillStyle = '#6b7280'; // Medium gray
-        ctx.fillText(`Expires ${expirationDate}`, newCanvas.width / 2, 210);
+        ctx.fillText(`Expires ${expirationDateStr}`, newCanvas.width / 2, 210);
 
         // Main content area
         const contentStartY = 350;
