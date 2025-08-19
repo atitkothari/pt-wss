@@ -106,13 +106,36 @@ export default function LandingPage() {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <motion.h1 
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 text-gray-900 leading-tight md:leading-normal pb-1"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 text-black leading-tight md:leading-normal pb-1"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             >
-              Master the Wheel Strategy. Pinpoint High-Yield Covered Calls & CSPs, Effortlessly.
+              Master the Wheel Strategy. Pinpoint High-Yield Covered Calls & Cash Secured Puts, Effortlessly.
             </motion.h1>
+            <motion.h2 
+            className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-black text-left"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            Secure Consistent Monthly Premiums Income with Unrivaled Speed and Precision.
+          </motion.h2>
+          <motion.div
+            className="flex justify-start mt-10"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+          >
+            <Link href="/options">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 lg:px-10 py-6 sm:py-7 md:py-8 lg:py-9 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto flex flex-col">
+                <div className="text-left font-bold leading-tight">Experience Instant Screening!</div>
+                <div className="text-left text-xs sm:text-sm leading-tight">(No Credit Card Needed to Try)</div>
+              </Button>
+            </Link>
+          </motion.div>
           </motion.div>
 
           {/* Right side - Hero Image */}
@@ -140,40 +163,17 @@ export default function LandingPage() {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
-      >
-        <div className="text-left max-w-4xl">
-          <motion.h2 
-            className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-800 text-left"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-            Secure Consistent Monthly Premiums Income with Unrivaled Speed and Precision.
-          </motion.h2>
-          <motion.div
-            className="flex justify-start"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            viewport={{ once: true }}
-          >
-            <Link href="/options">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 lg:px-10 py-6 sm:py-7 md:py-8 lg:py-9 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto flex flex-col">
-                <div className="text-left font-bold leading-tight">Experience Instant Screening!</div>
-                <div className="text-left text-xs sm:text-sm leading-tight">(No Credit Card Needed to Try)</div>
-              </Button>
-            </Link>
-          </motion.div>
+      >        
+
           <motion.p 
-            className="text-base sm:text-lg md:text-xl text-gray-600 mt-4 md:mt-6 leading-relaxed text-left lg:text-left"
+            className="text-base sm:text-lg md:text-xl text-black mt-4 md:mt-6 leading-relaxed text-left lg:text-left"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
           >
-            The AI-powered screener scans over 570,000 option contracts in less than a second, delivering high-yield trades tailored by option sellers, for option sellers. Invest in Your Profits, Risk-Free!
+            The AI-powered screener scans over 570,000 option contracts in less than a second, delivering high-yield trades tailored by option sellers, for option sellers. <span className="text-green-600 font-bold">Invest in Your Profits, Risk-Free!</span>
           </motion.p>
-        </div>
+        
       </motion.div>
 
       {/* Precision Tools Section */}
@@ -186,7 +186,7 @@ export default function LandingPage() {
       >
         <div className="text-left mb-8 md:mb-12 px-2">
           <motion.h2 
-            className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-gray-800"
+            className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-black"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -204,7 +204,7 @@ export default function LandingPage() {
             Generate Predictable Income.
           </motion.h3>
           <motion.p 
-            className="text-base sm:text-lg md:text-xl text-gray-600"
+            className="text-base sm:text-lg md:text-xl text-black"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
@@ -213,7 +213,7 @@ export default function LandingPage() {
             Pinpoint the Most Profitable Covered Calls & CSPs with Confidence.
           </motion.p>
         </div>
-        <div className="max-w-4xl px-2">
+        <div className="max-w-4xl">
           <img 
             src="/v3_predictable_income.jpeg" 
             alt="Precision Tools for Predictable Profits" 
@@ -241,7 +241,7 @@ export default function LandingPage() {
             Find Trades that Match Your Setup.
           </motion.h2>
           <motion.p 
-            className="text-base sm:text-lg md:text-xl text-gray-600"
+            className="text-base sm:text-lg md:text-xl text-black"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -250,7 +250,7 @@ export default function LandingPage() {
             Hyper-Target Trades with Precision Filters (Delta, IV, P/E & many many more).
           </motion.p>
         </div>
-        <div className="max-w-4xl px-2">
+        <div className="max-w-4xl">
         <img 
             src="/v3_find_trades.jpeg" 
             alt="Find Trades that Match Your Setup" 
@@ -279,7 +279,7 @@ export default function LandingPage() {
             Never Lose Your Winning Setup.
           </motion.h2>
           <motion.p 
-            className="text-base sm:text-lg md:text-xl text-gray-600"
+            className="text-base sm:text-lg md:text-xl text-black"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -288,7 +288,7 @@ export default function LandingPage() {
             Lock in your most profitable screeners. And even get fresh results delivered straight to your inbox.
           </motion.p>
         </div>
-        <div className="max-w-md px-2">
+        <div className="max-w-md">
           <img 
             src="/v3_never_lose.jpeg" 
             alt="Never Lose Your Winning Setup" 
@@ -316,7 +316,7 @@ export default function LandingPage() {
             Track Every Trade.
           </motion.h2>
           <motion.p 
-            className="text-base sm:text-lg md:text-xl text-gray-600"
+            className="text-base sm:text-lg md:text-xl text-black"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -325,7 +325,7 @@ export default function LandingPage() {
             Analyze Performance, Optimize for Profit & Maximize Your Wheel Cycle.
           </motion.p>
         </div>
-        <div className="max-w-md px-2">
+        <div className="max-w-4xl">
           <img 
             src="/v3_track_every.jpeg" 
             alt="Track Every Trade" 
@@ -356,7 +356,7 @@ export default function LandingPage() {
             </Link>
           </motion.div>
           <motion.p 
-            className="text-base sm:text-lg text-gray-600 mt-4"
+            className="text-base sm:text-lg text-black mt-4"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -376,7 +376,7 @@ export default function LandingPage() {
         viewport={{ once: true }}
       >
         <motion.h2 
-          className="text-2xl sm:text-3xl md:text-4xl font-bold text-left mb-8 md:mb-12 text-gray-800 px-2"
+          className="text-2xl sm:text-3xl md:text-4xl font-bold text-left mb-8 md:mb-12 text-black px-2"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
@@ -395,9 +395,9 @@ export default function LandingPage() {
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
       >
-        <div className="text-left max-w-4xl">
+        <div className="text-left">
           <motion.h2 
-            className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-gray-800"
+            className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-black"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -406,7 +406,7 @@ export default function LandingPage() {
             Why We Built This.
           </motion.h2>
           <motion.h3 
-            className="text-lg sm:text-xl md:text-2xl font-semibold mb-4 md:mb-6 text-gray-700"
+            className="text-lg sm:text-xl md:text-2xl font-semibold mb-4 md:mb-6 text-black"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -415,7 +415,7 @@ export default function LandingPage() {
             Built by Traders, For Traders.
           </motion.h3>
           <motion.p 
-            className="text-base sm:text-lg text-gray-600 leading-relaxed"
+            className="text-base sm:text-lg text-black leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
@@ -424,7 +424,7 @@ export default function LandingPage() {
             We're options enthusiasts who grew frustrated with ridiculously priced, clunky, slow screeners. So, we built the tool we wished we had – a powerful, intuitive platform designed to maximize your premium income.
           </motion.p>
           <motion.p 
-            className="text-base sm:text-lg text-gray-600 leading-relaxed mt-4"
+            className="text-base sm:text-lg text-black leading-relaxed mt-4"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.8 }}
@@ -454,7 +454,7 @@ export default function LandingPage() {
           >
             <Link href="/options">
               <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-5 md:py-6 lg:py-7 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 font-bold w-full sm:w-auto whitespace-normal">
-                <div className="text-left font-bold leading-tight">Reclaim Your Time. Reclaim Your Profits.<br />Try NOW!</div>
+                <div className="text-left font-bold leading-tight">Reclaim Your Time. Reclaim Your Profits. Try NOW!</div>
               </Button>
             </Link>
           </motion.div>
@@ -477,8 +477,8 @@ function FeatureCard({ icon, title, description, href = "/options" }: {
         <div className="mb-4">
           {icon}
         </div>
-        <h3 className="text-xl font-semibold mb-4 text-gray-800">{title}</h3>
-        <p className="text-gray-600 leading-relaxed">{description}</p>
+        <h3 className="text-xl font-semibold mb-4 text-black">{title}</h3>
+        <p className="text-black leading-relaxed">{description}</p>
       </div>
     </Link>
   );
@@ -506,8 +506,8 @@ function StepCard({ icon, number, title, description }: {
       >
         {icon}
       </motion.div>
-      <h3 className="text-xl font-semibold mb-4 text-gray-800">{title}</h3>
-      <p className="text-gray-600 leading-relaxed">{description}</p>
+      <h3 className="text-xl font-semibold mb-4 text-black">{title}</h3>
+      <p className="text-black leading-relaxed">{description}</p>
     </motion.div>
   );
 }
