@@ -28,7 +28,7 @@ function BuggyComponent() {
 }
 
 // Component that throws an error on mount
-function AlwaysBuggyComponent() {
+function AlwaysBuggyComponent(): never {
   throw new Error('This component always throws an error on mount!');
 }
 
