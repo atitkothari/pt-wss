@@ -159,7 +159,7 @@ export default function LandingPage() {
               viewport={{ once: true }}
             >
               <Link href="/options">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base md:text-lg px-16 sm:px-6 md:px-8 py-6 sm:py-7 md:py-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto flex flex-col mx-auto">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base md:text-lg px-16 sm:px-6 md:px-8 py-8 sm:py-7 md:py-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto flex flex-col mx-auto">
                   <div className="text-left font-bold leading-tight">Experience Instant Screening!</div>
                   <div className="text-left text-xs sm:text-sm leading-tight">(No Credit Card Needed to Try)</div>
                 </Button>
@@ -422,8 +422,8 @@ export default function LandingPage() {
             viewport={{ once: true }}
           >
             <Link href="/options">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 lg:px-10 py-6 sm:py-7 md:py-8 lg:py-9 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto whitespace-normal">
-                <div className="text-left font-bold leading-tight">Try ALL Wheel Strategy Options Features FREE for 5 Days!</div>
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 lg:px-10 py-8 sm:py-7 md:py-8 lg:py-9 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto whitespace-normal">
+                <div className="text-center font-bold leading-tight">Try ALL Wheel Strategy Options Features FREE for 5 Days!</div>
               </Button>
             </Link>
           </motion.div>
@@ -525,8 +525,8 @@ export default function LandingPage() {
             whileTap={{ scale: 0.95 }}
           >
             <Link href="/options">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-5 md:py-6 lg:py-7 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 font-bold w-full sm:w-auto whitespace-normal">
-                <div className="text-left font-bold leading-tight">Reclaim Your Time. Reclaim Your Profits. Try NOW!</div>
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 lg:px-10 py-8 sm:py-5 md:py-6 lg:py-7 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 font-bold w-full sm:w-auto whitespace-normal">
+                <div className="text-center font-bold leading-tight">Reclaim Your Time. Reclaim Your Profits. Try NOW!</div>
               </Button>
             </Link>
           </motion.div>
