@@ -17,6 +17,7 @@ import { hasAcceptedAnalytics } from '@/lib/cookiePreferences';
 import Script from 'next/script';
 import { Suspense } from "react";
 import { ProAnnouncementBanner } from "./components/ProAnnouncementBanner";
+import { GlobalErrorHandler } from './components/GlobalErrorHandler';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -139,16 +140,18 @@ export default function RootLayout({
         <AuthProvider>
           <SubscriptionProvider>
             <MarketingConsentProvider>
-              <main>
-                <Suspense fallback={null}>
-                  <ProAnnouncementBanner />
-                </Suspense>
-                {children}
-              </main>
-              <Toaster />
-              <InstallPWA />
-              <MarketingConsentModal autoShow={true} />
-              <CookieConsentBanner />
+              <GlobalErrorHandler>
+                <main>
+                  <Suspense fallback={null}>
+                    <ProAnnouncementBanner />
+                  </Suspense>
+                  {children}
+                </main>
+                <Toaster />
+                <InstallPWA />
+                <MarketingConsentModal autoShow={true} />
+                <CookieConsentBanner />
+              </GlobalErrorHandler>
             </MarketingConsentProvider>
           </SubscriptionProvider>
         </AuthProvider>

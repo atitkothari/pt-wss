@@ -23,6 +23,7 @@ import { PageLayout } from "./components/PageLayout";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useCheckoutConversion } from "./hooks/useCheckoutConversion";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 function TestimonialsCarousel() {
   const testimonials = [1, 2, 3, 4, 5, 6];
@@ -114,9 +115,9 @@ export default function LandingPage() {
 
   return (
     <PageLayout className="bg-gradient-to-br from-gray-100 via-blue-50 to-amber-50 text-gray-900 min-h-screen">            
-      
-      {/* Hero Section */}
-      <div className="container mx-auto px-4 py-4 md:py-6">
+      <ErrorBoundary>
+        {/* Hero Section */}
+        <div className="container mx-auto px-4 py-4 md:py-6">
         <div className="grid lg:grid-cols-10 gap-3 lg:gap-8 items-center">
           {/* Left side - Copy */}
           <motion.div 
@@ -462,6 +463,7 @@ export default function LandingPage() {
           </motion.div>
         </div>
       </motion.div>
+        </ErrorBoundary>
       <Footer />
     </PageLayout>
   );

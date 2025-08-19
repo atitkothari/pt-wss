@@ -3,6 +3,7 @@
 import { ReactNode } from "react";
 import { NavBar } from "./NavBar";
 import { useAuth } from "@/app/context/AuthContext";
+import { ErrorBoundary } from "./ErrorBoundary";
 
 interface PageLayoutProps {
   children: ReactNode;
@@ -15,9 +16,13 @@ export function PageLayout({ children, showBanner = true, className = "" }: Page
 
   return (
     <div className={`min-h-screen bg-gray-50 ${className}`}>
-      <NavBar />      
+      <ErrorBoundary>
+        <NavBar />
+      </ErrorBoundary>
       <div className="max-w-screen-2xl mx-auto p-4">
-        {children}
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
       </div>
     </div>
   );

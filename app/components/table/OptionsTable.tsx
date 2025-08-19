@@ -26,6 +26,7 @@ import { Timestamp } from 'firebase/firestore';
 import { AddTradeModal } from '@/app/components/modals/AddTradeModal';
 import { ShareButton } from './ShareButton';
 import { createRef, RefObject } from 'react';
+import { TableErrorBoundary } from '../TableErrorBoundary';
 
 export const DEFAULT_COLUMNS: ColumnDef[] = [  
   { key: "rating", label: "Rating" },
@@ -370,8 +371,9 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
   };
 
   return (
-    <div>
-      <div className="rounded-md border">
+    <TableErrorBoundary tableName="Options Table">
+      <div>
+        <div className="rounded-md border">
         <div className="w-full overflow-x-auto">
           <table className="w-full border-collapse text-xs md:text-sm">
             <thead>
@@ -487,6 +489,7 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
           }
         }}
       />
-    </div>
+      </div>
+    </TableErrorBoundary>
   );
 }

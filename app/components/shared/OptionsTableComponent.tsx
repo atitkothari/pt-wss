@@ -18,6 +18,8 @@ import { useSymbols } from '../../hooks/useSymbols';
 import { SaveQueryModal } from "../modals/SaveQueryModal";
 import { BlurredTable } from "../auth/BlurredTable";
 import { useAuth } from "@/app/context/AuthContext";
+import { ErrorBoundary } from "../ErrorBoundary";
+import { DataErrorBoundary } from "../DataErrorBoundary";
 import {
   Select,
   SelectContent,
@@ -1307,7 +1309,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   if (error) return <div className="text-red-500 p-4">{error}</div>;
 
   return (
-    <div className="w-full">      
+    <ErrorBoundary>
+      <div className="w-full">      
       {/* Filter Controls */}
       <div className="space-y-2 mb-2">
         {/* Screener Dropdown */}
@@ -1784,10 +1787,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         onLoad={handleLoadScreener}
         optionType={option}
       />
-      <LoginPromptModal
-        isOpen={isLoginPromptOpen}
-        onClose={() => setIsLoginPromptOpen(false)}
-      />
-    </div>
+        <LoginPromptModal
+          isOpen={isLoginPromptOpen}
+          onClose={() => setIsLoginPromptOpen(false)}
+        />
+      </div>
+    </ErrorBoundary>
   );
 }

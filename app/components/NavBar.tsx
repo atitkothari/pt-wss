@@ -9,6 +9,7 @@ import { useSubscription } from "@/app/context/SubscriptionContext";
 import { sendAnalyticsEvent, AnalyticsEvents } from '../utils/analytics';
 import { AuthModal } from './modals/AuthModal';
 import { useMarketingConsentContext } from '@/app/context/MarketingConsentContext';
+import { ErrorBoundary } from './ErrorBoundary';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -68,7 +69,8 @@ export function NavBar() {
   };
 
   return (
-    <nav className="bg-gradient-to-br from-gray-50 via-white to-blue-50 w-full border-b border-gray-200 p-4 z-40 relative">
+    <ErrorBoundary>
+      <nav className="bg-gradient-to-br from-gray-50 via-white to-blue-50 w-full border-b border-gray-200 p-4 z-40 relative">
       <div className="max-w-screen-2xl mx-auto flex flex-wrap items-center gap-4">
         <div className="flex items-center justify-between w-full lg:w-auto">
           <div className="flex items-center flex-wrap gap-2 md:gap-4">
@@ -408,10 +410,11 @@ export function NavBar() {
         </div>
       )}
 
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
-      />
-    </nav>
+        <AuthModal 
+          isOpen={isAuthModalOpen} 
+          onClose={() => setIsAuthModalOpen(false)} 
+        />
+      </nav>
+    </ErrorBoundary>
   );
 }

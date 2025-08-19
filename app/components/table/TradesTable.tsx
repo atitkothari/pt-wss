@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { format, parseISO } from 'date-fns';
 import { TrendingUp, TrendingDown } from 'lucide-react';
+import { TableErrorBoundary } from '../TableErrorBoundary';
 
 interface TradeWithUnrealizedPL extends Trade {
   unrealizedPL?: number;
@@ -31,8 +32,9 @@ export function TradesTable({ trades, onRequestCloseTrade, onRequestEditTrade, o
   const isClosedTradesTable = trades.length > 0 && (trades[0].status === 'closed' || trades[0].status === 'assigned' || trades[0].status === 'expired');
 
   return (
-    <div className="rounded-md border overflow-x-auto">
-      <Table>
+    <TableErrorBoundary tableName="Trades Table">
+      <div className="rounded-md border overflow-x-auto">
+        <Table>
         <TableHeader>
           <TableRow>
             <TableHead className="w-[70px] text-xs sm:text-sm">Symbol</TableHead>
@@ -175,6 +177,7 @@ export function TradesTable({ trades, onRequestCloseTrade, onRequestEditTrade, o
           })}
         </TableBody>
       </Table>
-    </div>
+      </div>
+    </TableErrorBoundary>
   );
 }

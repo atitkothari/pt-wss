@@ -9,6 +9,8 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { useUserAccess } from "../hooks/useUserAccess";
 import { useCheckoutConversion } from "../hooks/useCheckoutConversion";
+import { ErrorBoundary } from "../components/ErrorBoundary";
+import { DataErrorBoundary } from "../components/DataErrorBoundary";
 
 export default function CoveredCallScreenerPage() {
   const { loading } = useAuth();
@@ -53,8 +55,9 @@ export default function CoveredCallScreenerPage() {
 
   return (
     <PageLayout>
-      {/* Mobile Navigation Bar */}
-      <div className="block md:hidden mb-4 flex items-center justify-center min-h-[20px]">
+      <ErrorBoundary>
+        {/* Mobile Navigation Bar */}
+        <div className="block md:hidden mb-4 flex items-center justify-center min-h-[20px]">
         <div className="flex flex-wrap justify-center items-center gap-1 w-full text-center">
           <Link href="/cash-secured-put-screener" className="text-xs sm:text-sm text-blue-600 hover:underline font-medium px-1 whitespace-nowrap">Cash Secured Put Screener</Link>
           <span className="text-gray-300">|</span>
@@ -77,10 +80,13 @@ export default function CoveredCallScreenerPage() {
           </Link>
         </div>
       </div>
-      <div className="bg-white p-4 rounded-lg shadow-sm relative">
-        <OptionsTableComponent option="call" />
-      </div>
-      <Footer />
+        <DataErrorBoundary>
+          <div className="bg-white p-4 rounded-lg shadow-sm relative">
+            <OptionsTableComponent option="call" />
+          </div>
+        </DataErrorBoundary>
+        <Footer />
+      </ErrorBoundary>
     </PageLayout>
   );
 } 

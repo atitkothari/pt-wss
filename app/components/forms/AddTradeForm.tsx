@@ -14,6 +14,7 @@ import {
 import { Trade } from '@/app/types/trade';
 import { useSymbols } from '@/app/hooks/useSymbols';
 import { useAuth } from '@/app/context/AuthContext';
+import { FormErrorBoundary } from '../FormErrorBoundary';
 
 interface AddTradeFormProps {
   onSubmit: (trade: Omit<Trade, 'id' | 'status' | 'openDate' | 'closeDate'>) => void;
@@ -182,7 +183,8 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
   const expirationDates = [...new Set(filteredContracts.map(c => c.expiration))].sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <FormErrorBoundary errorMessage="There was an error with the trade form. Please check your input and try again.">
+      <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <Label>Type</Label>
         <Select value={selectedType} onValueChange={val => setSelectedType(val as 'call' | 'put')}>
@@ -353,6 +355,7 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
       )}
 
       <Button type="submit" disabled={!((selectedStrike && selectedStrike > 0) || (manualStrike && parseFloat(manualStrike) > 0)) || !(selectedExpiration || manualExpiration) || typeof numContracts !== 'number' || numContracts < 1}>Add Trade</Button>
-    </form>
+      </form>
+    </FormErrorBoundary>
   );
 }
