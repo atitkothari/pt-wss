@@ -97,16 +97,83 @@ export default function LandingPage() {
       
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-6 md:py-8">
-        <div className="grid lg:grid-cols-12 gap-6 lg:gap-4 items-center">
-          {/* Left side - Copy */}
+        {/* Mobile Layout */}
+        <div className="lg:hidden">
+          {/* Main heading first on mobile */}
           <motion.div 
-            className="text-left lg:text-left pr-0 lg:pr-8 lg:col-span-7 order-1 lg:order-1"
+            className="text-left mb-6"
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <motion.h1 
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 text-black leading-tight md:leading-normal pb-1"
+              className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-black leading-tight"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            >
+              Master the Wheel Strategy. Pinpoint High-Yield Covered Calls & Cash Secured Puts, Effortlessly.
+            </motion.h1>
+          </motion.div>
+
+          {/* Hero Image second on mobile */}
+          <motion.div 
+            className="w-full mb-6"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+          >
+            <img 
+              src="/v3_hero.jpeg" 
+              alt="Wheel Strategy Options Hero" 
+              className="w-full h-auto rounded-lg object-cover"
+            />
+          </motion.div>
+
+          {/* Additional content third on mobile */}
+          <motion.div 
+            className="text-left"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <motion.h2 
+              className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-black text-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+            >
+              Secure Consistent Monthly Premiums Income with Unrivaled Speed and Precision.
+            </motion.h2>
+            <motion.div
+              className="flex justify-center mt-10"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              viewport={{ once: true }}
+            >
+              <Link href="/options">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base md:text-lg px-16 sm:px-6 md:px-8 py-6 sm:py-7 md:py-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto flex flex-col mx-auto">
+                  <div className="text-left font-bold leading-tight">Experience Instant Screening!</div>
+                  <div className="text-left text-xs sm:text-sm leading-tight">(No Credit Card Needed to Try)</div>
+                </Button>
+              </Link>
+            </motion.div>
+          </motion.div>
+        </div>
+
+        {/* Desktop Layout */}
+        <div className="hidden lg:grid lg:grid-cols-12 gap-6 lg:gap-4 items-center">
+          {/* Left side - Text content */}
+          <motion.div 
+            className="text-left pr-8 lg:col-span-7"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <motion.h1 
+              className="text-5xl font-bold mb-6 text-black leading-normal"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
@@ -114,43 +181,43 @@ export default function LandingPage() {
               Master the Wheel Strategy. Pinpoint High-Yield Covered Calls & Cash Secured Puts, Effortlessly.
             </motion.h1>
             <motion.h2 
-            className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-black text-left"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-            Secure Consistent Monthly Premiums Income with Unrivaled Speed and Precision.
-          </motion.h2>
-          <motion.div
-            className="flex justify-start mt-10"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            viewport={{ once: true }}
-          >
-            <Link href="/options">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 lg:px-10 py-6 sm:py-7 md:py-8 lg:py-9 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto flex flex-col">
-                <div className="text-left font-bold leading-tight">Experience Instant Screening!</div>
-                <div className="text-left text-xs sm:text-sm leading-tight">(No Credit Card Needed to Try)</div>
-              </Button>
-            </Link>
-          </motion.div>
+              className="text-3xl font-bold mb-6 text-black"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+            >
+              Secure Consistent Monthly Premiums Income with Unrivaled Speed and Precision.
+            </motion.h2>
+            <motion.div
+              className="flex justify-start mt-10"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              viewport={{ once: true }}
+            >
+              <Link href="/options">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-10 py-9 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col">
+                  <div className="text-left font-bold leading-tight">Experience Instant Screening!</div>
+                  <div className="text-left text-sm leading-tight">(No Credit Card Needed to Try)</div>
+                </Button>
+              </Link>
+            </motion.div>
           </motion.div>
 
           {/* Right side - Hero Image */}
           <motion.div 
-            className="mt-0 lg:mt-0 w-full lg:w-full lg:col-span-4 lg:ml-auto h-full flex items-center order-2 lg:order-2"
+            className="lg:col-span-4 lg:ml-auto h-full flex items-center"
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
           >
             <div className="w-full">                              
-                  <img 
-                    src="/v3_hero.jpeg" 
-                    alt="Wheel Strategy Options Hero" 
-                    className="w-full h-auto rounded-lg object-cover"
-                  />                
+              <img 
+                src="/v3_hero.jpeg" 
+                alt="Wheel Strategy Options Hero" 
+                className="w-full h-auto rounded-lg object-cover"
+              />                
             </div>
           </motion.div>
         </div>
