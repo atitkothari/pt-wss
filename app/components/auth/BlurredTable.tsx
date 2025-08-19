@@ -55,7 +55,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
       const count = parseInt(localStorage.getItem('pricingPageVisitCount') || '0', 10) + 1;
       localStorage.setItem('pricingPageVisitCount', count.toString());
       setVisitCount(count);
-      setIsLimitedTime(count > 1);
+      setIsLimitedTime(count >= 0);
     }
   }, []);  
 

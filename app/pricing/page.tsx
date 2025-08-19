@@ -34,7 +34,7 @@ export default function PricingPage() {
       const count = parseInt(localStorage.getItem('pricingPageVisitCount') || '0', 10) + 1;
       localStorage.setItem('pricingPageVisitCount', count.toString());
       setVisitCount(count);
-      setIsLimitedTime(count > 1);
+      setIsLimitedTime(count >= 0);
     }
 
     const reportPricingPage = async ()=>{      
@@ -255,7 +255,7 @@ export default function PricingPage() {
 
       {/* Pricing Card and Stock Chips Section */}
       <div className="container mx-auto px-4 pt-8">
-        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8 items-start">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8 items-start justify-center">
           {/* Pricing Card */}
           <div className="w-full lg:w-1/3">
             <Card className="bg-white border-2 border-blue-100 shadow-lg">
@@ -326,7 +326,7 @@ export default function PricingPage() {
           </div>
 
           {/* Stock Chips Section */}
-          <div className="w-full lg:w-2/3">
+          {/* <div className="w-full lg:w-2/3">
             <div className="bg-white rounded-lg p-6 shadow-lg border border-gray-100 h-full">
               <h2 className="text-xl md:text-2xl font-semibold mb-4">
                 Tool That Pays For Itself
@@ -336,7 +336,7 @@ export default function PricingPage() {
               </p>
               <StockChips />
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 
