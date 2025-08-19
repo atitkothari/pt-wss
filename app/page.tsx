@@ -2,22 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { 
-  Search, 
-  BarChart2, 
-  DollarSign, 
-  Clock, 
-  Target, 
-  Filter, 
-  LineChart,
-  ArrowRight,
-  Save,
-  BellRing,
-  TrendingUp,
-  Shield,
-  Zap,
-  ChartSpline
-} from "lucide-react";
 import { Footer } from "./components/Footer";
 import { PageLayout } from "./components/PageLayout";
 import { motion, AnimatePresence } from "framer-motion";
@@ -47,7 +31,7 @@ function TestimonialsCarousel() {
   };
 
   return (
-    <div className="relative max-w-4xl mx-auto">
+    <div className="relative max-w-4xl">
       {/* Carousel Container */}
       <div className="relative overflow-hidden rounded-xl">
         <AnimatePresence mode="wait">
@@ -92,7 +76,7 @@ function TestimonialsCarousel() {
       </motion.button>
 
       {/* Dots Indicator */}
-      <div className="flex justify-center mt-6 space-x-2">
+      <div className="flex justify-start mt-6 space-x-2">
         {testimonials.map((_, index) => (
           <motion.button
             key={index}
@@ -114,350 +98,435 @@ export default function LandingPage() {
   useCheckoutConversion();
 
   return (
-    <PageLayout className="bg-gradient-to-br from-gray-100 via-blue-50 to-amber-50 text-gray-900 min-h-screen">            
+    <PageLayout className="bg-white text-gray-900 min-h-screen">            
       <ErrorBoundary>
         {/* Hero Section */}
-        <div className="container mx-auto px-4 py-4 md:py-6">
-        <div className="grid lg:grid-cols-10 gap-3 lg:gap-8 items-center">
-          {/* Left side - Copy */}
+        <div className="container mx-auto px-4 py-6 md:py-8">
+        {/* Mobile Layout */}
+        <div className="lg:hidden">
+          {/* Main heading first on mobile */}
           <motion.div 
-            className="text-left pr-0 lg:pr-8 lg:col-span-7"
+            className="text-left mb-6"
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <motion.h1 
-              className="text-3xl md:text-5xl font-bold mb-4 md:mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-800 leading-normal pb-1"
+              className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-black leading-tight"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             >
-              Analyze High Premium Option Contracts 
+              Master the Wheel Strategy. Pinpoint High-Yield Covered Calls & Cash Secured Puts, Effortlessly.
             </motion.h1>
-            <motion.p 
-              className="text-lg md:text-2xl text-gray-600 mb-6 md:mb-8 leading-relaxed"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-            >
-              <b>Fast. Easy. Affordable.</b>
-            </motion.p>
-            <motion.p 
-              className="text-lg md:text-2xl text-gray-600 mb-6 md:mb-8 leading-relaxed"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
-            >
-              Scan 570,000+ option contracts in seconds. Discover high-yield trades that maximize premium income — with powerful filters built by option sellers for option sellers.
-            </motion.p>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }}
-            >
-              <Link href="/options">
-                <Button size="lg" className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white text-base md:text-lg px-8 md:px-10 py-6 md:py-7 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-                  Launch Screener <ArrowRight className="ml-2 h-4 md:h-5 w-4 md:w-5" />
-                </Button>
-              </Link>
-            </motion.div>
-            <motion.div 
-              className="container mx-auto py-2"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 1.0, ease: "easeOut" }}
-            >
-              <p className="text-lg text-gray-500 mb-2">
-                <a 
-                  href="https://wheelstrategyoptions.com/blog/selling-options-for-income-a-practical-guide-2/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-800 underline font-medium"
-                >
-                  Learn more
-                </a> 
-                {' '} about Wheel Strategy.
-              </p>
-            </motion.div>
           </motion.div>
 
-          {/* Right side - Animated Stats */}
+          {/* Hero Image second on mobile */}
           <motion.div 
-            className="mt-4 lg:mt-0 w-full lg:w-full lg:col-span-3 lg:ml-auto h-full flex items-center"
+            className="w-full mb-6"
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
           >
-            <div className="w-full space-y-6">
-              <motion.div 
-                className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-200"
-                whileHover={{ scale: 1.02, y: -5 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="p-3 bg-blue-100 rounded-lg">
-                    <TrendingUp className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <motion.div 
-                      className="text-2xl font-bold text-gray-800"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ duration: 0.5, delay: 1.2, type: "spring", stiffness: 200 }}
-                    >
-                      570K+
-                    </motion.div>
-                    <div className="text-sm text-gray-600">Option Contracts</div>
-                  </div>
-                </div>
-              </motion.div>
+            <img 
+              src="/v3_hero.jpeg" 
+              alt="Wheel Strategy Options Hero" 
+              className="w-full h-auto rounded-lg object-cover"
+            />
+          </motion.div>
 
-              <motion.div 
-                className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-200"
-                whileHover={{ scale: 1.02, y: -5 }}
-                transition={{ duration: 0.3, delay: 0.1 }}
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="p-3 bg-green-100 rounded-lg">
-                    <Zap className="h-6 w-6 text-green-600" />
-                  </div>
-                  <div>
-                    <motion.div 
-                      className="text-2xl font-bold text-gray-800"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ duration: 0.5, delay: 1.4, type: "spring", stiffness: 200 }}
-                    >
-                      &lt; 1s
-                    </motion.div>
-                    <div className="text-sm text-gray-600">Scan Time</div>
-                  </div>
-                </div>
-              </motion.div>
+          {/* Additional content third on mobile */}
+          <motion.div 
+            className="text-left"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <motion.h2 
+              className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-black text-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+            >
+              Secure Consistent Monthly Premiums Income with Unrivaled Speed and Precision.
+            </motion.h2>
+            <motion.div
+              className="flex justify-center mt-10"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              viewport={{ once: true }}
+            >
+              <Link href="/options">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base md:text-lg px-16 sm:px-6 md:px-8 py-6 sm:py-7 md:py-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto flex flex-col mx-auto">
+                  <div className="text-left font-bold leading-tight">Experience Instant Screening!</div>
+                  <div className="text-left text-xs sm:text-sm leading-tight">(No Credit Card Needed to Try)</div>
+                </Button>
+              </Link>
+            </motion.div>
+          </motion.div>
+        </div>
 
-              <motion.div 
-                className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-200"
-                whileHover={{ scale: 1.02, y: -5 }}
-                transition={{ duration: 0.3, delay: 0.2 }}
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="p-3 bg-amber-100 rounded-lg">
-                    <ChartSpline className="h-6 w-6 text-amber-600" />
-                  </div>
-                  <div>
-                    <motion.div 
-                      className="text-2xl font-bold text-gray-800"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ duration: 0.5, delay: 1.6, type: "spring", stiffness: 200 }}
-                    >
-                      3.5k+
-                    </motion.div>
-                    <div className="text-sm text-gray-600">Stocks & ETFs</div>
-                  </div>
-                </div>
-              </motion.div>
+        {/* Desktop Layout */}
+        <div className="hidden lg:grid lg:grid-cols-12 gap-6 lg:gap-4 items-center">
+          {/* Left side - Text content */}
+          <motion.div 
+            className="text-left pr-8 lg:col-span-7"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <motion.h1 
+              className="text-5xl font-bold mb-6 text-black leading-normal"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            >
+              Master the Wheel Strategy. Pinpoint High-Yield Covered Calls & Cash Secured Puts, Effortlessly.
+            </motion.h1>
+            <motion.h2 
+              className="text-3xl font-bold mb-6 text-black"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+            >
+              Secure Consistent Monthly Premiums Income with Unrivaled Speed and Precision.
+            </motion.h2>
+            <motion.div
+              className="flex justify-start mt-10"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              viewport={{ once: true }}
+            >
+              <Link href="/options">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-10 py-9 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col">
+                  <div className="text-left font-bold leading-tight">Experience Instant Screening!</div>
+                  <div className="text-left text-sm leading-tight">(No Credit Card Needed to Try)</div>
+                </Button>
+              </Link>
+            </motion.div>
+          </motion.div>
+
+          {/* Right side - Hero Image */}
+          <motion.div 
+            className="lg:col-span-4 lg:ml-auto h-full flex items-center"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+          >
+            <div className="w-full">                              
+              <img 
+                src="/v3_hero.jpeg" 
+                alt="Wheel Strategy Options Hero" 
+                className="w-full h-auto rounded-lg object-cover"
+              />                
             </div>
           </motion.div>
         </div>
       </div>
 
-      {/* Divider */}
+      {/* First Benefit Section */}
       <motion.div 
-        className="w-full px-4 py-7"
-        initial={{ opacity: 0, scaleX: 0 }}
-        animate={{ opacity: 1, scaleX: 1 }}
-        transition={{ duration: 1, delay: 1.8 }}
-      >
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
-      </motion.div>
-
-            {/* Detailed Features Section */}
-            <motion.div 
-        className="py-16 md:py-7"
+        className="container mx-auto px-4 py-8 md:py-12"
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
-      >
-        <div className="container mx-auto px-4">
-          <motion.h2 
-            className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-            Blazing Fast Screening of Over 570,000 Option Contracts
-          </motion.h2>
-          <div className="space-y-20">
-            <DetailedFeature
-              title="Covered Call and Cash Secured Put Screener"
-              description="Find the best covered call opportunities with our advanced screening tools. Filter by premium yield, strike price, expiration, earnings, and more. Screen for cash-secured put opportunities that match your risk tolerance and income targets."
-              imageSrc="/Screener.webp"
-              imageAlt="Covered Call and Cash Secured Put Screener"
-            />
-            <DetailedFeature
-              title="Advanced Filters"
-              description="Filter by Delta, Implied Volatility, Days to Expiration, P/E Ratio, Market Cap, and more to find the perfect trade."
-              imageSrc="/AdvancedFilters.webp"
-              imageAlt="Advanced Filters Interface"
-              reverse
-            />
-            <DetailedFeature
-              title="Save and Load Screener"
-              description="Save your favorite screeners and load them anytime. Perfect for recurring strategies and quick access to your preferred setups."
-              imageSrc="/SaveFilters.webp"
-              imageAlt="Save and Load Screener Interface"
-            />
-            <DetailedFeature
-              title="Trade Tracker"
-              description="Track your option trades with detailed analytics, profit/loss calculations, and performance metrics. Monitor your wheel strategy progress and optimize your trading decisions."
-              imageSrc="/trade-tracker.webp"
-              imageAlt="Trade Tracker Interface"
-              reverse
-            />
-            <DetailedFeature
-              title="Watchlist"
-              description="Create and manage personalized watchlists of your favorite stocks and options. Get real-time alerts and notifications when opportunities match your criteria."
-              imageSrc="/watchlist.webp"
-              imageAlt="Watchlist Interface"
-            />
-          </div>
-        </div>
-      </motion.div>
+      >        
 
-      <motion.div 
-        className="w-full px-4 py-7"
-        initial={{ opacity: 0, scaleX: 0 }}
-        whileInView={{ opacity: 1, scaleX: 1 }}
-        transition={{ duration: 1 }}
-        viewport={{ once: true }}
-      >
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
-      </motion.div>
-
-      {/* Testimonials Section */}
-      <motion.div 
-        className="container mx-auto px-4 py-16"
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-      >
-        <motion.h2 
-          className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          viewport={{ once: true }}
-        >
-          What Our Users Say
-        </motion.h2>
-        <TestimonialsCarousel />
-      </motion.div>
-      
-
-
-      {/* Divider */}    
-      <motion.div 
-        className="w-full px-4 py-7"
-        initial={{ opacity: 0, scaleX: 0 }}
-        whileInView={{ opacity: 1, scaleX: 1 }}
-        transition={{ duration: 1 }}
-        viewport={{ once: true }}
-      >
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
-      </motion.div>
-
-      {/* How It Works Section */}
-      <motion.div 
-        className="container mx-auto px-4 py-7 md:py-20"
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-      >
-        <motion.h2 
-          className="text-2xl md:text-4xl font-bold text-center mb-8 md:mb-12 text-gray-800"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          viewport={{ once: true }}
-        >
-          How It Works
-        </motion.h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          <StepCard
-            icon={<Target className="h-5 md:h-6 w-5 md:w-6 text-white" />}
-            number="1"
-            title="Choose Your Strategy"
-            description="Select between covered calls or cash-secured puts based on where you are in the wheel cycle."
-          />
-          <StepCard
-            icon={<Filter className="h-5 md:h-6 w-5 md:w-6 text-white" />}
-            number="2"
-            title="Set Your Filters"
-            description="Filter by yield, strike price, expiration date, and more to find trades that match your criteria."
-          />
-          <StepCard
-            icon={<LineChart className="h-5 md:h-6 w-5 md:w-6 text-white" />}
-            number="3"
-            title="Analyze & Trade"
-            description="Review the filtered results and select the best opportunities for your portfolio."
-          />
-        </div>
-      </motion.div>
-
-      {/* Divider */}
-      <motion.div 
-        className="w-full px-4 py-7"
-        initial={{ opacity: 0, scaleX: 0 }}
-        whileInView={{ opacity: 1, scaleX: 1 }}
-        transition={{ duration: 1 }}
-        viewport={{ once: true }}
-      >
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
-      </motion.div>
-
-      {/* CTA Section */}
-      <motion.div 
-        className="bg-transparent py-12 md:py-20"
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-      >
-        <div className="container mx-auto px-4 text-center">
-          <motion.h2 
-            className="text-2xl md:text-4xl font-bold mb-4 md:mb-6 text-gray-800"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-            Ready to Maximize Your Income?
-          </motion.h2>
           <motion.p 
-            className="text-lg md:text-xl text-gray-600 mb-6 md:mb-8 max-w-2xl mx-auto"
+            className="text-base sm:text-lg md:text-xl text-black mt-4 md:mt-6 leading-relaxed text-left lg:text-left"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
+          >
+            The AI-powered screener scans over 570,000 option contracts in less than a second, delivering high-yield trades tailored by option sellers, for option sellers. <span className="text-green-600 font-bold">Invest in Your Profits, Risk-Free!</span>
+          </motion.p>
+        
+      </motion.div>
+
+      {/* Precision Tools Section */}
+      <motion.div 
+        className="container mx-auto px-4 py-8 md:py-12"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+      >
+        <div className="text-left mb-8 md:mb-12 px-2">
+          <motion.h2 
+            className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-black"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            Precision Tools for Predictable Profits.
+          </motion.h2>
+          <motion.h3 
+            className="text-lg sm:text-xl md:text-2xl font-semibold mb-2 text-yellow-600"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
             viewport={{ once: true }}
           >
-            Join successful options traders who use our platform to find and execute high-yield trades.
-          </motion.p>
-          <motion.div
+            Generate Predictable Income.
+          </motion.h3>
+          <motion.p 
+            className="text-base sm:text-lg md:text-xl text-black"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
+            viewport={{ once: true }}
+          >
+            Pinpoint the Most Profitable Covered Calls & CSPs with Confidence.
+          </motion.p>
+        </div>
+        <div className="max-w-4xl">
+          <img 
+            src="/v3_predictable_income.jpeg" 
+            alt="Precision Tools for Predictable Profits" 
+            className="w-full h-auto rounded-lg object-cover"
+          />
+        </div>
+      </motion.div>
+
+      {/* Find Trades Section */}
+      <motion.div 
+        className="container mx-auto px-4 py-8 md:py-12"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+      >
+        <div className="text-left mb-8 md:mb-12 px-2">
+          <motion.h2 
+            className="text-lg sm:text-xl md:text-2xl font-semibold mb-2 text-yellow-600"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            Find Trades that Match Your Setup.
+          </motion.h2>
+          <motion.p 
+            className="text-base sm:text-lg md:text-xl text-black"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+          >
+            Hyper-Target Trades with Precision Filters (Delta, IV, P/E & many many more).
+          </motion.p>
+        </div>
+        <div className="max-w-4xl">
+        <img 
+            src="/v3_find_trades.jpeg" 
+            alt="Find Trades that Match Your Setup" 
+            className="w-full h-auto rounded-lg object-cover"
+          />
+   
+        </div>
+      </motion.div>
+
+            {/* Save Setup Section */}
+      <motion.div 
+        className="container mx-auto px-4 py-8 md:py-12"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+      >
+        <div className="text-left mb-8 md:mb-12 px-2">
+          <motion.h2 
+            className="text-xl sm:text-2xl md:text-3xl font-semibold mb-2 text-yellow-600"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            Never Lose Your Winning Setup.
+          </motion.h2>
+          <motion.p 
+            className="text-base sm:text-lg md:text-xl text-black"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+          >
+            Lock in your most profitable screeners. And even get fresh results delivered straight to your inbox.
+          </motion.p>
+        </div>
+        <div className="max-w-md">
+          <img 
+            src="/v3_never_lose.jpeg" 
+            alt="Never Lose Your Winning Setup" 
+            className="w-full h-auto rounded-lg object-cover"
+          />
+        </div>
+      </motion.div>
+
+      {/* Track Trades Section */}
+      <motion.div 
+        className="container mx-auto px-4 py-8 md:py-12"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+      >
+        <div className="text-left mb-8 md:mb-12 px-2">
+          <motion.h2 
+            className="text-xl sm:text-2xl md:text-3xl font-semibold mb-2 text-yellow-600"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            Track Every Trade.
+          </motion.h2>
+          <motion.p 
+            className="text-base sm:text-lg md:text-xl text-black"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+          >
+            Analyze Performance, Optimize for Profit & Maximize Your Wheel Cycle.
+          </motion.p>
+        </div>
+        <div className="max-w-4xl">
+          <img 
+            src="/v3_track_every.jpeg" 
+            alt="Track Every Trade" 
+            className="w-full h-auto rounded-lg object-cover"
+          />
+        </div>
+      </motion.div>
+
+      {/* Second CTA Section */}
+      <motion.div 
+        className="container mx-auto px-4 py-8 md:py-12"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+      >
+        <div className="text-left px-2">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            <Link href="/options">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 lg:px-10 py-6 sm:py-7 md:py-8 lg:py-9 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto whitespace-normal">
+                <div className="text-left font-bold leading-tight">Try ALL Wheel Strategy Options Features FREE for 5 Days!</div>
+              </Button>
+            </Link>
+          </motion.div>
+          <motion.p 
+            className="text-base sm:text-lg text-black mt-4"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+          >
+            No Credit Card Required. Just Pure Options Power.
+          </motion.p>
+        </div>
+      </motion.div>
+
+      {/* Testimonials Section */}
+      <motion.div 
+        className="container mx-auto px-4 py-8 md:py-12"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+      >
+        <motion.h2 
+          className="text-2xl sm:text-3xl md:text-4xl font-bold text-left mb-8 md:mb-12 text-black px-2"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          viewport={{ once: true }}
+        >
+          Why Wheel Strategy Traders Trust Us.
+        </motion.h2>
+        <TestimonialsCarousel />
+      </motion.div>
+
+      {/* About Section */}
+      <motion.div 
+        className="container mx-auto px-4 py-8 md:py-12"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+      >
+        <div className="text-left">
+          <motion.h2 
+            className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-black"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            Why We Built This.
+          </motion.h2>
+          <motion.h3 
+            className="text-lg sm:text-xl md:text-2xl font-semibold mb-4 md:mb-6 text-black"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+          >
+            Built by Traders, For Traders.
+          </motion.h3>
+          <motion.p 
+            className="text-base sm:text-lg text-black leading-relaxed"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            viewport={{ once: true }}
+          >
+            We're options enthusiasts who grew frustrated with ridiculously priced, clunky, slow screeners. So, we built the tool we wished we had – a powerful, intuitive platform designed to maximize your premium income.
+          </motion.p>
+          <motion.p 
+            className="text-base sm:text-lg text-black leading-relaxed mt-4"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+            viewport={{ once: true }}
+          >
+            Our goal is to save you time from sifting through hundreds of thousands of contracts manually. Wheel Strategy Options automates hours of tedious research, so you can focus on what matters: identifying profitable setups and executing trades.
+          </motion.p>
+        </div>
+      </motion.div>
+
+      {/* Final CTA Section */}
+      <motion.div 
+        className="container mx-auto px-4 py-8 md:py-12"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+      >
+        <div className="text-left px-2">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             <Link href="/options">
-              <Button size="lg" className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white text-base md:text-lg px-8 md:px-10 py-6 md:py-7 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-                Launch Screener <Search className="ml-2 h-4 md:h-5 w-4 md:w-5" />
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-5 md:py-6 lg:py-7 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 font-bold w-full sm:w-auto whitespace-normal">
+                <div className="text-left font-bold leading-tight">Reclaim Your Time. Reclaim Your Profits. Try NOW!</div>
               </Button>
             </Link>
           </motion.div>
@@ -481,8 +550,8 @@ function FeatureCard({ icon, title, description, href = "/options" }: {
         <div className="mb-4">
           {icon}
         </div>
-        <h3 className="text-xl font-semibold mb-4 text-gray-800">{title}</h3>
-        <p className="text-gray-600 leading-relaxed">{description}</p>
+        <h3 className="text-xl font-semibold mb-4 text-black">{title}</h3>
+        <p className="text-black leading-relaxed">{description}</p>
       </div>
     </Link>
   );
@@ -510,8 +579,8 @@ function StepCard({ icon, number, title, description }: {
       >
         {icon}
       </motion.div>
-      <h3 className="text-xl font-semibold mb-4 text-gray-800">{title}</h3>
-      <p className="text-gray-600 leading-relaxed">{description}</p>
+      <h3 className="text-xl font-semibold mb-4 text-black">{title}</h3>
+      <p className="text-black leading-relaxed">{description}</p>
     </motion.div>
   );
 }
