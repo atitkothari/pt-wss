@@ -273,6 +273,11 @@ export default function SavedScreenersPage() {
               <span className="font-medium">IV Range:</span> {filters.impliedVolatility[0]}% to {filters.impliedVolatility[1]}%
             </div>
           )}
+          {filters.premium && (
+            <div className="text-sm">
+              <span className="font-medium">Premium Range:</span> ${filters.premium[0]} to ${filters.premium[1]}
+            </div>
+          )}
           {filters.peRatio && (
             <div className="text-sm">
               <span className="font-medium">P/E Range:</span> {filters.peRatio[0]} to {filters.peRatio[1]}

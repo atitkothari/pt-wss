@@ -19,6 +19,7 @@ import {
   priceFilterConfig,
   volumeFilterConfig,
   deltaFilterConfig,
+  premiumFilterConfig,
   peRatioFilterConfig,
   marketCapFilterConfig,
   marketCapCategories,
@@ -37,6 +38,8 @@ import { usePlausibleTracker } from '@/app/utils/plausible';
 import { PlausibleEvents } from '@/app/utils/plausible';
 
 interface AdvancedFiltersProps {
+  premium: [number, number];
+  onPremiumChange: (value: [number, number]) => void;
   peRatio: [number, number];
   onPeRatioChange: (value: [number, number]) => void;
   marketCap: [number, number];
@@ -85,6 +88,8 @@ interface AdvancedFiltersProps {
 }
 
 export function AdvancedFilters({
+  premium,
+  onPremiumChange,
   peRatio,
   onPeRatioChange,
   marketCap,
@@ -155,7 +160,7 @@ export function AdvancedFilters({
       debouncedSearch();
     }
   }, [
-    peRatio,
+    premium,
     marketCap,
     movingAverageCrossover,
     sector,
@@ -185,8 +190,8 @@ export function AdvancedFilters({
               volumeRange[1] !== volumeFilterConfig.max,
       iv: impliedVolatility[0] !== impliedVolatilityFilterConfig.defaultMin || 
           impliedVolatility[1] !== impliedVolatilityFilterConfig.defaultMax,
-      peRatio: peRatio[0] !== peRatioFilterConfig.defaultMin || 
-               peRatio[1] !== peRatioFilterConfig.defaultMax,
+      premium: premium[0] !== premiumFilterConfig.defaultMin || 
+               premium[1] !== premiumFilterConfig.defaultMax,
       marketCap: marketCap[0] !== marketCapFilterConfig.defaultMin || 
                  marketCap[1] !== marketCapFilterConfig.defaultMax,
       movingAverage: movingAverageCrossover !== movingAverageCrossoverOptions[0],
@@ -201,7 +206,7 @@ export function AdvancedFilters({
     };
   }, [
     strikePrice, moneynessRange, minDte, maxDte, deltaFilter, volumeRange,
-    impliedVolatility, peRatio, marketCap, movingAverageCrossover, sector, yieldRange,
+    impliedVolatility, premium, marketCap, movingAverageCrossover, sector, yieldRange,
     probabilityRange, annualizedReturn, excludedStocks
   ]);
 
@@ -248,7 +253,7 @@ export function AdvancedFilters({
                   delta: 'Delta',
                   volume: 'Volume',
                   iv: 'IV',
-                  peRatio: 'P/E',
+                  premium: 'Premium',
                   marketCap: 'Market Cap',
                   movingAverage: 'MA',
                   // sector: 'Sector',
@@ -291,7 +296,30 @@ export function AdvancedFilters({
               toExponential={priceFilterConfig.toExponential}
               fromExponential={priceFilterConfig.fromExponential}
               className="col-span-1"              
-            />                
+            />              
+
+            {/* Premium */}
+            <RangeSlider
+              id="input_screener_premium"
+              label="Premium"
+              value={premium}
+              minValue={premium[0]}
+              maxValue={premium[1]}
+              onChange={onPremiumChange}
+              onValueCommit={(value) => {
+                trackEvent(PlausibleEvents.FilterChange, { filter: 'premium', value });
+              }}
+              min={premiumFilterConfig.min}
+              max={premiumFilterConfig.max}
+              step={premiumFilterConfig.step}
+              tooltip={premiumFilterConfig.tooltip}
+              isExponential={premiumFilterConfig.isExponential}
+              toExponential={premiumFilterConfig.toExponential}
+              fromExponential={premiumFilterConfig.fromExponential}
+              formatValue={(val) => `$${val}`}
+              className="col-span-1"
+              disabled={!canAccessFeature()}
+            />  
 
             {/* Yield Range */}
             <RangeSlider
@@ -458,8 +486,10 @@ export function AdvancedFilters({
               className="col-span-1"              
             />
             
+            
+
             {/* P/E Ratio */}
-            <RangeSlider
+            {/* <RangeSlider
               id="input_screener_pe_ratio"
               label="P/E Ratio"
               value={peRatio}
@@ -475,7 +505,7 @@ export function AdvancedFilters({
               tooltip={peRatioFilterConfig.tooltip}
               className="col-span-1"
               disabled={!canAccessFeature()}
-            />
+            /> */}
 
             {/* Market Cap */}
             <RangeSlider

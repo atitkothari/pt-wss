@@ -15,6 +15,7 @@ export interface SavedScreener {
     minDte?: number;
     maxDte?: number;
     impliedVolatility?: [number, number];
+    premium?: [number, number];
     peRatio?: [number, number];
     marketCap?: [number, number];
     moneynessRange?: [number, number];

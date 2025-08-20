@@ -60,6 +60,8 @@ export function useOptionsData(
     excludedSymbols?: string[];
     probabilityRange?: [number, number];
     annualizedReturnRange?: [number, number];
+    premium?: [number, number];
+    peRatio?: [number, number];
   } = {}
 ) {
   const {
@@ -103,6 +105,7 @@ export function useOptionsData(
       sortConfig?: { field: keyof Option; direction: 'asc' | 'desc' | null };
       strikeFilter?: StrikeFilter;
       deltaRange?: [number, number];
+      premium?: [number, number];
       peRatio?: [number, number];
       marketCap?: [number, number];
       sector?: string;
@@ -128,6 +131,7 @@ export function useOptionsData(
       sortConfig,
       strikeFilter,
       deltaRange,
+      premium,
       peRatio,
       marketCap,
       sector,
@@ -240,6 +244,16 @@ export function useOptionsData(
         filters.push({ operation: 'lte', field: 'peRatio', value: peRatio[1] });
       }
       
+      // Add Premium filters
+      if (premium && premium[0] > 0) {
+        filters.push({ operation: 'gte', field: 'bidPrice', value: premium[0]/100 });
+      }
+      if (premium && premium[1] < 1000) {
+        filters.push({ operation: 'lte', field: 'bidPrice', value: premium[1]/100 });
+      }
+    
+      console.log("premium", premium);
+      console.log("peRatio", peRatio);
       // Add Market Cap filters (in billions)
       if (marketCap && marketCap[0] > 0) {
         filters.push({ operation: 'gte', field: 'marketCap', value: marketCap[0] * 1000000000 });

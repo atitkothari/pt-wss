@@ -133,6 +133,24 @@ export function SaveQueryModal({ isOpen, onClose, currentQuery }: SaveQueryModal
       });
     }
     
+    // Add Premium filters
+    if (query.premium) {
+      if (query.premium[0] > 0) {
+        filterData.push({
+          operation: "gte",
+          field: "premium",
+          value: query.premium[0]
+        });
+      }
+      if (query.premium[1] < 1000) {
+        filterData.push({
+          operation: "lte",
+          field: "premium",
+          value: query.premium[1]
+        });
+      }
+    }
+    
     // Add PE Ratio filters
     if (query.peRatio) {
       if (query.peRatio[0] > 0) {

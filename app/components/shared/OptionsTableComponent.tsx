@@ -33,6 +33,7 @@ import {
   volumeFilterConfig,
   deltaFilterConfig,
   dteFilterConfig,
+  premiumFilterConfig,
   peRatioFilterConfig,
   marketCapFilterConfig,
   moneynessFilterConfig,
@@ -344,7 +345,33 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     // Default values
     return [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax];
   });
-  
+
+  const [premium, setPremium] = useState<[number, number]>(() => {
+    const minPremiumParam = getParamKey('min_premium');
+    const maxPremiumParam = getParamKey('max_premium');
+    const localStorageKey = `${option}_premium`;
+    
+    // Check URL params first
+    const minFromUrl = searchParams.get(minPremiumParam);
+    const maxFromUrl = searchParams.get(maxPremiumParam);
+    if (minFromUrl !== null && maxFromUrl !== null) {
+      return [Number(minFromUrl), Number(maxFromUrl)];
+    }
+    
+    // Then check localStorage
+    if (typeof window !== 'undefined') {
+      const storedValue = localStorage.getItem(localStorageKey);
+      if (storedValue) {
+        try {
+          return JSON.parse(storedValue) as [number, number];
+        } catch (e) {
+          console.error(`Error parsing localStorage value for ${localStorageKey}:`, e);
+        }
+      }     
+    }
+    return [premiumFilterConfig.defaultMin, premiumFilterConfig.defaultMax];
+  });
+
   const [marketCap, setMarketCap] = useState<[number, number]>(() => {
     const paramKey = getParamKey('marketCap');
     const localStorageKey = `${option}_marketCap`;
@@ -460,9 +487,9 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem(`${option}_peRatio`, JSON.stringify(peRatio));
+      localStorage.setItem(`${option}_premium`, JSON.stringify(premium));
     }
-  }, [peRatio, option]);
+      }, [premium, option]);
   
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -538,6 +565,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     selectedExpiration: "",
     minSelectedExpiration: "",
     pageNo: 1,
+    premium: [premiumFilterConfig.defaultMin, premiumFilterConfig.defaultMax] as [number, number],
     peRatio: [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax] as [number, number],
     marketCap: [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax] as [number, number],    
     sector: sectorOptions[0],
@@ -629,6 +657,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       selectedExpiration !== activeFilters.selectedExpiration ||
       deltaFilter[0] !== activeFilters.deltaFilter[0] ||
       deltaFilter[1] !== activeFilters.deltaFilter[1] ||
+      premium[0] !== activeFilters.premium[0] ||
+      premium[1] !== activeFilters.premium[1] ||
       peRatio[0] !== activeFilters.peRatio[0] ||
       peRatio[1] !== activeFilters.peRatio[1] ||
       marketCap[0] !== activeFilters.marketCap[0] ||
@@ -656,6 +686,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     selectedExpiration, 
     deltaFilter,
     peRatio,
+    premium,
     marketCap,
     movingAverageCrossover,
     sector,
@@ -681,6 +712,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       delta: deltaFilter,
       dte: [minDte, maxDte],
       iv: impliedVolatility,
+      premium: premium,
       pe: peRatio,
       marketCap: marketCap,
       annualizedReturn: annualizedReturn,
@@ -704,6 +736,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       selectedExpiration,
       minSelectedExpiration,
       pageNo: 1,
+      premium,
       peRatio,
       marketCap,      
       sector,
@@ -731,6 +764,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       max_moneyness: moneynessRange[1],
       min_delta: deltaFilter[0],
       max_delta: deltaFilter[1],
+      min_premium: premium[0],
+      max_premium: premium[1],
       min_pe: peRatio[0],
       max_pe: peRatio[1],
       min_market_cap: marketCap[0],
@@ -754,6 +789,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       pageSize: rowsPerPage,
       sortConfig: sortConfig.direction ? sortConfig : undefined,
       deltaRange: deltaFilter,
+      premium,
       peRatio,
       marketCap,
       sector,
@@ -801,6 +837,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             pageSize: rowsPerPage,
             sortConfig: sortConfig.direction ? sortConfig : undefined,
             deltaRange: deltaFilter,
+            premium,
             peRatio,
             marketCap,
             sector,
@@ -885,6 +922,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     selectedExpiration,
     moneynessRange,
     deltaFilter,
+    premium,
     peRatio,
     marketCap,
     movingAverageCrossover,
@@ -985,6 +1023,14 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       activeFilterList.push(`P/E: ${peText}`);
     }
 
+    if (premium[0] !== premiumFilterConfig.defaultMin || 
+      premium[1] !== premiumFilterConfig.defaultMax) {
+    const premiumText = premium[1] === premiumFilterConfig.defaultMax 
+      ? `at least $${premium[0]}`
+      : `$${premium[0]} to $${premium[1]}`;
+    activeFilterList.push(`Premium: ${premiumText}`);
+  }
+
     // Check market cap
     if (marketCap[0] !== marketCapFilterConfig.defaultMin || 
         marketCap[1] !== marketCapFilterConfig.defaultMax) {
@@ -1084,6 +1130,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       sortConfig: { field: columnId as keyof Option, direction: newSortDir },
       strikeFilter: strikeFilter !== 'ALL' ? strikeFilter : undefined,
       deltaRange: deltaFilter,
+      premium: activeFilters.premium,
       peRatio: activeFilters.peRatio,
       marketCap: activeFilters.marketCap,
       sector: activeFilters.sector,
@@ -1108,6 +1155,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     setMinDte(dteFilterConfig.defaultMin);
     setMaxDte(dteFilterConfig.defaultMax);
     setImpliedVolatility([impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax]);
+    setPremium([premiumFilterConfig.defaultMin, premiumFilterConfig.defaultMax]);
     setPeRatio([peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax]);
     setMarketCap([marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax]);
     setAnnualizedReturn([annualizedReturnFilterConfig.defaultMin, annualizedReturnFilterConfig.defaultMax]);
@@ -1125,6 +1173,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       selectedExpiration: "",
       minSelectedExpiration: "",
       pageNo: 1,
+      premium: [premiumFilterConfig.defaultMin, premiumFilterConfig.defaultMax] as [number, number],
       peRatio: [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax] as [number, number],
       marketCap: [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax] as [number, number],      
       sector: sectorOptions[0],
@@ -1208,6 +1257,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       selectedExpiration: "",
       minSelectedExpiration: "",
       pageNo: 1,
+      premium: screener.filters.premium || [premiumFilterConfig.defaultMin, premiumFilterConfig.defaultMax],
       peRatio: screener.filters.peRatio || [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax],
       marketCap: screener.filters.marketCap || [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax],
       sector: Array.isArray(screener.filters.sector) ? screener.filters.sector[0] : (screener.filters.sector || sectorOptions[0]),
@@ -1231,7 +1281,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     setMinDte(screener.filters.minDte || dteFilterConfig.defaultMin);
     setMaxDte(screener.filters.maxDte || dteFilterConfig.defaultMax);
     setImpliedVolatility(screener.filters.impliedVolatility || [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax]);
-    setPeRatio(screener.filters.peRatio || [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax]);
+          setPremium(screener.filters.premium || [premiumFilterConfig.defaultMin, premiumFilterConfig.defaultMax]);
     setMarketCap(screener.filters.marketCap || [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax]);
     setAnnualizedReturn(screener.filters.annualizedReturn || [annualizedReturnFilterConfig.defaultMin, annualizedReturnFilterConfig.defaultMax]);
     setMoneynessRange(screener.filters.moneynessRange || [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax]);
@@ -1418,6 +1468,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         {/* Advanced Filters */}
         <div className="mt-4">
           <AdvancedFilters
+            premium={premium}
+            onPremiumChange={(value) => {
+              setPremium(value);
+            }}
             peRatio={peRatio}
             onPeRatioChange={(value) => {
               setPeRatio(value);
@@ -1662,6 +1716,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                       sortConfig: sortConfig.direction ? sortConfig : undefined,
                       strikeFilter: strikeFilter !== 'ALL' ? strikeFilter : undefined,
                       deltaRange: deltaFilter,
+                      premium: activeFilters.premium,
                       peRatio: activeFilters.peRatio,
                       marketCap: activeFilters.marketCap,
                       sector: activeFilters.sector,
@@ -1701,6 +1756,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                       sortConfig: sortConfig.direction ? sortConfig : undefined,
                       strikeFilter: strikeFilter !== 'ALL' ? strikeFilter : undefined,
                       deltaRange: deltaFilter,
+                      premium: activeFilters.premium,
                       peRatio: activeFilters.peRatio,
                       marketCap: activeFilters.marketCap,
                       sector: activeFilters.sector,
@@ -1766,6 +1822,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             minDte,
             maxDte,
             impliedVolatility,
+            premium,
             peRatio,
             marketCap,
             movingAverageCrossover,

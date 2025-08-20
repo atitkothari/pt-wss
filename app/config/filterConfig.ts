@@ -95,6 +95,28 @@ export const peRatioFilterConfig = {
   tooltip: "Price-to-Earnings ratio to filter stocks"
 };
 
+export const premiumFilterConfig = {
+  min: 0,
+  max: 5000,
+  defaultMin: 0,
+  defaultMax: 5000,
+  step: 10,
+  tooltip: "Premium amount in dollars to filter options",
+  //make it exponential
+  isExponential: true,
+  exponent: 3,
+  toExponential: (linearValue: number) => {
+    const maxValue = 5000;
+    const normalizedValue = linearValue / maxValue;
+    return Math.round(Math.pow(normalizedValue, premiumFilterConfig.exponent) * maxValue);
+  },
+  fromExponential: (exponentialValue: number) => {
+    const maxValue = 5000;
+    const normalizedValue = exponentialValue / maxValue;
+    return Math.round(Math.pow(normalizedValue, 1/premiumFilterConfig.exponent) * maxValue);
+  }
+};
+
 // Market Cap Filter Configuration (in billions)
 export const marketCapFilterConfig = {
   min: 0,
@@ -278,8 +300,8 @@ export const setDefaultFilterValues = (optionType: 'call' | 'put') => {
   localStorage.setItem(`${optionType}_minDte`, JSON.stringify(dteFilterConfig.defaultMin));
   localStorage.setItem(`${optionType}_maxDte`, JSON.stringify(dteFilterConfig.defaultMax));
 
-  // P/E Ratio filter
-  localStorage.setItem(`${optionType}_peRatio`, JSON.stringify([peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax]));
+  // Premium filter
+  localStorage.setItem(`${optionType}_premium`, JSON.stringify([premiumFilterConfig.defaultMin, premiumFilterConfig.defaultMax]));
 
   // Market Cap filter
   localStorage.setItem(`${optionType}_marketCap`, JSON.stringify([marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax]));
