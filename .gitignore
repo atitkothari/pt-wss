@@ -36,3 +36,5 @@ next-env.d.ts
 
 # Project idx
 .idx/
+# Sentry Config File
+.env.sentry-build-plugin

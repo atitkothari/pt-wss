@@ -3,6 +3,7 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import * as Sentry from '@sentry/nextjs';
 
 interface Props {
   children: ReactNode;
@@ -43,8 +44,22 @@ export class ErrorBoundary extends Component<Props, State> {
       this.props.onError(error, errorInfo);
     }
 
-    // You could also log to an error reporting service here
-    // logErrorToService(error, errorInfo);
+    // Send error to Sentry
+    try {
+      Sentry.captureException(error, {
+        contexts: {
+          react: {
+            componentStack: errorInfo.componentStack,
+          },
+        },
+        extra: {
+          errorInfo,
+          componentName: this.constructor.name,
+        },
+      });
+    } catch (sentryError) {
+      console.error('Failed to send error to Sentry:', sentryError);
+    }
   }
 
   handleReset = () => {
@@ -132,10 +147,42 @@ export function useErrorHandler() {
   React.useEffect(() => {
     const handleError = (event: ErrorEvent) => {
       setError(event.error);
+      
+      // Send to Sentry
+      try {
+        Sentry.captureException(event.error, {
+          contexts: {
+            error: {
+              type: 'unhandled_error',
+              message: event.message,
+              filename: event.filename,
+              lineno: event.lineno,
+              colno: event.colno,
+            },
+          },
+        });
+      } catch (sentryError) {
+        console.error('Failed to send error to Sentry:', sentryError);
+      }
     };
 
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      setError(new Error(event.reason));
+      const error = new Error(event.reason);
+      setError(error);
+      
+      // Send to Sentry
+      try {
+        Sentry.captureException(error, {
+          contexts: {
+            error: {
+              type: 'unhandled_promise_rejection',
+              reason: event.reason,
+            },
+          },
+        });
+      } catch (sentryError) {
+        console.error('Failed to send error to Sentry:', sentryError);
+      }
     };
 
     window.addEventListener('error', handleError);

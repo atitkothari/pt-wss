@@ -21,6 +21,7 @@ import { sendAnalyticsEvent, AnalyticsEvents } from '../utils/analytics';
 import { FirebaseError } from 'firebase/app';
 import { db } from '../lib/firebase';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { setUserContext, clearUserContext, addBreadcrumb } from '../lib/sentry';
 
 const sendUserLoginWebhook = async (email: string) => {
   try {
@@ -83,6 +84,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(user);
           setUserId(user.uid);
           
+          // Set Sentry user context
+          setUserContext(user.uid, user.email || undefined, user.displayName || undefined);
+          addBreadcrumb('User signed in', 'auth', { email: user.email, uid: user.uid });
+          
           // Ensure the user document exists in Firestore
           ensureUserDocumentExists(user);
           
@@ -92,6 +97,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } else {
           setUser(null);
           setUserId(null);
+          
+          // Clear Sentry user context
+          clearUserContext();
+          addBreadcrumb('User signed out', 'auth');
+          
           if (typeof window !== 'undefined' && 'gtag' in window) {
             ((window as any).gtag)('set', { user_id: undefined });
           }
@@ -263,6 +273,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
       setError(null);
+      
+      // Add Sentry breadcrumb before logout
+      addBreadcrumb('User logging out', 'auth', { userId: user?.uid });
+      
       await signOut(auth);
       
       sendAnalyticsEvent({
