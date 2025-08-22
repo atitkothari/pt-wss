@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, X, Clock, CreditCard } from "lucide-react";
@@ -72,6 +72,42 @@ export const PricingPopup = ({ isOpen, onClose, triggerSource }: PricingPopupPro
   const router = useRouter();
   const { trackEvent } = usePlausibleTracker();
 
+  // Track popup open
+  React.useEffect(() => {
+    if (isOpen) {
+      // Google Analytics
+      sendAnalyticsEvent({
+        event_name: 'pricing_popup_opened',
+        event_category: 'Pricing Popup',
+        event_label: triggerSource,
+        custom_parameters: {
+          billing_cycle: billingCycle,
+          user_status: status,
+          trigger_source: triggerSource
+        }
+      });
+
+      // Plausible Analytics
+      trackEvent(PlausibleEvents.PricingStartTrialClick, {
+        source: 'popup_opened',
+        triggerSource,
+        billingCycle,
+        userStatus: status,
+        userId: userId || 'anonymous'
+      });
+
+      // Facebook Pixel
+      if (typeof window !== 'undefined' && (window as any).fbq) {
+        (window as any).fbq('track', 'ViewContent', {
+          content_name: 'Pricing Popup',
+          content_category: 'Pricing',
+          content_type: 'popup',
+          trigger_source: triggerSource
+        });
+      }
+    }
+  }, [isOpen, triggerSource, billingCycle, status, userId, trackEvent]);
+
   if (!isOpen) return null;
 
   const handleBillingToggle = (cycle: 'monthly' | 'quarterly' | 'yearly') => {
@@ -99,6 +135,27 @@ export const PricingPopup = ({ isOpen, onClose, triggerSource }: PricingPopupPro
     try {
       setIsLoading(true);
       if (!user) {
+        // Track auth modal opened from popup
+        sendAnalyticsEvent({
+          event_name: 'pricing_popup_auth_modal_opened',
+          event_category: 'Pricing Popup',
+          event_label: triggerSource,
+          custom_parameters: {
+            billing_cycle: billingCycle,
+            trigger_source: triggerSource,
+            user_status: 'unauthenticated'
+          }
+        });
+
+        // Plausible Analytics
+        trackEvent(PlausibleEvents.PricingStartTrialClick, {
+          source: 'popup_auth_modal_opened',
+          triggerSource,
+          billingCycle,
+          userStatus: 'unauthenticated',
+          userId: 'anonymous'
+        });
+
         setShowAuthModal(true);
         return;
       }
@@ -117,6 +174,31 @@ export const PricingPopup = ({ isOpen, onClose, triggerSource }: PricingPopupPro
       
       // Pass the coupon code to the checkout session with limited time pricing
       await createCheckoutSession(billingCycle, true, 'LABORDAY25');
+      
+      // Track successful checkout session creation
+      sendAnalyticsEvent({
+        event_name: 'pricing_popup_checkout_created',
+        event_category: 'Pricing Popup',
+        event_label: triggerSource,
+        custom_parameters: {
+          billing_cycle: billingCycle,
+          trigger_source: triggerSource,
+          user_status: status,
+          coupon_code: 'LABORDAY25',
+          pricing_type: 'limited_time'
+        }
+      });
+
+      // Plausible Analytics
+      trackEvent(PlausibleEvents.PricingStartTrialClick, {
+        source: 'popup_checkout_created',
+        triggerSource,
+        billingCycle,
+        userStatus: status,
+        userId: userId || 'anonymous',
+        couponCode: 'LABORDAY25',
+        pricingType: 'limited_time'
+      });
     } catch (error) {
       console.error('Error starting trial:', error);
       alert('Something went wrong. Please try again.');
@@ -126,6 +208,27 @@ export const PricingPopup = ({ isOpen, onClose, triggerSource }: PricingPopupPro
   };
 
   const handleAuthModalClose = () => {
+    // Track auth modal closed
+    sendAnalyticsEvent({
+      event_name: 'pricing_popup_auth_modal_closed',
+      event_category: 'Pricing Popup',
+      event_label: triggerSource,
+      custom_parameters: {
+        billing_cycle: billingCycle,
+        trigger_source: triggerSource,
+        user_status: status
+      }
+    });
+
+    // Plausible Analytics
+    trackEvent(PlausibleEvents.PricingStartTrialClick, {
+      source: 'popup_auth_modal_closed',
+      triggerSource,
+      billingCycle,
+      userStatus: status,
+      userId: userId || 'anonymous'
+    });
+
     setShowAuthModal(false);
   };
 
@@ -173,7 +276,32 @@ export const PricingPopup = ({ isOpen, onClose, triggerSource }: PricingPopupPro
 
   return (
     <>
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4" onClick={onClose}>
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4" onClick={() => {
+        // Track popup close via backdrop click
+        sendAnalyticsEvent({
+          event_name: 'pricing_popup_closed',
+          event_category: 'Pricing Popup',
+          event_label: triggerSource,
+          custom_parameters: {
+            billing_cycle: billingCycle,
+            user_status: status,
+            trigger_source: triggerSource,
+            close_method: 'backdrop_click'
+          }
+        });
+
+        // Plausible Analytics
+        trackEvent(PlausibleEvents.PricingStartTrialClick, {
+          source: 'popup_closed',
+          triggerSource,
+          billingCycle,
+          userStatus: status,
+          userId: userId || 'anonymous',
+          closeMethod: 'backdrop_click'
+        });
+
+        onClose();
+      }}>
         <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-300" onClick={(e) => e.stopPropagation()}>
           {/* Header with close button */}
           <div className="flex justify-between items-start p-4 sm:p-6 border-b border-gray-200">
@@ -195,7 +323,32 @@ export const PricingPopup = ({ isOpen, onClose, triggerSource }: PricingPopupPro
               </p>
             </div>
             <Button
-              onClick={onClose}
+              onClick={() => {
+                // Track popup close
+                sendAnalyticsEvent({
+                  event_name: 'pricing_popup_closed',
+                  event_category: 'Pricing Popup',
+                  event_label: triggerSource,
+                  custom_parameters: {
+                    billing_cycle: billingCycle,
+                    user_status: status,
+                    trigger_source: triggerSource,
+                    close_method: 'close_button'
+                  }
+                });
+
+                // Plausible Analytics
+                trackEvent(PlausibleEvents.PricingStartTrialClick, {
+                  source: 'popup_closed',
+                  triggerSource,
+                  billingCycle,
+                  userStatus: status,
+                  userId: userId || 'anonymous',
+                  closeMethod: 'close_button'
+                });
+
+                onClose();
+              }}
               variant="ghost"
               size="sm"
               className="h-8 w-8 p-0 hover:bg-gray-100"
@@ -257,14 +410,37 @@ export const PricingPopup = ({ isOpen, onClose, triggerSource }: PricingPopupPro
                 
                 {/* Action Button - moved below green box */}
                 <div className="mt-4">
-                  {status === 'active' || status === 'paused' ? (
-                    <Button 
-                      onClick={() => router.push('/manage-subscription')}
-                      className="w-full bg-black text-white flex items-center gap-2"
-                    >
-                      <CreditCard className="h-4 w-4" />
-                      <span>Manage Subscription</span>
-                    </Button>
+                                  {status === 'active' || status === 'paused' ? (
+                  <Button 
+                    onClick={() => {
+                      // Track manage subscription click from popup
+                      sendAnalyticsEvent({
+                        event_name: 'pricing_popup_manage_subscription_clicked',
+                        event_category: 'Pricing Popup',
+                        event_label: triggerSource,
+                        custom_parameters: {
+                          billing_cycle: billingCycle,
+                          trigger_source: triggerSource,
+                          user_status: status
+                        }
+                      });
+
+                      // Plausible Analytics
+                      trackEvent(PlausibleEvents.PricingStartTrialClick, {
+                        source: 'popup_manage_subscription_clicked',
+                        triggerSource,
+                        billingCycle,
+                        userStatus: status,
+                        userId: userId || 'anonymous'
+                      });
+
+                      router.push('/manage-subscription');
+                    }}
+                    className="w-full bg-black text-white flex items-center gap-2"
+                  >
+                    <CreditCard className="h-4 w-4" />
+                    <span>Manage Subscription</span>
+                  </Button>
                   ) : (
                     <Button 
                       onClick={handleStartTrial}
