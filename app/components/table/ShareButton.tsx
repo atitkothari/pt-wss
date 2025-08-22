@@ -147,23 +147,23 @@ export function ShareButton({ elementToCapture, className, option }: ShareButton
         drawDataRow('Earnings Date', option.earningsDate, contentStartY + lineHeight * 5, false, '#374151', '#111827', false, false, undefined, undefined, true);
 
         // Footer
-        // const footerHeight = 150;
-        // ctx.fillStyle = '#f3f4f6';
-        // ctx.fillRect(0, newCanvas.height - footerHeight, newCanvas.width, footerHeight);
+        const footerHeight = 150;
+        ctx.fillStyle = '#f3f4f6';
+        ctx.fillRect(0, newCanvas.height - footerHeight, newCanvas.width, footerHeight);
         
-        // // Footer border
-        // ctx.strokeStyle = '#d1d5db';
-        // ctx.lineWidth = 2;
-        // ctx.beginPath();
-        // ctx.moveTo(0, newCanvas.height - footerHeight);
-        // ctx.lineTo(newCanvas.width, newCanvas.height - footerHeight);
-        // ctx.stroke();
+        // Footer border
+        ctx.strokeStyle = '#d1d5db';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, newCanvas.height - footerHeight);
+        ctx.lineTo(newCanvas.width, newCanvas.height - footerHeight);
+        ctx.stroke();
 
-        // // Website URL
-        // ctx.fillStyle = '#3b82f6'; // Blue
-        // ctx.textAlign = 'center';
-        // ctx.font = '32px Arial';
-        // ctx.fillText('wheelstrategyoptions.com', newCanvas.width / 2, newCanvas.height - 80);
+        // Website URL
+        ctx.fillStyle = '#3b82f6'; // Blue
+        ctx.textAlign = 'center';
+        ctx.font = '32px Arial';
+        ctx.fillText('wheelstrategyoptions.com', newCanvas.width / 2, newCanvas.height - 80);
       }
 
       newCanvas.toBlob(async (blob) => {
