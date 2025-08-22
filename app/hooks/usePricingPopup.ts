@@ -12,7 +12,7 @@ export const usePricingPopup = () => {
   const { status } = useUserAccess();
 
   // Only show popup for signed-in users who are not premium
-  const canShowPopup = user && status !== 'active' && status !== 'paused';
+  const canShowPopup = Boolean(user && status !== 'active' && status !== 'paused');
 
   // Check if enough time has passed since last popup
   const canShowPopupNow = useCallback(() => {
