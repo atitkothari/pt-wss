@@ -59,12 +59,13 @@ export default function CoveredCallScreenerPage() {
         {/* Mobile Navigation Bar */}
         <div className="block md:hidden mb-4 flex items-center justify-center min-h-[20px]">
         <div className="flex flex-wrap justify-center items-center gap-1 w-full text-center">
-          <Link href="/cash-secured-put-screener" className="text-xs sm:text-sm text-blue-600 hover:underline font-medium px-1 whitespace-nowrap">Cash Secured Put Screener</Link>
+          <Link href="/cash-secured-put-screener" className="text-xs sm:text-sm text-blue-600 hover:underline font-medium px-1 whitespace-nowrap">CSP Screener</Link>
           <span className="text-gray-300">|</span>
           <Link href="/discover" className="text-xs sm:text-sm text-blue-600 hover:underline font-medium px-1 whitespace-nowrap">Discover</Link>
           <span className="text-gray-300">|</span>
           <Link href="/trade-tracker" className="text-xs sm:text-sm text-blue-600 hover:underline font-medium px-1 whitespace-nowrap">Trade Tracker</Link>
-          
+          <span className="text-gray-300">|</span>
+          <Link href="/watchlist" className="text-xs sm:text-sm text-blue-600 hover:underline font-medium px-1 whitespace-nowrap">Watchlist</Link>
           {/* <span className="text-gray-300">|</span>
            <Link href="/watchlist" className="text-xs sm:text-sm text-blue-600 hover:underline font-medium px-1 whitespace-nowrap">Watchlist</Link>*/}
         </div>

@@ -117,7 +117,7 @@ export default function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             >
-              Master the Wheel Strategy. Pinpoint High-Yield Covered Calls & Cash Secured Puts, Effortlessly.
+              Master the Wheel Strategy. Pinpoint High-Yield Covered Calls (CC) & Cash Secured Puts (CSP), Effortlessly.
             </motion.h1>
           </motion.div>
 
@@ -183,7 +183,7 @@ export default function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             >
-              Master the Wheel Strategy. Pinpoint High-Yield Covered Calls & Cash Secured Puts, Effortlessly.
+              Master the Wheel Strategy. Pinpoint High-Yield Covered Calls (CC) & Cash Secured Puts (CSP), Effortlessly.
             </motion.h1>
             <motion.h2 
               className="text-3xl font-bold mb-6 text-black"
@@ -282,7 +282,7 @@ export default function LandingPage() {
             transition={{ duration: 0.6, delay: 0.6 }}
             viewport={{ once: true }}
           >
-            Pinpoint the Most Profitable Covered Calls & CSPs with Confidence.
+            Pinpoint the Most Profitable Covered Calls (CC) & Cash Secured Puts (CSP) with Confidence.
           </motion.p>
         </div>
         <div className="max-w-4xl">

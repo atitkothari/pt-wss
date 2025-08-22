@@ -334,12 +334,14 @@ export default function WatchlistPage() {
   return (
     <PageLayout>
       <div className="max-w-6xl mx-auto py-4 px-2 sm:px-4 lg:px-6">
-        <div className="flex justify-center gap-3 mb-3">
+        <div className="flex justify-center gap-3 mb-3 items-center">
           <a href="/discover" className="text-xs text-blue-600 hover:underline font-medium">Discover</a>
           <span className="text-gray-300">|</span>
-          <a href="/cash-secured-put-screener" className="text-xs text-blue-600 hover:underline font-medium">Cash Secured Put</a>
+          <a href="/cash-secured-put-screener" className="text-xs text-blue-600 hover:underline font-medium text-center">CSP Screener</a>
           <span className="text-gray-300">|</span>
-          <a href="/covered-call-screener" className="text-xs text-blue-600 hover:underline font-medium">Covered Call Screener</a>
+          <a href="/covered-call-screener" className="text-xs text-blue-600 hover:underline font-medium text-center">CC Screener</a>
+          <span className="text-gray-300">|</span>
+          <a href="/trade-tracker" className="text-xs text-blue-600 hover:underline font-medium text-center">Trade Tracker</a>
         </div>
         <div className="text-center mb-4">          
           <h1 className="text-lg font-semibold text-gray-900 mb-1">My Watchlist</h1>
