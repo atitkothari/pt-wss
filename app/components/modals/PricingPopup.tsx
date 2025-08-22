@@ -254,6 +254,34 @@ export const PricingPopup = ({ isOpen, onClose, triggerSource }: PricingPopupPro
                     💰 Save {discountedPricing[billingCycle].savings} per month with coupon code LABORDAY25
                   </p>
                 </div>
+                
+                {/* Action Button - moved below green box */}
+                <div className="mt-4">
+                  {status === 'active' || status === 'paused' ? (
+                    <Button 
+                      onClick={() => router.push('/manage-subscription')}
+                      className="w-full bg-black text-white flex items-center gap-2"
+                    >
+                      <CreditCard className="h-4 w-4" />
+                      <span>Manage Subscription</span>
+                    </Button>
+                  ) : (
+                    <Button 
+                      onClick={handleStartTrial}
+                      disabled={isLoading}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-4 flex items-center justify-center gap-2"
+                    >
+                      {isLoading ? (
+                        <>
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                          <span>Loading...</span>
+                        </>
+                      ) : (
+                        'Get 25% Off Now'
+                      )}
+                    </Button>
+                  )}
+                </div>
               </CardHeader>
               <CardContent className="pt-4 sm:pt-6 px-4 sm:px-6">
                 <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
@@ -265,32 +293,6 @@ export const PricingPopup = ({ isOpen, onClose, triggerSource }: PricingPopupPro
                   ))}
                 </ul>
               </CardContent>
-              <CardFooter className="flex flex-col gap-3 pt-4 sm:pt-6 px-4 sm:px-6">
-                {status === 'active' || status === 'paused' ? (
-                  <Button 
-                    onClick={() => router.push('/manage-subscription')}
-                    className="w-full bg-black text-white flex items-center gap-2"
-                  >
-                    <CreditCard className="h-4 w-4" />
-                    <span>Manage Subscription</span>
-                  </Button>
-                ) : (
-                  <Button 
-                    onClick={handleStartTrial}
-                    disabled={isLoading}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-4 flex items-center justify-center gap-2"
-                  >
-                    {isLoading ? (
-                      <>
-                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                        <span>Loading...</span>
-                      </>
-                    ) : (
-                      'Get 25% Off Now'
-                    )}
-                  </Button>
-                )}                
-              </CardFooter>
             </Card>
           </div>
         </div>
