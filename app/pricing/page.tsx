@@ -17,6 +17,8 @@ import { PlausibleEvents, usePlausibleTracker } from '@/app/utils/plausible';
 import { StockChips } from '../components/StockChips';
 import { pricingInfo } from "../config/pricingInfo";
 import { fetchOptionsData } from "../services/api";
+import { PricingPopup } from '../components/modals/PricingPopup';
+import { usePricingPopupContext } from '../context/PricingPopupContext';
 
 export default function PricingPage() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'quarterly' | 'yearly'>('yearly');  
@@ -28,6 +30,7 @@ export default function PricingPage() {
   const { status } = useUserAccess();
   const router = useRouter();
   const { trackEvent } = usePlausibleTracker();
+  const { openPopup, canShowPopup, canShowPopupNow } = usePricingPopupContext();
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -41,7 +44,22 @@ export default function PricingPage() {
       await fetchOptionsData([], undefined, undefined, undefined, undefined, undefined, userId, 'pricing_page');
     }
     reportPricingPage();
-  }, []);
+  }, [userId]);
+
+  // Separate effect for the popup timer
+  useEffect(() => {
+    // Show pricing popup after 5 seconds only if user can see it and cooldown has passed
+    let timer: NodeJS.Timeout | undefined;
+    if (canShowPopup && canShowPopupNow()) {
+      timer = setTimeout(() => {
+        openPopup('pricing-page');
+      }, 5000);
+    }
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [canShowPopup, openPopup]);
 
   const handleBillingToggle = (cycle: 'monthly' | 'quarterly' | 'yearly') => {
     setBillingCycle(cycle);
@@ -83,7 +101,7 @@ export default function PricingPage() {
         event_label: billingCycle === 'yearly' ? 'Yearly' : billingCycle === 'quarterly' ? 'Quarterly' : 'Monthly'
       });
       trackEvent(PlausibleEvents.PricingStartTrialClick);
-      await createCheckoutSession(billingCycle, isLimitedTime);
+      await createCheckoutSession(billingCycle, true, 'LABORDAY25');
     } catch (error) {
       console.error('Error starting trial:', error);
       alert('Something went wrong. Please try again.');
@@ -199,6 +217,8 @@ export default function PricingPage() {
         onClose={handleAuthModalClose}
         initialMode="signin"
       />
+      
+
             
       
       {/* Hero Section */}
@@ -207,6 +227,8 @@ export default function PricingPage() {
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 md:mb-6">
             Simple, Transparent Pricing
           </h1>
+          
+
           <p className="text-lg sm:text-xl text-gray-600 mb-6 md:mb-8 px-4">
           Scan 570,000+ option contracts in seconds.
           </p>

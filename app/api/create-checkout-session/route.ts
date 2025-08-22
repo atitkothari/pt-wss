@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     
     // Get user info from request body since we're only using Firebase Auth
     const body = await req.json();
-    const { userId, email: userEmail, billingCycle, isLimitedTime } = body;
+    const { userId, email: userEmail, billingCycle, isLimitedTime, couponCode } = body;
     
 
     
@@ -149,6 +149,7 @@ export async function POST(req: Request) {
         allow_promotion_codes: true,
         metadata: {
           userId,
+          couponCode: couponCode || '',
         },
       });
 

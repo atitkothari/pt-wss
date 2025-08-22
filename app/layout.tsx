@@ -8,6 +8,8 @@ import { SubscriptionProvider } from './context/SubscriptionContext';
 import InstallPWA from './components/InstallPWA';
 import { MarketingConsentModal } from './components/auth/MarketingConsentModal';
 import { MarketingConsentProvider } from './context/MarketingConsentContext';
+import { PricingPopupProvider } from './context/PricingPopupContext';
+import { PricingPopupWrapper } from './components/PricingPopupWrapper';
 import { AnnouncementBanner } from './components/AnnouncementBanner';
 import { sendAnalyticsEvent } from './utils/analytics';
 import PlausibleProvider from 'next-plausible';
@@ -140,18 +142,21 @@ export default function RootLayout({
         <AuthProvider>
           <SubscriptionProvider>
             <MarketingConsentProvider>
-              <GlobalErrorHandler>
-                <main>
-                  <Suspense fallback={null}>
-                    <ProAnnouncementBanner />
-                  </Suspense>
-                  {children}
-                </main>
-                <Toaster />
+              <PricingPopupProvider>
+                <GlobalErrorHandler>
+                  <main>
+                    <Suspense fallback={null}>
+                      <ProAnnouncementBanner />
+                    </Suspense>
+                    {children}
+                  </main>
+                                  <Toaster />
                 <InstallPWA />
                 <MarketingConsentModal autoShow={true} />
                 <CookieConsentBanner />
-              </GlobalErrorHandler>
+                <PricingPopupWrapper />
+                </GlobalErrorHandler>
+              </PricingPopupProvider>
             </MarketingConsentProvider>
           </SubscriptionProvider>
         </AuthProvider>

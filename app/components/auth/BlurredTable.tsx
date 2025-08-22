@@ -13,6 +13,8 @@ import { useAuth } from "@/app/context/AuthContext";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { sendAnalyticsEvent, AnalyticsEvents } from "@/app/utils/analytics";
 import { pricingInfo } from "@/app/config/pricingInfo";
+import { PricingPopup } from "../modals/PricingPopup";
+import { usePricingPopupContext } from "../../context/PricingPopupContext";
 
 interface BlurredTableProps {
   children: React.ReactNode;
@@ -46,7 +48,8 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
   const [isUpgrading, setIsUpgrading] = useState(false);
   const router = useRouter();
   const [visitCount, setVisitCount] = useState(0);
-  const [isLimitedTime, setIsLimitedTime] = useState(false);  
+  const [isLimitedTime, setIsLimitedTime] = useState(false);
+  const { openPopup, canShowPopup, canShowPopupNow } = usePricingPopupContext();  
 
   const shouldBlur = hasSearched || (status !== 'trialing' && status !== 'active' && status !== 'incomplete_expired');
 
@@ -57,7 +60,19 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
       setVisitCount(count);
       setIsLimitedTime(count >= 0);
     }
-  }, []);  
+
+    // Show pricing popup after a short delay when paywall is visible and cooldown has passed
+    let timer: NodeJS.Timeout | undefined;
+    if (shouldBlur && canShowPopup && canShowPopupNow()) {
+      timer = setTimeout(() => {
+        openPopup('blurred-table');
+      }, 2000);
+    }
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [shouldBlur]);  
 
   const handleUpgrade = async (billingCycle: 'monthly' | 'quarterly' | 'yearly' = 'yearly') => {
     try {
@@ -70,7 +85,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
         event_label: billingCycle === 'yearly' ? 'Yearly' : billingCycle === 'quarterly' ? 'Quarterly' : 'Monthly',
         plan_type: billingCycle
       });
-      await createCheckoutSession(billingCycle, isLimitedTime);
+      await createCheckoutSession(billingCycle, true, 'LABORDAY25');
     } catch (error) {
       console.error('Failed to create checkout session:', error);
     } finally {
@@ -361,6 +376,7 @@ export const BlurredTable = ({ children, className, hasSearched = false }: Blurr
         onClose={() => setShowAuthModal(false)} 
         initialMode="signin" 
       />
+
     </>
   );
 };
