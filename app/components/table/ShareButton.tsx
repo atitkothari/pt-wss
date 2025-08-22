@@ -6,6 +6,7 @@ import { saveAs } from 'file-saver';
 import { Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { PlausibleEvents, usePlausibleTracker } from '@/app/utils/plausible';
 
 import { Option } from '@/app/types/option';
 
@@ -17,9 +18,19 @@ interface ShareButtonProps {
 
 export function ShareButton({ elementToCapture, className, option }: ShareButtonProps) {
   const [isSharing, setIsSharing] = useState(false);
+  const { trackEvent } = usePlausibleTracker();
 
   const handleShare = async () => {
     setIsSharing(true);
+    
+    // Track the share event
+    trackEvent(PlausibleEvents.Share, {
+      symbol: option.symbol,
+      strike: option.strike,
+      type: option.type,
+      expiration: option.expiration
+    });
+    
     try {
       const element = elementToCapture();
       if (!element) {
