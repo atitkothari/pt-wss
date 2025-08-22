@@ -959,11 +959,15 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   };
 
   const getActiveFilterSummary = () => {
-    const activeFilterList: string[] = [];
+    const activeFilterList: Array<{ label: string; type: string; reset: () => void }> = [];
 
     // Check search term
     if (searchTerm && searchTerm.trim() !== '') {
-      activeFilterList.push(`Symbols: ${searchTerm}`);
+      activeFilterList.push({
+        label: `Symbols: ${searchTerm}`,
+        type: 'searchTerm',
+        reset: () => setSearchTerm('')
+      });
     }
 
     // Check yield range
@@ -972,7 +976,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       const yieldText = yieldRange[1] === yieldFilterConfig.defaultMax 
         ? `at least ${yieldRange[0]}%`
         : `${yieldRange[0]}% to ${yieldRange[1]}%`;
-      activeFilterList.push(`Yield: ${yieldText}`);
+      activeFilterList.push({
+        label: `Yield: ${yieldText}`,
+        type: 'yieldRange',
+        reset: () => setYieldRange([yieldFilterConfig.defaultMin, yieldFilterConfig.defaultMax])
+      });
     }
 
     // Check price range
@@ -981,7 +989,14 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       const priceText = maxPrice === priceFilterConfig.defaultMax 
         ? `at least $${minPrice}`
         : `$${minPrice} to $${maxPrice}`;
-      activeFilterList.push(`Price: ${priceText}`);
+      activeFilterList.push({
+        label: `Price: ${priceText}`,
+        type: 'priceRange',
+        reset: () => {
+          setMinPrice(priceFilterConfig.defaultMin);
+          setMaxPrice(priceFilterConfig.defaultMax);
+        }
+      });
     }
 
     // Check volume range
@@ -990,7 +1005,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       const volumeText = volumeRange[1] === volumeFilterConfig.max 
         ? `at least ${volumeRange[0].toLocaleString()}`
         : `${volumeRange[0].toLocaleString()} to ${volumeRange[1].toLocaleString()}`;
-      activeFilterList.push(`Volume: ${volumeText}`);
+      activeFilterList.push({
+        label: `Volume: ${volumeText}`,
+        type: 'volumeRange',
+        reset: () => setVolumeRange([volumeFilterConfig.min, volumeFilterConfig.max])
+      });
     }
 
     // Check delta range
@@ -999,7 +1018,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       const deltaText = deltaFilter[1] === deltaFilterConfig.defaultMax 
         ? `at least ${deltaFilter[0]}`
         : `${deltaFilter[0]} to ${deltaFilter[1]}`;
-      activeFilterList.push(`Delta: ${deltaText}`);
+      activeFilterList.push({
+        label: `Delta: ${deltaText}`,
+        type: 'deltaFilter',
+        reset: () => setDeltaFilter([deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax])
+      });
     }
 
     // Check expiration dates
@@ -1011,7 +1034,14 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       if (selectedExpiration) {
         expirationText.push(`To: ${selectedExpiration}`);
       }
-      activeFilterList.push(`Expiration: ${expirationText.join(', ')}`);
+      activeFilterList.push({
+        label: `Expiration: ${expirationText.join(', ')}`,
+        type: 'expiration',
+        reset: () => {
+          setSelectedExpiration('');
+          setMinSelectedExpiration('');
+        }
+      });
     }
 
     // Check P/E ratio
@@ -1020,7 +1050,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       const peText = peRatio[1] === peRatioFilterConfig.defaultMax 
         ? `at least ${peRatio[0]}`
         : `${peRatio[0]} to ${peRatio[1]}`;
-      activeFilterList.push(`P/E: ${peText}`);
+      activeFilterList.push({
+        label: `P/E: ${peText}`,
+        type: 'peRatio',
+        reset: () => setPeRatio([peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax])
+      });
     }
 
     if (premium[0] !== premiumFilterConfig.defaultMin || 
@@ -1028,7 +1062,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     const premiumText = premium[1] === premiumFilterConfig.defaultMax 
       ? `at least $${premium[0]}`
       : `$${premium[0]} to $${premium[1]}`;
-    activeFilterList.push(`Premium: ${premiumText}`);
+    activeFilterList.push({
+      label: `Premium: ${premiumText}`,
+      type: 'premium',
+      reset: () => setPremium([premiumFilterConfig.defaultMin, premiumFilterConfig.defaultMax])
+    });
   }
 
     // Check market cap
@@ -1037,7 +1075,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       const marketCapText = marketCap[1] === marketCapFilterConfig.defaultMax 
         ? `at least $${marketCap[0]}B`
         : `$${marketCap[0]}B to $${marketCap[1]}B`;
-      activeFilterList.push(`Market Cap: ${marketCapText}`);
+      activeFilterList.push({
+        label: `Market Cap: ${marketCapText}`,
+        type: 'marketCap',
+        reset: () => setMarketCap([marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax])
+      });
     }
 
     // Check sector
@@ -1051,7 +1093,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       const moneynessText = moneynessRange[1] === moneynessFilterConfig.defaultMax 
         ? `at least ${moneynessRange[0]}%`
         : `${moneynessRange[0]}% to ${moneynessRange[1]}%`;
-      activeFilterList.push(`Strike Filter: ${moneynessText}`);
+      activeFilterList.push({
+        label: `Strike Filter: ${moneynessText}`,
+        type: 'moneynessRange',
+        reset: () => setMoneynessRange([moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax])
+      });
     }
 
     // Check implied volatility
@@ -1060,7 +1106,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       const ivText = impliedVolatility[1] === impliedVolatilityFilterConfig.defaultMax 
         ? `at least ${impliedVolatility[0]}%`
         : `${impliedVolatility[0]}% to ${impliedVolatility[1]}%`;
-      activeFilterList.push(`IV: ${ivText}`);
+      activeFilterList.push({
+        label: `IV: ${ivText}`,
+        type: 'impliedVolatility',
+        reset: () => setImpliedVolatility([impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax])
+      });
     }
 
     // Check probability range
@@ -1069,7 +1119,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       const probText = probabilityRange[1] === probabilityFilterConfig.defaultMax 
         ? `at least ${probabilityRange[0]}%`
         : `${probabilityRange[0]}% to ${probabilityRange[1]}%`;
-      activeFilterList.push(`Probability: ${probText}`);
+      activeFilterList.push({
+        label: `Probability: ${probText}`,
+        type: 'probabilityRange',
+        reset: () => setProbabilityRange([probabilityFilterConfig.defaultMin, probabilityFilterConfig.defaultMax])
+      });
     }
 
     // Check annualized return
@@ -1078,12 +1132,20 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       const annualizedText = annualizedReturn[1] === annualizedReturnFilterConfig.defaultMax 
         ? `at least ${annualizedReturn[0]}%`
         : `${annualizedReturn[0]}% to ${annualizedReturn[1]}%`;
-      activeFilterList.push(`Annualized Return: ${annualizedText}`);
+      activeFilterList.push({
+        label: `Annualized Return: ${annualizedText}`,
+        type: 'annualizedReturn',
+        reset: () => setAnnualizedReturn([annualizedReturnFilterConfig.defaultMin, annualizedReturnFilterConfig.defaultMax])
+      });
     }
 
     // Check excluded stocks
     if (excludedStocks.length > 0) {
-      activeFilterList.push(`Excluded: ${excludedStocks.join(', ')}`);
+      activeFilterList.push({
+        label: `Excluded: ${excludedStocks.join(', ')}`,
+        type: 'excludedStocks',
+        reset: () => setExcludedStocks([])
+      });
     }
 
     return activeFilterList;
@@ -1667,8 +1729,15 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                   <div className="font-medium mb-1">Active filters:</div>
                   <div className="flex flex-wrap gap-1 justify-center">
                     {activeFilterSummary.map((filter, index) => (
-                      <span key={index} className="bg-gray-100 px-2 py-1 rounded text-gray-600">
-                        {filter}
+                      <span key={index} className="bg-gray-100 px-2 py-1 rounded text-gray-600 flex items-center gap-1">
+                        {filter.label}
+                        <button
+                          onClick={filter.reset}
+                          className="ml-1 text-gray-400 hover:text-gray-600 text-xs font-bold hover:bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center transition-colors"
+                          title="Remove filter"
+                        >
+                          ×
+                        </button>
                       </span>
                     ))}
                   </div>

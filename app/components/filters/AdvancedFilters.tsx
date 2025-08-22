@@ -262,13 +262,57 @@ export function AdvancedFilters({
                   annualizedReturn: 'Annualized Return',
                   excludedStocks: 'Excluded Stocks',
                 };
+
+                // Define reset functions for each filter type
+                const getResetFunction = (filterKey: string) => {
+                  switch (filterKey) {
+                    case 'strikePrice':
+                      return () => onStrikePriceChange([priceFilterConfig.min, priceFilterConfig.max]);
+                    case 'moneyness':
+                      return () => onMoneynessRangeChange([moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax]);
+                    case 'dte':
+                      return () => onDteChange([dteFilterConfig.defaultMin, dteFilterConfig.defaultMax]);
+                    case 'delta':
+                      return () => onDeltaFilterChange([deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax]);
+                    case 'volume':
+                      return () => onVolumeRangeChange([volumeFilterConfig.min, volumeFilterConfig.max]);
+                    case 'iv':
+                      return () => onImpliedVolatilityChange([impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax]);
+                    case 'premium':
+                      return () => onPremiumChange([premiumFilterConfig.defaultMin, premiumFilterConfig.defaultMax]);
+                    case 'marketCap':
+                      return () => onMarketCapChange([marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax]);
+                    case 'movingAverage':
+                      return () => onMovingAverageCrossoverChange(movingAverageCrossoverOptions[0]);
+                    case 'sector':
+                      return () => onSectorChange(sectorOptions[0]);
+                    case 'yieldRange':
+                      return () => onYieldRangeChange([yieldFilterConfig.defaultMin, yieldFilterConfig.defaultMax]);
+                    case 'probabilityRange':
+                      return () => onProbabilityRangeChange([probabilityFilterConfig.defaultMin, probabilityFilterConfig.defaultMax]);
+                    case 'annualizedReturn':
+                      return () => onAnnualizedReturnChange([annualizedReturnFilterConfig.defaultMin, annualizedReturnFilterConfig.defaultMax]);
+                    case 'excludedStocks':
+                      return () => onExcludedStocksChange([]);
+                    default:
+                      return () => {};
+                  }
+                };
+
                 return (
                   <Badge 
                     key={key}
                     variant="outline" 
-                    className="bg-blue-200 text-blue-800 border-blue-300 text-xs font-medium"
+                    className="bg-blue-200 text-blue-800 border-blue-300 text-xs font-medium flex items-center gap-1"
                   >
                     {filterNames[key]}
+                    <button
+                      onClick={getResetFunction(key)}
+                      className="ml-1 text-blue-600 hover:text-blue-800 text-xs font-bold hover:bg-blue-300 rounded-full w-4 h-4 flex items-center justify-center transition-colors"
+                      title="Remove filter"
+                    >
+                      ×
+                    </button>
                   </Badge>
                 );
               })}
