@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Image from "next/image";
 import { Footer } from "./components/Footer";
 import { PageLayout } from "./components/PageLayout";
 import { motion, AnimatePresence } from "framer-motion";
@@ -45,9 +46,11 @@ function TestimonialsCarousel() {
             transition={{ duration: 0.5, ease: "easeInOut" }}
             className="bg-white rounded-xl p-6 shadow-lg"
           >
-            <img
+            <Image
               src={`/testimonials/${testimonials[currentIndex]}.webp`}
               alt={`User testimonial ${testimonials[currentIndex]}`}
+              width={600}
+              height={400}
               className="w-full h-auto rounded-lg max-h-[400px] object-cover"
             />
           </motion.div>
@@ -151,9 +154,11 @@ export default function LandingPage() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
             >
-              <img
+              <Image
                 src="/v3_hero.jpeg"
                 alt="Wheel Strategy Options Hero"
+                width={600}
+                height={400}
                 className="w-full h-auto rounded-lg object-cover"
               />
             </motion.div>
@@ -252,9 +257,11 @@ export default function LandingPage() {
               transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
             >
               <div className="w-full">
-                <img
+                <Image
                   src="/v3_hero.jpeg"
                   alt="Wheel Strategy Options Hero"
+                  width={600}
+                  height={400}
                   className="w-full h-auto rounded-lg object-cover"
                 />
               </div>
@@ -324,9 +331,11 @@ export default function LandingPage() {
             </motion.p>
           </div>
           <div className="max-w-4xl">
-            <img
+            <Image
               src="/v3_predictable_income.jpeg"
               alt="Precision Tools for Predictable Profits"
+              width={600}
+              height={400}
               className="w-full h-auto rounded-lg object-cover"
             />
           </div>
@@ -362,9 +371,11 @@ export default function LandingPage() {
             </motion.p>
           </div>
           <div className="max-w-4xl">
-            <img
+            <Image
               src="/v3_find_trades.jpeg"
               alt="Find Trades that Match Your Setup"
+              width={600}
+              height={400}
               className="w-full h-auto rounded-lg object-cover"
             />
           </div>
@@ -400,9 +411,11 @@ export default function LandingPage() {
             </motion.p>
           </div>
           <div className="max-w-md">
-            <img
+            <Image
               src="/v3_never_lose.jpeg"
               alt="Never Lose Your Winning Setup"
+              width={600}
+              height={400}
               className="w-full h-auto rounded-lg object-cover"
             />
           </div>
@@ -438,9 +451,11 @@ export default function LandingPage() {
             </motion.p>
           </div>
           <div className="max-w-4xl">
-            <img
+            <Image
               src="/v3_track_every.jpeg"
               alt="Track Every Trade"
+              width={600}
+              height={400}
               className="w-full h-auto rounded-lg object-cover"
             />
           </div>
@@ -743,9 +758,11 @@ function DetailedFeature({
         whileHover={{ scale: 1.02 }}
       >
         <Link href="/options" className="group block">
-          <img
+          <Image
             src={imageSrc}
             alt={imageAlt}
+            width={600}
+            height={400}
             className="w-full h-auto max-h-[300px] object-contain rounded-lg transition-all duration-300 group-hover:opacity-90"
           />
         </Link>
