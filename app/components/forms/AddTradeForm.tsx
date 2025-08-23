@@ -40,6 +40,36 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
   const { user } = useAuth();
   const userId = user?.uid;
 
+  // Helper function to format date to yyyy-mm-dd
+  const formatDateToYYYYMMDD = (date: string | Date): string => {
+    try {
+      const dateObj = typeof date === 'string' ? new Date(date) : date;
+      if (isNaN(dateObj.getTime())) {
+        return '';
+      }
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    } catch (error) {
+      return '';
+    }
+  };
+
+  // Helper function to format partial date input in real-time
+  const formatPartialDate = (input: string): string => {
+    // Remove all non-numeric characters
+    const numbers = input.replace(/\D/g, '');
+    
+    if (numbers.length === 0) return '';
+    if (numbers.length <= 4) return numbers; // Just year
+    if (numbers.length <= 6) return `${numbers.slice(0, 4)}-${numbers.slice(4)}`; // Year-month
+    if (numbers.length <= 8) return `${numbers.slice(0, 4)}-${numbers.slice(4, 6)}-${numbers.slice(6)}`; // Year-month-day
+    
+    // If more than 8 digits, truncate to 8
+    return `${numbers.slice(0, 4)}-${numbers.slice(4, 6)}-${numbers.slice(6, 8)}`;
+  };
+
   // Function to generate option key in format: SYMBOL + EXPIRATION + TYPE + STRIKE
   const generateOptionKey = (symbol: string, expiration: string, type: string, strike: number): string => {
     // Format expiration as DDMMYY (e.g., "2024-12-19" becomes "191224")
@@ -111,8 +141,10 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
   useEffect(() => {
     if (selectedExpiration || manualExpiration) {
       const currentExpiration = selectedExpiration || manualExpiration;
+      // Ensure we're working with formatted dates
+      const formattedExpiration = formatDateToYYYYMMDD(currentExpiration);
       const strikes = contracts
-        .filter(c => c.expiration === currentExpiration)
+        .filter(c => c.expiration === formattedExpiration)
         .map(c => c.strike);
       setAvailableStrikePrices([...new Set(strikes)] as number[]);
       // Reset strike and premium when expiration changes
@@ -133,21 +165,23 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
       const currentStrike = selectedStrike || (manualStrike ? parseFloat(manualStrike) : null);
       
       if (currentStrike) {
-        const contract = contracts.find(c => c.expiration === currentExpiration && c.strike === currentStrike && c.type === selectedType);
+        // Ensure we're working with formatted dates
+        const formattedExpiration = formatDateToYYYYMMDD(currentExpiration);
+        const contract = contracts.find(c => c.expiration === formattedExpiration && c.strike === currentStrike && c.type === selectedType);
         if (contract) {
           setPremium(contract.bidPrice * 100);
           // Use contract's optionKey if available, otherwise generate one
           if (contract.optionKey) {
             setOptionKey(contract.optionKey);
           } else {
-            const generatedKey = generateOptionKey(symbol, currentExpiration, selectedType, currentStrike);
+            const generatedKey = generateOptionKey(symbol, formattedExpiration, selectedType, currentStrike);
       
             setOptionKey(generatedKey);
           }
         } else {
           setPremium(0);
           // Generate option key even when no contract is found
-          const generatedKey = generateOptionKey(symbol, currentExpiration, selectedType, currentStrike);
+          const generatedKey = generateOptionKey(symbol, formattedExpiration, selectedType, currentStrike);
   
           setOptionKey(generatedKey);
         }
@@ -165,12 +199,14 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
       const currentStrike = selectedStrike || (manualStrike ? parseFloat(manualStrike) : null);
       
       if (currentStrike) {
-        const contract = filteredContracts.find(c => c.expiration === currentExpiration && c.strike === currentStrike);
+        // Ensure expiration date is formatted as yyyy-mm-dd
+        const formattedExpiration = formatDateToYYYYMMDD(currentExpiration);
+        const contract = filteredContracts.find(c => c.expiration === formattedExpiration && c.strike === currentStrike);
         onSubmit({
           symbol,
           type: selectedType,
           strike: currentStrike,
-          expiration: currentExpiration,
+          expiration: formattedExpiration,
           premium,
           contracts: typeof numContracts === 'number' ? numContracts : 1,
           optionKey: optionKey
@@ -180,7 +216,7 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
   };
 
   const filteredContracts = contracts.filter(c => c.type === selectedType);
-  const expirationDates = [...new Set(filteredContracts.map(c => c.expiration))].sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+  const expirationDates = [...new Set(filteredContracts.map(c => c.expiration))].sort((a, b) => new Date(a).getTime() - new Date(b).getTime()).map(date => formatDateToYYYYMMDD(date));
 
   return (
     <FormErrorBoundary errorMessage="There was an error with the trade form. Please check your input and try again.">
@@ -233,10 +269,14 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
                 if (expirationDates.includes(value)) {
                   setSelectedExpiration(value);
                   setManualExpiration('');
+                  setShowExpirationDropdown(false);
                 } else {
-                  // Otherwise, treat as manual input
-                  setManualExpiration(value);
+                  // Otherwise, treat as manual input and format to yyyy-mm-dd in real-time
+                  const formattedValue = formatPartialDate(value);
+                  setManualExpiration(formattedValue);
                   setSelectedExpiration('');
+                  // Hide dropdown when user is typing manually
+                  setShowExpirationDropdown(false);
                 }
               }}
               onFocus={() => setShowExpirationDropdown(true)}
@@ -249,12 +289,13 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
                     key={date as string}
                     className="p-2 cursor-pointer hover:bg-gray-100"
                     onClick={() => {
-                      setSelectedExpiration(date as string);
+                      const formattedDate = formatDateToYYYYMMDD(date as string);
+                      setSelectedExpiration(formattedDate);
                       setManualExpiration('');
                       setShowExpirationDropdown(false);
                     }}
                   >
-                    {date as string}
+                    {formatDateToYYYYMMDD(date as string)}
                   </div>
                 ))}
               </div>
