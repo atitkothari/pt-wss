@@ -6,7 +6,7 @@ import { useAuth } from "@/app/context/AuthContext";
 import { Trade } from '@/app/types/trade';
 import { TradesTable } from '@/app/components/table/TradesTable';
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Group, List, RefreshCw } from "lucide-react";
+import { PlusCircle, Group, List, RefreshCw, Lock } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -25,7 +25,8 @@ import { Switch } from "@/components/ui/switch";
 import { fetchOptionPrice, calculateUnrealizedPL } from "@/app/hooks/useOptionsData";
 import { useCheckoutConversion } from "../hooks/useCheckoutConversion";
 import PremiumChart from "../components/PremiumChart";
-
+import { useUserAccess } from "../hooks/useUserAccess";
+import { useRouter } from 'next/navigation';
 interface TradeWithUnrealizedPL extends Trade {
   unrealizedPL?: number;
   currentPrice?: number;
@@ -33,11 +34,13 @@ interface TradeWithUnrealizedPL extends Trade {
   currentStockPrice?:number;
 }
 
-export default function TradeTrackerPage() {
+function TradeTrackerPageContent() {
   // Handle checkout conversion tracking
   useCheckoutConversion();
 
   const { user,loading: authLoading } = useAuth();
+  const { status } = useUserAccess();
+  const router = useRouter();
   const [trades, setTrades] = useState<TradeWithUnrealizedPL[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingPrices, setLoadingPrices] = useState(false);
@@ -374,6 +377,63 @@ export default function TradeTrackerPage() {
     };
   });
 
+  // Premium paywall component
+  if (status !== 'trialing' && status !== 'active' && status !== 'incomplete_expired') {
+    return (
+      <PageLayout>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-full p-6 mb-6">
+            <Lock className="h-16 w-16 text-blue-600" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">Trade Tracker</h1>
+          <p className="text-lg text-gray-600 max-w-md mb-8">
+            Track your options trades, monitor performance, and analyze your strategy with our comprehensive trade tracking tools.
+          </p>
+          
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full mb-8">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Premium Feature</h2>
+            <div className="space-y-3 mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-gray-700">Track unlimited trades</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-gray-700">Real-time P&L calculations</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-gray-700">Performance analytics</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-gray-700">Advanced reporting</span>
+              </div>
+            </div>
+            
+            {status === 'unauthenticated' ? (
+              <Button
+                onClick={() => setIsAuthModalOpen(true)}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3"
+              >
+                Sign In to Access
+              </Button>
+            ) : (
+              <Button
+                onClick={() => router.push('/pricing')}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3"
+              >
+                Upgrade to Pro
+              </Button>
+            )}
+          </div>
+        </div>
+        
+        <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      </PageLayout>
+    );
+  }
+
   return (
     <PageLayout>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
@@ -674,8 +734,8 @@ export default function TradeTrackerPage() {
                 <div><span className="font-semibold">Type:</span> {tradeToEdit.type}</div>
                 <div><span className="font-semibold">Strike:</span> ${tradeToEdit.strike.toFixed(2)}</div>
                 <div><span className="font-semibold">Expiration:</span> {tradeToEdit.expiration}</div>
-                <div><span className="font-semibold">Open Date:</span> {tradeToEdit.openDate ? new Date(tradeToEdit.openDate).toLocaleDateString() : '-'}</div>
-                <div><span className="font-semibold">Close Date:</span> {tradeToEdit.closeDate ? new Date(tradeToEdit.closeDate).toLocaleDateString() : '-'}</div>
+                <div><span className="font-semibold">Open Date:</span> {tradeToEdit.openDate ? new Date(tradeToEdit.openDate).toLocaleDateString() : 'N/A'}</div>
+                <div><span className="font-semibold">Close Date:</span> {tradeToEdit.closeDate ? new Date(tradeToEdit.closeDate).toLocaleDateString() : 'N/A'}</div>
               </div>
             )}
             <div>
@@ -747,4 +807,5 @@ export default function TradeTrackerPage() {
     </PageLayout>
   );
 }
+export default TradeTrackerPageContent;
 

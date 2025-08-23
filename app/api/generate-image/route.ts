@@ -1,6 +1,30 @@
 import { createCanvas, registerFont } from 'canvas';
 import { NextRequest } from 'next/server';
 
+/*
+Sample curl command:
+curl -X POST http://localhost:3000/api/generate-image \
+  -H "Content-Type: application/json" \
+  -d '{
+    "symbol": "AAPL",
+    "strike": 150,
+    "type": "call",
+    "expiration": "2024-12-20",
+    "stockPrice": 148.50,
+    "bidPrice": 2.15,
+    "askPrice": 2.25,
+    "delta": 0.65,
+    "impliedVolatility": 0.25,
+    "peRatio": 28.5,
+    "probability": 0.68,
+    "annualizedReturn": 0.12,
+    "openInterest": 1250,
+    "volume": 450,
+    "earningsDate": "2024-10-25"
+  }' \
+  --output aapl-150-call.png
+*/
+
 //register font Arial from public/fonts/Arial.ttf
 registerFont('public/fonts/arial.ttf', { family: 'Arial' });
 
