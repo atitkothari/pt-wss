@@ -192,27 +192,22 @@ interface WatchlistItem {
 }
 
 interface OptionsTableProps {
-  data: Option[];
-  onSort: (field: string) => void;
-  sortConfig?: { field: keyof Option; direction: 'asc' | 'desc' | null };
+  options: Option[];
+  optionType: 'call' | 'put';
   visibleColumns: string[];
 }
 
-export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps) {
-  const searchParams = useSearchParams();
-  const sortColumn = searchParams.get('sortBy');
-  const sortDirection = searchParams.get('sortDir');  
+export function OptionsTable({ options, optionType, visibleColumns }: OptionsTableProps) {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const { canAccessFeature } = useUserAccess();
-
   const [userWatchlist, setUserWatchlist] = useState<WatchlistItem[]>([]);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [pendingTrade, setPendingTrade] = useState<Option | null>(null);
   const [addPremium, setAddPremium] = useState('');
   const [addExpiration, setAddExpiration] = useState('');
   const [addStrike, setAddStrike] = useState('');
-  const rowRefs: RefObject<HTMLTableRowElement>[] = data.map(() => createRef<HTMLTableRowElement>());
+  const rowRefs: RefObject<HTMLTableRowElement>[] = options.map(() => createRef<HTMLTableRowElement>());
 
   useEffect(() => {
     if (authLoading || !user) {
@@ -386,16 +381,10 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
                   return (
                     <th
                       key={column}
-                      onClick={() => onSort(column)}
-                      className="text-left p-2 md:p-2.5 font-medium cursor-pointer hover:bg-gray-50"
+                      className="text-left p-2 md:p-2.5 font-medium"
                     >
                       <div className="flex items-center">
                         {columnDef?.label}
-                        {sortColumn === column && (
-                          <span className="ml-1">
-                            {sortDirection === 'asc' ? '↑' : '↓'}
-                          </span>
-                        )}
                       </div>
                     </th>
                   );
@@ -405,7 +394,7 @@ export function OptionsTable({ data, onSort, visibleColumns }: OptionsTableProps
               </tr>
             </thead>
             <tbody>
-              {data.map((option, index) => (
+              {options.map((option, index) => (
                 <tr 
                   key={`${option.symbol}-${option.strike}-${index}`}
                   className="border-b hover:bg-gray-50"

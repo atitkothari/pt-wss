@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { Metadata } from 'next';
 import { generateWebPageSchema, generateBreadcrumbSchema } from '@/app/lib/structured-data';
+import { SymbolPage } from '@/app/components/SymbolPage';
 import { validSymbols } from '@/app/lib/valid-symbols';
 
 interface Props {
@@ -42,7 +43,7 @@ export async function generateStaticParams() {
   }));
 }
 
-export default function StockCoveredCallPage({ params }: Props) {
+export default function CashSecuredPutSymbolPage({ params }: Props) {
   const { symbol } = params;
 
   if (!validSymbols.includes(symbol)) {
@@ -67,11 +68,6 @@ export default function StockCoveredCallPage({ params }: Props) {
     { name: `${symbol} Cash Secured Put Screener`, url: `https://wheelstrategyoptions.com/cash-secured-put/${symbol}` },
   ]);
 
-  // Redirect to the main screener with call_search parameter
-  redirect(`/cash-secured-put-screener?put_search=${symbol}`);
-
-  // This return statement is never reached due to the redirect,
-  // but it's needed for TypeScript and to maintain SEO benefits
   return (
     <>
       <script
@@ -82,6 +78,7 @@ export default function StockCoveredCallPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
+      <SymbolPage symbol={symbol} type="put" />
     </>
   );
 } 

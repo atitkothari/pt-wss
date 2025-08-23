@@ -3,6 +3,7 @@
 import { Menu, X, LogOut, ChevronDown, CreditCard, User, Settings, Loader2, Save, Crown, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import { useSubscription } from "@/app/context/SubscriptionContext";
@@ -75,7 +76,7 @@ export function NavBar() {
         <div className="flex items-center justify-between w-full lg:w-auto">
           <div className="flex items-center flex-wrap gap-2 md:gap-4">
             <Link href="/" className="flex items-center hover:opacity-90 transition-opacity shrink-0">
-              <img src="/logo.png" className="h-8 md:h-10 mr-2 md:mr-3" alt="Wheel Strategy Options Logo" />
+              <Image src="/logo.png" width={40} height={40} className="h-8 md:h-10 mr-2 md:mr-3" alt="Wheel Strategy Options Logo" />
               <span className="self-center text-base md:text-xl font-semibold whitespace-nowrap text-gray-900 hidden sm:inline">
                 Wheel Strategy Options
               </span>
@@ -215,9 +216,11 @@ export function NavBar() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="bg-white/80 text-gray-900 hover:bg-white border-gray-200 transition-colors flex items-center gap-2 font-medium">
                       {user.photoURL ? (
-                        <img 
+                        <Image
                           src={user.photoURL} 
                           alt={user.displayName || user.email || 'User'} 
+                          width={24}
+                          height={24}
                           className="h-6 w-6 rounded-full" 
                         />
                       ) : (
@@ -360,9 +363,11 @@ export function NavBar() {
               <div className="space-y-2">
                 <div className="flex items-center gap-2 pb-2">
                   {user.photoURL ? (
-                    <img 
+                    <Image
                       src={user.photoURL} 
                       alt={user.displayName || user.email || 'User'} 
+                      width={32}
+                      height={32}
                       className="h-8 w-8 rounded-full" 
                     />
                   ) : (

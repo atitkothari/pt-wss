@@ -6,6 +6,7 @@ import { Check, Clock, Mail, CreditCard } from "lucide-react";
 import { Footer } from "../components/Footer";
 import { PageLayout } from "../components/PageLayout";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useAuth } from "@/app/context/AuthContext";
 import { createCheckoutSession } from "@/app/lib/stripe";
 import { AuthModal } from "@/app/components/modals/AuthModal";
@@ -369,44 +370,56 @@ export default function PricingPage() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto">
           <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
-            <img 
+            <Image
               src="/testimonials/1.webp" 
               alt="User testimonial 1" 
+              width={600}
+              height={400}
               className="w-full h-auto rounded-lg"
             />
           </div>
           <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
-            <img 
+            <Image
               src="/testimonials/2.webp" 
               alt="User testimonial 2" 
+              width={600}
+              height={400}
               className="w-full h-auto rounded-lg"
             />
           </div>
           <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
-            <img 
+            <Image
               src="/testimonials/3.webp" 
               alt="User testimonial 3" 
+              width={600}
+              height={400}
               className="w-full h-auto rounded-lg"
             />
           </div>
           <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
-            <img 
+            <Image
               src="/testimonials/4.webp" 
               alt="User testimonial 4" 
+              width={600}
+              height={400}
               className="w-full h-auto rounded-lg"
             />
           </div>
           <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
-            <img 
+            <Image
               src="/testimonials/5.webp" 
               alt="User testimonial 5" 
+              width={600}
+              height={400}
               className="w-full h-auto rounded-lg"
             />
           </div>
           <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
-            <img 
+            <Image
               src="/testimonials/6.webp" 
               alt="User testimonial 6" 
+              width={600}
+              height={400}
               className="w-full h-auto rounded-lg"
             />
           </div>
