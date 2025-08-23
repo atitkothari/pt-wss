@@ -15,6 +15,7 @@ export function Footer() {
       { name: 'API', href: 'https://rapidapi.com/wheel-strategy-options-wheel-strategy-options-default/api/wheel-options-strategy', external: true },
     ],
     resources: [      
+      { name: 'FAQ', href: '/faq' },
       { name: 'Blog', href: 'https://wheelstrategyoptions.com/blog/', external: true },
       { name: 'Contact Us', href: 'mailto:reply@wheelstrategyoptions.com', external: true },      
       { name: 'Privacy Policy', href: 'https://wheelstrategyoptions.com/blog/privacy-policy-for-wheel-strategy-options/', external: true },
@@ -66,14 +67,23 @@ export function Footer() {
             <ul className="space-y-2">
               {navigation.resources.map((item) => (
                 <li key={item.name}>
-                  <a
-                    href={item.href}
-                    className="text-sm text-gray-600 hover:text-gray-900"
-                    target={item.external ? "_blank" : undefined}
-                    rel={item.external ? "noopener noreferrer" : undefined}
-                  >
-                    {item.name}
-                  </a>
+                  {item.external ? (
+                    <a
+                      href={item.href}
+                      className="text-sm text-gray-600 hover:text-gray-900"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {item.name}
+                    </a>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      className="text-sm text-gray-600 hover:text-gray-900"
+                    >
+                      {item.name}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

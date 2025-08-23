@@ -42,6 +42,7 @@ export function NavBar() {
     resources: [
       { name: 'Discover', href: '/discover' },      
       { name: 'Covered Call Calculator', href: '/covered-call-calculator' },
+      { name: 'FAQ', href: '/faq' },
       { name: 'Blog', href: 'https://wheelstrategyoptions.com/blog/', external: true },
       { name: 'Contact Us', href: 'mailto:reply@wheelstrategyoptions.com', external: true },       
       // Only show pricing if user is not pro (active subscription)

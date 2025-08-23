@@ -66,8 +66,8 @@ export default function CoveredCallScreenerPage() {
           <Link href="/trade-tracker" className="text-xs sm:text-sm text-blue-600 hover:underline font-medium px-1 whitespace-nowrap">Trade Tracker</Link>
           <span className="text-gray-300">|</span>
           <Link href="/watchlist" className="text-xs sm:text-sm text-blue-600 hover:underline font-medium px-1 whitespace-nowrap">Watchlist</Link>
-          {/* <span className="text-gray-300">|</span>
-           <Link href="/watchlist" className="text-xs sm:text-sm text-blue-600 hover:underline font-medium px-1 whitespace-nowrap">Watchlist</Link>*/}
+          <span className="text-gray-300">|</span>
+          <Link href="/faq" className="text-xs sm:text-sm text-blue-600 hover:underline font-medium px-1 whitespace-nowrap">FAQ</Link>
         </div>
       </div>
       <div className="mb-4">
