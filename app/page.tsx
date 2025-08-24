@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useCheckoutConversion } from "./hooks/useCheckoutConversion";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import { DiscoverSectionWrapper } from "./components/DiscoverSectionWrapper";
 
 function TestimonialsCarousel() {
   const testimonials = [1, 2, 3, 4, 5, 6];
@@ -181,7 +182,7 @@ export default function LandingPage() {
                 and Precision.
               </motion.h2>
               <motion.div
-                className="flex justify-center mt-10"
+                className="flex flex-col sm:flex-row gap-4 justify-center mt-10"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
@@ -230,7 +231,7 @@ export default function LandingPage() {
                 and Precision.
               </motion.h2>
               <motion.div
-                className="flex justify-start mt-10"
+                className="flex flex-col sm:flex-row gap-4 justify-start mt-10"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
@@ -271,7 +272,7 @@ export default function LandingPage() {
 
         {/* First Benefit Section */}
         <motion.div
-          className="container mx-auto px-4 py-8 md:py-12"
+          className="container mx-auto px-4 py-8 md:py-6"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -290,6 +291,57 @@ export default function LandingPage() {
               Invest in Your Profits, Risk-Free!
             </span>
           </motion.p>
+        </motion.div>
+        {/* Discover Section */}
+        <motion.div
+          className="container mx-auto px-4 py-8 md:py-6"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+        >
+          <div className="text-left mb-8">
+            <motion.h2
+              className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-black"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+            >
+              Discover Weekly Trading Opportunities
+            </motion.h2>
+            <motion.p
+              className="text-base text-left sm:text-lg md:text-xl text-gray-600"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              viewport={{ once: true }}
+            >
+              Get instant access to the highest-yielding covered calls and cash
+              secured puts, plus earnings plays and high IV opportunities.
+              Updated daily with fresh data.
+            </motion.p>
+          </div>
+          <DiscoverSectionWrapper />
+
+          {/* CTA to Full Discover Page */}
+          <motion.div
+            className="text-center mt-8"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <Link href="/discover">
+              <Button
+                variant="outline"
+                size="lg"
+                className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white text-sm sm:text-base md:text-lg px-6 py-3 rounded-lg transition-all duration-300 font-medium"
+              >
+                View Full Discover Page
+              </Button>
+            </Link>
+          </motion.div>
         </motion.div>
 
         {/* Precision Tools Section */}
@@ -471,6 +523,7 @@ export default function LandingPage() {
         >
           <div className="text-left px-2">
             <motion.div
+              className="flex flex-col sm:flex-row gap-4"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
@@ -481,6 +534,14 @@ export default function LandingPage() {
                   <div className="text-center font-bold leading-tight">
                     Try ALL Wheel Strategy Options Features FREE for 5 Days!
                   </div>
+                </Button>
+              </Link>
+              <Link href="/discover">
+                <Button
+                  variant="outline"
+                  className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white text-sm sm:text-base md:text-lg px-6 py-8 sm:py-7 md:py-8 lg:py-9 rounded-lg transition-all duration-300 w-full sm:w-auto"
+                >
+                  Explore Trading Ideas
                 </Button>
               </Link>
             </motion.div>
@@ -580,12 +641,12 @@ export default function LandingPage() {
         >
           <div className="text-left px-2">
             <motion.div
+              className="flex flex-col sm:flex-row gap-4"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
               viewport={{ once: true }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
             >
               <Link href="/options">
                 <Button
@@ -595,6 +656,15 @@ export default function LandingPage() {
                   <div className="text-center font-bold leading-tight">
                     Reclaim Your Time. Reclaim Your Profits. Try NOW!
                   </div>
+                </Button>
+              </Link>
+              <Link href="/discover">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white text-sm sm:text-base md:text-lg px-6 py-8 sm:py-5 md:py-6 lg:py-7 rounded-lg transition-all duration-300 font-bold w-full sm:w-auto"
+                >
+                  Discover Weekly Ideas
                 </Button>
               </Link>
             </motion.div>
