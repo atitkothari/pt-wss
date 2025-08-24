@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
   const option = await req.json();
 
   const width = 1200;
-  const height = 1200;
+  const height = 1000;
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
 
