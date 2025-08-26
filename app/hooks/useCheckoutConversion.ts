@@ -28,9 +28,9 @@ export function useCheckoutConversion() {
       let conversionValue = 1.0; // Default fallback
       if (billingCycle && (billingCycle === 'monthly' || billingCycle === 'quarterly' || billingCycle === 'yearly')) {
         if (isLimitedTime) {
-          conversionValue = pricingInfo.limitedTime[billingCycle].price;
+          conversionValue = pricingInfo.limitedTime[billingCycle].totalPrice;
         } else {
-          conversionValue = pricingInfo.regular[billingCycle].price;
+          conversionValue = pricingInfo.regular[billingCycle].totalPrice;
         }
         console.log('Conversion tracking - Calculated value:', conversionValue);
       } else {
