@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -11,31 +11,41 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Trade } from '@/app/types/trade';
-import { useSymbols } from '@/app/hooks/useSymbols';
-import { useAuth } from '@/app/context/AuthContext';
-import { FormErrorBoundary } from '../FormErrorBoundary';
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { Trade } from "@/app/types/trade";
+import { useSymbols } from "@/app/hooks/useSymbols";
+import { useAuth } from "@/app/context/AuthContext";
+import { FormErrorBoundary } from "../FormErrorBoundary";
 
 interface AddTradeFormProps {
-  onSubmit: (trade: Omit<Trade, 'id' | 'status' | 'openDate' | 'closeDate'>) => void;
+  onSubmit: (
+    trade: Omit<Trade, "id" | "status" | "openDate" | "closeDate">
+  ) => void;
 }
 
 export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
-  const [symbol, setSymbol] = useState('');
+  const [symbol, setSymbol] = useState("");
   const [filteredSymbols, setFilteredSymbols] = useState<string[]>([]);
   const [showSymbolDropdown, setShowSymbolDropdown] = useState(false);
-  const [showExpirationDropdown, setShowExpirationDropdown] = useState(false);
-  const [contracts, setContracts] = useState<any[]>([]);
-  const [selectedExpiration, setSelectedExpiration] = useState<string>('');
-  const [manualExpiration, setManualExpiration] = useState<string>('');
-  const [availableStrikePrices, setAvailableStrikePrices] = useState<number[]>([]);
+  const [selectedExpiration, setSelectedExpiration] = useState<
+    Date | undefined
+  >(undefined);
+  const [manualExpiration, setManualExpiration] = useState<string>("");
   const [selectedStrike, setSelectedStrike] = useState<number | null>(null);
-  const [manualStrike, setManualStrike] = useState<string>('');
+  const [manualStrike, setManualStrike] = useState<string>("");
   const [showStrikeDropdown, setShowStrikeDropdown] = useState(false);
-  const [premium, setPremium] = useState(0);
+  const [premium, setPremium] = useState<number | "">(0);
   const [optionKey, setOptionKey] = useState<string | undefined>(undefined);
-  const [numContracts, setNumContracts] = useState<number | ''>(1);
-  const [selectedType, setSelectedType] = useState<'call' | 'put'>('call');
+  const [numContracts, setNumContracts] = useState<number | "">(1);
+  const [selectedType, setSelectedType] = useState<"call" | "put">("call");
   const { symbols: allSymbols } = useSymbols();
   const { user } = useAuth();
   const userId = user?.uid;
@@ -43,55 +53,66 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
   // Helper function to format date to yyyy-mm-dd
   const formatDateToYYYYMMDD = (date: string | Date): string => {
     try {
-      const dateObj = typeof date === 'string' ? new Date(date) : date;
+      const dateObj = typeof date === "string" ? new Date(date) : date;
       if (isNaN(dateObj.getTime())) {
-        return '';
+        return "";
       }
       const year = dateObj.getFullYear();
-      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-      const day = String(dateObj.getDate()).padStart(2, '0');
+      const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+      const day = String(dateObj.getDate()).padStart(2, "0");
       return `${year}-${month}-${day}`;
     } catch (error) {
-      return '';
+      return "";
     }
   };
 
   // Helper function to format partial date input in real-time
   const formatPartialDate = (input: string): string => {
     // Remove all non-numeric characters
-    const numbers = input.replace(/\D/g, '');
-    
-    if (numbers.length === 0) return '';
+    const numbers = input.replace(/\D/g, "");
+
+    if (numbers.length === 0) return "";
     if (numbers.length <= 4) return numbers; // Just year
-    if (numbers.length <= 6) return `${numbers.slice(0, 4)}-${numbers.slice(4)}`; // Year-month
-    if (numbers.length <= 8) return `${numbers.slice(0, 4)}-${numbers.slice(4, 6)}-${numbers.slice(6)}`; // Year-month-day
-    
+    if (numbers.length <= 6)
+      return `${numbers.slice(0, 4)}-${numbers.slice(4)}`; // Year-month
+    if (numbers.length <= 8)
+      return `${numbers.slice(0, 4)}-${numbers.slice(4, 6)}-${numbers.slice(
+        6
+      )}`; // Year-month-day
+
     // If more than 8 digits, truncate to 8
-    return `${numbers.slice(0, 4)}-${numbers.slice(4, 6)}-${numbers.slice(6, 8)}`;
+    return `${numbers.slice(0, 4)}-${numbers.slice(4, 6)}-${numbers.slice(
+      6,
+      8
+    )}`;
   };
 
   // Function to generate option key in format: SYMBOL + EXPIRATION + TYPE + STRIKE
-  const generateOptionKey = (symbol: string, expiration: string, type: string, strike: number): string => {
-    // Format expiration as DDMMYY (e.g., "2024-12-19" becomes "191224")
-    const date = new Date(expiration);
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear().toString().slice(-2);
-    const formattedExpiration = day + month + year;
-    
-    // Format strike as 8-digit number (e.g., 25.00 becomes 00002500)
-    const formattedStrike = Math.round(strike * 100).toString().padStart(8, '0');
-    
-    // Type is already 'C' for call or 'P' for put
-    const optionType = type === 'call' ? 'C' : 'P';
-    
+  const generateOptionKey = (
+    symbol: string,
+    expiration: string, // "YYYY-MM-DD"
+    type: "call" | "put",
+    strike: number
+  ): string => {
+    const [year, month, day] = expiration.split("-");
+    const formattedExpiration = year.slice(-2) + month + day;
+
+    // Universal OCC-style: always keep 3 decimals
+    const formattedStrike = Math.round(strike * 1000)
+      .toString()
+      .padStart(8, "0");
+
+    const optionType = type === "call" ? "C" : "P";
+
     return `${symbol}${formattedExpiration}${optionType}${formattedStrike}`;
   };
 
   useEffect(() => {
     if (symbol.length > 0) {
       setFilteredSymbols(
-        allSymbols.filter(s => s.toLowerCase().startsWith(symbol.toLowerCase()))
+        allSymbols.filter((s) =>
+          s.toLowerCase().startsWith(symbol.toLowerCase())
+        )
       );
       setShowSymbolDropdown(true);
     } else {
@@ -99,212 +120,184 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
       setShowSymbolDropdown(false);
     }
     // Reset all fields when symbol changes
-    setContracts([]);
-    setSelectedExpiration('');
-    setManualExpiration('');
-    setAvailableStrikePrices([]);
+    setSelectedExpiration(undefined);
+    setManualExpiration("");
     setSelectedStrike(null);
-    setManualStrike('');
-    setPremium(0);
+    setManualStrike("");
+    setPremium("");
   }, [symbol, allSymbols]);
 
   // Reset all fields when type changes
   useEffect(() => {
-    setContracts([]);
-    setSymbol('');
+    setSymbol("");
     setFilteredSymbols([]);
     setShowSymbolDropdown(false);
-    setSelectedExpiration('');
-    setAvailableStrikePrices([]);
+    setSelectedExpiration(undefined);
     setSelectedStrike(null);
-    setPremium(0);
+    setPremium("");
   }, [selectedType]);
 
-  const handleSymbolSelect = async (selectedSymbol: string) => {    
+  const handleSymbolSelect = async (selectedSymbol: string) => {
     setSymbol(selectedSymbol);
 
     setFilteredSymbols([]);
     setShowSymbolDropdown(false);
     // Reset all fields when symbol is selected
-    setContracts([]);
-    setSelectedExpiration('');
-    setManualExpiration('');
-    setAvailableStrikePrices([]);
+    setSelectedExpiration(undefined);
+    setManualExpiration("");
     setSelectedStrike(null);
-    setManualStrike('');
-    setPremium(0);
-    const response = await fetch(`/api/options?symbol=${selectedSymbol}&userId=${userId}`);
-    const data = await response.json();
-    setContracts(data.options);
+    setManualStrike("");
+    setPremium("");
+    // const response = await fetch(`/api/options?symbol=${selectedSymbol}&userId=${userId}`);
+    // const data = await response.json();
+    // setContracts(data.options);
   };
 
   useEffect(() => {
-    if (selectedExpiration || manualExpiration) {
+    if (
+      (selectedStrike || manualStrike) &&
+      (selectedExpiration || manualExpiration)
+    ) {
       const currentExpiration = selectedExpiration || manualExpiration;
-      // Ensure we're working with formatted dates
-      const formattedExpiration = formatDateToYYYYMMDD(currentExpiration);
-      const strikes = contracts
-        .filter(c => c.expiration === formattedExpiration)
-        .map(c => c.strike);
-      setAvailableStrikePrices([...new Set(strikes)] as number[]);
-      // Reset strike and premium when expiration changes
-      setSelectedStrike(null);
-      setManualStrike('');
-      setPremium(0);
-    } else {
-      setAvailableStrikePrices([]);
-      setSelectedStrike(null);
-      setManualStrike('');
-      setPremium(0);
-    }
-  }, [selectedExpiration, manualExpiration, contracts]);
+      const currentStrike =
+        selectedStrike || (manualStrike ? parseFloat(manualStrike) : null);
 
-  useEffect(() => {
-    if ((selectedStrike || manualStrike) && (selectedExpiration || manualExpiration)) {
-      const currentExpiration = selectedExpiration || manualExpiration;
-      const currentStrike = selectedStrike || (manualStrike ? parseFloat(manualStrike) : null);
-      
       if (currentStrike) {
         // Ensure we're working with formatted dates
         const formattedExpiration = formatDateToYYYYMMDD(currentExpiration);
-        const contract = contracts.find(c => c.expiration === formattedExpiration && c.strike === currentStrike && c.type === selectedType);
-        if (contract) {
-          setPremium(contract.bidPrice * 100);
-          // Use contract's optionKey if available, otherwise generate one
-          if (contract.optionKey) {
-            setOptionKey(contract.optionKey);
-          } else {
-            const generatedKey = generateOptionKey(symbol, formattedExpiration, selectedType, currentStrike);
-      
-            setOptionKey(generatedKey);
-          }
-        } else {
-          setPremium(0);
-          // Generate option key even when no contract is found
-          const generatedKey = generateOptionKey(symbol, formattedExpiration, selectedType, currentStrike);
-  
-          setOptionKey(generatedKey);
-        }
+
+        const generatedKey = generateOptionKey(
+          symbol,
+          formattedExpiration,
+          selectedType,
+          currentStrike
+        );
+
+        setOptionKey(generatedKey);
       }
     } else {
-      setPremium(0);
+      setPremium("");
       setOptionKey(undefined);
     }
-  }, [selectedStrike, manualStrike, selectedExpiration, manualExpiration, contracts, selectedType, symbol]);
+  }, [
+    selectedStrike,
+    manualStrike,
+    selectedExpiration,
+    manualExpiration,
+    selectedType,
+    symbol,
+  ]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if ((selectedStrike || manualStrike) && (selectedExpiration || manualExpiration)) {
+    if (
+      (selectedStrike || manualStrike) &&
+      (selectedExpiration || manualExpiration)
+    ) {
       const currentExpiration = selectedExpiration || manualExpiration;
-      const currentStrike = selectedStrike || (manualStrike ? parseFloat(manualStrike) : null);
-      
+      const currentStrike =
+        selectedStrike || (manualStrike ? parseFloat(manualStrike) : null);
+
       if (currentStrike) {
         // Ensure expiration date is formatted as yyyy-mm-dd
         const formattedExpiration = formatDateToYYYYMMDD(currentExpiration);
-        const contract = filteredContracts.find(c => c.expiration === formattedExpiration && c.strike === currentStrike);
         onSubmit({
           symbol,
           type: selectedType,
           strike: currentStrike,
           expiration: formattedExpiration,
-          premium,
-          contracts: typeof numContracts === 'number' ? numContracts : 1,
-          optionKey: optionKey
+          premium: typeof premium === "number" ? premium : 0,
+          contracts: typeof numContracts === "number" ? numContracts : 1,
+          optionKey: optionKey,
         });
       }
     }
   };
 
-  const filteredContracts = contracts.filter(c => c.type === selectedType);
-  const expirationDates = [...new Set(filteredContracts.map(c => c.expiration))].sort((a, b) => new Date(a).getTime() - new Date(b).getTime()).map(date => formatDateToYYYYMMDD(date));
-
   return (
     <FormErrorBoundary errorMessage="There was an error with the trade form. Please check your input and try again.">
       <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <Label>Type</Label>
-        <Select value={selectedType} onValueChange={val => setSelectedType(val as 'call' | 'put')}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="call">Covered Call</SelectItem>
-            <SelectItem value="put">Cash-Secured Put</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <div>
-        <Label htmlFor="symbol">Stock Symbol</Label>
-        <Input
-          id="symbol"
-          value={symbol}
-          onChange={(e) => setSymbol(e.target.value)}
-          autoComplete="off"
-        />
-        {(showSymbolDropdown && filteredSymbols.length > 0)? (
-          <ul className="border rounded-md mt-1 max-h-60 overflow-y-auto">
-            {filteredSymbols.slice(0, 10).map(s => (
-              <li
-                key={s}
-                onClick={() => handleSymbolSelect(s)}
-                className="p-2 cursor-pointer hover:bg-gray-100"
-              >
-                {s}
-              </li>
-            ))}
-          </ul>
-        ): null}
-      </div>      
-      {filteredContracts.length > 0 && (
+        <div>
+          <Label>Type</Label>
+          <Select
+            value={selectedType}
+            onValueChange={(val) => setSelectedType(val as "call" | "put")}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="call">Covered Call</SelectItem>
+              <SelectItem value="put">Cash-Secured Put</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label htmlFor="symbol">Stock Symbol</Label>
+          <Input
+            id="symbol"
+            value={symbol}
+            onChange={(e) => setSymbol(e.target.value)}
+            autoComplete="off"
+          />
+          {showSymbolDropdown && filteredSymbols.length > 0 ? (
+            <ul className="border rounded-md mt-1 max-h-60 overflow-y-auto">
+              {filteredSymbols.slice(0, 10).map((s) => (
+                <li
+                  key={s}
+                  onClick={() => handleSymbolSelect(s)}
+                  className="p-2 cursor-pointer hover:bg-gray-100"
+                >
+                  {s}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
         <div>
           <Label>Expiration Date</Label>
           <div className="relative">
             <Input
               type="text"
               placeholder="Select or enter expiration date (YYYY-MM-DD)"
-              value={selectedExpiration || manualExpiration}
+              value={
+                selectedExpiration
+                  ? format(selectedExpiration, "yyyy-MM-dd")
+                  : manualExpiration
+              }
               onChange={(e) => {
                 const value = e.target.value;
-                // If it matches a dropdown option, use selectedExpiration
-                if (expirationDates.includes(value)) {
-                  setSelectedExpiration(value);
-                  setManualExpiration('');
-                  setShowExpirationDropdown(false);
-                } else {
-                  // Otherwise, treat as manual input and format to yyyy-mm-dd in real-time
-                  const formattedValue = formatPartialDate(value);
-                  setManualExpiration(formattedValue);
-                  setSelectedExpiration('');
-                  // Hide dropdown when user is typing manually
-                  setShowExpirationDropdown(false);
-                }
+                //format it as I type
+                const formattedValue = formatPartialDate(value);
+                setManualExpiration(formattedValue);
+                setSelectedExpiration(undefined);
               }}
-              onFocus={() => setShowExpirationDropdown(true)}
-              onBlur={() => setTimeout(() => setShowExpirationDropdown(false), 200)}
             />
-            {showExpirationDropdown && expirationDates.length > 0 && (
-              <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
-                {expirationDates.map(date => (
-                  <div
-                    key={date as string}
-                    className="p-2 cursor-pointer hover:bg-gray-100"
-                    onClick={() => {
-                      const formattedDate = formatDateToYYYYMMDD(date as string);
-                      setSelectedExpiration(formattedDate);
-                      setManualExpiration('');
-                      setShowExpirationDropdown(false);
-                    }}
-                  >
-                    {formatDateToYYYYMMDD(date as string)}
-                  </div>
-                ))}
-              </div>
-            )}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="absolute right-1 top-1 h-8 w-8 p-0"
+                >
+                  <CalendarIcon className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={selectedExpiration}
+                  onSelect={(date) => {
+                    setSelectedExpiration(date);
+                    setManualExpiration("");
+                  }}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
-      )}
 
-      {(availableStrikePrices.length > 0 || (selectedExpiration || manualExpiration)) && (
         <div>
           <Label>Strike Price</Label>
           <div className="relative">
@@ -314,49 +307,19 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
               value={selectedStrike ? String(selectedStrike) : manualStrike}
               onChange={(e) => {
                 const value = e.target.value;
-                if(value.length === 0) {
-                  setShowStrikeDropdown(true)
-                }else{
-                  setShowStrikeDropdown(false)
-                }
-                // If it matches a dropdown option, use selectedStrike
-                if (availableStrikePrices.includes(parseFloat(value))) {
-                  setSelectedStrike(parseFloat(value));
-                  setManualStrike('');
+                if (value.length === 0) {
+                  setShowStrikeDropdown(true);
                 } else {
-                  // Otherwise, treat as manual input
-                  setManualStrike(value);
-                  setSelectedStrike(null);
+                  setShowStrikeDropdown(false);
                 }
+                setManualStrike(value);
+                setSelectedStrike(null);
               }}
               onFocus={() => setShowStrikeDropdown(true)}
               onBlur={() => setTimeout(() => setShowStrikeDropdown(false), 200)}
             />
-            {showStrikeDropdown && availableStrikePrices.length > 0 && (
-              <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
-                {availableStrikePrices.sort((a, b) => a - b).map(strike => {
-                  const contract = filteredContracts.find(c => c.expiration === (selectedExpiration || manualExpiration) && c.strike === strike && c.type === selectedType);
-                  return (
-                    <div
-                      key={strike}
-                      className="p-2 cursor-pointer hover:bg-gray-100"
-                      onClick={() => {
-                        setSelectedStrike(strike);
-                        setManualStrike('');
-                        setShowStrikeDropdown(false);
-                      }}
-                    >
-                      ${strike}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
           </div>
         </div>
-      )}
-
-      {((selectedStrike && selectedStrike > 0) || (manualStrike && parseFloat(manualStrike) > 0)) && (
         <>
           <div>
             <Label htmlFor="numContracts">Number of Contracts</Label>
@@ -366,10 +329,10 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
               min="1"
               step="1"
               value={numContracts}
-              onChange={e => {
+              onChange={(e) => {
                 const value = e.target.value;
-                if (value === '') {
-                  setNumContracts('');
+                if (value === "") {
+                  setNumContracts("");
                 } else {
                   const num = parseInt(value);
                   if (!isNaN(num) && num > 0) {
@@ -386,16 +349,42 @@ export function AddTradeForm({ onSubmit }: AddTradeFormProps) {
               id="premium"
               type="number"
               value={premium}
-              onChange={(e) => setPremium(Number(e.target.value))}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === "") {
+                  setPremium("");
+                } else {
+                  setPremium(Number(value));
+                }
+              }}
             />
           </div>
           <div className="text-sm text-gray-600">
-            <span className="font-medium">Total Premium:</span> ${(premium * (typeof numContracts === 'number' ? numContracts : 0)).toFixed(2)}
+            <span className="font-medium">Total Premium:</span> $
+            {(typeof premium === "number"
+              ? premium * (typeof numContracts === "number" ? numContracts : 0)
+              : 0
+            ).toFixed(2)}
           </div>
         </>
-      )}
 
-      <Button type="submit" disabled={!((selectedStrike && selectedStrike > 0) || (manualStrike && parseFloat(manualStrike) > 0)) || !(selectedExpiration || manualExpiration) || typeof numContracts !== 'number' || numContracts < 1}>Add Trade</Button>
+        <Button
+          type="submit"
+          disabled={
+            !(
+              (selectedStrike && selectedStrike > 0) ||
+              (manualStrike && parseFloat(manualStrike) > 0)
+            ) ||
+            !(
+              selectedExpiration ||
+              (manualExpiration && manualExpiration.trim() !== "")
+            ) ||
+            typeof numContracts !== "number" ||
+            numContracts < 1
+          }
+        >
+          Add Trade
+        </Button>
       </form>
     </FormErrorBoundary>
   );
