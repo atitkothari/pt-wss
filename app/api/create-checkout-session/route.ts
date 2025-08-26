@@ -135,6 +135,10 @@ export async function POST(req: Request) {
 
 
       // Create checkout session
+      const successUrl = `${APP_URL}/covered-call-screener?session_id={CHECKOUT_SESSION_ID}&billing_cycle=${billingCycle}&is_limited_time=${isLimitedTime}`;
+      console.log('Creating checkout session with success URL:', successUrl);
+      console.log('Billing cycle:', billingCycle, 'Limited time:', isLimitedTime);
+      
       const checkoutSession = await stripe.checkout.sessions.create({
         customer: stripeId,
         line_items: [
@@ -144,7 +148,7 @@ export async function POST(req: Request) {
           },
         ],
         mode: 'subscription',        
-        success_url: `${APP_URL}/covered-call-screener?session_id={CHECKOUT_SESSION_ID}`,
+        success_url: successUrl,
         cancel_url: `${APP_URL}/pricing`,
         allow_promotion_codes: true,
         metadata: {
