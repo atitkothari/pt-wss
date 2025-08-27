@@ -14,6 +14,7 @@ export enum PlausibleEvents {
   FilterChange = 'Filter Change',
   ColumnToggle = 'Column Toggle',
   StockExpand = 'Stock Expand',
+  LoadScreener = 'Load Screener',
 
   // Calculator events
   CalculatorUse = 'Calculator Use',

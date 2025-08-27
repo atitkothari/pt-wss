@@ -12,9 +12,19 @@ import { Option, OptionType, StrikeFilter } from "../../types/option";
 import { DEFAULT_COLUMNS, OptionsTable } from "../table/OptionsTable";
 import { format, addDays } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Search, Mail, Save, Coffee, RotateCcw, BellRing, FolderOpen, FilterX, Share2 } from "lucide-react";
-import { useSearchParams, useRouter } from 'next/navigation';
-import { useSymbols } from '../../hooks/useSymbols';
+import {
+  Search,
+  Mail,
+  Save,
+  Coffee,
+  RotateCcw,
+  BellRing,
+  FolderOpen,
+  FilterX,
+  Share2,
+} from "lucide-react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useSymbols } from "../../hooks/useSymbols";
 import { SaveQueryModal } from "../modals/SaveQueryModal";
 import { BlurredTable } from "../auth/BlurredTable";
 import { useAuth } from "@/app/context/AuthContext";
@@ -42,19 +52,19 @@ import {
   defaultVisibleColumns as configDefaultVisibleColumns,
   impliedVolatilityFilterConfig,
   probabilityFilterConfig,
-  annualizedReturnFilterConfig
+  annualizedReturnFilterConfig,
 } from "@/app/config/filterConfig";
 import { SaveScreenerModal } from "../modals/SaveScreenerModal";
 import { LoadScreenerModal } from "../modals/LoadScreenerModal";
 import { LoginPromptModal } from "../modals/LoginPromptModal";
 import { SavedScreener, EmailFrequency } from "@/app/types/screener";
-import { defaultScreeners } from '@/app/config/defaultScreeners';
+import { defaultScreeners } from "@/app/config/defaultScreeners";
 import { ColumnCustomizer } from "../table/ColumnCustomizer";
 import { screenerService } from "@/app/services/screenerService";
 import { useUserAccess } from "@/app/hooks/useUserAccess";
-import { toast } from 'sonner';
-import { PlausibleEvents, usePlausibleTracker } from '@/app/utils/plausible';
-import { sendAnalyticsEvent, AnalyticsEvents } from '@/app/utils/analytics';
+import { toast } from "sonner";
+import { PlausibleEvents, usePlausibleTracker } from "@/app/utils/plausible";
+import { sendAnalyticsEvent, AnalyticsEvents } from "@/app/utils/analytics";
 
 interface Filter {
   field: string;
@@ -75,7 +85,6 @@ interface OptionsTableComponentProps {
   option: OptionType;
 }
 
-
 function convertUtcToEst(utcDate: string): Date {
   // Parse the UTC date string into a Date object
   const utcDateObj = new Date(utcDate);
@@ -93,7 +102,7 @@ function convertUtcToEst(utcDate: string): Date {
 // Using the centralized default visible columns from filterConfig
 const DEFAULT_VISIBLE_COLUMNS = configDefaultVisibleColumns;
 
-export function OptionsTableComponent({ option }: OptionsTableComponentProps) {  
+export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { symbols } = useSymbols();
@@ -102,485 +111,625 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const { trackEvent } = usePlausibleTracker();
   const { canAccessFeature } = useUserAccess();
 
-  const {status} = useUserAccess()
+  const { status } = useUserAccess();
 
   const getParamKey = (key: string) => `${option}_${key}`;
-  
+
   // Helper function to get value from URL params, localStorage, or default value
-  const getInitialValue = <T,>(paramKey: string, localStorageKey: string, defaultValue: T): T => {
+  const getInitialValue = <T,>(
+    paramKey: string,
+    localStorageKey: string,
+    defaultValue: T
+  ): T => {
     // First priority: URL parameters
     const urlParam = searchParams.get(paramKey);
     if (urlParam !== null) {
       // For arrays, split by comma and convert to numbers if needed
-      if (Array.isArray(defaultValue) && typeof defaultValue[0] === 'number') {
-        return urlParam.split(',').map(Number) as unknown as T;
+      if (Array.isArray(defaultValue) && typeof defaultValue[0] === "number") {
+        return urlParam.split(",").map(Number) as unknown as T;
       }
       // For single values
-      return (typeof defaultValue === 'number' ? Number(urlParam) : urlParam) as unknown as T;
+      return (typeof defaultValue === "number"
+        ? Number(urlParam)
+        : urlParam) as unknown as T;
     }
-    
+
     // Second priority: localStorage (only if in browser)
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const storedValue = localStorage.getItem(localStorageKey);
       if (storedValue !== null) {
         try {
           return JSON.parse(storedValue) as T;
         } catch (e) {
-          console.error(`Error parsing localStorage value for ${localStorageKey}:`, e);
+          console.error(
+            `Error parsing localStorage value for ${localStorageKey}:`,
+            e
+          );
         }
       }
     }
-    
+
     // Third priority: default value
     return defaultValue;
   };
 
   const [searchTerm, setSearchTerm] = useState(() => {
-    const paramKey = getParamKey('search');
+    const paramKey = getParamKey("search");
     const localStorageKey = `${option}_searchTerm`;
     return getInitialValue<string>(paramKey, localStorageKey, "");
   });
-  
+
   const [selectedStocks, setSelectedStocks] = useState<string[]>(() => {
-    const paramKey = getParamKey('search');
+    const paramKey = getParamKey("search");
     const localStorageKey = `${option}_selectedStocks`;
     const searchParam = searchParams.get(paramKey);
     if (searchParam) {
-      return searchParam.split(',');
+      return searchParam.split(",");
     }
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const storedValue = localStorage.getItem(localStorageKey);
       if (storedValue) {
         try {
           return JSON.parse(storedValue);
         } catch (e) {
-          console.error(`Error parsing localStorage value for ${localStorageKey}:`, e);
+          console.error(
+            `Error parsing localStorage value for ${localStorageKey}:`,
+            e
+          );
         }
       }
     }
     return [];
   });
-  
+
   const [excludedStocks, setExcludedStocks] = useState<string[]>(() => {
-    const paramKey = getParamKey('exclude');
+    const paramKey = getParamKey("exclude");
     const localStorageKey = `${option}_excludedStocks`;
     const excludeParam = searchParams.get(paramKey);
     if (excludeParam) {
-      return excludeParam.split(',');
+      return excludeParam.split(",");
     }
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const storedValue = localStorage.getItem(localStorageKey);
       if (storedValue) {
         try {
           return JSON.parse(storedValue);
         } catch (e) {
-          console.error(`Error parsing localStorage value for ${localStorageKey}:`, e);
+          console.error(
+            `Error parsing localStorage value for ${localStorageKey}:`,
+            e
+          );
         }
       }
     }
     return [];
   });
-  
+
   const [yieldRange, setYieldRange] = useState<[number, number]>(() => {
-    const minYieldParam = getParamKey('min_yield');
-    const maxYieldParam = getParamKey('max_yield');
+    const minYieldParam = getParamKey("min_yield");
+    const maxYieldParam = getParamKey("max_yield");
     const localStorageKey = `${option}_yieldRange`;
-    
+
     // Check URL params first
     const minFromUrl = searchParams.get(minYieldParam);
     const maxFromUrl = searchParams.get(maxYieldParam);
     if (minFromUrl !== null && maxFromUrl !== null) {
       return [Number(minFromUrl), Number(maxFromUrl)];
     }
-    
+
     // Then check localStorage
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const storedValue = localStorage.getItem(localStorageKey);
       if (storedValue) {
         try {
           return JSON.parse(storedValue) as [number, number];
         } catch (e) {
-          console.error(`Error parsing localStorage value for ${localStorageKey}:`, e);
+          console.error(
+            `Error parsing localStorage value for ${localStorageKey}:`,
+            e
+          );
         }
       }
     }
-    
+
     // Default values
     return [yieldFilterConfig.min, yieldFilterConfig.max];
   });
-  
+
   const [minPrice, setMinPrice] = useState(() => {
-    const paramKey = getParamKey('minPrice');
+    const paramKey = getParamKey("minPrice");
     const localStorageKey = `${option}_minPrice`;
-    return getInitialValue<number>(paramKey, localStorageKey, priceFilterConfig.defaultMin);
+    return getInitialValue<number>(
+      paramKey,
+      localStorageKey,
+      priceFilterConfig.defaultMin
+    );
   });
-  
+
   const [maxPrice, setMaxPrice] = useState(() => {
-    const paramKey = getParamKey('maxPrice');
+    const paramKey = getParamKey("maxPrice");
     const localStorageKey = `${option}_maxPrice`;
-    return getInitialValue<number>(paramKey, localStorageKey, priceFilterConfig.defaultMax);
+    return getInitialValue<number>(
+      paramKey,
+      localStorageKey,
+      priceFilterConfig.defaultMax
+    );
   });
-  
+
   const [volumeRange, setVolumeRange] = useState<[number, number]>(() => {
-    const minVolParam = getParamKey('min_vol');
-    const maxVolParam = getParamKey('max_vol');
+    const minVolParam = getParamKey("min_vol");
+    const maxVolParam = getParamKey("max_vol");
     const localStorageKey = `${option}_volumeRange`;
-    
+
     // Check URL params first
     const minFromUrl = searchParams.get(minVolParam);
     const maxFromUrl = searchParams.get(maxVolParam);
     if (minFromUrl !== null && maxFromUrl !== null) {
       return [Number(minFromUrl), Number(maxFromUrl)];
     }
-    
+
     // Then check localStorage
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const storedValue = localStorage.getItem(localStorageKey);
       if (storedValue) {
         try {
           return JSON.parse(storedValue) as [number, number];
         } catch (e) {
-          console.error(`Error parsing localStorage value for ${localStorageKey}:`, e);
+          console.error(
+            `Error parsing localStorage value for ${localStorageKey}:`,
+            e
+          );
         }
       }
     }
-    
+
     // Default values
     return [volumeFilterConfig.min, volumeFilterConfig.max];
   });
-  
+
   const [deltaFilter, setDeltaFilter] = useState<[number, number]>(() => {
-    const minDeltaParam = getParamKey('min_delta');
-    const maxDeltaParam = getParamKey('max_delta');
+    const minDeltaParam = getParamKey("min_delta");
+    const maxDeltaParam = getParamKey("max_delta");
     const localStorageKey = `${option}_deltaFilter`;
-    
+
     // Check URL params first
     const minFromUrl = searchParams.get(minDeltaParam);
     const maxFromUrl = searchParams.get(maxDeltaParam);
     if (minFromUrl !== null && maxFromUrl !== null) {
       return [Number(minFromUrl), Number(maxFromUrl)];
     }
-    
+
     // Then check localStorage
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const storedValue = localStorage.getItem(localStorageKey);
       if (storedValue) {
         try {
           return JSON.parse(storedValue) as [number, number];
         } catch (e) {
-          console.error(`Error parsing localStorage value for ${localStorageKey}:`, e);
+          console.error(
+            `Error parsing localStorage value for ${localStorageKey}:`,
+            e
+          );
         }
       }
     }
-    
+
     // Default values
     return [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax];
   });
-  
+
   const [minDte, setMinDte] = useState(() => {
-    const paramKey = getParamKey('min_dte');
+    const paramKey = getParamKey("min_dte");
     const localStorageKey = `${option}_minDte`;
-    return getInitialValue<number>(paramKey, localStorageKey, dteFilterConfig.defaultMin);
+    return getInitialValue<number>(
+      paramKey,
+      localStorageKey,
+      dteFilterConfig.defaultMin
+    );
   });
-  
+
   const [maxDte, setMaxDte] = useState(() => {
-    const paramKey = getParamKey('max_dte');
+    const paramKey = getParamKey("max_dte");
     const localStorageKey = `${option}_maxDte`;
-    return getInitialValue<number>(paramKey, localStorageKey, dteFilterConfig.defaultMax);
+    return getInitialValue<number>(
+      paramKey,
+      localStorageKey,
+      dteFilterConfig.defaultMax
+    );
   });
-  
+
   // Advanced filters
-  const [impliedVolatility, setImpliedVolatility] = useState<[number, number]>(() => {
-    const minIvParam = getParamKey('min_iv');
-    const maxIvParam = getParamKey('max_iv');
-    const localStorageKey = `${option}_impliedVolatility`;
-    
-    // Check URL params first
-    const minFromUrl = searchParams.get(minIvParam);
-    const maxFromUrl = searchParams.get(maxIvParam);
-    if (minFromUrl !== null && maxFromUrl !== null) {
-      return [Number(minFromUrl), Number(maxFromUrl)];
-    }
-    
-    // Then check localStorage
-    if (typeof window !== 'undefined') {
-      const storedValue = localStorage.getItem(localStorageKey);
-      if (storedValue) {
-        try {
-          return JSON.parse(storedValue) as [number, number];
-        } catch (e) {
-          console.error(`Error parsing localStorage value for ${localStorageKey}:`, e);
+  const [impliedVolatility, setImpliedVolatility] = useState<[number, number]>(
+    () => {
+      const minIvParam = getParamKey("min_iv");
+      const maxIvParam = getParamKey("max_iv");
+      const localStorageKey = `${option}_impliedVolatility`;
+
+      // Check URL params first
+      const minFromUrl = searchParams.get(minIvParam);
+      const maxFromUrl = searchParams.get(maxIvParam);
+      if (minFromUrl !== null && maxFromUrl !== null) {
+        return [Number(minFromUrl), Number(maxFromUrl)];
+      }
+
+      // Then check localStorage
+      if (typeof window !== "undefined") {
+        const storedValue = localStorage.getItem(localStorageKey);
+        if (storedValue) {
+          try {
+            return JSON.parse(storedValue) as [number, number];
+          } catch (e) {
+            console.error(
+              `Error parsing localStorage value for ${localStorageKey}:`,
+              e
+            );
+          }
         }
       }
+
+      // Default values
+      return [
+        impliedVolatilityFilterConfig.defaultMin,
+        impliedVolatilityFilterConfig.defaultMax,
+      ];
     }
-    
-    // Default values
-    return [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax];
-  });
-  
+  );
+
   const [peRatio, setPeRatio] = useState<[number, number]>(() => {
-    const minPeParam = getParamKey('min_pe');
-    const maxPeParam = getParamKey('max_pe');
+    const minPeParam = getParamKey("min_pe");
+    const maxPeParam = getParamKey("max_pe");
     const localStorageKey = `${option}_peRatio`;
-    
+
     // Check URL params first
     const minFromUrl = searchParams.get(minPeParam);
     const maxFromUrl = searchParams.get(maxPeParam);
     if (minFromUrl !== null && maxFromUrl !== null) {
       return [Number(minFromUrl), Number(maxFromUrl)];
     }
-    
+
     // Then check localStorage
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const storedValue = localStorage.getItem(localStorageKey);
       if (storedValue) {
         try {
           return JSON.parse(storedValue) as [number, number];
         } catch (e) {
-          console.error(`Error parsing localStorage value for ${localStorageKey}:`, e);
+          console.error(
+            `Error parsing localStorage value for ${localStorageKey}:`,
+            e
+          );
         }
       }
     }
-    
+
     // Default values
     return [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax];
   });
 
   const [premium, setPremium] = useState<[number, number]>(() => {
-    const minPremiumParam = getParamKey('min_premium');
-    const maxPremiumParam = getParamKey('max_premium');
+    const minPremiumParam = getParamKey("min_premium");
+    const maxPremiumParam = getParamKey("max_premium");
     const localStorageKey = `${option}_premium`;
-    
+
     // Check URL params first
     const minFromUrl = searchParams.get(minPremiumParam);
     const maxFromUrl = searchParams.get(maxPremiumParam);
     if (minFromUrl !== null && maxFromUrl !== null) {
       return [Number(minFromUrl), Number(maxFromUrl)];
     }
-    
+
     // Then check localStorage
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const storedValue = localStorage.getItem(localStorageKey);
       if (storedValue) {
         try {
           return JSON.parse(storedValue) as [number, number];
         } catch (e) {
-          console.error(`Error parsing localStorage value for ${localStorageKey}:`, e);
+          console.error(
+            `Error parsing localStorage value for ${localStorageKey}:`,
+            e
+          );
         }
-      }     
+      }
     }
     return [premiumFilterConfig.defaultMin, premiumFilterConfig.defaultMax];
   });
 
   const [marketCap, setMarketCap] = useState<[number, number]>(() => {
-    const paramKey = getParamKey('marketCap');
+    const paramKey = getParamKey("marketCap");
     const localStorageKey = `${option}_marketCap`;
-    return getInitialValue<[number, number]>(paramKey, localStorageKey, [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax]);
+    return getInitialValue<[number, number]>(paramKey, localStorageKey, [
+      marketCapFilterConfig.defaultMin,
+      marketCapFilterConfig.defaultMax,
+    ]);
   });
 
-  const [annualizedReturn, setAnnualizedReturn] = useState<[number, number]>(() => {
-    const paramKey = getParamKey('annualizedReturn');
-    const localStorageKey = `${option}_annualizedReturn`;
-    return getInitialValue<[number, number]>(paramKey, localStorageKey, [annualizedReturnFilterConfig.defaultMin, annualizedReturnFilterConfig.defaultMax]);
-  });
-  
+  const [annualizedReturn, setAnnualizedReturn] = useState<[number, number]>(
+    () => {
+      const paramKey = getParamKey("annualizedReturn");
+      const localStorageKey = `${option}_annualizedReturn`;
+      return getInitialValue<[number, number]>(paramKey, localStorageKey, [
+        annualizedReturnFilterConfig.defaultMin,
+        annualizedReturnFilterConfig.defaultMax,
+      ]);
+    }
+  );
+
   const [movingAverageCrossover, setMovingAverageCrossover] = useState(() => {
-    const paramKey = getParamKey('ma_crossover');
+    const paramKey = getParamKey("ma_crossover");
     const localStorageKey = `${option}_movingAverageCrossover`;
-    return getInitialValue<string>(paramKey, localStorageKey, movingAverageCrossoverOptions[0]);
+    return getInitialValue<string>(
+      paramKey,
+      localStorageKey,
+      movingAverageCrossoverOptions[0]
+    );
   });
-  
+
   const [sector, setSector] = useState(() => {
-    const paramKey = getParamKey('sector');
+    const paramKey = getParamKey("sector");
     const localStorageKey = `${option}_sector`;
     return getInitialValue<string>(paramKey, localStorageKey, sectorOptions[0]);
   });
-  
+
   const [moneynessRange, setMoneynessRange] = useState<[number, number]>(() => {
-    const minMoneynessParam = getParamKey('min_moneyness');
-    const maxMoneynessParam = getParamKey('max_moneyness');
+    const minMoneynessParam = getParamKey("min_moneyness");
+    const maxMoneynessParam = getParamKey("max_moneyness");
     const localStorageKey = `${option}_moneynessRange`;
-    
+
     // Check URL params first
     const minFromUrl = searchParams.get(minMoneynessParam);
     const maxFromUrl = searchParams.get(maxMoneynessParam);
     if (minFromUrl !== null && maxFromUrl !== null) {
       return [Number(minFromUrl), Number(maxFromUrl)];
     }
-    
+
     // Then check localStorage
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const storedValue = localStorage.getItem(localStorageKey);
       if (storedValue) {
         try {
           return JSON.parse(storedValue) as [number, number];
         } catch (e) {
-          console.error(`Error parsing localStorage value for ${localStorageKey}:`, e);
+          console.error(
+            `Error parsing localStorage value for ${localStorageKey}:`,
+            e
+          );
         }
       }
     }
-    
+
     // Default values
     return [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax];
   });
-  
+
   // Save filter values to localStorage whenever they change
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       localStorage.setItem(`${option}_searchTerm`, JSON.stringify(searchTerm));
     }
   }, [searchTerm, option]);
-  
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(`${option}_selectedStocks`, JSON.stringify(selectedStocks));
+    if (typeof window !== "undefined") {
+      localStorage.setItem(
+        `${option}_selectedStocks`,
+        JSON.stringify(selectedStocks)
+      );
     }
   }, [selectedStocks, option]);
-  
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(`${option}_excludedStocks`, JSON.stringify(excludedStocks));
+    if (typeof window !== "undefined") {
+      localStorage.setItem(
+        `${option}_excludedStocks`,
+        JSON.stringify(excludedStocks)
+      );
     }
   }, [excludedStocks, option]);
-  
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       localStorage.setItem(`${option}_yieldRange`, JSON.stringify(yieldRange));
     }
   }, [yieldRange, option]);
-  
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       localStorage.setItem(`${option}_minPrice`, JSON.stringify(minPrice));
     }
   }, [minPrice, option]);
-  
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       localStorage.setItem(`${option}_maxPrice`, JSON.stringify(maxPrice));
     }
   }, [maxPrice, option]);
-  
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(`${option}_volumeRange`, JSON.stringify(volumeRange));
+    if (typeof window !== "undefined") {
+      localStorage.setItem(
+        `${option}_volumeRange`,
+        JSON.stringify(volumeRange)
+      );
     }
   }, [volumeRange, option]);
-  
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(`${option}_deltaFilter`, JSON.stringify(deltaFilter));
+    if (typeof window !== "undefined") {
+      localStorage.setItem(
+        `${option}_deltaFilter`,
+        JSON.stringify(deltaFilter)
+      );
     }
   }, [deltaFilter, option]);
-  
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       localStorage.setItem(`${option}_minDte`, JSON.stringify(minDte));
     }
   }, [minDte, option]);
-  
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       localStorage.setItem(`${option}_maxDte`, JSON.stringify(maxDte));
     }
   }, [maxDte, option]);
-  
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       localStorage.setItem(`${option}_premium`, JSON.stringify(premium));
     }
-      }, [premium, option]);
-  
+  }, [premium, option]);
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       localStorage.setItem(`${option}_marketCap`, JSON.stringify(marketCap));
     }
   }, [marketCap, option]);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(`${option}_annualizedReturn`, JSON.stringify(annualizedReturn));
+    if (typeof window !== "undefined") {
+      localStorage.setItem(
+        `${option}_annualizedReturn`,
+        JSON.stringify(annualizedReturn)
+      );
     }
   }, [annualizedReturn, option]);
-  
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(`${option}_movingAverageCrossover`, JSON.stringify(movingAverageCrossover));
+    if (typeof window !== "undefined") {
+      localStorage.setItem(
+        `${option}_movingAverageCrossover`,
+        JSON.stringify(movingAverageCrossover)
+      );
     }
   }, [movingAverageCrossover, option]);
-  
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       localStorage.setItem(`${option}_sector`, JSON.stringify(sector));
     }
   }, [sector, option]);
-  
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(`${option}_moneynessRange`, JSON.stringify(moneynessRange));
+    if (typeof window !== "undefined") {
+      localStorage.setItem(
+        `${option}_moneynessRange`,
+        JSON.stringify(moneynessRange)
+      );
     }
   }, [moneynessRange, option]);
-  
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(`${option}_impliedVolatility`, JSON.stringify(impliedVolatility));
+    if (typeof window !== "undefined") {
+      localStorage.setItem(
+        `${option}_impliedVolatility`,
+        JSON.stringify(impliedVolatility)
+      );
     }
   }, [impliedVolatility, option]);
-  
+
   const [selectedExpiration, setSelectedExpiration] = useState(() => {
-    return getInitialValue<string>(getParamKey('max_expiration'), `${option}_maxExpiration`, "");
+    return getInitialValue<string>(
+      getParamKey("max_expiration"),
+      `${option}_maxExpiration`,
+      ""
+    );
   });
   const [minSelectedExpiration, setMinSelectedExpiration] = useState(() => {
-    return getInitialValue<string>(getParamKey('min_expiration'), `${option}_minExpiration`, "");
+    return getInitialValue<string>(
+      getParamKey("min_expiration"),
+      `${option}_minExpiration`,
+      ""
+    );
   });
-  
+
   // Save expiration parameters to localStorage whenever they change
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(`${option}_maxExpiration`, JSON.stringify(selectedExpiration));
+    if (typeof window !== "undefined") {
+      localStorage.setItem(
+        `${option}_maxExpiration`,
+        JSON.stringify(selectedExpiration)
+      );
     }
   }, [selectedExpiration, option]);
-  
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(`${option}_minExpiration`, JSON.stringify(minSelectedExpiration));
+    if (typeof window !== "undefined") {
+      localStorage.setItem(
+        `${option}_minExpiration`,
+        JSON.stringify(minSelectedExpiration)
+      );
     }
   }, [minSelectedExpiration, option]);
-  const [sortConfig, setSortConfig] = useState<{ field: keyof Option; direction: 'asc' | 'desc' | null }>({ 
-    field: "volume", 
-    direction: 'desc' 
+  const [sortConfig, setSortConfig] = useState<{
+    field: keyof Option;
+    direction: "asc" | "desc" | null;
+  }>({
+    field: "volume",
+    direction: "desc",
   });
-  
+
   const [probabilityRange, setProbabilityRange] = useState<[number, number]>([
     probabilityFilterConfig.defaultMin,
-    probabilityFilterConfig.defaultMax
+    probabilityFilterConfig.defaultMax,
   ]);
 
   const [activeFilters, setActiveFilters] = useState({
     searchTerm: "",
-    yieldRange: [yieldFilterConfig.min, yieldFilterConfig.max] as [number, number],
+    yieldRange: [yieldFilterConfig.min, yieldFilterConfig.max] as [
+      number,
+      number
+    ],
     maxPrice: priceFilterConfig.defaultMax,
     minPrice: priceFilterConfig.defaultMin,
-    volumeRange: [volumeFilterConfig.min, volumeFilterConfig.max] as [number, number],
+    volumeRange: [volumeFilterConfig.min, volumeFilterConfig.max] as [
+      number,
+      number
+    ],
     selectedExpiration: "",
     minSelectedExpiration: "",
     pageNo: 1,
-    premium: [premiumFilterConfig.defaultMin, premiumFilterConfig.defaultMax] as [number, number],
-    peRatio: [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax] as [number, number],
-    marketCap: [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax] as [number, number],    
+    premium: [
+      premiumFilterConfig.defaultMin,
+      premiumFilterConfig.defaultMax,
+    ] as [number, number],
+    peRatio: [
+      peRatioFilterConfig.defaultMin,
+      peRatioFilterConfig.defaultMax,
+    ] as [number, number],
+    marketCap: [
+      marketCapFilterConfig.defaultMin,
+      marketCapFilterConfig.defaultMax,
+    ] as [number, number],
     sector: sectorOptions[0],
-    moneynessRange: [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax] as [number, number],
-    impliedVolatility: [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax] as [number, number],
-    deltaFilter: [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax] as [number, number],
+    moneynessRange: [
+      moneynessFilterConfig.defaultMin,
+      moneynessFilterConfig.defaultMax,
+    ] as [number, number],
+    impliedVolatility: [
+      impliedVolatilityFilterConfig.defaultMin,
+      impliedVolatilityFilterConfig.defaultMax,
+    ] as [number, number],
+    deltaFilter: [
+      deltaFilterConfig.defaultMin,
+      deltaFilterConfig.defaultMax,
+    ] as [number, number],
     excludedStocks: "",
-    probabilityOfProfit: [probabilityFilterConfig.defaultMin, probabilityFilterConfig.defaultMax] as [number, number],
-    annualizedReturn: [annualizedReturnFilterConfig.defaultMin, annualizedReturnFilterConfig.defaultMax] as [number, number]
+    probabilityOfProfit: [
+      probabilityFilterConfig.defaultMin,
+      probabilityFilterConfig.defaultMax,
+    ] as [number, number],
+    annualizedReturn: [
+      annualizedReturnFilterConfig.defaultMin,
+      annualizedReturnFilterConfig.defaultMax,
+    ] as [number, number],
   });
 
   const [hasSearched, setHasSearched] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [strikeFilter, setStrikeFilter] = useState<StrikeFilter>(
-    (searchParams.get(getParamKey('strikeFilter')) as StrikeFilter)
+    searchParams.get(getParamKey("strikeFilter")) as StrikeFilter
   );
   const rowsPerPage = 50;
 
@@ -597,30 +746,33 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     minDelta: deltaFilterConfig.defaultMin,
     maxDelta: deltaFilterConfig.defaultMax,
     minExpiration: activeFilters.minSelectedExpiration,
-    pageName: option === 'call' ? 'covered_call_screener' : 'cash_secured_put_screener',
+    pageName:
+      option === "call" ? "covered_call_screener" : "cash_secured_put_screener",
     excludedSymbols: excludedStocks,
     probabilityRange: probabilityRange as [number, number] | undefined,
-    annualizedReturnRange: activeFilters.annualizedReturn as [number, number] | undefined
+    annualizedReturnRange: activeFilters.annualizedReturn as
+      | [number, number]
+      | undefined,
   });
 
   // Calculate expiration dates based on minDte and maxDte whenever they change
   useEffect(() => {
     const today = new Date();
-    
+
     // Calculate min expiration date based on minDte
     const minDate = addDays(today, minDte);
-    const minFormattedDate = format(minDate, 'yyyy-MM-dd');
+    const minFormattedDate = format(minDate, "yyyy-MM-dd");
     setMinSelectedExpiration(minFormattedDate);
-    
+
     // Calculate max expiration date based on maxDte
     const maxDate = addDays(today, maxDte);
-    const maxFormattedDate = format(maxDate, 'yyyy-MM-dd');
+    const maxFormattedDate = format(maxDate, "yyyy-MM-dd");
     setSelectedExpiration(maxFormattedDate);
   }, [minDte, maxDte]);
 
   const updateURL = (filters: Record<string, string | number>) => {
     const params = new URLSearchParams(searchParams.toString());
-    
+
     Object.entries(filters).forEach(([key, value]) => {
       const paramKey = getParamKey(key);
       if (value) {
@@ -632,13 +784,12 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     router.push(`?${params.toString()}`);
   };
 
-
   const [isFromCache, setIsFromCache] = useState(false);
   const [filtersChanged, setFiltersChanged] = useState(false);
 
   const [searchCount, setSearchCount] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return Number(localStorage.getItem('searchCount') || '0');
+    if (typeof window !== "undefined") {
+      return Number(localStorage.getItem("searchCount") || "0");
     }
     return 0;
   });
@@ -646,8 +797,8 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   // Track filter changes
   useEffect(() => {
     // Compare current filter values with the last search values
-    const hasChanged = 
-      selectedStocks.join(',') !== activeFilters.searchTerm ||
+    const hasChanged =
+      selectedStocks.join(",") !== activeFilters.searchTerm ||
       yieldRange[0] !== activeFilters.yieldRange[0] ||
       yieldRange[1] !== activeFilters.yieldRange[1] ||
       minPrice !== activeFilters.minPrice ||
@@ -662,28 +813,28 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       peRatio[0] !== activeFilters.peRatio[0] ||
       peRatio[1] !== activeFilters.peRatio[1] ||
       marketCap[0] !== activeFilters.marketCap[0] ||
-      marketCap[1] !== activeFilters.marketCap[1] ||      
+      marketCap[1] !== activeFilters.marketCap[1] ||
       sector !== activeFilters.sector ||
       impliedVolatility[0] !== activeFilters.impliedVolatility[0] ||
-      impliedVolatility[1] !== activeFilters.impliedVolatility[1] || 
+      impliedVolatility[1] !== activeFilters.impliedVolatility[1] ||
       moneynessRange[0] !== activeFilters.moneynessRange[0] ||
       moneynessRange[1] !== activeFilters.moneynessRange[1] ||
-      activeFilters.excludedStocks !== excludedStocks.join(',') ||
+      activeFilters.excludedStocks !== excludedStocks.join(",") ||
       activeFilters.annualizedReturn[0] !== annualizedReturn[0] ||
       activeFilters.annualizedReturn[1] !== annualizedReturn[1] ||
-      probabilityRange[0] !== activeFilters.probabilityOfProfit[0] || 
+      probabilityRange[0] !== activeFilters.probabilityOfProfit[0] ||
       probabilityRange[1] !== activeFilters.probabilityOfProfit[1];
-    
-    if (hasChanged) {      
+
+    if (hasChanged) {
       setFiltersChanged(true);
     }
   }, [
-    selectedStocks, 
-    yieldRange, 
+    selectedStocks,
+    yieldRange,
     minPrice,
-    maxPrice, 
-    volumeRange, 
-    selectedExpiration, 
+    maxPrice,
+    volumeRange,
+    selectedExpiration,
     deltaFilter,
     peRatio,
     premium,
@@ -695,17 +846,18 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     activeFilters,
     excludedStocks,
     annualizedReturn,
-    probabilityRange
+    probabilityRange,
   ]);
-  
-  const[symbolInput, setSymbolInput] = useState('')
-  
-  const [isAdvancedFiltersExpanded, setIsAdvancedFiltersExpanded] = useState(false);
+
+  const [symbolInput, setSymbolInput] = useState("");
+
+  const [isAdvancedFiltersExpanded, setIsAdvancedFiltersExpanded] =
+    useState(false);
 
   const handleSearch = useCallback(() => {
     trackEvent(PlausibleEvents.ScreenerSearch, {
-      symbols: selectedStocks.join(','),
-      excluded: excludedStocks.join(','),
+      symbols: selectedStocks.join(","),
+      excluded: excludedStocks.join(","),
       yield: yieldRange,
       price: [minPrice, maxPrice],
       volume: volumeRange,
@@ -721,14 +873,14 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       moneyness: moneynessRange,
     });
     setHasSearched(true);
-    setIsFromCache(false);    
-    
+    setIsFromCache(false);
+
     const newCount = searchCount + 1;
     setSearchCount(newCount);
-    localStorage.setItem('searchCount', newCount.toString());
-    
+    localStorage.setItem("searchCount", newCount.toString());
+
     setActiveFilters({
-      searchTerm: selectedStocks.join(','),
+      searchTerm: selectedStocks.join(","),
       yieldRange,
       minPrice,
       maxPrice,
@@ -738,19 +890,19 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       pageNo: 1,
       premium,
       peRatio,
-      marketCap,      
+      marketCap,
       sector,
       moneynessRange,
       impliedVolatility,
       deltaFilter,
-      excludedStocks: excludedStocks.join(','),
+      excludedStocks: excludedStocks.join(","),
       probabilityOfProfit: probabilityRange,
-      annualizedReturn: annualizedReturn
+      annualizedReturn: annualizedReturn,
     });
 
     updateURL({
-      search: selectedStocks.join(','),
-      exclude: excludedStocks.join(','),
+      search: selectedStocks.join(","),
+      exclude: excludedStocks.join(","),
       min_yield: yieldRange[0],
       max_yield: yieldRange[1],
       maxPrice,
@@ -771,11 +923,11 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       min_market_cap: marketCap[0],
       max_market_cap: marketCap[1],
       min_iv: impliedVolatility[0],
-      max_iv: impliedVolatility[1],      
-      sector: sector,            
-      annualized_return: annualizedReturn.join(',')
+      max_iv: impliedVolatility[1],
+      sector: sector,
+      annualized_return: annualizedReturn.join(","),
     });
-        
+
     fetchData({
       searchTerms: [...selectedStocks, symbolInput],
       minYield: yieldRange[0],
@@ -798,19 +950,46 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       minSelectedExpiration,
       excludedSymbols: excludedStocks,
       probabilityRange: probabilityRange as [number, number],
-      annualizedReturnRange: annualizedReturn as [number, number]
-    }).then(()=>{
-      setFiltersChanged(false);
-      
-    }).catch(console.error);
+      annualizedReturnRange: annualizedReturn as [number, number],
+    })
+      .then(() => {
+        setFiltersChanged(false);
+      })
+      .catch(console.error);
 
     setCurrentPage(1);
-    setSymbolInput('');
-    
-    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+    setSymbolInput("");
+
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
       setIsAdvancedFiltersExpanded(false);
     }
-  }, [trackEvent, selectedStocks, excludedStocks, yieldRange, minPrice, maxPrice, volumeRange, deltaFilter, minDte, maxDte, impliedVolatility, peRatio, marketCap, annualizedReturn, movingAverageCrossover, sector, moneynessRange, searchCount, updateURL, fetchData, symbolInput, sortConfig, probabilityRange, minSelectedExpiration, selectedExpiration]);
+  }, [
+    trackEvent,
+    selectedStocks,
+    excludedStocks,
+    yieldRange,
+    minPrice,
+    maxPrice,
+    volumeRange,
+    deltaFilter,
+    minDte,
+    maxDte,
+    impliedVolatility,
+    peRatio,
+    marketCap,
+    annualizedReturn,
+    movingAverageCrossover,
+    sector,
+    moneynessRange,
+    searchCount,
+    updateURL,
+    fetchData,
+    symbolInput,
+    sortConfig,
+    probabilityRange,
+    minSelectedExpiration,
+    selectedExpiration,
+  ]);
 
   useEffect(() => {
     // Auto fetch data on initial load regardless of URL parameters
@@ -820,10 +999,10 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       // Use a small timeout to prevent immediate API call on page load
       const timer = setTimeout(() => {
         // If URL has parameters, use those for search
-        if (Array.from(searchParams.entries()).length > 0) {          
-          handleSearch();          
+        if (Array.from(searchParams.entries()).length > 0) {
+          handleSearch();
         } else {
-          // Otherwise, fetch with default values             
+          // Otherwise, fetch with default values
           fetchData({
             searchTerms: selectedStocks,
             minYield: yieldRange[0],
@@ -845,37 +1024,60 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             impliedVolatilityRange: impliedVolatility,
             minSelectedExpiration,
             excludedSymbols: excludedStocks,
-            probabilityRange: probabilityRange as [number, number]
+            probabilityRange: probabilityRange as [number, number],
           }).catch(console.error);
-      
+
           setHasSearched(true);
-          setFiltersChanged(false)
+          setFiltersChanged(false);
         }
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [isFromCache, searchParams, handleSearch, fetchData, selectedStocks, yieldRange, minPrice, maxPrice, volumeRange, selectedExpiration, sortConfig, deltaFilter, peRatio, marketCap, sector, moneynessRange, impliedVolatility, minSelectedExpiration, excludedStocks, probabilityRange, annualizedReturn]);
-  
-
+  }, [
+    isFromCache,
+    searchParams,
+    handleSearch,
+    fetchData,
+    selectedStocks,
+    yieldRange,
+    minPrice,
+    maxPrice,
+    volumeRange,
+    selectedExpiration,
+    sortConfig,
+    deltaFilter,
+    peRatio,
+    marketCap,
+    sector,
+    moneynessRange,
+    impliedVolatility,
+    minSelectedExpiration,
+    excludedStocks,
+    probabilityRange,
+    annualizedReturn,
+  ]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleSearch();
     }
   };
 
   const [visibleColumns, setVisibleColumns] = useState<string[]>(() => {
     // Try to get saved columns from localStorage
-    if (typeof window !== 'undefined') {
-      const savedColumns = localStorage.getItem('visibleColumns');
+    if (typeof window !== "undefined") {
+      const savedColumns = localStorage.getItem("visibleColumns");
       if (savedColumns) {
         try {
           console.log("savedColumns", savedColumns);
           //remove sector from savedColumns
           const columns = JSON.parse(savedColumns);
-          return columns.filter((column: string) => column !== 'sector');
+          return columns.filter((column: string) => column !== "sector");
         } catch (e) {
-          console.error('Error parsing localStorage value for visibleColumns:', e);
+          console.error(
+            "Error parsing localStorage value for visibleColumns:",
+            e
+          );
         }
       }
     }
@@ -888,28 +1090,27 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       column: columnKey,
       visible: !visibleColumns.includes(columnKey),
     });
-    setVisibleColumns(current => {
+    setVisibleColumns((current) => {
       let newColumns;
       if (current.includes(columnKey)) {
         if (current.length === 1) return current;
-        newColumns = current.filter(key => key !== columnKey);
+        newColumns = current.filter((key) => key !== columnKey);
       } else {
         newColumns = [...current, columnKey].sort(
-          (a, b) => 
-            DEFAULT_COLUMNS.findIndex(col => col.key === a) - 
-            DEFAULT_COLUMNS.findIndex(col => col.key === b)
+          (a, b) =>
+            DEFAULT_COLUMNS.findIndex((col) => col.key === a) -
+            DEFAULT_COLUMNS.findIndex((col) => col.key === b)
         );
       }
-      
+
       // Save to localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('visibleColumns', JSON.stringify(newColumns));
+      if (typeof window !== "undefined") {
+        localStorage.setItem("visibleColumns", JSON.stringify(newColumns));
       }
-      
+
       return newColumns;
     });
   };
-
 
   const [showSaveModal, setShowSaveModal] = useState(false);
 
@@ -930,7 +1131,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     option,
     strikePrice: [minPrice, maxPrice],
     impliedVolatility,
-    annualizedReturn: annualizedReturn
+    annualizedReturn: annualizedReturn,
   });
 
   // const [dte, setDte] = useState(Number(searchParams.get(getParamKey('dte'))) || 30);
@@ -944,84 +1145,111 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
   const getOldestUpdateDate = () => {
     if (!data || data.length === 0) return null;
-    
-    const dates = data.map(item => convertUtcToEst(item.lastUpdatedDate));
-    const oldestDate = new Date(Math.max(...dates.map(date => date.getTime())));
-    
-    return oldestDate.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',      
+
+    const dates = data.map((item) => convertUtcToEst(item.lastUpdatedDate));
+    const oldestDate = new Date(
+      Math.max(...dates.map((date) => date.getTime()))
+    );
+
+    return oldestDate.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
       // timeZoneName: 'short'
     });
   };
 
   const getActiveFilterSummary = () => {
-    const activeFilterList: Array<{ label: string; type: string; reset: () => void }> = [];
+    const activeFilterList: Array<{
+      label: string;
+      type: string;
+      reset: () => void;
+    }> = [];
 
     // Check search term
-    if (searchTerm && searchTerm.trim() !== '') {
+    if (searchTerm && searchTerm.trim() !== "") {
       activeFilterList.push({
         label: `Symbols: ${searchTerm}`,
-        type: 'searchTerm',
-        reset: () => setSearchTerm('')
+        type: "searchTerm",
+        reset: () => setSearchTerm(""),
       });
     }
 
     // Check yield range
-    if (yieldRange[0] !== yieldFilterConfig.defaultMin || 
-        yieldRange[1] !== yieldFilterConfig.defaultMax) {
-      const yieldText = yieldRange[1] === yieldFilterConfig.defaultMax 
-        ? `at least ${yieldRange[0]}%`
-        : `${yieldRange[0]}% to ${yieldRange[1]}%`;
+    if (
+      yieldRange[0] !== yieldFilterConfig.defaultMin ||
+      yieldRange[1] !== yieldFilterConfig.defaultMax
+    ) {
+      const yieldText =
+        yieldRange[1] === yieldFilterConfig.defaultMax
+          ? `at least ${yieldRange[0]}%`
+          : `${yieldRange[0]}% to ${yieldRange[1]}%`;
       activeFilterList.push({
         label: `Yield: ${yieldText}`,
-        type: 'yieldRange',
-        reset: () => setYieldRange([yieldFilterConfig.defaultMin, yieldFilterConfig.defaultMax])
+        type: "yieldRange",
+        reset: () =>
+          setYieldRange([
+            yieldFilterConfig.defaultMin,
+            yieldFilterConfig.defaultMax,
+          ]),
       });
     }
 
     // Check price range
-    if (minPrice !== priceFilterConfig.defaultMin || 
-        maxPrice !== priceFilterConfig.defaultMax) {
-      const priceText = maxPrice === priceFilterConfig.defaultMax 
-        ? `at least $${minPrice}`
-        : `$${minPrice} to $${maxPrice}`;
+    if (
+      minPrice !== priceFilterConfig.defaultMin ||
+      maxPrice !== priceFilterConfig.defaultMax
+    ) {
+      const priceText =
+        maxPrice === priceFilterConfig.defaultMax
+          ? `at least $${minPrice}`
+          : `$${minPrice} to $${maxPrice}`;
       activeFilterList.push({
         label: `Price: ${priceText}`,
-        type: 'priceRange',
+        type: "priceRange",
         reset: () => {
           setMinPrice(priceFilterConfig.defaultMin);
           setMaxPrice(priceFilterConfig.defaultMax);
-        }
+        },
       });
     }
 
     // Check volume range
-    if (volumeRange[0] !== volumeFilterConfig.min || 
-        volumeRange[1] !== volumeFilterConfig.max) {
-      const volumeText = volumeRange[1] === volumeFilterConfig.max 
-        ? `at least ${volumeRange[0].toLocaleString()}`
-        : `${volumeRange[0].toLocaleString()} to ${volumeRange[1].toLocaleString()}`;
+    if (
+      volumeRange[0] !== volumeFilterConfig.min ||
+      volumeRange[1] !== volumeFilterConfig.max
+    ) {
+      const volumeText =
+        volumeRange[1] === volumeFilterConfig.max
+          ? `at least ${volumeRange[0].toLocaleString()}`
+          : `${volumeRange[0].toLocaleString()} to ${volumeRange[1].toLocaleString()}`;
       activeFilterList.push({
         label: `Volume: ${volumeText}`,
-        type: 'volumeRange',
-        reset: () => setVolumeRange([volumeFilterConfig.min, volumeFilterConfig.max])
+        type: "volumeRange",
+        reset: () =>
+          setVolumeRange([volumeFilterConfig.min, volumeFilterConfig.max]),
       });
     }
 
     // Check delta range
-    if (deltaFilter[0] !== deltaFilterConfig.defaultMin || 
-        deltaFilter[1] !== deltaFilterConfig.defaultMax) {
-      const deltaText = deltaFilter[1] === deltaFilterConfig.defaultMax 
-        ? `at least ${deltaFilter[0]}`
-        : `${deltaFilter[0]} to ${deltaFilter[1]}`;
+    if (
+      deltaFilter[0] !== deltaFilterConfig.defaultMin ||
+      deltaFilter[1] !== deltaFilterConfig.defaultMax
+    ) {
+      const deltaText =
+        deltaFilter[1] === deltaFilterConfig.defaultMax
+          ? `at least ${deltaFilter[0]}`
+          : `${deltaFilter[0]} to ${deltaFilter[1]}`;
       activeFilterList.push({
         label: `Delta: ${deltaText}`,
-        type: 'deltaFilter',
-        reset: () => setDeltaFilter([deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax])
+        type: "deltaFilter",
+        reset: () =>
+          setDeltaFilter([
+            deltaFilterConfig.defaultMin,
+            deltaFilterConfig.defaultMax,
+          ]),
       });
     }
 
@@ -1035,50 +1263,71 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         expirationText.push(`To: ${selectedExpiration}`);
       }
       activeFilterList.push({
-        label: `Expiration: ${expirationText.join(', ')}`,
-        type: 'expiration',
+        label: `Expiration: ${expirationText.join(", ")}`,
+        type: "expiration",
         reset: () => {
-          setSelectedExpiration('');
-          setMinSelectedExpiration('');
-        }
+          setSelectedExpiration("");
+          setMinSelectedExpiration("");
+        },
       });
     }
 
     // Check P/E ratio
-    if (peRatio[0] !== peRatioFilterConfig.defaultMin || 
-        peRatio[1] !== peRatioFilterConfig.defaultMax) {
-      const peText = peRatio[1] === peRatioFilterConfig.defaultMax 
-        ? `at least ${peRatio[0]}`
-        : `${peRatio[0]} to ${peRatio[1]}`;
+    if (
+      peRatio[0] !== peRatioFilterConfig.defaultMin ||
+      peRatio[1] !== peRatioFilterConfig.defaultMax
+    ) {
+      const peText =
+        peRatio[1] === peRatioFilterConfig.defaultMax
+          ? `at least ${peRatio[0]}`
+          : `${peRatio[0]} to ${peRatio[1]}`;
       activeFilterList.push({
         label: `P/E: ${peText}`,
-        type: 'peRatio',
-        reset: () => setPeRatio([peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax])
+        type: "peRatio",
+        reset: () =>
+          setPeRatio([
+            peRatioFilterConfig.defaultMin,
+            peRatioFilterConfig.defaultMax,
+          ]),
       });
     }
 
-    if (premium[0] !== premiumFilterConfig.defaultMin || 
-      premium[1] !== premiumFilterConfig.defaultMax) {
-    const premiumText = premium[1] === premiumFilterConfig.defaultMax 
-      ? `at least $${premium[0]}`
-      : `$${premium[0]} to $${premium[1]}`;
-    activeFilterList.push({
-      label: `Premium: ${premiumText}`,
-      type: 'premium',
-      reset: () => setPremium([premiumFilterConfig.defaultMin, premiumFilterConfig.defaultMax])
-    });
-  }
+    if (
+      premium[0] !== premiumFilterConfig.defaultMin ||
+      premium[1] !== premiumFilterConfig.defaultMax
+    ) {
+      const premiumText =
+        premium[1] === premiumFilterConfig.defaultMax
+          ? `at least $${premium[0]}`
+          : `$${premium[0]} to $${premium[1]}`;
+      activeFilterList.push({
+        label: `Premium: ${premiumText}`,
+        type: "premium",
+        reset: () =>
+          setPremium([
+            premiumFilterConfig.defaultMin,
+            premiumFilterConfig.defaultMax,
+          ]),
+      });
+    }
 
     // Check market cap
-    if (marketCap[0] !== marketCapFilterConfig.defaultMin || 
-        marketCap[1] !== marketCapFilterConfig.defaultMax) {
-      const marketCapText = marketCap[1] === marketCapFilterConfig.defaultMax 
-        ? `at least $${marketCap[0]}B`
-        : `$${marketCap[0]}B to $${marketCap[1]}B`;
+    if (
+      marketCap[0] !== marketCapFilterConfig.defaultMin ||
+      marketCap[1] !== marketCapFilterConfig.defaultMax
+    ) {
+      const marketCapText =
+        marketCap[1] === marketCapFilterConfig.defaultMax
+          ? `at least $${marketCap[0]}B`
+          : `$${marketCap[0]}B to $${marketCap[1]}B`;
       activeFilterList.push({
         label: `Market Cap: ${marketCapText}`,
-        type: 'marketCap',
-        reset: () => setMarketCap([marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax])
+        type: "marketCap",
+        reset: () =>
+          setMarketCap([
+            marketCapFilterConfig.defaultMin,
+            marketCapFilterConfig.defaultMax,
+          ]),
       });
     }
 
@@ -1088,63 +1337,91 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
     // }
 
     // Check moneyness range
-    if (moneynessRange[0] !== moneynessFilterConfig.defaultMin || 
-        moneynessRange[1] !== moneynessFilterConfig.defaultMax) {
-      const moneynessText = moneynessRange[1] === moneynessFilterConfig.defaultMax 
-        ? `at least ${moneynessRange[0]}%`
-        : `${moneynessRange[0]}% to ${moneynessRange[1]}%`;
+    if (
+      moneynessRange[0] !== moneynessFilterConfig.defaultMin ||
+      moneynessRange[1] !== moneynessFilterConfig.defaultMax
+    ) {
+      const moneynessText =
+        moneynessRange[1] === moneynessFilterConfig.defaultMax
+          ? `at least ${moneynessRange[0]}%`
+          : `${moneynessRange[0]}% to ${moneynessRange[1]}%`;
       activeFilterList.push({
         label: `Strike Filter: ${moneynessText}`,
-        type: 'moneynessRange',
-        reset: () => setMoneynessRange([moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax])
+        type: "moneynessRange",
+        reset: () =>
+          setMoneynessRange([
+            moneynessFilterConfig.defaultMin,
+            moneynessFilterConfig.defaultMax,
+          ]),
       });
     }
 
     // Check implied volatility
-    if (impliedVolatility[0] !== impliedVolatilityFilterConfig.defaultMin || 
-        impliedVolatility[1] !== impliedVolatilityFilterConfig.defaultMax) {
-      const ivText = impliedVolatility[1] === impliedVolatilityFilterConfig.defaultMax 
-        ? `at least ${impliedVolatility[0]}%`
-        : `${impliedVolatility[0]}% to ${impliedVolatility[1]}%`;
+    if (
+      impliedVolatility[0] !== impliedVolatilityFilterConfig.defaultMin ||
+      impliedVolatility[1] !== impliedVolatilityFilterConfig.defaultMax
+    ) {
+      const ivText =
+        impliedVolatility[1] === impliedVolatilityFilterConfig.defaultMax
+          ? `at least ${impliedVolatility[0]}%`
+          : `${impliedVolatility[0]}% to ${impliedVolatility[1]}%`;
       activeFilterList.push({
         label: `IV: ${ivText}`,
-        type: 'impliedVolatility',
-        reset: () => setImpliedVolatility([impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax])
+        type: "impliedVolatility",
+        reset: () =>
+          setImpliedVolatility([
+            impliedVolatilityFilterConfig.defaultMin,
+            impliedVolatilityFilterConfig.defaultMax,
+          ]),
       });
     }
 
     // Check probability range
-    if (probabilityRange[0] !== probabilityFilterConfig.defaultMin || 
-        probabilityRange[1] !== probabilityFilterConfig.defaultMax) {
-      const probText = probabilityRange[1] === probabilityFilterConfig.defaultMax 
-        ? `at least ${probabilityRange[0]}%`
-        : `${probabilityRange[0]}% to ${probabilityRange[1]}%`;
+    if (
+      probabilityRange[0] !== probabilityFilterConfig.defaultMin ||
+      probabilityRange[1] !== probabilityFilterConfig.defaultMax
+    ) {
+      const probText =
+        probabilityRange[1] === probabilityFilterConfig.defaultMax
+          ? `at least ${probabilityRange[0]}%`
+          : `${probabilityRange[0]}% to ${probabilityRange[1]}%`;
       activeFilterList.push({
         label: `Probability: ${probText}`,
-        type: 'probabilityRange',
-        reset: () => setProbabilityRange([probabilityFilterConfig.defaultMin, probabilityFilterConfig.defaultMax])
+        type: "probabilityRange",
+        reset: () =>
+          setProbabilityRange([
+            probabilityFilterConfig.defaultMin,
+            probabilityFilterConfig.defaultMax,
+          ]),
       });
     }
 
     // Check annualized return
-    if (annualizedReturn[0] !== annualizedReturnFilterConfig.defaultMin || 
-        annualizedReturn[1] !== annualizedReturnFilterConfig.defaultMax) {
-      const annualizedText = annualizedReturn[1] === annualizedReturnFilterConfig.defaultMax 
-        ? `at least ${annualizedReturn[0]}%`
-        : `${annualizedReturn[0]}% to ${annualizedReturn[1]}%`;
+    if (
+      annualizedReturn[0] !== annualizedReturnFilterConfig.defaultMin ||
+      annualizedReturn[1] !== annualizedReturnFilterConfig.defaultMax
+    ) {
+      const annualizedText =
+        annualizedReturn[1] === annualizedReturnFilterConfig.defaultMax
+          ? `at least ${annualizedReturn[0]}%`
+          : `${annualizedReturn[0]}% to ${annualizedReturn[1]}%`;
       activeFilterList.push({
         label: `Annualized Return: ${annualizedText}`,
-        type: 'annualizedReturn',
-        reset: () => setAnnualizedReturn([annualizedReturnFilterConfig.defaultMin, annualizedReturnFilterConfig.defaultMax])
+        type: "annualizedReturn",
+        reset: () =>
+          setAnnualizedReturn([
+            annualizedReturnFilterConfig.defaultMin,
+            annualizedReturnFilterConfig.defaultMax,
+          ]),
       });
     }
 
     // Check excluded stocks
     if (excludedStocks.length > 0) {
       activeFilterList.push({
-        label: `Excluded: ${excludedStocks.join(', ')}`,
-        type: 'excludedStocks',
-        reset: () => setExcludedStocks([])
+        label: `Excluded: ${excludedStocks.join(", ")}`,
+        type: "excludedStocks",
+        reset: () => setExcludedStocks([]),
       });
     }
 
@@ -1152,105 +1429,170 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   };
 
   // Get current sort parameters from URL
-  const sortColumn = searchParams.get('sortBy') || '';
-  const sortDirection = searchParams.get('sortDir') || 'asc';
+  const sortColumn = searchParams.get("sortBy") || "";
+  const sortDirection = searchParams.get("sortDir") || "asc";
 
   // Handle sort change
-  const handleSortURL = useCallback((columnId: string) => {     
-    const params = new URLSearchParams(searchParams.toString());    
-    
-    trackEvent(PlausibleEvents.Sort, {
-      column: columnId,
-      direction: sortDirection === 'asc' ? 'desc' : 'asc',
-    });
-    let newSortDir: 'asc' | 'desc';
-    if (sortColumn === columnId) {
-      // Toggle direction if clicking same column
-      newSortDir = sortDirection === 'asc' ? 'desc' : 'asc';      
-    } else {
-      // Set new column and default to ascending
-      newSortDir = 'desc';      
-    }
-    
-    params.set('sortBy', columnId);
-    params.set('sortDir', newSortDir);
-    router.push(`?${params.toString()}`);
+  const handleSortURL = useCallback(
+    (columnId: string) => {
+      const params = new URLSearchParams(searchParams.toString());
 
+      trackEvent(PlausibleEvents.Sort, {
+        column: columnId,
+        direction: sortDirection === "asc" ? "desc" : "asc",
+      });
+      let newSortDir: "asc" | "desc";
+      if (sortColumn === columnId) {
+        // Toggle direction if clicking same column
+        newSortDir = sortDirection === "asc" ? "desc" : "asc";
+      } else {
+        // Set new column and default to ascending
+        newSortDir = "desc";
+      }
 
-    // Fetch new data with updated sort configuration
-    fetchData({
-      searchTerms: activeFilters.searchTerm.split(","),
-      minYield: activeFilters.yieldRange[0],
-      maxYield: activeFilters.yieldRange[1],
-      minPrice: activeFilters.minPrice,
-      maxPrice: activeFilters.maxPrice,
-      minVol: activeFilters.volumeRange[0],
-      maxVol: activeFilters.volumeRange[1],
-      selectedExpiration: activeFilters.selectedExpiration,
-      pageNo: currentPage,
-      pageSize: rowsPerPage,
-      sortConfig: { field: columnId as keyof Option, direction: newSortDir },
-      strikeFilter: strikeFilter !== 'ALL' ? strikeFilter : undefined,
-      deltaRange: deltaFilter,
-      premium: activeFilters.premium,
-      peRatio: activeFilters.peRatio,
-      marketCap: activeFilters.marketCap,
-      sector: activeFilters.sector,
-      moneynessRange: activeFilters.moneynessRange,
-      impliedVolatilityRange: activeFilters.impliedVolatility,
-      excludedSymbols: activeFilters.excludedStocks.split(","),
-      probabilityRange: activeFilters.probabilityOfProfit,
-      annualizedReturnRange: activeFilters.annualizedReturn
-    }).catch(console.error);
-  }, [sortColumn, sortDirection, router, searchParams, activeFilters, currentPage, rowsPerPage, strikeFilter, deltaFilter, fetchData, trackEvent]);
+      params.set("sortBy", columnId);
+      params.set("sortDir", newSortDir);
+      router.push(`?${params.toString()}`);
+
+      // Fetch new data with updated sort configuration
+      fetchData({
+        searchTerms: activeFilters.searchTerm.split(","),
+        minYield: activeFilters.yieldRange[0],
+        maxYield: activeFilters.yieldRange[1],
+        minPrice: activeFilters.minPrice,
+        maxPrice: activeFilters.maxPrice,
+        minVol: activeFilters.volumeRange[0],
+        maxVol: activeFilters.volumeRange[1],
+        selectedExpiration: activeFilters.selectedExpiration,
+        pageNo: currentPage,
+        pageSize: rowsPerPage,
+        sortConfig: { field: columnId as keyof Option, direction: newSortDir },
+        strikeFilter: strikeFilter !== "ALL" ? strikeFilter : undefined,
+        deltaRange: deltaFilter,
+        premium: activeFilters.premium,
+        peRatio: activeFilters.peRatio,
+        marketCap: activeFilters.marketCap,
+        sector: activeFilters.sector,
+        moneynessRange: activeFilters.moneynessRange,
+        impliedVolatilityRange: activeFilters.impliedVolatility,
+        excludedSymbols: activeFilters.excludedStocks.split(","),
+        probabilityRange: activeFilters.probabilityOfProfit,
+        annualizedReturnRange: activeFilters.annualizedReturn,
+      }).catch(console.error);
+    },
+    [
+      sortColumn,
+      sortDirection,
+      router,
+      searchParams,
+      activeFilters,
+      currentPage,
+      rowsPerPage,
+      strikeFilter,
+      deltaFilter,
+      fetchData,
+      trackEvent,
+    ]
+  );
 
   const handleReset = () => {
     trackEvent(PlausibleEvents.ResetFilters);
     setSelectedStocks([]);
     setExcludedStocks([]);
-    setSearchTerm('');
+    setSearchTerm("");
     setYieldRange([yieldFilterConfig.min, yieldFilterConfig.max]);
     setMinPrice(priceFilterConfig.defaultMin);
     setMaxPrice(priceFilterConfig.defaultMax);
     setVolumeRange([volumeFilterConfig.min, volumeFilterConfig.max]);
-    setDeltaFilter([deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax]);
+    setDeltaFilter([
+      deltaFilterConfig.defaultMin,
+      deltaFilterConfig.defaultMax,
+    ]);
     setMinDte(dteFilterConfig.defaultMin);
     setMaxDte(dteFilterConfig.defaultMax);
-    setImpliedVolatility([impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax]);
-    setPremium([premiumFilterConfig.defaultMin, premiumFilterConfig.defaultMax]);
-    setPeRatio([peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax]);
-    setMarketCap([marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax]);
-    setAnnualizedReturn([annualizedReturnFilterConfig.defaultMin, annualizedReturnFilterConfig.defaultMax]);
+    setImpliedVolatility([
+      impliedVolatilityFilterConfig.defaultMin,
+      impliedVolatilityFilterConfig.defaultMax,
+    ]);
+    setPremium([
+      premiumFilterConfig.defaultMin,
+      premiumFilterConfig.defaultMax,
+    ]);
+    setPeRatio([
+      peRatioFilterConfig.defaultMin,
+      peRatioFilterConfig.defaultMax,
+    ]);
+    setMarketCap([
+      marketCapFilterConfig.defaultMin,
+      marketCapFilterConfig.defaultMax,
+    ]);
+    setAnnualizedReturn([
+      annualizedReturnFilterConfig.defaultMin,
+      annualizedReturnFilterConfig.defaultMax,
+    ]);
     setMovingAverageCrossover(movingAverageCrossoverOptions[0]);
     setSector(sectorOptions[0]);
-    setMoneynessRange([moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax]);
-    
+    setMoneynessRange([
+      moneynessFilterConfig.defaultMin,
+      moneynessFilterConfig.defaultMax,
+    ]);
+
     // Reset active filters
     setActiveFilters({
       searchTerm: "",
-      yieldRange: [yieldFilterConfig.min, yieldFilterConfig.max] as [number, number],
+      yieldRange: [yieldFilterConfig.min, yieldFilterConfig.max] as [
+        number,
+        number
+      ],
       maxPrice: priceFilterConfig.defaultMax,
       minPrice: priceFilterConfig.defaultMin,
-      volumeRange: [volumeFilterConfig.min, volumeFilterConfig.max] as [number, number],
+      volumeRange: [volumeFilterConfig.min, volumeFilterConfig.max] as [
+        number,
+        number
+      ],
       selectedExpiration: "",
       minSelectedExpiration: "",
       pageNo: 1,
-      premium: [premiumFilterConfig.defaultMin, premiumFilterConfig.defaultMax] as [number, number],
-      peRatio: [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax] as [number, number],
-      marketCap: [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax] as [number, number],      
+      premium: [
+        premiumFilterConfig.defaultMin,
+        premiumFilterConfig.defaultMax,
+      ] as [number, number],
+      peRatio: [
+        peRatioFilterConfig.defaultMin,
+        peRatioFilterConfig.defaultMax,
+      ] as [number, number],
+      marketCap: [
+        marketCapFilterConfig.defaultMin,
+        marketCapFilterConfig.defaultMax,
+      ] as [number, number],
       sector: sectorOptions[0],
-      moneynessRange: [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax] as [number, number],
-      impliedVolatility: [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax] as [number, number],
-      deltaFilter: [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax] as [number, number],
-      excludedStocks:"",
-      probabilityOfProfit:[probabilityFilterConfig.defaultMin, probabilityFilterConfig.defaultMax] as [number, number],
-      annualizedReturn: [annualizedReturnFilterConfig.defaultMin, annualizedReturnFilterConfig.defaultMax] as [number, number]
+      moneynessRange: [
+        moneynessFilterConfig.defaultMin,
+        moneynessFilterConfig.defaultMax,
+      ] as [number, number],
+      impliedVolatility: [
+        impliedVolatilityFilterConfig.defaultMin,
+        impliedVolatilityFilterConfig.defaultMax,
+      ] as [number, number],
+      deltaFilter: [
+        deltaFilterConfig.defaultMin,
+        deltaFilterConfig.defaultMax,
+      ] as [number, number],
+      excludedStocks: "",
+      probabilityOfProfit: [
+        probabilityFilterConfig.defaultMin,
+        probabilityFilterConfig.defaultMax,
+      ] as [number, number],
+      annualizedReturn: [
+        annualizedReturnFilterConfig.defaultMin,
+        annualizedReturnFilterConfig.defaultMax,
+      ] as [number, number],
     });
-    
+
     // Reset URL parameters
     const params = new URLSearchParams();
     router.push(`?${params.toString()}`);
-    
+
     setCurrentPage(1);
   };
 
@@ -1259,25 +1601,27 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   const [isLoginPromptOpen, setIsLoginPromptOpen] = useState(false);
 
   const handleSaveScreener = async (screener: SavedScreener) => {
-    if (typeof window === 'undefined') return;
-    
+    if (typeof window === "undefined") return;
+
     try {
       // Convert SavedScreener to SaveFilterPayload
       const payload = {
-        user_id: userId || '',
-        email_id: screener.emailNotifications?.email || '',
-        frequency: screener.emailNotifications?.frequency??'daily' as const,
+        user_id: userId || "",
+        email_id: screener.emailNotifications?.email || "",
+        frequency: screener.emailNotifications?.frequency ?? ("daily" as const),
         filter_name: screener.name,
         filters: JSON.stringify(screener.filters),
-        is_alerting: screener.emailNotifications?.enabled??false
+        is_alerting: screener.emailNotifications?.enabled ?? false,
       };
-      
+
       // Save to backend
       await screenerService.saveFilter(payload);
-      
+
       // Fetch updated list of screeners
-      const fetchScreener = await screenerService.fetchFilter({user_id: userId||''});
-      
+      const fetchScreener = await screenerService.fetchFilter({
+        user_id: userId || "",
+      });
+
       // Convert API response to SavedScreener format
       const convertedScreeners = fetchScreener.map((screener: any) => {
         const parsedFilters = JSON.parse(screener.filter);
@@ -1286,15 +1630,17 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
           name: screener.filter_name,
           filters: {
             ...parsedFilters,
-            optionType: parsedFilters.optionType || 'call' // Default to call if not specified
+            optionType: parsedFilters.optionType || "call", // Default to call if not specified
           },
           createdAt: screener.created_date,
           updatedAt: screener.last_updated_date,
-          emailNotifications: screener.is_alerting ? {
-            enabled: true,
-            email: user?.email ?? '',
-            frequency: screener.frequency || 'daily' as EmailFrequency
-          } : undefined
+          emailNotifications: screener.is_alerting
+            ? {
+                enabled: true,
+                email: user?.email ?? "",
+                frequency: screener.frequency || ("daily" as EmailFrequency),
+              }
+            : undefined,
         };
       });
 
@@ -1304,53 +1650,135 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
       // Close the modal
       setIsSaveModalOpen(false);
     } catch (e) {
-      console.error('Error saving screener:', e);
+      console.error("Error saving screener:", e);
     }
   };
 
   const handleLoadScreener = (screener: SavedScreener) => {
+    // Track the screener load event
+    trackEvent(PlausibleEvents.LoadScreener, {
+      screenerId: screener.id,
+      screenerName: screener.name,
+      screenerType: screener.isDefault ? "default" : "custom",
+      optionType: option,
+    });
+
     // Update filters based on the loaded screener
     setActiveFilters({
-      searchTerm: screener.filters.searchTerm || '',
-      yieldRange: screener.filters.yieldRange || [yieldFilterConfig.min, yieldFilterConfig.max],
+      searchTerm: screener.filters.searchTerm || "",
+      yieldRange: screener.filters.yieldRange || [
+        yieldFilterConfig.min,
+        yieldFilterConfig.max,
+      ],
       maxPrice: screener.filters.maxPrice || priceFilterConfig.defaultMax,
       minPrice: screener.filters.minPrice || priceFilterConfig.defaultMin,
-      volumeRange: screener.filters.volumeRange || [volumeFilterConfig.min, volumeFilterConfig.max],
+      volumeRange: screener.filters.volumeRange || [
+        volumeFilterConfig.min,
+        volumeFilterConfig.max,
+      ],
       selectedExpiration: "",
       minSelectedExpiration: "",
       pageNo: 1,
-      premium: screener.filters.premium || [premiumFilterConfig.defaultMin, premiumFilterConfig.defaultMax],
-      peRatio: screener.filters.peRatio || [peRatioFilterConfig.defaultMin, peRatioFilterConfig.defaultMax],
-      marketCap: screener.filters.marketCap || [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax],
-      sector: Array.isArray(screener.filters.sector) ? screener.filters.sector[0] : (screener.filters.sector || sectorOptions[0]),
-      moneynessRange: screener.filters.moneynessRange || [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax],
-      impliedVolatility: screener.filters.impliedVolatility || [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax],
-      deltaFilter: screener.filters.deltaFilter || [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax],
-      excludedStocks: screener.filters.excludedStocks?.join(",") || '',
-      probabilityOfProfit: screener.filters.probabilityOfProfit || [probabilityFilterConfig.defaultMin, probabilityFilterConfig.defaultMax],
-      annualizedReturn: screener.filters.annualizedReturn || [annualizedReturnFilterConfig.defaultMin, annualizedReturnFilterConfig.defaultMax]
+      premium: screener.filters.premium || [
+        premiumFilterConfig.defaultMin,
+        premiumFilterConfig.defaultMax,
+      ],
+      peRatio: screener.filters.peRatio || [
+        peRatioFilterConfig.defaultMin,
+        peRatioFilterConfig.defaultMax,
+      ],
+      marketCap: screener.filters.marketCap || [
+        marketCapFilterConfig.defaultMin,
+        marketCapFilterConfig.defaultMax,
+      ],
+      sector: Array.isArray(screener.filters.sector)
+        ? screener.filters.sector[0]
+        : screener.filters.sector || sectorOptions[0],
+      moneynessRange: screener.filters.moneynessRange || [
+        moneynessFilterConfig.defaultMin,
+        moneynessFilterConfig.defaultMax,
+      ],
+      impliedVolatility: screener.filters.impliedVolatility || [
+        impliedVolatilityFilterConfig.defaultMin,
+        impliedVolatilityFilterConfig.defaultMax,
+      ],
+      deltaFilter: screener.filters.deltaFilter || [
+        deltaFilterConfig.defaultMin,
+        deltaFilterConfig.defaultMax,
+      ],
+      excludedStocks: screener.filters.excludedStocks?.join(",") || "",
+      probabilityOfProfit: screener.filters.probabilityOfProfit || [
+        probabilityFilterConfig.defaultMin,
+        probabilityFilterConfig.defaultMax,
+      ],
+      annualizedReturn: screener.filters.annualizedReturn || [
+        annualizedReturnFilterConfig.defaultMin,
+        annualizedReturnFilterConfig.defaultMax,
+      ],
     });
 
     // Update individual states
-    setSearchTerm(screener.filters.searchTerm || '');
+    setSearchTerm(screener.filters.searchTerm || "");
     setExcludedStocks(screener.filters.excludedStocks || []);
     setSelectedStocks(screener.filters.selectedStocks || []);
-    setYieldRange(screener.filters.yieldRange || [yieldFilterConfig.min, yieldFilterConfig.max]);
+    setYieldRange(
+      screener.filters.yieldRange || [
+        yieldFilterConfig.min,
+        yieldFilterConfig.max,
+      ]
+    );
     setMinPrice(screener.filters.minPrice || priceFilterConfig.defaultMin);
     setMaxPrice(screener.filters.maxPrice || priceFilterConfig.defaultMax);
-    setVolumeRange(screener.filters.volumeRange || [volumeFilterConfig.min, volumeFilterConfig.max]);
-    setDeltaFilter(screener.filters.deltaFilter || [deltaFilterConfig.defaultMin, deltaFilterConfig.defaultMax]);
+    setVolumeRange(
+      screener.filters.volumeRange || [
+        volumeFilterConfig.min,
+        volumeFilterConfig.max,
+      ]
+    );
+    setDeltaFilter(
+      screener.filters.deltaFilter || [
+        deltaFilterConfig.defaultMin,
+        deltaFilterConfig.defaultMax,
+      ]
+    );
     setMinDte(screener.filters.minDte || dteFilterConfig.defaultMin);
     setMaxDte(screener.filters.maxDte || dteFilterConfig.defaultMax);
-    setImpliedVolatility(screener.filters.impliedVolatility || [impliedVolatilityFilterConfig.defaultMin, impliedVolatilityFilterConfig.defaultMax]);
-          setPremium(screener.filters.premium || [premiumFilterConfig.defaultMin, premiumFilterConfig.defaultMax]);
-    setMarketCap(screener.filters.marketCap || [marketCapFilterConfig.defaultMin, marketCapFilterConfig.defaultMax]);
-    setAnnualizedReturn(screener.filters.annualizedReturn || [annualizedReturnFilterConfig.defaultMin, annualizedReturnFilterConfig.defaultMax]);
-    setMoneynessRange(screener.filters.moneynessRange || [moneynessFilterConfig.defaultMin, moneynessFilterConfig.defaultMax]);
-    setSector(Array.isArray(screener.filters.sector) ? screener.filters.sector[0] : (screener.filters.sector || sectorOptions[0]));    
+    setImpliedVolatility(
+      screener.filters.impliedVolatility || [
+        impliedVolatilityFilterConfig.defaultMin,
+        impliedVolatilityFilterConfig.defaultMax,
+      ]
+    );
+    setPremium(
+      screener.filters.premium || [
+        premiumFilterConfig.defaultMin,
+        premiumFilterConfig.defaultMax,
+      ]
+    );
+    setMarketCap(
+      screener.filters.marketCap || [
+        marketCapFilterConfig.defaultMin,
+        marketCapFilterConfig.defaultMax,
+      ]
+    );
+    setAnnualizedReturn(
+      screener.filters.annualizedReturn || [
+        annualizedReturnFilterConfig.defaultMin,
+        annualizedReturnFilterConfig.defaultMax,
+      ]
+    );
+    setMoneynessRange(
+      screener.filters.moneynessRange || [
+        moneynessFilterConfig.defaultMin,
+        moneynessFilterConfig.defaultMax,
+      ]
+    );
+    setSector(
+      Array.isArray(screener.filters.sector)
+        ? screener.filters.sector[0]
+        : screener.filters.sector || sectorOptions[0]
+    );
   };
-
-  
 
   // Update the Save Screener button click handlers
   const handleSaveScreenerClick = () => {
@@ -1363,20 +1791,23 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
   const handleShare = () => {
     const url = window.location.href;
-    navigator.clipboard.writeText(url).then(() => {
-      toast.success('URL copied to clipboard!');
-      trackEvent(PlausibleEvents.Share, {
-        url: url,
-        option: option,
+    navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        toast.success("URL copied to clipboard!");
+        trackEvent(PlausibleEvents.Share, {
+          url: url,
+          option: option,
+        });
+        sendAnalyticsEvent({
+          event_name: "share_screener",
+          event_category: "Screener",
+          event_label: option === "call" ? "Covered Call" : "Cash Secured Put",
+        });
+      })
+      .catch(() => {
+        toast.error("Failed to copy URL");
       });
-      sendAnalyticsEvent({
-        event_name: 'share_screener',
-        event_category: 'Screener',
-        event_label: option === 'call' ? 'Covered Call' : 'Cash Secured Put'
-      });
-    }).catch(() => {
-      toast.error('Failed to copy URL');
-    });
   };
 
   const [showColumnSelector, setShowColumnSelector] = useState(false);
@@ -1384,10 +1815,12 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
   useEffect(() => {
     const loadSavedScreeners = async () => {
       if (!userId) return;
-      
+
       try {
-        const fetchScreener = await screenerService.fetchFilter({user_id: userId});
-        
+        const fetchScreener = await screenerService.fetchFilter({
+          user_id: userId,
+        });
+
         // Convert API response to SavedScreener format
         const convertedScreeners = fetchScreener.map((screener: any) => {
           const parsedFilters = JSON.parse(screener.filter);
@@ -1396,21 +1829,23 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
             name: screener.filter_name,
             filters: {
               ...parsedFilters,
-              optionType: parsedFilters.optionType || 'call' // Default to call if not specified
+              optionType: parsedFilters.optionType || "call", // Default to call if not specified
             },
             createdAt: screener.created_date,
             updatedAt: screener.last_updated_date,
-            emailNotifications: screener.is_alerting ? {
-              enabled: true,
-              email: user?.email ?? '',
-              frequency: 'daily' as EmailFrequency
-            } : undefined
+            emailNotifications: screener.is_alerting
+              ? {
+                  enabled: true,
+                  email: user?.email ?? "",
+                  frequency: "daily" as EmailFrequency,
+                }
+              : undefined,
           };
         });
 
         setSavedScreeners(convertedScreeners);
       } catch (e) {
-        console.error('Error loading saved screeners:', e);
+        console.error("Error loading saved screeners:", e);
         setSavedScreeners([]);
       }
     };
@@ -1422,218 +1857,250 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
 
   return (
     <ErrorBoundary>
-      <div className="w-full">      
-      {/* Filter Controls */}
-      <div className="space-y-2 mb-2">
-        {/* Screener Dropdown */}
-        <div className="mb-4">
-          <Select
-            onValueChange={(value) => {              
-              if (value === "manage") {
-                window.location.href = '/saved-screeners';
-                return;
-              }
-              if (value === "save") {
-                handleSaveScreenerClick();
-                return;
-              }
-              if (value === "default") return;
-              const allScreeners = [...defaultScreeners, ...savedScreeners];
-              const selectedScreener = allScreeners.find((s: SavedScreener) => s.id === value);
-              if (selectedScreener) {
-                handleLoadScreener(selectedScreener);
-              }
-            }}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select a saved screener" />
-            </SelectTrigger>
-            <SelectContent>
-              {/* Predefined Screeners Section */}
-              <div className="px-2 py-1.5 text-sm font-semibold text-gray-500">
-                Predefined Screeners
-              </div>
-              {(() => {
-                if (typeof window === 'undefined') return null;
-                const predefinedScreeners = defaultScreeners.filter((s: SavedScreener) => s.filters.optionType === option);
-                return predefinedScreeners.map((screener: SavedScreener) => (
-                  <SelectItem key={screener.id} value={screener.id}>
-                    {screener.name}
-                  </SelectItem>
-                ));
-              })()}
-
-              {/* Custom Screeners Section - Only show if user is logged in */}
-              {user && (() => {
-                if (typeof window === 'undefined') return null;
-                const customScreeners = savedScreeners.filter((s: SavedScreener) => s.filters.optionType === option);
-                if (customScreeners.length === 0) return null;
-                return (
-                  <>
-                    <div className="px-2 py-1.5 text-sm font-semibold text-gray-500">
-                      Custom Screeners
-                    </div>
-                    {customScreeners.map((screener: SavedScreener) => (
-                      <SelectItem key={screener.id} value={screener.id}>
-                        {screener.name}
-                      </SelectItem>
-                    ))}
-                  </>
+      <div className="w-full">
+        {/* Filter Controls */}
+        <div className="space-y-2 mb-2">
+          {/* Screener Dropdown */}
+          <div className="mb-4">
+            <Select
+              onValueChange={(value) => {
+                if (value === "manage") {
+                  window.location.href = "/saved-screeners";
+                  return;
+                }
+                if (value === "save") {
+                  handleSaveScreenerClick();
+                  return;
+                }
+                if (value === "default") return;
+                const allScreeners = [...defaultScreeners, ...savedScreeners];
+                const selectedScreener = allScreeners.find(
+                  (s: SavedScreener) => s.id === value
                 );
-              })()}
+                if (selectedScreener) {
+                  handleLoadScreener(selectedScreener);
+                }
+              }}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a saved screener" />
+              </SelectTrigger>
+              <SelectContent>
+                {/* Predefined Screeners Section */}
+                <div className="px-2 py-1.5 text-sm font-semibold text-gray-500">
+                  Predefined Screeners
+                </div>
+                {(() => {
+                  if (typeof window === "undefined") return null;
+                  const predefinedScreeners = defaultScreeners.filter(
+                    (s: SavedScreener) => s.filters.optionType === option
+                  );
+                  return predefinedScreeners.map((screener: SavedScreener) => (
+                    <SelectItem key={screener.id} value={screener.id}>
+                      {screener.name}
+                    </SelectItem>
+                  ));
+                })()}
 
-              <div className="px-2 py-1.5 text-sm font-semibold text-gray-500 border-t">
-                  
-                <SelectItem 
-                  value="save" 
-                  className="text-blue-600 hover:text-blue-800 cursor-pointer"
-                >
-                  Save Your Configuration
-                </SelectItem>
-              </div>
-              {/* Actions Section - Only show if user is logged in */}              
-              {user && (
-                <div className="px-2 py-1.5 text-sm font-semibold text-gray-500 border-t">                
-                  <SelectItem 
-                    value="manage" 
+                {/* Custom Screeners Section - Only show if user is logged in */}
+                {user &&
+                  (() => {
+                    if (typeof window === "undefined") return null;
+                    const customScreeners = savedScreeners.filter(
+                      (s: SavedScreener) => s.filters.optionType === option
+                    );
+                    if (customScreeners.length === 0) return null;
+                    return (
+                      <>
+                        <div className="px-2 py-1.5 text-sm font-semibold text-gray-500">
+                          Custom Screeners
+                        </div>
+                        {customScreeners.map((screener: SavedScreener) => (
+                          <SelectItem key={screener.id} value={screener.id}>
+                            {screener.name}
+                          </SelectItem>
+                        ))}
+                      </>
+                    );
+                  })()}
+
+                <div className="px-2 py-1.5 text-sm font-semibold text-gray-500 border-t">
+                  <SelectItem
+                    value="save"
                     className="text-blue-600 hover:text-blue-800 cursor-pointer"
                   >
-                    Manage Saved Screeners
+                    Save Your Configuration
                   </SelectItem>
                 </div>
-              )}
-            </SelectContent>
-          </Select>
-        </div>
+                {/* Actions Section - Only show if user is logged in */}
+                {user && (
+                  <div className="px-2 py-1.5 text-sm font-semibold text-gray-500 border-t">
+                    <SelectItem
+                      value="manage"
+                      className="text-blue-600 hover:text-blue-800 cursor-pointer"
+                    >
+                      Manage Saved Screeners
+                    </SelectItem>
+                  </div>
+                )}
+              </SelectContent>
+            </Select>
+          </div>
 
-        {/* All Rows - 2 columns on mobile, 4 on large screens */}
-        <div className="grid grid-cols-1 lg:grid-cols-1 gap-2">
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              <MultiStockSelect
-                id="input_screener_symbol"
-                label="Symbol"
-                selectedStocks={selectedStocks}
-                onChange={(stocks) => {
-                  setSelectedStocks(stocks);
-                }}
-                placeholder="Enter symbols..."
-                onKeyPress={handleKeyPress}
-                suggestions={symbols}
-                showSuggestions={true}
-                tooltip="Enter stock symbols to search for options"
-              />
+          {/* All Rows - 2 columns on mobile, 4 on large screens */}
+          <div className="grid grid-cols-1 lg:grid-cols-1 gap-2">
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <MultiStockSelect
+                  id="input_screener_symbol"
+                  label="Symbol"
+                  selectedStocks={selectedStocks}
+                  onChange={(stocks) => {
+                    setSelectedStocks(stocks);
+                  }}
+                  placeholder="Enter symbols..."
+                  onKeyPress={handleKeyPress}
+                  suggestions={symbols}
+                  showSuggestions={true}
+                  tooltip="Enter stock symbols to search for options"
+                />
+              </div>
             </div>
           </div>
-        </div>
-        
-        {/* Advanced Filters */}
-        <div className="mt-4">
-          <AdvancedFilters
-            premium={premium}
-            onPremiumChange={(value) => {
-              setPremium(value);
-            }}
-            peRatio={peRatio}
-            onPeRatioChange={(value) => {
-              setPeRatio(value);
-            }}
-            marketCap={marketCap}
-            onMarketCapChange={(value) => {
-              setMarketCap(value);
-            }}
-            movingAverageCrossover={movingAverageCrossover}
-            onMovingAverageCrossoverChange={(value) => {
-              setMovingAverageCrossover(value);
-            }}
-            sector={sector}
-            onSectorChange={(value) => {
-              setSector(value);
-            }}
-            deltaFilter={deltaFilter}
-            onDeltaFilterChange={(value) => {
-              setDeltaFilter(value);
-            }}
-            volumeRange={volumeRange}
-            onVolumeRangeChange={(value) => {
-              // trackEvent(PlausibleEvents.FilterChange, { filter: 'volumeRange', value });
-              setVolumeRange(value);
-            }}
-            handleKeyPress={handleKeyPress}
-            strikePrice={[minPrice, maxPrice]}
-            onStrikePriceChange={([min, max]) => {
-              // trackEvent(PlausibleEvents.FilterChange, { filter: 'strikePrice', value: [min, max] });
-              setMinPrice(min);
-              setMaxPrice(max);
-            }}
-            impliedVolatility={impliedVolatility}
-            onImpliedVolatilityChange={(value) => {
-              // trackEvent(PlausibleEvents.FilterChange, { filter: 'impliedVolatility', value });
-              setImpliedVolatility(value);
-            }}
-            moneynessRange={moneynessRange}
-            onMoneynessRangeChange={(value) => {
-              // trackEvent(PlausibleEvents.FilterChange, { filter: 'moneynessRange', value });
-              setMoneynessRange(value);
-            }}
-            minDte={minDte}
-            maxDte={maxDte}
-            onDteChange={([min, max]) => {
-              // trackEvent(PlausibleEvents.FilterChange, { filter: 'dte', value: [min, max] });
-              setMinDte(min);
-              setMaxDte(max);
-            }}
-            yieldRange={yieldRange}
-            onYieldRangeChange={(value) => {
-              // trackEvent(PlausibleEvents.FilterChange, { filter: 'yieldRange', value });
-              setYieldRange(value);
-            }}
-            probabilityRange={probabilityRange}
-            onProbabilityRangeChange={(value) => {
-              setProbabilityRange(value);
-            }}
-            autoSearch={false}
-            excludedStocks={excludedStocks}
-            onExcludedStocksChange={(value) => {
-              setExcludedStocks(value);
-            }}
-            symbols={symbols}
-            isExpanded={isAdvancedFiltersExpanded}
-            onExpandedChange={setIsAdvancedFiltersExpanded}
-            annualizedReturn={annualizedReturn}
-            onAnnualizedReturnChange={(value) => {
-              setAnnualizedReturn(value);
-            }}
-          />
-        </div>
 
-        {/* Buttons */}
-        <div className="flex flex-col gap-2">
-          {/* Desktop buttons */}
-          <div className="hidden md:flex items-center justify-between gap-2 w-full">
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                onClick={handleSaveScreenerClick}
-                className="flex items-center gap-2 relative"                
-              >
-                <Save className="h-4 w-4" />
-                <span>Save Screener</span>                
-              </Button>
-              <Button
-                onClick={handleSearch}
-                className="flex items-center gap-2"                
-              >
-                <Search className="h-4 w-4" />
-                Search
-              </Button>
+          {/* Advanced Filters */}
+          <div className="mt-4">
+            <AdvancedFilters
+              premium={premium}
+              onPremiumChange={(value) => {
+                setPremium(value);
+              }}
+              peRatio={peRatio}
+              onPeRatioChange={(value) => {
+                setPeRatio(value);
+              }}
+              marketCap={marketCap}
+              onMarketCapChange={(value) => {
+                setMarketCap(value);
+              }}
+              movingAverageCrossover={movingAverageCrossover}
+              onMovingAverageCrossoverChange={(value) => {
+                setMovingAverageCrossover(value);
+              }}
+              sector={sector}
+              onSectorChange={(value) => {
+                setSector(value);
+              }}
+              deltaFilter={deltaFilter}
+              onDeltaFilterChange={(value) => {
+                setDeltaFilter(value);
+              }}
+              volumeRange={volumeRange}
+              onVolumeRangeChange={(value) => {
+                // trackEvent(PlausibleEvents.FilterChange, { filter: 'volumeRange', value });
+                setVolumeRange(value);
+              }}
+              handleKeyPress={handleKeyPress}
+              strikePrice={[minPrice, maxPrice]}
+              onStrikePriceChange={([min, max]) => {
+                // trackEvent(PlausibleEvents.FilterChange, { filter: 'strikePrice', value: [min, max] });
+                setMinPrice(min);
+                setMaxPrice(max);
+              }}
+              impliedVolatility={impliedVolatility}
+              onImpliedVolatilityChange={(value) => {
+                // trackEvent(PlausibleEvents.FilterChange, { filter: 'impliedVolatility', value });
+                setImpliedVolatility(value);
+              }}
+              moneynessRange={moneynessRange}
+              onMoneynessRangeChange={(value) => {
+                // trackEvent(PlausibleEvents.FilterChange, { filter: 'moneynessRange', value });
+                setMoneynessRange(value);
+              }}
+              minDte={minDte}
+              maxDte={maxDte}
+              onDteChange={([min, max]) => {
+                // trackEvent(PlausibleEvents.FilterChange, { filter: 'dte', value: [min, max] });
+                setMinDte(min);
+                setMaxDte(max);
+              }}
+              yieldRange={yieldRange}
+              onYieldRangeChange={(value) => {
+                // trackEvent(PlausibleEvents.FilterChange, { filter: 'yieldRange', value });
+                setYieldRange(value);
+              }}
+              probabilityRange={probabilityRange}
+              onProbabilityRangeChange={(value) => {
+                setProbabilityRange(value);
+              }}
+              autoSearch={false}
+              excludedStocks={excludedStocks}
+              onExcludedStocksChange={(value) => {
+                setExcludedStocks(value);
+              }}
+              symbols={symbols}
+              isExpanded={isAdvancedFiltersExpanded}
+              onExpandedChange={setIsAdvancedFiltersExpanded}
+              annualizedReturn={annualizedReturn}
+              onAnnualizedReturnChange={(value) => {
+                setAnnualizedReturn(value);
+              }}
+            />
+          </div>
+
+          {/* Buttons */}
+          <div className="flex flex-col gap-2">
+            {/* Desktop buttons */}
+            <div className="hidden md:flex items-center justify-between gap-2 w-full">
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  onClick={handleSaveScreenerClick}
+                  className="flex items-center gap-2 relative"
+                >
+                  <Save className="h-4 w-4" />
+                  <span>Save Screener</span>
+                </Button>
+                <Button
+                  onClick={handleSearch}
+                  className="flex items-center gap-2"
+                >
+                  <Search className="h-4 w-4" />
+                  Search
+                </Button>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleShare}
+                  className="flex items-center gap-2"
+                >
+                  <Share2 className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleReset}
+                  className="flex items-center gap-2"
+                >
+                  <FilterX className="h-4 w-4" />
+                </Button>
+                <ColumnCustomizer
+                  columns={DEFAULT_COLUMNS}
+                  visibleColumns={visibleColumns}
+                  onColumnToggle={handleColumnToggle}
+                />
+              </div>
             </div>
-            <div className="flex items-center gap-2">
+
+            {/* Mobile buttons */}
+            <div className="md:hidden flex items-end justify-end gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleShare}
-                className="flex items-center gap-2"                
+                className="flex items-center gap-2"
               >
                 <Share2 className="h-4 w-4" />
               </Button>
@@ -1641,278 +2108,273 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
                 variant="outline"
                 size="sm"
                 onClick={handleReset}
-                className="flex items-center gap-2"                
+                className="flex items-center gap-2"
               >
-                <FilterX className="h-4 w-4" />                
+                <FilterX className="h-4 w-4" />
               </Button>
               <ColumnCustomizer
                 columns={DEFAULT_COLUMNS}
                 visibleColumns={visibleColumns}
-                onColumnToggle={handleColumnToggle}                
+                onColumnToggle={handleColumnToggle}
               />
             </div>
           </div>
-          
-          {/* Mobile buttons */}
-          <div className="md:hidden flex items-end justify-end gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleShare}
-              className="flex items-center gap-2"              
-            >
-              <Share2 className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleReset}
-              className="flex items-center gap-2"              
-            >
-              <FilterX className="h-4 w-4" />              
-            </Button>
-            <ColumnCustomizer
-              columns={DEFAULT_COLUMNS}
-              visibleColumns={visibleColumns}
-              onColumnToggle={handleColumnToggle}              
-            />
-          </div>
         </div>
-      </div>
-      {!filtersChanged? 
-      <div className="mt-1 mb-2 flex justify-end items-center text-sm text-gray-500">
-              <div className="text-xs text-gray-500 mt-2">
-                {loading ? (
-                  <span>Loading...</span>
-                ) : userId && getOldestUpdateDate() && getOldestUpdateDate()!="Invalid Date" ? (
-                  <span>* Data last updated on {getOldestUpdateDate()} EST</span>
-                ) : null}
-              </div>             
+        {!filtersChanged ? (
+          <div className="mt-1 mb-2 flex justify-end items-center text-sm text-gray-500">
+            <div className="text-xs text-gray-500 mt-2">
+              {loading ? (
+                <span>Loading...</span>
+              ) : userId &&
+                getOldestUpdateDate() &&
+                getOldestUpdateDate() != "Invalid Date" ? (
+                <span>* Data last updated on {getOldestUpdateDate()} EST</span>
+              ) : null}
             </div>
-      : null}      
-      {/* Results Section - Fixed height container */}
-      <div className="relative flex-1 min-h-[400px] bg-white rounded-lg shadow-sm overflow-hidden">
-        {!hasSearched && !activeFilters.searchTerm && 
-         activeFilters.yieldRange[0] === yieldFilterConfig.min && 
-         activeFilters.yieldRange[1] === yieldFilterConfig.max && 
-         activeFilters.maxPrice === 1000 && 
-         activeFilters.volumeRange[0] === volumeFilterConfig.min && 
-         activeFilters.volumeRange[1] === volumeFilterConfig.max && 
-         !activeFilters.selectedExpiration && 
-         strikeFilter === 'ONE_OUT' ? (
-          <div className="absolute inset-0 flex items-center justify-center text-gray-600">
-            Run a search to view results
           </div>
-        ) : filtersChanged ? (
-          <div className="absolute inset-0 flex flex-col justify-center items-center text-gray-600 gap-2">
-            <div>Filters have been updated. Click the Search button to view updated results.</div>
+        ) : null}
+        {/* Results Section - Fixed height container */}
+        <div className="relative flex-1 min-h-[400px] bg-white rounded-lg shadow-sm overflow-hidden">
+          {!hasSearched &&
+          !activeFilters.searchTerm &&
+          activeFilters.yieldRange[0] === yieldFilterConfig.min &&
+          activeFilters.yieldRange[1] === yieldFilterConfig.max &&
+          activeFilters.maxPrice === 1000 &&
+          activeFilters.volumeRange[0] === volumeFilterConfig.min &&
+          activeFilters.volumeRange[1] === volumeFilterConfig.max &&
+          !activeFilters.selectedExpiration &&
+          strikeFilter === "ONE_OUT" ? (
+            <div className="absolute inset-0 flex items-center justify-center text-gray-600">
+              Run a search to view results
+            </div>
+          ) : filtersChanged ? (
+            <div className="absolute inset-0 flex flex-col justify-center items-center text-gray-600 gap-2">
+              <div>
+                Filters have been updated. Click the Search button to view
+                updated results.
+              </div>
+              <Button variant="default" size="sm" onClick={handleSearch}>
+                Search
+              </Button>
+            </div>
+          ) : loading ? (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <LoadingSpinner />
+            </div>
+          ) : data.length === 0 ? (
+            <div className="absolute inset-0 flex flex-col items-center text-gray-600 gap-2">
+              <div>No results match your filter criteria</div>
+              <div className="text-sm text-red-500 font-medium">
+                Try broadening your search filters
+              </div>
+              {(() => {
+                const activeFilterSummary = getActiveFilterSummary();
+                return activeFilterSummary.length > 0 ? (
+                  <div className="mt-2 text-xs text-gray-400 max-w-md text-center">
+                    <div className="font-medium mb-1">Active filters:</div>
+                    <div className="flex flex-wrap gap-1 justify-center">
+                      {activeFilterSummary.map((filter, index) => (
+                        <span
+                          key={index}
+                          className="bg-gray-100 px-2 py-1 rounded text-gray-600 flex items-center gap-1"
+                        >
+                          {filter.label}
+                          <button
+                            onClick={filter.reset}
+                            className="ml-1 text-gray-400 hover:text-gray-600 text-xs font-bold hover:bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center transition-colors"
+                            title="Remove filter"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ) : null;
+              })()}
+            </div>
+          ) : (
+            <div className="h-full flex flex-col">
+              <div className="flex-grow">
+                <BlurredTable
+                  hasSearched={hasSearched && (!user || !user.emailVerified)}
+                >
+                  <OptionsTable
+                    data={data}
+                    onSort={handleSortURL}
+                    visibleColumns={visibleColumns}
+                  />
+                </BlurredTable>
+              </div>
+              {/* Pagination Controls */}
+              <div className="flex justify-between items-center mt-0.5 md:mt-1 px-0.5 md:px-1 text-xs">
+                <div className="text-gray-600">
+                  Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
+                  {Math.min(currentPage * rowsPerPage, totalCount)} of{" "}
+                  {totalCount} results
+                </div>
+                <div className="flex gap-1">
+                  <Button
+                    onClick={() => {
+                      const prevPage = Math.max(1, currentPage - 1);
+                      trackEvent(PlausibleEvents.Paginate, {
+                        direction: "previous",
+                        page: prevPage,
+                      });
+                      setCurrentPage(prevPage);
+                      setActiveFilters((prev) => ({
+                        ...prev,
+                        pageNo: prevPage,
+                      }));
+                      fetchData({
+                        searchTerms: activeFilters.searchTerm.split(","),
+                        minYield: activeFilters.yieldRange[0],
+                        maxYield: activeFilters.yieldRange[1],
+                        minPrice: activeFilters.minPrice,
+                        maxPrice: activeFilters.maxPrice,
+                        minVol: activeFilters.volumeRange[0],
+                        maxVol: activeFilters.volumeRange[1],
+                        selectedExpiration: activeFilters.selectedExpiration,
+                        pageNo: prevPage,
+                        pageSize: rowsPerPage,
+                        sortConfig: sortConfig.direction
+                          ? sortConfig
+                          : undefined,
+                        strikeFilter:
+                          strikeFilter !== "ALL" ? strikeFilter : undefined,
+                        deltaRange: deltaFilter,
+                        premium: activeFilters.premium,
+                        peRatio: activeFilters.peRatio,
+                        marketCap: activeFilters.marketCap,
+                        sector: activeFilters.sector,
+                        moneynessRange: activeFilters.moneynessRange,
+                        impliedVolatilityRange: activeFilters.impliedVolatility,
+                        minSelectedExpiration:
+                          activeFilters.minSelectedExpiration,
+                        annualizedReturnRange: activeFilters.annualizedReturn,
+                      }).catch(console.error);
+                    }}
+                    disabled={currentPage === 1}
+                    variant="outline"
+                    size="sm"
+                    className="px-1.5 py-0.5 text-xs"
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      const nextPage = currentPage + 1;
+                      trackEvent(PlausibleEvents.Paginate, {
+                        direction: "next",
+                        page: nextPage,
+                      });
+                      setCurrentPage(nextPage);
+                      setActiveFilters((prev) => ({
+                        ...prev,
+                        pageNo: nextPage,
+                      }));
+                      fetchData({
+                        searchTerms: activeFilters.searchTerm.split(","),
+                        minYield: activeFilters.yieldRange[0],
+                        maxYield: activeFilters.yieldRange[1],
+                        minPrice: activeFilters.minPrice,
+                        maxPrice: activeFilters.maxPrice,
+                        minVol: activeFilters.volumeRange[0],
+                        maxVol: activeFilters.volumeRange[1],
+                        selectedExpiration: activeFilters.selectedExpiration,
+                        pageNo: nextPage,
+                        pageSize: rowsPerPage,
+                        sortConfig: sortConfig.direction
+                          ? sortConfig
+                          : undefined,
+                        strikeFilter:
+                          strikeFilter !== "ALL" ? strikeFilter : undefined,
+                        deltaRange: deltaFilter,
+                        premium: activeFilters.premium,
+                        peRatio: activeFilters.peRatio,
+                        marketCap: activeFilters.marketCap,
+                        sector: activeFilters.sector,
+                        moneynessRange: activeFilters.moneynessRange,
+                        impliedVolatilityRange: activeFilters.impliedVolatility,
+                        minSelectedExpiration:
+                          activeFilters.minSelectedExpiration,
+                        annualizedReturnRange: activeFilters.annualizedReturn,
+                      }).catch(console.error);
+                    }}
+                    disabled={currentPage * rowsPerPage >= totalCount}
+                    variant="outline"
+                    size="sm"
+                    className="px-1.5 py-0.5 text-xs"
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Mobile Sticky Save and Search buttons */}
+        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 z-50">
+          <div className="flex justify-between items-center">
             <Button
-              variant="default"
-              size="sm"
-              onClick={handleSearch}
+              variant="outline"
+              onClick={handleSaveScreenerClick}
+              className="flex items-center gap-2 relative"
             >
+              <Save className="h-4 w-4" />
+              <span>Save Screener</span>
+            </Button>
+            <Button onClick={handleSearch} className="flex items-center gap-2">
+              <Search className="h-4 w-4" />
               Search
             </Button>
           </div>
-        ) : loading ? (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <LoadingSpinner />
-          </div>
-        ) : data.length === 0 ? (
-          <div className="absolute inset-0 flex flex-col items-center text-gray-600 gap-2">
-            <div>No results match your filter criteria</div>
-            <div className="text-sm text-red-500 font-medium">Try broadening your search filters</div>
-            {(() => {
-              const activeFilterSummary = getActiveFilterSummary();
-              return activeFilterSummary.length > 0 ? (
-                <div className="mt-2 text-xs text-gray-400 max-w-md text-center">
-                  <div className="font-medium mb-1">Active filters:</div>
-                  <div className="flex flex-wrap gap-1 justify-center">
-                    {activeFilterSummary.map((filter, index) => (
-                      <span key={index} className="bg-gray-100 px-2 py-1 rounded text-gray-600 flex items-center gap-1">
-                        {filter.label}
-                        <button
-                          onClick={filter.reset}
-                          className="ml-1 text-gray-400 hover:text-gray-600 text-xs font-bold hover:bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center transition-colors"
-                          title="Remove filter"
-                        >
-                          ×
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ) : null;
-            })()}
-          </div>
-        ) : (
-          <div className="h-full flex flex-col">          
-            <div className="flex-grow">
-              <BlurredTable hasSearched={hasSearched && (!user || !user.emailVerified)}>
-                <OptionsTable 
-                  data={data}              
-                  onSort={handleSortURL}
-                  visibleColumns={visibleColumns}
-                />
-              </BlurredTable>
-            </div>
-            {/* Pagination Controls */}
-            <div className="flex justify-between items-center mt-0.5 md:mt-1 px-0.5 md:px-1 text-xs">
-              <div className="text-gray-600">
-                Showing {((currentPage - 1) * rowsPerPage) + 1} to {Math.min(currentPage * rowsPerPage, totalCount)} of {totalCount} results
-              </div>
-              <div className="flex gap-1">
-                <Button 
-                  onClick={() => {
-                    const prevPage = Math.max(1, currentPage - 1);
-                    trackEvent(PlausibleEvents.Paginate, {
-                      direction: 'previous',
-                      page: prevPage,
-                    });
-                    setCurrentPage(prevPage);
-                    setActiveFilters(prev => ({ ...prev, pageNo: prevPage }));
-                    fetchData({
-                      searchTerms: activeFilters.searchTerm.split(","),
-                      minYield: activeFilters.yieldRange[0],
-                      maxYield: activeFilters.yieldRange[1],
-                      minPrice: activeFilters.minPrice,
-                      maxPrice: activeFilters.maxPrice,
-                      minVol: activeFilters.volumeRange[0],
-                      maxVol: activeFilters.volumeRange[1],
-                      selectedExpiration: activeFilters.selectedExpiration,
-                      pageNo: prevPage,
-                      pageSize: rowsPerPage,
-                      sortConfig: sortConfig.direction ? sortConfig : undefined,
-                      strikeFilter: strikeFilter !== 'ALL' ? strikeFilter : undefined,
-                      deltaRange: deltaFilter,
-                      premium: activeFilters.premium,
-                      peRatio: activeFilters.peRatio,
-                      marketCap: activeFilters.marketCap,
-                      sector: activeFilters.sector,
-                      moneynessRange: activeFilters.moneynessRange,
-                      impliedVolatilityRange: activeFilters.impliedVolatility,
-                      minSelectedExpiration: activeFilters.minSelectedExpiration,
-                      annualizedReturnRange: activeFilters.annualizedReturn
-                    }).catch(console.error); 
-                  }}
-                  disabled={currentPage === 1}
-                  variant="outline"
-                  size="sm"
-                  className="px-1.5 py-0.5 text-xs"
-                >
-                  Previous
-                </Button>
-                <Button
-                  onClick={() => {
-                    const nextPage = currentPage + 1;
-                    trackEvent(PlausibleEvents.Paginate, {
-                      direction: 'next',
-                      page: nextPage,
-                    });
-                    setCurrentPage(nextPage);
-                    setActiveFilters(prev => ({ ...prev, pageNo: nextPage }));
-                    fetchData({
-                      searchTerms: activeFilters.searchTerm.split(","),
-                      minYield: activeFilters.yieldRange[0],
-                      maxYield: activeFilters.yieldRange[1],
-                      minPrice: activeFilters.minPrice,
-                      maxPrice: activeFilters.maxPrice,
-                      minVol: activeFilters.volumeRange[0],
-                      maxVol: activeFilters.volumeRange[1],
-                      selectedExpiration: activeFilters.selectedExpiration,
-                      pageNo: nextPage,
-                      pageSize: rowsPerPage,
-                      sortConfig: sortConfig.direction ? sortConfig : undefined,
-                      strikeFilter: strikeFilter !== 'ALL' ? strikeFilter : undefined,
-                      deltaRange: deltaFilter,
-                      premium: activeFilters.premium,
-                      peRatio: activeFilters.peRatio,
-                      marketCap: activeFilters.marketCap,
-                      sector: activeFilters.sector,
-                      moneynessRange: activeFilters.moneynessRange,
-                      impliedVolatilityRange: activeFilters.impliedVolatility,
-                      minSelectedExpiration: activeFilters.minSelectedExpiration,
-                      annualizedReturnRange: activeFilters.annualizedReturn
-                    }).catch(console.error);
-                  }}
-                  disabled={currentPage * rowsPerPage >= totalCount}
-                  variant="outline"
-                  size="sm"
-                  className="px-1.5 py-0.5 text-xs"
-                >
-                  Next
-                </Button>
-              </div>
-            </div>                      
-            
-          </div>
-        )}
-      </div>
-
-      {/* Mobile Sticky Save and Search buttons */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 z-50">
-        <div className="flex justify-between items-center">
-          <Button
-            variant="outline"
-            onClick={handleSaveScreenerClick}
-            className="flex items-center gap-2 relative"            
-          >
-            <Save className="h-4 w-4" />
-            <span>Save Screener</span>            
-          </Button>
-          <Button
-            onClick={handleSearch}
-            className="flex items-center gap-2"            
-          >
-            <Search className="h-4 w-4" />
-            Search
-          </Button>
         </div>
-      </div>
 
-      {/* Add padding to the bottom to account for the sticky button on mobile only */}
-      <div className="h-20 md:h-0" />
+        {/* Add padding to the bottom to account for the sticky button on mobile only */}
+        <div className="h-20 md:h-0" />
 
-      {/* Save Screener Modal */}
-      {isSaveModalOpen && (
-        <SaveScreenerModal
-          isOpen={isSaveModalOpen}
-          onClose={() => setIsSaveModalOpen(false)}
-          onSave={handleSaveScreener}
-          optionType={option}
-          filters={{
-            searchTerm,
-            selectedStocks,
-            yieldRange,
-            minPrice,
-            maxPrice,
-            volumeRange,
-            deltaFilter,
-            minDte,
-            maxDte,
-            impliedVolatility,
-            premium,
-            peRatio,
-            marketCap,
-            movingAverageCrossover,
-            sector,
-            moneynessRange,
-            excludedStocks,
-            annualizedReturn: annualizedReturn
-          }}
+        {/* Save Screener Modal */}
+        {isSaveModalOpen && (
+          <SaveScreenerModal
+            isOpen={isSaveModalOpen}
+            onClose={() => setIsSaveModalOpen(false)}
+            onSave={handleSaveScreener}
+            optionType={option}
+            filters={{
+              searchTerm,
+              selectedStocks,
+              yieldRange,
+              minPrice,
+              maxPrice,
+              volumeRange,
+              deltaFilter,
+              minDte,
+              maxDte,
+              impliedVolatility,
+              premium,
+              peRatio,
+              marketCap,
+              movingAverageCrossover,
+              sector,
+              moneynessRange,
+              excludedStocks,
+              annualizedReturn: annualizedReturn,
+            }}
+          />
+        )}
+        <SaveQueryModal
+          isOpen={showSaveModal}
+          onClose={() => setShowSaveModal(false)}
+          currentQuery={getCurrentQuery()}
         />
-      )}
-      <SaveQueryModal
-        isOpen={showSaveModal}
-        onClose={() => setShowSaveModal(false)}
-        currentQuery={getCurrentQuery()}
-      />
-      <LoadScreenerModal
-        isOpen={isLoadModalOpen}
-        onClose={() => setIsLoadModalOpen(false)}
-        onLoad={handleLoadScreener}
-        optionType={option}
-      />
+        <LoadScreenerModal
+          isOpen={isLoadModalOpen}
+          onClose={() => setIsLoadModalOpen(false)}
+          onLoad={handleLoadScreener}
+          optionType={option}
+        />
         <LoginPromptModal
           isOpen={isLoginPromptOpen}
           onClose={() => setIsLoginPromptOpen(false)}

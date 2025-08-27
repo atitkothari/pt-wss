@@ -1,42 +1,49 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Star } from "lucide-react";
-import { SavedScreener } from '@/app/types/screener';
-import { defaultScreeners } from '@/app/config/defaultScreeners';
+import { SavedScreener } from "@/app/types/screener";
+import { defaultScreeners } from "@/app/config/defaultScreeners";
 
 interface LoadScreenerModalProps {
   isOpen: boolean;
   onClose: () => void;
   onLoad: (screener: SavedScreener) => void;
-  optionType: 'call' | 'put';
+  optionType: "call" | "put";
 }
 
 export function LoadScreenerModal({
   isOpen,
   onClose,
   onLoad,
-  optionType
+  optionType,
 }: LoadScreenerModalProps) {
   const [screeners, setScreeners] = useState<SavedScreener[]>(defaultScreeners);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    
-    const savedScreeners = localStorage.getItem('savedScreeners');
+    if (typeof window === "undefined") return;
+
+    const savedScreeners = localStorage.getItem("savedScreeners");
     if (savedScreeners) {
       try {
         const parsedScreeners = JSON.parse(savedScreeners);
         setScreeners([...defaultScreeners, ...parsedScreeners]);
       } catch (e) {
-        console.error('Error parsing saved screeners:', e);
+        console.error("Error parsing saved screeners:", e);
       }
     }
   }, []);
 
-  const filteredScreeners = screeners.filter(screener => screener.filters.optionType === optionType);
+  const filteredScreeners = screeners.filter(
+    (screener) => screener.filters.optionType === optionType
+  );
 
   const handleLoad = (screener: SavedScreener) => {
     onLoad(screener);
@@ -57,11 +64,13 @@ export function LoadScreenerModal({
               onClick={() => handleLoad(screener)}
             >
               <div className="flex items-center gap-2">
-                {screener.isDefault && <Star className="h-4 w-4 text-yellow-500" />}
+                {screener.isDefault && (
+                  <Star className="h-4 w-4 text-yellow-500" />
+                )}
                 <span className="font-medium">{screener.name}</span>
               </div>
               <div className="text-sm text-gray-500">
-                {screener.isDefault ? 'Default' : 'Custom'}
+                {screener.isDefault ? "Default" : "Custom"}
               </div>
             </div>
           ))}
@@ -69,4 +78,4 @@ export function LoadScreenerModal({
       </DialogContent>
     </Dialog>
   );
-} 
+}
