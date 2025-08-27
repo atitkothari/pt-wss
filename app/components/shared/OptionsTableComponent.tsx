@@ -2315,7 +2315,7 @@ export function OptionsTableComponent({ option }: OptionsTableComponentProps) {
         </div>
 
         {/* Mobile Sticky Save and Search buttons */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 z-50">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 z-40">
           <div className="flex justify-between items-center">
             <Button
               variant="outline"
