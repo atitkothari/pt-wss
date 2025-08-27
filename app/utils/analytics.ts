@@ -7,14 +7,24 @@ type AnalyticsEvent = {
   [key: string]: any;
 };
 
-// Function to send analytics events
+import { getAnalyticsAuthStatus } from './userAuthStatus';
+
+// Function to send analytics events with automatic user authentication status
 export const sendAnalyticsEvent = (event: AnalyticsEvent) => {
   if (typeof window !== 'undefined' && 'gtag' in window) {
+    const authStatus = getAnalyticsAuthStatus();
+    
+    // Add authentication status to all events
+    const enhancedEvent = {
+      ...event,
+      ...authStatus
+    };
+    
     ((window as any).gtag)('event', event.event_name, {
       event_category: event.event_category,
       event_label: event.event_label,
       value: event.value,
-      ...event
+      ...enhancedEvent
     });
   }
 };

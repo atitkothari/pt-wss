@@ -251,9 +251,7 @@ export function useOptionsData(
       if (premium && premium[1] < 1000) {
         filters.push({ operation: 'lte', field: 'bidPrice', value: premium[1]/100 });
       }
-    
-      console.log("premium", premium);
-      console.log("peRatio", peRatio);
+
       // Add Market Cap filters (in billions)
       if (marketCap && marketCap[0] > 0) {
         filters.push({ operation: 'gte', field: 'marketCap', value: marketCap[0] * 1000000000 });

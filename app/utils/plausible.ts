@@ -50,24 +50,45 @@ export enum PlausibleEvents {
 }
 
 import { usePlausible } from 'next-plausible';
+import { useAuth } from '../context/AuthContext';
+import { getAnalyticsAuthStatus } from './userAuthStatus';
 
 export const usePlausibleTracker = () => {
   const plausible = usePlausible();
+  const { user, userId } = useAuth();
 
   const trackEvent = (eventName: PlausibleEvents, props?: Record<string, any>) => {
+    // Get authentication status - prefer React context, fallback to utility function
+    const authStatus = user ? { user_signed_in: true, user_id: user.uid } : getAnalyticsAuthStatus();
+    
+    // Enhance props with authentication status
+    const enhancedProps = {
+      ...props,
+      ...authStatus
+    };
+
     if (process.env.NODE_ENV === 'development') {
-      console.log(`PLAUSIBLE_EVENT: ${eventName}`, props);
+      console.log(`PLAUSIBLE_EVENT: ${eventName}`, enhancedProps);
     }
-    plausible(eventName, { props });
+    plausible(eventName, { props: enhancedProps });
   };
 
   const trackPageView = (pageName: string, props?: Record<string, any>) => {
+    // Get authentication status - prefer React context, fallback to utility function
+    const authStatus = user ? { user_signed_in: true, user_id: user.uid } : getAnalyticsAuthStatus();
+    
+    // Enhance props with authentication status
+    const enhancedProps = {
+      ...props,
+      ...authStatus
+    };
+
     if (process.env.NODE_ENV === 'development') {
-      console.log(`PLAUSIBLE_PAGE_VIEW: ${pageName}`, props);
+      console.log(`PLAUSIBLE_PAGE_VIEW: ${pageName}`, enhancedProps);
     }
     plausible('pageview', {
       u: `${window.location.pathname}?page=${pageName}`,
-      props,
+      props: enhancedProps,
     });
   };
 

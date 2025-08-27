@@ -1,7 +1,14 @@
-'use client';
+"use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Check, Clock, Mail, CreditCard } from "lucide-react";
 import { Footer } from "../components/Footer";
 import { PageLayout } from "../components/PageLayout";
@@ -11,19 +18,21 @@ import { createCheckoutSession } from "@/app/lib/stripe";
 import { AuthModal } from "@/app/components/modals/AuthModal";
 import { useUserAccess } from "@/app/hooks/useUserAccess";
 import DebugEnv from "../components/DebugEnv";
-import { sendAnalyticsEvent, AnalyticsEvents } from '../utils/analytics';
+import { sendAnalyticsEvent, AnalyticsEvents } from "../utils/analytics";
 import { useRouter } from "next/navigation";
-import { PlausibleEvents, usePlausibleTracker } from '@/app/utils/plausible';
-import { StockChips } from '../components/StockChips';
+import { PlausibleEvents, usePlausibleTracker } from "@/app/utils/plausible";
+import { StockChips } from "../components/StockChips";
 import { pricingInfo } from "../config/pricingInfo";
 import { fetchOptionsData } from "../services/api";
-import { PricingPopup } from '../components/modals/PricingPopup';
-import { usePricingPopupContext } from '../context/PricingPopupContext';
+import { PricingPopup } from "../components/modals/PricingPopup";
+import { usePricingPopupContext } from "../context/PricingPopupContext";
 
 export default function PricingPage() {
-  const [billingCycle, setBillingCycle] = useState<'monthly' | 'quarterly' | 'yearly'>('yearly');  
+  const [billingCycle, setBillingCycle] = useState<
+    "monthly" | "quarterly" | "yearly"
+  >("yearly");
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);  
+  const [isLoading, setIsLoading] = useState(false);
   const [visitCount, setVisitCount] = useState(0);
   const [isLimitedTime, setIsLimitedTime] = useState(false);
   const { user, userId } = useAuth();
@@ -33,16 +42,26 @@ export default function PricingPage() {
   const { openPopup, canShowPopup, canShowPopupNow } = usePricingPopupContext();
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const count = parseInt(localStorage.getItem('pricingPageVisitCount') || '0', 10) + 1;
-      localStorage.setItem('pricingPageVisitCount', count.toString());
+    if (typeof window !== "undefined") {
+      const count =
+        parseInt(localStorage.getItem("pricingPageVisitCount") || "0", 10) + 1;
+      localStorage.setItem("pricingPageVisitCount", count.toString());
       setVisitCount(count);
       setIsLimitedTime(count >= 0);
     }
 
-    const reportPricingPage = async ()=>{      
-      await fetchOptionsData([], undefined, undefined, undefined, undefined, undefined, userId, 'pricing_page');
-    }
+    const reportPricingPage = async () => {
+      await fetchOptionsData(
+        [],
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        userId,
+        "pricing_page"
+      );
+    };
     reportPricingPage();
   }, [userId]);
 
@@ -52,7 +71,7 @@ export default function PricingPage() {
     let timer: NodeJS.Timeout | undefined;
     if (canShowPopup && canShowPopupNow()) {
       timer = setTimeout(() => {
-        openPopup('pricing-page');
+        openPopup("pricing-page");
       }, 5000);
     }
 
@@ -61,27 +80,41 @@ export default function PricingPage() {
     };
   }, [canShowPopup, openPopup]);
 
-  const handleBillingToggle = (cycle: 'monthly' | 'quarterly' | 'yearly') => {
+  const handleBillingToggle = (cycle: "monthly" | "quarterly" | "yearly") => {
     setBillingCycle(cycle);
     sendAnalyticsEvent({
-      event_name: cycle === 'yearly' ? AnalyticsEvents.PRICING_YEARLY_CLICK : 
-                  cycle === 'quarterly' ? AnalyticsEvents.PRICING_QUARTERLY_CLICK : 
-                  AnalyticsEvents.PRICING_MONTHLY_CLICK,
-      event_category: 'Pricing',
-      event_label: cycle === 'yearly' ? 'Yearly' : cycle === 'quarterly' ? 'Quarterly' : 'Monthly'
+      event_name:
+        cycle === "yearly"
+          ? AnalyticsEvents.PRICING_YEARLY_CLICK
+          : cycle === "quarterly"
+          ? AnalyticsEvents.PRICING_QUARTERLY_CLICK
+          : AnalyticsEvents.PRICING_MONTHLY_CLICK,
+      event_category: "Pricing",
+      event_label:
+        cycle === "yearly"
+          ? "Yearly"
+          : cycle === "quarterly"
+          ? "Quarterly"
+          : "Monthly",
     });
-    if (cycle === 'yearly') {
-      trackEvent(PlausibleEvents.PricingYearlyClick, { billingCycle: 'yearly' });
-    } else if (cycle === 'quarterly') {
-      trackEvent(PlausibleEvents.PricingQuarterlyClick, { billingCycle: 'quarterly' });
+    if (cycle === "yearly") {
+      trackEvent(PlausibleEvents.PricingYearlyClick, {
+        billingCycle: "yearly",
+      });
+    } else if (cycle === "quarterly") {
+      trackEvent(PlausibleEvents.PricingQuarterlyClick, {
+        billingCycle: "quarterly",
+      });
     } else {
-      trackEvent(PlausibleEvents.PricingMonthlyClick, { billingCycle: 'monthly' });
+      trackEvent(PlausibleEvents.PricingMonthlyClick, {
+        billingCycle: "monthly",
+      });
     }
   };
 
   const handleStartTrial = async () => {
-    if (typeof window !== 'undefined' && (window as any).fbq) {
-      (window as any).fbq('track', 'InitiateCheckout');
+    if (typeof window !== "undefined" && (window as any).fbq) {
+      (window as any).fbq("track", "InitiateCheckout");
     }
     try {
       setIsLoading(true);
@@ -97,14 +130,19 @@ export default function PricingPage() {
 
       sendAnalyticsEvent({
         event_name: AnalyticsEvents.PRICING_START_TRIAL_CLICK,
-        event_category: 'Pricing',
-        event_label: billingCycle === 'yearly' ? 'Yearly' : billingCycle === 'quarterly' ? 'Quarterly' : 'Monthly'
+        event_category: "Pricing",
+        event_label:
+          billingCycle === "yearly"
+            ? "Yearly"
+            : billingCycle === "quarterly"
+            ? "Quarterly"
+            : "Monthly",
       });
       trackEvent(PlausibleEvents.PricingStartTrialClick);
-      await createCheckoutSession(billingCycle, true, 'LABORDAY25');
+      await createCheckoutSession(billingCycle, true, "LABORDAY25");
     } catch (error) {
-      console.error('Error starting trial:', error);
-      alert('Something went wrong. Please try again.');
+      console.error("Error starting trial:", error);
+      alert("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -119,11 +157,11 @@ export default function PricingPage() {
   const handleContactClick = () => {
     sendAnalyticsEvent({
       event_name: AnalyticsEvents.CONTACT_CLICK,
-      event_category: 'Contact',
-      event_label: 'Pricing Page'
+      event_category: "Contact",
+      event_label: "Pricing Page",
     });
     trackEvent(PlausibleEvents.ContactClick);
-    window.location.href = 'mailto:reply@wheelstrategyoptions.com';
+    window.location.href = "mailto:reply@wheelstrategyoptions.com";
   };
 
   const features = [
@@ -137,50 +175,68 @@ export default function PricingPage() {
     "Premium Yield Analysis",
     "Fundamental Filters (P/E Ratio, Market Cap and more)",
     "Column Customization",
-    "Mobile Responsive Design",    
+    "Mobile Responsive Design",
     "Watchlist",
-    "Trade Tracker"
+    "Trade Tracker",
   ];
 
-  const getBillingCycleLabel = (cycle: 'monthly' | 'quarterly' | 'yearly') => {
+  const getBillingCycleLabel = (cycle: "monthly" | "quarterly" | "yearly") => {
     switch (cycle) {
-      case 'monthly': return '/month';
-      case 'quarterly': return '/month';
-      case 'yearly': return '/month';
-      default: return '/month';
+      case "monthly":
+        return "/month";
+      case "quarterly":
+        return "/month";
+      case "yearly":
+        return "/month";
+      default:
+        return "/month";
     }
   };
 
-  const getBillingCyclePeriod = (cycle: 'monthly' | 'quarterly' | 'yearly') => {
+  const getBillingCyclePeriod = (cycle: "monthly" | "quarterly" | "yearly") => {
     switch (cycle) {
-      case 'monthly': return 'month';
-      case 'quarterly': return 'quarter';
-      case 'yearly': return 'month';
-      default: return 'month';
+      case "monthly":
+        return "month";
+      case "quarterly":
+        return "quarter";
+      case "yearly":
+        return "month";
+      default:
+        return "month";
     }
   };
 
-  const getPriceDisplay = (cycle: 'monthly' | 'quarterly' | 'yearly') => {
-    if (cycle === 'quarterly') {
+  const getPriceDisplay = (cycle: "monthly" | "quarterly" | "yearly") => {
+    if (cycle === "quarterly") {
       return (
         <>
           <span className="text-3xl md:text-4xl font-bold text-gray-900">
-            <span className="line-through">{isLimitedTime ? pricingInfo.limitedTime.quarterly.lineThrough : pricingInfo.regular.quarterly.lineThrough}</span> {isLimitedTime ? pricingInfo.limitedTime.quarterly.priceStr : pricingInfo.regular.quarterly.priceStr}
+            <span className="line-through">
+              {isLimitedTime
+                ? pricingInfo.limitedTime.quarterly.lineThrough
+                : pricingInfo.regular.quarterly.lineThrough}
+            </span>{" "}
+            {isLimitedTime
+              ? pricingInfo.limitedTime.quarterly.priceStr
+              : pricingInfo.regular.quarterly.priceStr}
           </span>
-          <span className="text-gray-600 text-base md:text-lg">
-            /month
-          </span>
+          <span className="text-gray-600 text-base md:text-lg">/month</span>
         </>
       );
-    } else if (cycle === 'yearly') {
+    } else if (cycle === "yearly") {
       return (
         <>
           <span className="text-3xl md:text-4xl font-bold text-gray-900">
-            <span className="line-through">{isLimitedTime ? pricingInfo.limitedTime.yearly.lineThrough : pricingInfo.regular.yearly.lineThrough}</span> {isLimitedTime ? pricingInfo.limitedTime.yearly.priceStr : pricingInfo.regular.yearly.priceStr}
+            <span className="line-through">
+              {isLimitedTime
+                ? pricingInfo.limitedTime.yearly.lineThrough
+                : pricingInfo.regular.yearly.lineThrough}
+            </span>{" "}
+            {isLimitedTime
+              ? pricingInfo.limitedTime.yearly.priceStr
+              : pricingInfo.regular.yearly.priceStr}
           </span>
-          <span className="text-gray-600 text-base md:text-lg">
-            /month
-          </span>
+          <span className="text-gray-600 text-base md:text-lg">/month</span>
         </>
       );
     } else {
@@ -188,22 +244,34 @@ export default function PricingPage() {
         <>
           <div className="flex items-center gap-2">
             <span className="text-3xl md:text-4xl font-bold text-gray-900">
-              {isLimitedTime && <span className="line-through">{pricingInfo.limitedTime.monthly.lineThrough}</span>} {isLimitedTime ? pricingInfo.limitedTime.monthly.priceStr : pricingInfo.regular.monthly.priceStr}
-            </span>                      
-            <span className="text-gray-600 text-base md:text-lg">
-              /month
+              {isLimitedTime && (
+                <span className="line-through">
+                  {pricingInfo.limitedTime.monthly.lineThrough}
+                </span>
+              )}{" "}
+              {isLimitedTime
+                ? pricingInfo.limitedTime.monthly.priceStr
+                : pricingInfo.regular.monthly.priceStr}
             </span>
+            <span className="text-gray-600 text-base md:text-lg">/month</span>
           </div>
         </>
       );
     }
   };
 
-  const getYearlyEquivalent = (cycle: 'monthly' | 'quarterly' | 'yearly') => {
-    if (cycle === 'yearly') {
+  const getYearlyEquivalent = (cycle: "monthly" | "quarterly" | "yearly") => {
+    if (cycle === "yearly") {
       return (
         <p className="text-green-600 text-xs md:text-sm mt-2">
-          <span className="line-through">{isLimitedTime ? pricingInfo.limitedTime.yearly.lineThroughYear : pricingInfo.regular.yearly.lineThroughYear}</span> {isLimitedTime ? pricingInfo.limitedTime.yearly.yearlyEquivalentStr : pricingInfo.regular.yearly.yearlyEquivalentStr}
+          <span className="line-through">
+            {isLimitedTime
+              ? pricingInfo.limitedTime.yearly.lineThroughYear
+              : pricingInfo.regular.yearly.lineThroughYear}
+          </span>{" "}
+          {isLimitedTime
+            ? pricingInfo.limitedTime.yearly.yearlyEquivalentStr
+            : pricingInfo.regular.yearly.yearlyEquivalentStr}
         </p>
       );
     }
@@ -212,45 +280,41 @@ export default function PricingPage() {
 
   return (
     <PageLayout className="bg-white text-gray-900">
-      <AuthModal 
-        isOpen={showAuthModal} 
+      <AuthModal
+        isOpen={showAuthModal}
         onClose={handleAuthModalClose}
         initialMode="signin"
       />
-      
 
-            
-      
       {/* Hero Section */}
       <div className="container mx-auto px-4 pb-4 pt-8 md:pt-16">
         <div className="text-center max-w-3xl mx-auto">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 md:mb-6">
             Simple, Transparent Pricing
           </h1>
-          
 
           <p className="text-lg sm:text-xl text-gray-600 mb-6 md:mb-8 px-4">
-          Scan 570,000+ option contracts in seconds.
+            Scan 570,000+ option contracts in seconds.
           </p>
 
           {/* Billing Toggle */}
           <div className="flex items-center justify-center gap-3 md:gap-4 mb-6">
             <button
-              onClick={() => handleBillingToggle('monthly')}
+              onClick={() => handleBillingToggle("monthly")}
               className={`px-4 py-2 rounded-lg text-sm md:text-base font-medium transition-colors ${
-                billingCycle === 'monthly' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                billingCycle === "monthly"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
               Monthly
             </button>
             <button
-              onClick={() => handleBillingToggle('quarterly')}
+              onClick={() => handleBillingToggle("quarterly")}
               className={`px-4 py-2 rounded-lg text-sm md:text-base font-medium transition-colors ${
-                billingCycle === 'quarterly' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                billingCycle === "quarterly"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
               Quarterly
@@ -259,11 +323,11 @@ export default function PricingPage() {
               </span> */}
             </button>
             <button
-              onClick={() => handleBillingToggle('yearly')}
+              onClick={() => handleBillingToggle("yearly")}
               className={`px-4 py-2 rounded-lg text-sm md:text-base font-medium transition-colors ${
-                billingCycle === 'yearly' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                billingCycle === "yearly"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
               Yearly
@@ -282,7 +346,9 @@ export default function PricingPage() {
           <div className="w-full lg:w-1/3">
             <Card className="bg-white border-2 border-blue-100 shadow-lg">
               <CardHeader className="text-center pb-6 md:pb-8 border-b px-4 md:px-6">
-                <CardTitle className="text-2xl md:text-3xl font-bold mb-2">Pro Plan</CardTitle>                
+                <CardTitle className="text-2xl md:text-3xl font-bold mb-2">
+                  Pro Plan
+                </CardTitle>
 
                 <div className="flex items-center justify-center gap-1 md:gap-2">
                   {getPriceDisplay(billingCycle)}
@@ -290,7 +356,8 @@ export default function PricingPage() {
                 {getYearlyEquivalent(billingCycle)}
                 {isLimitedTime && (
                   <p className="text-red-600 text-xs md:text-sm mt-2 font-semibold">
-                    Limited time offer! Discounted price available for a short period.
+                    Limited time offer! Discounted price available for a short
+                    period.
                   </p>
                 )}
               </CardHeader>
@@ -303,15 +370,17 @@ export default function PricingPage() {
                       ) : (
                         <Check className="h-4 w-4 md:h-5 md:w-5 text-green-500 flex-shrink-0 mt-0.5" />
                       )}
-                      <span className="text-sm md:text-base text-gray-700">{feature}</span>
+                      <span className="text-sm md:text-base text-gray-700">
+                        {feature}
+                      </span>
                     </li>
                   ))}
                 </ul>
               </CardContent>
               <CardFooter className="flex flex-col gap-3 md:gap-4 pt-6 md:pt-8 px-4 md:px-6">
-                {status === 'active' || status === 'paused' ? (
-                  <Button 
-                    onClick={() => router.push('/manage-subscription')}
+                {status === "active" || status === "paused" ? (
+                  <Button
+                    onClick={() => router.push("/manage-subscription")}
                     className="w-full bg-black text-white flex items-center gap-2"
                   >
                     <CreditCard className="h-4 w-4" />
@@ -319,7 +388,7 @@ export default function PricingPage() {
                   </Button>
                 ) : (
                   <>
-                    <Button 
+                    <Button
                       onClick={handleStartTrial}
                       disabled={isLoading}
                       className="w-full bg-blue-600 hover:bg-blue-700 text-base md:text-lg py-4 md:py-6 flex items-center justify-center gap-2"
@@ -330,9 +399,9 @@ export default function PricingPage() {
                           <span>Loading...</span>
                         </>
                       ) : (
-                        'Upgrade'
+                        "Upgrade"
                       )}
-                    </Button>                  
+                    </Button>
                   </>
                 )}
                 <Button
@@ -369,44 +438,44 @@ export default function PricingPage() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto">
           <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
-            <img 
-              src="/testimonials/1.webp" 
-              alt="User testimonial 1" 
+            <img
+              src="/testimonials/1.webp"
+              alt="User testimonial 1"
               className="w-full h-auto rounded-lg"
             />
           </div>
           <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
-            <img 
-              src="/testimonials/2.webp" 
-              alt="User testimonial 2" 
+            <img
+              src="/testimonials/2.webp"
+              alt="User testimonial 2"
               className="w-full h-auto rounded-lg"
             />
           </div>
           <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
-            <img 
-              src="/testimonials/3.webp" 
-              alt="User testimonial 3" 
+            <img
+              src="/testimonials/3.webp"
+              alt="User testimonial 3"
               className="w-full h-auto rounded-lg"
             />
           </div>
           <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
-            <img 
-              src="/testimonials/4.webp" 
-              alt="User testimonial 4" 
+            <img
+              src="/testimonials/4.webp"
+              alt="User testimonial 4"
               className="w-full h-auto rounded-lg"
             />
           </div>
           <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
-            <img 
-              src="/testimonials/5.webp" 
-              alt="User testimonial 5" 
+            <img
+              src="/testimonials/5.webp"
+              alt="User testimonial 5"
               className="w-full h-auto rounded-lg"
             />
           </div>
           <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
-            <img 
-              src="/testimonials/6.webp" 
-              alt="User testimonial 6" 
+            <img
+              src="/testimonials/6.webp"
+              alt="User testimonial 6"
               className="w-full h-auto rounded-lg"
             />
           </div>
@@ -415,11 +484,18 @@ export default function PricingPage() {
 
       {/* FAQ Section */}
       <div className="container mx-auto px-4 py-8 md:py-12">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-8">Frequently Asked Questions</h2>
-        <div className="max-w-3xl mx-auto space-y-4 md:space-y-6">          
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-8">
+          Frequently Asked Questions
+        </h2>
+        <div className="max-w-3xl mx-auto space-y-4 md:space-y-6">
           <div className="bg-gray-50 p-4 md:p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg md:text-xl font-semibold mb-2">Can I cancel anytime?</h3>
-            <p className="text-sm md:text-base text-gray-700">Yes, you can cancel your subscription at any time. No questions asked.</p>
+            <h3 className="text-lg md:text-xl font-semibold mb-2">
+              Can I cancel anytime?
+            </h3>
+            <p className="text-sm md:text-base text-gray-700">
+              Yes, you can cancel your subscription at any time. No questions
+              asked.
+            </p>
           </div>
           {/* <div className="bg-gray-50 p-4 md:p-6 rounded-lg border border-gray-200">
             <h3 className="text-lg md:text-xl font-semibold mb-2">What payment methods do you accept?</h3>
@@ -428,14 +504,14 @@ export default function PricingPage() {
         </div>
       </div>
       <Button
-                onClick={handleContactClick}
-                size="lg"
-                variant="default"
-                className="mx-auto block hover:text-gray-900 hover:bg-gray-100"
-              >
-                Contact Us
+        onClick={handleContactClick}
+        size="lg"
+        variant="default"
+        className="mx-auto block hover:text-gray-900 hover:bg-gray-100"
+      >
+        Contact Us
       </Button>
       <Footer />
     </PageLayout>
   );
-} 
+}
